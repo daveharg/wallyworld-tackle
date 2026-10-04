@@ -23,15 +23,18 @@ export default function ProductGallery({
 
   return (
     <div className="-mx-4 sm:mx-0">
-      <div className="sm:rounded-2xl overflow-hidden bg-white border-y sm:border border-pine/10 flex items-center justify-center min-h-[300px]">
+      <div className="sm:rounded-2xl overflow-hidden bg-white border-y sm:border border-pine/10">
         {current && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            key={current.url}
-            src={current.url}
-            alt={current.altText ?? title}
-            className="w-full max-w-full h-auto max-h-[60vh] object-contain animate-fade-in"
-          />
+          <div className="w-full flex justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              key={current.url}
+              src={current.url}
+              alt={current.altText ?? title}
+              className="max-w-full h-auto animate-fade-in"
+              style={{ maxHeight: "60vh" }}
+            />
+          </div>
         )}
       </div>
       {images.length > 1 && (
