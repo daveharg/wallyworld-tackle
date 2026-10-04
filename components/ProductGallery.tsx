@@ -23,20 +23,21 @@ export default function ProductGallery({
 
   return (
     <div className="-mx-4 sm:mx-0">
-      <div className="sm:rounded-2xl overflow-hidden bg-white border-y sm:border border-pine/10">
+      {/* Main image - simple, centered, fills width on mobile */}
+      <div className="bg-white border-y sm:border sm:rounded-2xl border-pine/10 overflow-hidden">
         {current && (
-          <div className="w-full bg-white flex justify-center py-2 px-4">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              key={current.url}
-              src={current.url}
-              alt={current.altText ?? title}
-              className="animate-fade-in"
-              style={{ width: "100%", maxWidth: "500px", height: "auto", maxHeight: "60vh", objectFit: "contain" }}
-            />
-          </div>
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={current.url}
+            src={current.url}
+            alt={current.altText ?? title}
+            className="block w-full h-auto"
+            style={{ maxHeight: "70vh", objectFit: "contain", margin: "0 auto" }}
+          />
         )}
       </div>
+
+      {/* Thumbnails */}
       {images.length > 1 && (
         <div className="flex gap-2.5 mt-3 overflow-x-auto no-scrollbar pb-1 px-4 sm:px-0">
           {images.map((img, i) => (
