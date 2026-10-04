@@ -18,8 +18,8 @@ export default function WalleyeRodGuide() {
         <div className="absolute right-8 top-8 text-6xl opacity-10">🎣</div>
 
         <div className="relative p-6 md:p-8">
-          <div className="flex items-start justify-between gap-4">
-            <div>
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+            <div className="flex-1 min-w-0">
               <p className="text-xs font-bold uppercase tracking-[0.24em] text-gold mb-2">
                 Walleye Guide
               </p>
@@ -33,7 +33,7 @@ export default function WalleyeRodGuide() {
             </div>
             <button
               onClick={() => setOpen(!open)}
-              className="shrink-0 rounded-lg bg-white/10 hover:bg-white/20 px-4 py-2 text-sm font-semibold transition"
+              className="shrink-0 self-start rounded-lg bg-white/10 hover:bg-white/20 px-4 py-2 text-sm font-semibold transition"
               aria-expanded={open}
             >
               {open ? "Hide" : "Show"}

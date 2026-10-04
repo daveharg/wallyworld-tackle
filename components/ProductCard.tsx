@@ -57,7 +57,7 @@ export default function ProductCard({ product }: { product: ShopifyProduct }) {
             src={image.url}
             alt={image.altText ?? product.title}
             loading="lazy"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
           <div className="w-full h-full grid place-items-center text-pine/30 font-display font-bold uppercase tracking-widest">
@@ -77,7 +77,7 @@ export default function ProductCard({ product }: { product: ShopifyProduct }) {
         {!outOfStock && defaultVariant && (
           <button
             onClick={quickAdd}
-            className="absolute bottom-2.5 left-2.5 right-2.5 rounded-lg bg-signal hover:bg-signal-dark text-white font-bold text-sm py-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-200 shadow"
+            className="absolute bottom-2.5 left-2.5 right-2.5 rounded-lg bg-signal hover:bg-signal-dark text-white font-bold text-sm py-2 shadow md:opacity-0 md:translate-y-2 md:group-hover:opacity-100 md:group-hover:translate-y-0 transition-all duration-200"
             aria-label={`Quick add ${product.title} to cart`}
           >
             Quick Add
