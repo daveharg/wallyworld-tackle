@@ -7,7 +7,7 @@ import { useState } from "react";
  * Recommends 2000-size and explains why light is right for walleye.
  */
 export default function WalleyeReelGuide() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   return (
     <div className="max-w-7xl mx-auto px-4 pt-8">

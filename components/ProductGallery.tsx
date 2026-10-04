@@ -23,14 +23,14 @@ export default function ProductGallery({
 
   return (
     <div className="-mx-4 sm:mx-0">
-      <div className="sm:rounded-2xl overflow-hidden bg-white border-y sm:border border-pine/10">
+      <div className="sm:rounded-2xl overflow-hidden bg-white border-y sm:border border-pine/10 flex items-center justify-center min-h-[300px]">
         {current && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             key={current.url}
             src={current.url}
             alt={current.altText ?? title}
-            className="w-full h-auto max-h-[70vh] object-contain animate-fade-in"
+            className="w-full max-w-full h-auto max-h-[60vh] object-contain animate-fade-in"
           />
         )}
       </div>

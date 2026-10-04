@@ -7,7 +7,7 @@ import { useState } from "react";
  * Explains what rod to get for walleye: jigging vs casting sizes, power, action.
  */
 export default function WalleyeRodGuide() {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   return (
     <div className="max-w-7xl mx-auto px-4 pt-8">
