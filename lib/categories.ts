@@ -38,6 +38,10 @@ function titleOf(p: ShopifyProduct): string {
 
 export function categoryOf(product: ShopifyProduct): CategoryKey {
   const t = titleOf(product);
+  // Check tools/accessories FIRST so "Reel Repair Tool Set" and "Rod Holder"
+  // don't get miscategorized as reels/rods.
+  if (/plier/.test(t) || /knife/.test(t) || /net\b/.test(t) || /tool/.test(t) || /accessor/.test(t) || /holder/.test(t) || /winder/.test(t) || /\bbelt\b/.test(t) || /repair/.test(t))
+    return "tools";
   if (/\brod\b/.test(t)) return "rods";
   if (/\breel\b/.test(t)) return "reels";
   if (/\bjig\b/.test(t) || /jig head/.test(t)) return "jigHeads";
@@ -53,8 +57,6 @@ export function categoryOf(product: ShopifyProduct): CategoryKey {
     /topwater/.test(t)
   )
     return "hardBaits";
-  if (/plier/.test(t) || /knife/.test(t) || /net\b/.test(t) || /tool/.test(t) || /accessor/.test(t))
-    return "tools";
   if (/hook/.test(t) || /sinker/.test(t) || /swivel/.test(t) || /snap/.test(t) || /leader/.test(t))
     return "terminalTackle";
   return "other";

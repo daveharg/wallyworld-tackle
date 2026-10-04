@@ -13,6 +13,8 @@ import { useCart } from "../../../components/CartContext";
 
 function categoryHref(handle: string, title: string): string {
   const t = `${title}`.toLowerCase();
+  // Check tools first so accessories don't link to rod/reel pages.
+  if (/tool/.test(t) || /accessor/.test(t) || /holder/.test(t) || /winder/.test(t) || /\bbelt\b/.test(t) || /repair/.test(t) || /plier/.test(t) || /knife/.test(t)) return "/tackle";
   if (/\brod\b/.test(t)) return "/rods";
   if (/\breel\b/.test(t)) return "/reels";
   return "/tackle";
@@ -20,6 +22,8 @@ function categoryHref(handle: string, title: string): string {
 
 function categoryLabel(handle: string, title: string): string {
   const t = `${title}`.toLowerCase();
+  // Check tools first so accessories don't label as rods/reels.
+  if (/tool/.test(t) || /accessor/.test(t) || /holder/.test(t) || /winder/.test(t) || /\bbelt\b/.test(t) || /repair/.test(t) || /plier/.test(t) || /knife/.test(t)) return "Tackle & More";
   if (/\brod\b/.test(t)) return "Rods";
   if (/\breel\b/.test(t)) return "Reels";
   return "Tackle & More";
