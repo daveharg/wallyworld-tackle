@@ -46,33 +46,40 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account }) {
       // Link/create the DB user for Google OAuth logins.
       if (account?.provider === "google" && user.email) {
-        const email = user.email.toLowerCase();
-        const googleId = account.providerAccountId;
-        let dbUser = await prisma.user.findUnique({ where: { email } });
-        if (!dbUser) {
-          dbUser = await prisma.user.create({
-            data: {
-              email,
-              name: user.name ?? null,
-              googleId,
-              loyalty: { create: {} },
-            },
-          });
-        } else {
-          const updates: { googleId?: string; name?: string } = {};
-          if (!dbUser.googleId) updates.googleId = googleId;
-          if (!dbUser.name && user.name) updates.name = user.name;
-          if (Object.keys(updates).length > 0) {
-            dbUser = await prisma.user.update({ where: { id: dbUser.id }, data: updates });
+        try {
+          const email = user.email.toLowerCase();
+          const googleId = account.providerAccountId;
+          let dbUser = await prisma.user.findUnique({ where: { email } });
+          if (!dbUser) {
+            dbUser = await prisma.user.create({
+              data: {
+                email,
+                name: user.name ?? null,
+                googleId,
+                loyalty: { create: {} },
+              },
+            });
+          } else {
+            const updates: { googleId?: string; name?: string } = {};
+            if (!dbUser.googleId) updates.googleId = googleId;
+            if (!dbUser.name && user.name) updates.name = user.name;
+            if (Object.keys(updates).length > 0) {
+              dbUser = await prisma.user.update({ where: { id: dbUser.id }, data: updates });
+            }
+            // Ensure a loyalty row exists for older accounts.
+            await prisma.loyaltyPoints.upsert({
+              where: { userId: dbUser.id },
+              update: {},
+              create: { userId: dbUser.id },
+            });
           }
-          // Ensure a loyalty row exists for older accounts.
-          await prisma.loyaltyPoints.upsert({
-            where: { userId: dbUser.id },
-            update: {},
-            create: { userId: dbUser.id },
-          });
+          user.id = dbUser.id;
+        } catch (e) {
+          // Never let a database outage strand the user on a broken/blank
+          // page: log it and send them home instead.
+          console.error("[auth] Google sign-in database error:", e);
+          return "/?error=auth_unavailable";
         }
-        user.id = dbUser.id;
       }
       return true;
     },

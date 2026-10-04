@@ -23,7 +23,7 @@ Copy `.env.example` to `.env` and fill in:
 
 | Variable | Required | Notes |
 |---|---|---|
-| `DATABASE_URL` | yes | Dev: `file:./dev.db`. Prod: Vercel Postgres connection string |
+| `DATABASE_URL` | yes | Postgres connection string. In prod, connecting a Vercel Postgres store auto-provides `POSTGRES_PRISMA_URL`/`POSTGRES_URL` instead — either works |
 | `NEXTAUTH_SECRET` | yes | Random string — generate with `openssl rand -base64 32` |
 | `NEXTAUTH_URL` | yes | `http://localhost:3000` locally; `https://wallyworldtackle.ca` in prod |
 | `GOOGLE_CLIENT_ID` | for Google button | From Google Cloud Console (below) |
@@ -54,25 +54,26 @@ without them.
 
 ## 3. Database setup
 
-Development uses a SQLite file — zero setup:
+Production uses **Vercel Postgres** (required — SQLite cannot work on Vercel's
+read-only serverless filesystem; without Postgres every auth/loyalty API route
+fails, including Google sign-in):
 
-```bash
-npm install
-npm run db:migrate   # creates prisma/dev.db and applies the schema
-npm run dev
-```
+1. Vercel Dashboard → Storage → Create → Postgres, then connect it to the
+   `wallyworld-tackle` project. This auto-sets `POSTGRES_PRISMA_URL` /
+   `POSTGRES_URL` env vars, which the app picks up automatically
+   (see `lib/prisma.ts`). Alternatively, set `DATABASE_URL` manually to the
+   Postgres connection string.
+2. Apply the schema to the new database with the **direct (non-pooled)**
+   connection string:
+   ```bash
+   DATABASE_URL="<direct-postgres-url>" npx prisma migrate deploy
+   ```
+   The initial migration lives in `prisma/migrations/0001_init/`.
+3. Redeploy. No code changes needed — `lib/prisma.ts` picks the Postgres
+   driver automatically.
 
-The Prisma schema (`prisma/schema.prisma`) is Postgres-compatible. To move to
-**Vercel Postgres** for production:
-
-1. Vercel Dashboard → Storage → Create → Postgres.
-2. Copy the connection string into the `DATABASE_URL` env var.
-3. In `prisma/schema.prisma`, change `provider = "sqlite"` to
-   `provider = "postgresql"`.
-4. Run `npx prisma migrate deploy` (or `npm run db:migrate` locally with the
-   Postgres URL) to create the tables.
-5. No code changes needed — `lib/prisma.ts` picks the Postgres driver
-   automatically when `DATABASE_URL` starts with `postgres://`.
+Local development also needs a Postgres `DATABASE_URL` now (there is no
+SQLite fallback — it was removed because it silently broke production).
 
 Tables: `User`, `LoyaltyPoints`, `PointsTransaction`, `SavedCart`, `Address`,
 `Order`, `StoreCredit`.

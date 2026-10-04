@@ -1,16 +1,18 @@
 // Wallyworld Tackle — accounts + loyalty database schema.
 //
-// Development: SQLite (DATABASE_URL="file:./dev.db").
-// Production (Vercel): switch the provider to "postgresql" and point
-// DATABASE_URL at your Vercel Postgres connection string — no schema
-// changes needed (Json/DateTime defaults are Postgres-compatible).
+// Production database: Vercel Postgres (provider = "postgresql").
+// Point DATABASE_URL at the Postgres connection string (or connect a Vercel
+// Postgres store, which auto-provides POSTGRES_PRISMA_URL / POSTGRES_URL).
+// NOTE: SQLite is NOT supported in production — Vercel's serverless
+// filesystem is read-only and ephemeral, so a file-based DB silently breaks
+// every auth/loyalty API route (this caused the Google sign-in blank screen).
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 model User {
