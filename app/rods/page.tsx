@@ -1,6 +1,7 @@
 import { getProducts, isShopifyConfigured } from "../../lib/shopify";
 import { productsInCategory } from "../../lib/categories";
 import ProductListing from "../../components/ProductListing";
+import WalleyeRodGuide from "../../components/WalleyeRodGuide";
 
 export const revalidate = 300;
 export const metadata = { title: "Fishing Rods — Wallyworld Tackle" };
@@ -17,11 +18,14 @@ export default async function RodsPage() {
   const rods = productsInCategory(products, "rods");
 
   return (
-    <ProductListing
-      title="Fishing Rods"
-      subtitle="Spinning and casting rods from 2-piece value sticks to carbon fiber — every length with its own honest price."
-      products={rods}
-      breadcrumbs={[{ label: "Home", href: "/" }, { label: "Rods" }]}
-    />
+    <>
+      <WalleyeRodGuide />
+      <ProductListing
+        title="Fishing Rods"
+        subtitle="Spinning and casting rods from 2-piece value sticks to carbon fiber — every length with its own honest price."
+        products={rods}
+        breadcrumbs={[{ label: "Home", href: "/" }, { label: "Rods" }]}
+      />
+    </>
   );
 }

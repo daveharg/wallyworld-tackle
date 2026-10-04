@@ -9,6 +9,7 @@ import {
 } from "../../lib/categories";
 import ProductRow, { CategoryJumpNav } from "../../components/ProductRow";
 import Breadcrumbs from "../../components/Breadcrumbs";
+import WalleyeReelGuide from "../../components/WalleyeReelGuide";
 
 type SortKey = "featured" | "price-asc" | "price-desc" | "name";
 
@@ -73,7 +74,9 @@ export default function ReelsClient({ products }: { products: ShopifyProduct[] }
   ].filter((g) => g.products.length > 0);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <>
+      <WalleyeReelGuide />
+      <div className="max-w-7xl mx-auto px-4 py-8">
       <Breadcrumbs trail={[{ label: "Home", href: "/" }, { label: "Reels" }]} />
 
       <div className="mt-3 mb-6">
@@ -126,6 +129,7 @@ export default function ReelsClient({ products }: { products: ShopifyProduct[] }
           <ProductRow key={g.id} id={g.id} title={g.label} products={g.products} />
         ))}
       </div>
-    </div>
+      </div>
+    </>
   );
 }
