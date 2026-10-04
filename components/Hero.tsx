@@ -5,8 +5,8 @@ import Link from "next/link";
 
 const SLIDES = [
   {
-    img: "https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=2000&q=75",
-    alt: "Angler fishing at sunrise on a misty lake",
+    img: "https://images.unsplash.com/photo-1541742425281-c1d3fc8aff96?auto=format&fit=crop&w=2000&q=75",
+    alt: "Fishing rod silhouetted against a sunset over the water",
     eyebrow: "Chosen by real Canadian anglers",
     headline: "good gear, low prices.",
     sub: "Rods, reels and tackle chosen for performance per dollar — shipped direct, priced honest.",
@@ -14,8 +14,8 @@ const SLIDES = [
     href: "/rods",
   },
   {
-    img: "https://images.unsplash.com/photo-1445112098124-3e76dd67983c?auto=format&fit=crop&w=2000&q=75",
-    alt: "Fisherman casting at dawn",
+    img: "https://images.unsplash.com/photo-1609859682240-6860cf3d99d5?auto=format&fit=crop&w=2000&q=75",
+    alt: "Anglers fishing from a quiet lake shore",
     eyebrow: "Reel season is here",
     headline: "reels that work as hard as you do.",
     sub: "Spinning reels in every size up to 4000 — smooth drags, honest prices.",
@@ -23,8 +23,8 @@ const SLIDES = [
     href: "/reels",
   },
   {
-    img: "https://images.unsplash.com/photo-1499242611767-cf8b9be02854?auto=format&fit=crop&w=2000&q=75",
-    alt: "Fly angler on a clear river",
+    img: "https://images.unsplash.com/photo-1439066615861-d1af74d74000?auto=format&fit=crop&w=2000&q=75",
+    alt: "Calm lake with a wooden dock at dawn",
     eyebrow: "Tackle for every species",
     headline: "jigs, plastics & hard baits.",
     sub: "Walleye, pike, trout, perch, crappie — stock the box for whatever's biting.",

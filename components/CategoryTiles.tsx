@@ -5,15 +5,15 @@ const TILES = [
     title: "Shop Rods",
     blurb: "Two-piece, telescopic & casting — every budget covered.",
     href: "/rods",
-    img: "https://images.unsplash.com/photo-1499242611767-cf8b9be02854?auto=format&fit=crop&w=1200&q=70",
-    alt: "Angler holding a fishing rod on a river",
+    img: "https://images.unsplash.com/photo-1541742425281-c1d3fc8aff96?auto=format&fit=crop&w=1200&q=70",
+    alt: "Fishing rod silhouetted against a sunset over the water",
   },
   {
     title: "Shop Reels",
     blurb: "Spinning reels in every size, smooth drags, honest prices.",
     href: "/reels",
-    img: "https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=1200&q=70",
-    alt: "Fishing at sunset on a calm lake",
+    img: "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1200&q=70",
+    alt: "Fishing from a boat on a mountain lake",
   },
 ];
 
