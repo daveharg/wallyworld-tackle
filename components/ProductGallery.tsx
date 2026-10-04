@@ -25,14 +25,13 @@ export default function ProductGallery({
     <div className="-mx-4 sm:mx-0">
       <div className="sm:rounded-2xl overflow-hidden bg-white border-y sm:border border-pine/10">
         {current && (
-          <div className="w-full flex justify-center">
+          <div className="w-full h-[50vh] sm:h-[60vh] flex items-center justify-center p-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               key={current.url}
               src={current.url}
               alt={current.altText ?? title}
-              className="max-w-full h-auto animate-fade-in"
-              style={{ maxHeight: "60vh" }}
+              className="max-w-full max-h-full object-contain animate-fade-in"
             />
           </div>
         )}
