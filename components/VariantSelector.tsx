@@ -21,10 +21,12 @@ export default function VariantSelector({
   selected: string;
   onSelect: (value: string) => void;
 }) {
+  // Display "Style" instead of "Color" for the option label.
+  const displayName = optionName.toLowerCase() === "color" ? "Style" : optionName;
   return (
     <div className="mb-5">
       <p className="text-sm mb-2.5">
-        <span className="text-pine/55 font-medium">{optionName}: </span>
+        <span className="text-pine/55 font-medium">{displayName}: </span>
         <strong className="text-pine">
           {variantDisplayLabel(productHandle, productTitle, selected)}
         </strong>

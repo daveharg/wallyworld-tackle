@@ -1,5 +1,10 @@
 import { getProducts, isShopifyConfigured } from "../../lib/shopify";
-import { productsInCategory, reelSubcategoryOf } from "../../lib/categories";
+import {
+  productsInCategory,
+  reelSubcategoryOf,
+  hasLargeSeriesVariants,
+  hasStandardSeriesVariants,
+} from "../../lib/categories";
 import ProductRow, { CategoryJumpNav } from "../../components/ProductRow";
 import Breadcrumbs from "../../components/Breadcrumbs";
 
@@ -17,13 +22,29 @@ export default async function ReelsPage() {
   const products = await getProducts(100);
   const reels = productsInCategory(products, "reels");
 
-  const baitcasters = reels.filter((p) => reelSubcategoryOf(p) === "baitcaster");
-  const spinners = reels.filter((p) => reelSubcategoryOf(p) === "spinner");
-  const otherReels = reels.filter((p) => reelSubcategoryOf(p) === "other");
+  // Baitcaster Reels: baitcaster type with standard (≤5000) series variants.
+  // If a baitcaster also has >5000 series variants, it appears in both rows.
+  const baitcasters = reels.filter(
+    (p) => reelSubcategoryOf(p) === "baitcaster" && hasStandardSeriesVariants(p)
+  );
+  // Spinner Reels: spinner type with standard (≤5000) series variants.
+  // If a spinner also has >5000 series variants, it appears in both rows.
+  const spinners = reels.filter(
+    (p) => reelSubcategoryOf(p) === "spinner" && hasStandardSeriesVariants(p)
+  );
+  // Large Species Reels: any reel with >5000 series variants.
+  const largeSpecies = reels.filter((p) => hasLargeSeriesVariants(p));
+  // Other reels that don't fit the above (e.g., trolling reels without series info).
+  const otherReels = reels.filter(
+    (p) =>
+      reelSubcategoryOf(p) === "other" &&
+      !hasLargeSeriesVariants(p)
+  );
 
   const groups = [
     { id: "baitcaster-reels", label: "Baitcaster Reels", products: baitcasters },
     { id: "spinner-reels", label: "Spinner Reels", products: spinners },
+    { id: "large-species-reels", label: "Large Species Reels", products: largeSpecies },
     { id: "other-reels", label: "Other Reels", products: otherReels },
   ].filter((g) => g.products.length > 0);
 
@@ -36,7 +57,7 @@ export default async function ReelsPage() {
           Fishing Reels
         </h1>
         <p className="text-pine/60 mt-2 max-w-2xl">
-          Baitcasting and spinning reels — smooth drags, metal spools, prices that make sense.
+          Baitcasting, spinning, and large species reels — smooth drags, metal spools, prices that make sense.
         </p>
         <p className="text-sm text-pine/40 mt-2">
           {reels.length} {reels.length === 1 ? "product" : "products"}

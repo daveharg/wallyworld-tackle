@@ -74,6 +74,58 @@ export function reelSubcategoryOf(product: ShopifyProduct): ReelSubcategory {
   return "other";
 }
 
+/**
+ * Check if a reel product has any variants over 5000 series (large species).
+ * Parses series numbers like 6000, 7000, 8000, 10000, 14000 from variant titles.
+ */
+export function hasLargeSeriesVariants(product: ShopifyProduct): boolean {
+  const seriesPattern = /\b([5-9]\d{3}|\d{5,})\b/; // 5000+ (5000, 6000, 8000, 10000, 14000, etc.)
+  // Check variant titles/options
+  for (const v of product.variants) {
+    const text = `${v.title} ${v.selectedOptions.map((o) => o.value).join(" ")}`;
+    const match = text.match(/\b(\d{4,5})\b/);
+    if (match) {
+      const num = parseInt(match[1], 10);
+      if (num > 5000) return true;
+    }
+  }
+  // Fallback: check product title
+  const titleMatch = product.title.match(/\b(\d{4,5})\b/g);
+  if (titleMatch) {
+    for (const m of titleMatch) {
+      const num = parseInt(m, 10);
+      if (num > 5000) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Check if a reel product has any variants at or under 5000 series.
+ */
+export function hasStandardSeriesVariants(product: ShopifyProduct): boolean {
+  for (const v of product.variants) {
+    const text = `${v.title} ${v.selectedOptions.map((o) => o.value).join(" ")}`;
+    const match = text.match(/\b(\d{3,5})\b/);
+    if (match) {
+      const num = parseInt(match[1], 10);
+      if (num <= 5000) return true;
+    }
+  }
+  // If no series numbers found in variants, assume standard (under 5000)
+  // to ensure the product appears in its type row.
+  const hasAnySeries = product.variants.some((v) => {
+    const text = `${v.title} ${v.selectedOptions.map((o) => o.value).join(" ")}`;
+    return /\b\d{3,5}\b/.test(text);
+  });
+  if (!hasAnySeries) {
+    // Check title for series numbers
+    const titleHasSeries = /\b\d{3,5}\b/.test(product.title);
+    if (!titleHasSeries) return true; // No series info, treat as standard
+  }
+  return false;
+}
+
 export function rodsAndReels(products: ShopifyProduct[]) {
   return {
     rods: productsInCategory(products, "rods"),
