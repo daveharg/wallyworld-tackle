@@ -1,0 +1,56 @@
+"use client";
+
+import { useState } from "react";
+import type { ShopifyImage } from "../lib/shopify";
+
+export default function ProductGallery({
+  images,
+  title,
+}: {
+  images: ShopifyImage[];
+  title: string;
+}) {
+  const [active, setActive] = useState(0);
+  const current = images[active] ?? images[0];
+
+  if (images.length === 0) {
+    return (
+      <div className="rounded-2xl bg-night-800 border border-night-700 aspect-square grid place-items-center text-slate-500">
+        Wallyworld Tackle
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="rounded-2xl overflow-hidden bg-white border border-night-700 aspect-square">
+        {current && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={current.url}
+            src={current.url}
+            alt={current.altText ?? title}
+            className="w-full h-full object-cover animate-fade-in"
+          />
+        )}
+      </div>
+      {images.length > 1 && (
+        <div className="flex gap-2.5 mt-3 overflow-x-auto no-scrollbar pb-1">
+          {images.map((img, i) => (
+            <button
+              key={img.url + i}
+              onClick={() => setActive(i)}
+              aria-label={`View image ${i + 1}`}
+              className={`shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-white border-2 transition ${
+                i === active ? "border-ember-500" : "border-night-700 hover:border-night-600"
+              }`}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={img.url} alt="" className="w-full h-full object-cover" loading="lazy" />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
