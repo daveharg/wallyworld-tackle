@@ -64,6 +64,16 @@ export function productsInCategory(products: ShopifyProduct[], key: CategoryKey)
   return products.filter((p) => categoryOf(p) === key);
 }
 
+export type ReelSubcategory = "baitcaster" | "spinner" | "other";
+
+/** Split reels into baitcaster vs spinner rows for the Reels page. */
+export function reelSubcategoryOf(product: ShopifyProduct): ReelSubcategory {
+  const t = titleOf(product);
+  if (/baitcast/.test(t)) return "baitcaster";
+  if (/spinning/.test(t) || /\bspinner\b/.test(t)) return "spinner";
+  return "other";
+}
+
 export function rodsAndReels(products: ShopifyProduct[]) {
   return {
     rods: productsInCategory(products, "rods"),
