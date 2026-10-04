@@ -25,14 +25,14 @@ export default function ProductGallery({
     <div className="-mx-4 sm:mx-0">
       <div className="sm:rounded-2xl overflow-hidden bg-white border-y sm:border border-pine/10">
         {current && (
-          <div className="w-full bg-white text-center py-2">
+          <div className="w-full bg-white flex justify-center py-2 px-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               key={current.url}
               src={current.url}
               alt={current.altText ?? title}
-              className="inline-block animate-fade-in"
-              style={{ maxWidth: "100%", maxHeight: "60vh", height: "auto" }}
+              className="animate-fade-in"
+              style={{ width: "100%", maxWidth: "500px", height: "auto", maxHeight: "60vh", objectFit: "contain" }}
             />
           </div>
         )}
