@@ -24,6 +24,7 @@ export interface ShopifyVariant {
   availableForSale: boolean;
   quantityAvailable: number | null;
   price: ShopifyPrice;
+  compareAtPrice: ShopifyPrice | null;
   selectedOptions: { name: string; value: string }[];
   image: ShopifyImage | null;
 }
@@ -95,6 +96,7 @@ const PRODUCT_FRAGMENT = `
           availableForSale
           quantityAvailable
           price { amount currencyCode }
+          compareAtPrice { amount currencyCode }
           selectedOptions { name value }
           image { url altText }
         }
@@ -125,6 +127,7 @@ function mapProduct(node: any): ShopifyProduct {
       availableForSale: e.node.availableForSale,
       quantityAvailable: e.node.quantityAvailable ?? null,
       price: e.node.price,
+      compareAtPrice: e.node.compareAtPrice ?? null,
       selectedOptions: e.node.selectedOptions ?? [],
       image: e.node.image
         ? { url: e.node.image.url, altText: e.node.image.altText ?? null }
