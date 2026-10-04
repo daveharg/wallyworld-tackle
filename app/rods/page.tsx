@@ -3,9 +3,9 @@ import { productsInCategory } from "../../lib/categories";
 import CategoryRow from "../../components/CategoryRow";
 
 export const revalidate = 300;
-export const metadata = { title: "Tackle & More — Wallyworld Tackle" };
+export const metadata = { title: "Rods — Wallyworld Tackle" };
 
-export default async function TacklePage() {
+export default async function RodsPage() {
   if (!isShopifyConfigured()) {
     return (
       <div className="section">
@@ -14,27 +14,20 @@ export default async function TacklePage() {
     );
   }
   const products = await getProducts(100);
+  const rods = productsInCategory(products, "rods");
 
-  const rows = [
-    { id: "jig-heads", title: "Jig Heads", key: "jigHeads" },
-    { id: "soft-plastics", title: "Soft Plastics", key: "softPlastics" },
-    { id: "hard-baits", title: "Hard Baits", key: "hardBaits" },
-    { id: "tackle-boxes", title: "Tackle Boxes", key: "tackleBoxes" },
-    { id: "tools", title: "Tools & Accessories", key: "tools" },
-    { id: "terminal-tackle", title: "Terminal Tackle", key: "terminalTackle" },
-  ] as const;
+  // Split rods into simple sub-rows by keyword for horizontal scrolling sections.
+  const spinning = rods.filter((p) => /spinning/i.test(p.title));
+  const casting = rods.filter((p) => /casting/i.test(p.title));
+  const rest = rods.filter((p) => !/spinning/i.test(p.title) && !/casting/i.test(p.title));
 
   return (
     <div className="section">
-      <h1>Tackle &amp; More</h1>
-      {rows.map((row) => (
-        <CategoryRow
-          key={row.id}
-          id={row.id}
-          title={row.title}
-          products={productsInCategory(products, row.key)}
-        />
-      ))}
+      <h1>Rods</h1>
+      {rods.length === 0 && <p>No rods found yet — check back soon.</p>}
+      <CategoryRow id="spinning" title="Spinning Rods" products={spinning} />
+      <CategoryRow id="casting" title="Casting Rods" products={casting} />
+      <CategoryRow id="other-rods" title="Other Rods" products={rest} />
     </div>
   );
 }
