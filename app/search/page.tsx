@@ -14,7 +14,7 @@ export default async function SearchPage({
   if (!isShopifyConfigured()) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16">
-        <p className="text-slate-400">Store not connected yet. Set your Shopify environment variables.</p>
+        <p className="text-pine/60">Store not connected yet. Set your Shopify environment variables.</p>
       </div>
     );
   }
@@ -29,29 +29,31 @@ export default async function SearchPage({
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <Breadcrumbs trail={[{ label: "Home", href: "/" }, { label: "Search" }]} />
-      <h1 className="font-display font-bold uppercase text-4xl text-white tracking-wide mt-3">
+      <h1 className="font-display font-bold uppercase text-4xl text-pine tracking-wide mt-3">
         {q ? (
           <>
-            Results for <span className="text-ember-400">“{searchParams.q}”</span>
+            Results for <span className="text-signal">“{searchParams.q}”</span>
           </>
         ) : (
           "Search"
         )}
       </h1>
-      <p className="text-slate-500 text-sm mt-2">
+      <p className="text-pine/45 text-sm mt-2">
         {results.length} {results.length === 1 ? "product" : "products"} found
       </p>
 
       {results.length === 0 ? (
         <div className="text-center py-20">
-          <p className="text-slate-400 text-lg">
+          <p className="text-pine/60 text-lg">
             {q ? "Nothing matched that search. Try “rod”, “reel”, “jig” or “crankbait”." : "Type something in the search bar above."}
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5 mt-8">
+        <div className="flex gap-4 md:gap-5 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 mt-8">
           {results.map((p) => (
-            <ProductCard key={p.id} product={p} />
+            <div key={p.id} className="w-[220px] md:w-[250px] shrink-0">
+              <ProductCard product={p} />
+            </div>
           ))}
         </div>
       )}

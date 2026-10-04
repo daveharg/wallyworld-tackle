@@ -1,10 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { formatPrice, type ShopifyProduct } from "../../../lib/shopify";
 import { variantDisplayLabel } from "../../../lib/variant-names";
-import { categoryOf } from "../../../lib/categories";
 import VariantSelector from "../../../components/VariantSelector";
 import ProductGallery from "../../../components/ProductGallery";
 import StockBadge from "../../../components/StockBadge";
@@ -126,16 +124,16 @@ export default function ProductDetailClient({
         <ProductGallery images={galleryImages} title={product.title} />
 
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-ember-400 mb-2">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-signal mb-2">
             {categoryLabel(product.handle, product.title)}
           </p>
-          <h1 className="font-display font-bold uppercase text-3xl md:text-4xl text-white tracking-wide leading-tight">
+          <h1 className="font-display font-bold uppercase text-3xl md:text-4xl text-pine tracking-wide leading-tight">
             {product.title}
           </h1>
 
           <div className="flex items-center gap-3 mt-4">
             {selectedVariant && (
-              <p className="font-display font-bold text-3xl text-ember-400">
+              <p className="font-display font-bold text-3xl text-signal">
                 {formatPrice(selectedVariant.price)}
               </p>
             )}
@@ -162,23 +160,23 @@ export default function ProductDetailClient({
 
           {/* qty + add to cart */}
           <div className="flex flex-wrap items-stretch gap-3 mt-2">
-            <div className="flex items-center rounded-xl border-2 border-night-600 bg-night-800 overflow-hidden">
+            <div className="flex items-center rounded-xl border-2 border-pine/15 bg-white overflow-hidden">
               <button
                 type="button"
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                 aria-label="Decrease quantity"
-                className="px-4 py-3 text-xl text-slate-300 hover:bg-night-700 hover:text-white transition"
+                className="px-4 py-3 text-xl text-pine/60 hover:bg-paper-deep hover:text-pine transition"
               >
                 −
               </button>
-              <span className="min-w-[3rem] text-center font-bold text-lg text-white">
+              <span className="min-w-[3rem] text-center font-bold text-lg text-pine">
                 {quantity}
               </span>
               <button
                 type="button"
                 onClick={() => setQuantity((q) => Math.min(99, q + 1))}
                 aria-label="Increase quantity"
-                className="px-4 py-3 text-xl text-slate-300 hover:bg-night-700 hover:text-white transition"
+                className="px-4 py-3 text-xl text-pine/60 hover:bg-paper-deep hover:text-pine transition"
               >
                 +
               </button>
@@ -187,7 +185,7 @@ export default function ProductDetailClient({
               type="button"
               onClick={handleAdd}
               disabled={!selectedVariant?.availableForSale}
-              className="flex-1 min-w-[200px] rounded-xl bg-ember-500 hover:bg-ember-600 disabled:opacity-40 disabled:cursor-not-allowed text-night-950 font-bold text-lg px-8 py-3.5 transition shadow-xl shadow-ember-600/25"
+              className="flex-1 min-w-[200px] rounded-xl bg-signal hover:bg-signal-dark disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-lg px-8 py-3.5 transition shadow-lg"
             >
               {added ? "Added to Cart ✓" : "Add to Cart"}
             </button>
@@ -200,9 +198,9 @@ export default function ProductDetailClient({
               { t: "30-Day Returns", s: "Hassle-free" },
               { t: "Secure Checkout", s: "Via Shopify" },
             ].map((r) => (
-              <div key={r.t} className="rounded-xl bg-night-900 border border-night-700 px-2 py-3">
-                <p className="text-xs font-bold text-white">{r.t}</p>
-                <p className="text-[11px] text-slate-500 mt-0.5">{r.s}</p>
+              <div key={r.t} className="rounded-xl bg-paper-deep border border-pine/10 px-2 py-3">
+                <p className="text-xs font-bold text-pine">{r.t}</p>
+                <p className="text-[11px] text-pine/50 mt-0.5">{r.s}</p>
               </div>
             ))}
           </div>

@@ -2,23 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Exact tokens from the original Stillwater Tackle Co. theme.css */
 :root {
-  --night-950: #0a0f1a;
-  --night-900: #101828;
-  --night-850: #152033;
-  --night-800: #1b2a41;
-  --night-700: #243650;
-  --ember-500: #f97316;
-  --ember-600: #ea580c;
+  --bg: #fdfdfb;
+  --bg2: #f2efe7;
+  --pine: #12322b;
+  --pine-deep: #0b231f;
+  --accent: #e4572e;
+  --gold: #b97e14;
 }
+
+/* Always light theme — no dark mode override. */
 
 html {
   scroll-behavior: smooth;
 }
 
 body {
-  background: var(--night-950);
-  color: #e2e8f0;
+  background: var(--bg);
+  color: var(--pine);
   font-family: var(--font-body), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -28,10 +30,10 @@ body {
   letter-spacing: 0.02em;
 }
 
-/* thin styled scrollbars for horizontal rows */
+/* thin styled scrollbars for horizontal product rows */
 .nice-scroll {
   scrollbar-width: thin;
-  scrollbar-color: #31465f transparent;
+  scrollbar-color: #c9c2b2 transparent;
 }
 .nice-scroll::-webkit-scrollbar {
   height: 8px;
@@ -40,23 +42,15 @@ body {
   background: transparent;
 }
 .nice-scroll::-webkit-scrollbar-thumb {
-  background: #31465f;
+  background: #c9c2b2;
   border-radius: 999px;
 }
 .no-scrollbar {
   scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none;
-}
-
-/* hero texture */
-.hero-grid-overlay {
-  background-image:
-    linear-gradient(rgba(249, 115, 22, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(249, 115, 22, 0.06) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 75%);
 }
 
 @keyframes fadeUp {

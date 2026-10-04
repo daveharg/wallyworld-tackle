@@ -14,17 +14,17 @@ export default function StockBadge({ variant }: { variant: ShopifyVariant | null
   const { label, tone } = stockState(variant);
   const styles =
     tone === "in"
-      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+      ? "bg-emerald-50 text-emerald-700 border-emerald-600/30"
       : tone === "low"
-        ? "bg-amber-500/10 text-amber-400 border-amber-500/30"
-        : "bg-red-500/10 text-red-400 border-red-500/30";
+        ? "bg-amber-50 text-amber-700 border-amber-600/30"
+        : "bg-red-50 text-red-700 border-red-600/30";
   return (
     <span
       className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider border rounded-full px-3 py-1.5 ${styles}`}
     >
       <span
         className={`w-1.5 h-1.5 rounded-full ${
-          tone === "in" ? "bg-emerald-400" : tone === "low" ? "bg-amber-400" : "bg-red-400"
+          tone === "in" ? "bg-emerald-600" : tone === "low" ? "bg-amber-600" : "bg-red-600"
         }`}
       />
       {label}

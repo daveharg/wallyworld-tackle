@@ -17,9 +17,9 @@ export default async function ProductPage({ params }: { params: { handle: string
   if (!isShopifyConfigured()) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16">
-        <div className="rounded-2xl bg-night-900 border border-night-700 p-8 text-center">
-          <h2 className="font-display font-bold text-2xl text-white uppercase">Store not connected yet</h2>
-          <p className="text-slate-400 mt-2">Set your Shopify environment variables, then redeploy.</p>
+        <div className="rounded-2xl bg-paper-deep border border-pine/10 p-8 text-center">
+          <h2 className="font-display font-bold text-2xl text-pine uppercase">Store not connected yet</h2>
+          <p className="text-pine/60 mt-2">Set your Shopify environment variables, then redeploy.</p>
         </div>
       </div>
     );

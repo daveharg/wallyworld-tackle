@@ -9,7 +9,7 @@ export default async function ReelsPage() {
   if (!isShopifyConfigured()) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16">
-        <p className="text-slate-400">Store not connected yet. Set your Shopify environment variables.</p>
+        <p className="text-pine/60">Store not connected yet. Set your Shopify environment variables.</p>
       </div>
     );
   }

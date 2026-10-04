@@ -15,7 +15,7 @@ export default function ProductGallery({
 
   if (images.length === 0) {
     return (
-      <div className="rounded-2xl bg-night-800 border border-night-700 aspect-square grid place-items-center text-slate-500">
+      <div className="rounded-2xl bg-paper-deep border border-pine/10 aspect-square grid place-items-center text-pine/40">
         Wallyworld Tackle
       </div>
     );
@@ -23,7 +23,7 @@ export default function ProductGallery({
 
   return (
     <div>
-      <div className="rounded-2xl overflow-hidden bg-white border border-night-700 aspect-square">
+      <div className="rounded-2xl overflow-hidden bg-white border border-pine/10 aspect-square">
         {current && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -42,7 +42,7 @@ export default function ProductGallery({
               onClick={() => setActive(i)}
               aria-label={`View image ${i + 1}`}
               className={`shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-white border-2 transition ${
-                i === active ? "border-ember-500" : "border-night-700 hover:border-night-600"
+                i === active ? "border-signal" : "border-pine/10 hover:border-pine/30"
               }`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}

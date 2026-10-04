@@ -47,17 +47,17 @@ export default function CartDrawer() {
 
   return (
     <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Shopping cart">
-      <div className="absolute inset-0 bg-black/60 animate-fade-in" onClick={closeDrawer} />
-      <aside className="absolute right-0 top-0 h-full w-full max-w-md bg-night-900 border-l border-night-700 flex flex-col animate-drawer-in">
+      <div className="absolute inset-0 bg-pine-deep/50 animate-fade-in" onClick={closeDrawer} />
+      <aside className="absolute right-0 top-0 h-full w-full max-w-md bg-paper border-l border-pine/10 flex flex-col animate-drawer-in">
         {/* header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-night-700">
-          <h2 className="font-display font-bold text-xl uppercase tracking-wide text-white">
-            Your Cart {count > 0 && <span className="text-ember-400">({count})</span>}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-pine/10">
+          <h2 className="font-display font-bold text-xl uppercase tracking-wide text-pine">
+            Your Cart {count > 0 && <span className="text-signal">({count})</span>}
           </h2>
           <button
             onClick={closeDrawer}
             aria-label="Close cart"
-            className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-night-700 transition"
+            className="p-2 rounded-lg text-pine/60 hover:text-pine hover:bg-paper-deep transition"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <path d="M6 6l12 12M18 6 6 18" />
@@ -68,10 +68,10 @@ export default function CartDrawer() {
         {items.length === 0 ? (
           <div className="flex-1 grid place-items-center p-8 text-center">
             <div>
-              <p className="text-slate-400 mb-4">Your cart is empty.</p>
+              <p className="text-pine/60 mb-4">Your cart is empty.</p>
               <button
                 onClick={closeDrawer}
-                className="rounded-xl bg-ember-500 hover:bg-ember-600 text-night-950 font-bold px-6 py-3 transition"
+                className="rounded-xl bg-signal hover:bg-signal-dark text-white font-bold px-6 py-3 transition"
               >
                 Keep Shopping
               </button>
@@ -80,20 +80,20 @@ export default function CartDrawer() {
         ) : (
           <>
             {/* free shipping progress */}
-            <div className="px-5 py-4 border-b border-night-700 bg-night-850">
+            <div className="px-5 py-4 border-b border-pine/10 bg-paper-deep">
               {remaining > 0 ? (
-                <p className="text-sm text-slate-300 mb-2">
-                  You&apos;re <strong className="text-ember-400">{money(remaining, currencyCode)}</strong> away
+                <p className="text-sm text-pine/70 mb-2">
+                  You&apos;re <strong className="text-signal">{money(remaining, currencyCode)}</strong> away
                   from <strong>free shipping</strong>
                 </p>
               ) : (
-                <p className="text-sm text-emerald-400 font-semibold mb-2">
+                <p className="text-sm text-emerald-700 font-semibold mb-2">
                   You&apos;ve unlocked FREE shipping!
                 </p>
               )}
-              <div className="h-2 rounded-full bg-night-700 overflow-hidden">
+              <div className="h-2 rounded-full bg-pine/10 overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-ember-600 to-ember-400 transition-all duration-500"
+                  className="h-full rounded-full bg-signal transition-all duration-500"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -103,12 +103,12 @@ export default function CartDrawer() {
             <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4 nice-scroll">
               {items.map((item) => (
                 <div key={item.variantId} className="flex gap-3">
-                  <div className="w-20 h-20 rounded-xl overflow-hidden bg-white shrink-0 border border-night-700">
+                  <div className="w-20 h-20 rounded-xl overflow-hidden bg-white shrink-0 border border-pine/10">
                     {item.imageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={item.imageUrl} alt={item.productTitle} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full grid place-items-center text-[10px] text-slate-500 bg-night-800">
+                      <div className="w-full h-full grid place-items-center text-[10px] text-pine/40 bg-paper-deep">
                         No image
                       </div>
                     )}
@@ -117,38 +117,38 @@ export default function CartDrawer() {
                     <Link
                       href={`/products/${item.productHandle}`}
                       onClick={closeDrawer}
-                      className="text-sm font-semibold text-slate-100 hover:text-ember-400 line-clamp-2"
+                      className="text-sm font-semibold text-pine hover:text-signal line-clamp-2"
                     >
                       {item.productTitle}
                     </Link>
-                    <p className="text-xs text-slate-500 mt-0.5">{item.variantLabel}</p>
+                    <p className="text-xs text-pine/50 mt-0.5">{item.variantLabel}</p>
                     <div className="flex items-center justify-between mt-2">
-                      <div className="flex items-center rounded-lg border border-night-600 overflow-hidden">
+                      <div className="flex items-center rounded-lg border border-pine/15 overflow-hidden">
                         <button
-                          className="px-2.5 py-1 text-slate-300 hover:bg-night-700"
+                          className="px-2.5 py-1 text-pine/60 hover:bg-paper-deep"
                           onClick={() => setQuantity(item.variantId, item.quantity - 1)}
                           aria-label="Decrease quantity"
                         >
                           −
                         </button>
-                        <span className="px-2 text-sm font-bold text-white min-w-[2rem] text-center">
+                        <span className="px-2 text-sm font-bold text-pine min-w-[2rem] text-center">
                           {item.quantity}
                         </span>
                         <button
-                          className="px-2.5 py-1 text-slate-300 hover:bg-night-700"
+                          className="px-2.5 py-1 text-pine/60 hover:bg-paper-deep"
                           onClick={() => setQuantity(item.variantId, item.quantity + 1)}
                           aria-label="Increase quantity"
                         >
                           +
                         </button>
                       </div>
-                      <span className="text-sm font-bold text-ember-400">
+                      <span className="text-sm font-bold text-signal">
                         {money(parseFloat(item.price.amount) * item.quantity, item.price.currencyCode)}
                       </span>
                     </div>
                     <button
                       onClick={() => removeItem(item.variantId)}
-                      className="text-xs text-slate-500 hover:text-red-400 mt-1"
+                      className="text-xs text-pine/45 hover:text-red-600 mt-1"
                     >
                       Remove
                     </button>
@@ -158,26 +158,26 @@ export default function CartDrawer() {
             </div>
 
             {/* footer */}
-            <div className="border-t border-night-700 px-5 py-4 bg-night-850">
-              <div className="flex justify-between mb-1 text-sm text-slate-400">
+            <div className="border-t border-pine/10 px-5 py-4 bg-paper-deep">
+              <div className="flex justify-between mb-1 text-sm text-pine/60">
                 <span>Subtotal</span>
-                <span className="font-display font-bold text-xl text-white">
+                <span className="font-display font-bold text-xl text-pine">
                   {money(subtotal, currencyCode)}
                 </span>
               </div>
-              <p className="text-xs text-slate-500 mb-3">Shipping & taxes calculated at checkout.</p>
-              {error && <p className="text-sm text-red-400 mb-2">{error}</p>}
+              <p className="text-xs text-pine/45 mb-3">Shipping & taxes calculated at checkout.</p>
+              {error && <p className="text-sm text-red-600 mb-2">{error}</p>}
               <button
                 onClick={handleCheckout}
                 disabled={checkingOut}
-                className="w-full rounded-xl bg-ember-500 hover:bg-ember-600 disabled:opacity-50 text-night-950 font-bold py-3.5 transition shadow-lg shadow-ember-600/20"
+                className="w-full rounded-xl bg-signal hover:bg-signal-dark disabled:opacity-50 text-white font-bold py-3.5 transition shadow-md"
               >
                 {checkingOut ? "Redirecting…" : "Secure Checkout"}
               </button>
               <Link
                 href="/cart"
                 onClick={closeDrawer}
-                className="block text-center text-sm text-slate-400 hover:text-ember-400 mt-2.5"
+                className="block text-center text-sm text-pine/55 hover:text-signal mt-2.5"
               >
                 View full cart
               </Link>

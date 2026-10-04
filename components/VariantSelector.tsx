@@ -3,7 +3,7 @@
 import { variantDisplayLabel } from "../lib/variant-names";
 
 /**
- * Professional text-only variant buttons. The underlying Shopify option value is
+ * Text-only variant buttons. The underlying Shopify option value is
  * preserved for DSers mapping; only the customer-facing label changes.
  */
 export default function VariantSelector({
@@ -24,8 +24,8 @@ export default function VariantSelector({
   return (
     <div className="mb-5">
       <p className="text-sm mb-2.5">
-        <span className="text-slate-400 font-medium">{optionName}: </span>
-        <strong className="text-white">
+        <span className="text-pine/55 font-medium">{optionName}: </span>
+        <strong className="text-pine">
           {variantDisplayLabel(productHandle, productTitle, selected)}
         </strong>
       </p>
@@ -41,8 +41,8 @@ export default function VariantSelector({
               aria-pressed={isSel}
               className={`rounded-xl border-2 px-4 py-2.5 text-sm font-semibold transition ${
                 isSel
-                  ? "border-ember-500 bg-ember-500/10 text-ember-400 shadow-lg shadow-ember-600/10"
-                  : "border-night-600 bg-night-800 text-slate-300 hover:border-night-600 hover:border-ember-500/50 hover:text-white"
+                  ? "border-signal bg-signal/10 text-signal shadow-md"
+                  : "border-pine/15 bg-white text-pine/75 hover:border-signal/50 hover:text-pine"
               }`}
             >
               {label}

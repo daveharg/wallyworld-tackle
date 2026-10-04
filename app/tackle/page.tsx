@@ -14,20 +14,20 @@ const TACKLE_KEYS: CategoryKey[] = [
   "terminalTackle",
 ];
 
-const LABELS: Partial<Record<CategoryKey, string>> = {
-  jigHeads: "Jig Heads",
-  softPlastics: "Soft Plastics",
-  hardBaits: "Hard Baits",
-  tackleBoxes: "Tackle Boxes",
-  tools: "Tools & Accessories",
-  terminalTackle: "Terminal Tackle",
-};
+const ROW_GROUPS: { key: CategoryKey; id: string; label: string }[] = [
+  { key: "jigHeads", id: "jig-heads", label: "Jig Heads" },
+  { key: "softPlastics", id: "soft-plastics", label: "Soft Plastics" },
+  { key: "hardBaits", id: "hard-baits", label: "Hard Baits" },
+  { key: "tackleBoxes", id: "tackle-boxes", label: "Tackle Boxes" },
+  { key: "tools", id: "tools", label: "Tools & Accessories" },
+  { key: "terminalTackle", id: "terminal-tackle", label: "Terminal Tackle" },
+];
 
 export default async function TacklePage() {
   if (!isShopifyConfigured()) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16">
-        <p className="text-slate-400">Store not connected yet. Set your Shopify environment variables.</p>
+        <p className="text-pine/60">Store not connected yet. Set your Shopify environment variables.</p>
       </div>
     );
   }
@@ -40,8 +40,7 @@ export default async function TacklePage() {
       subtitle="Jigs, plastics, hard baits, boxes, tools and terminal tackle — everything else you need in the boat."
       products={tackle}
       breadcrumbs={[{ label: "Home", href: "/" }, { label: "Tackle & More" }]}
-      showCategoryFilter
-      categoryLabels={LABELS}
+      rowGroups={ROW_GROUPS}
     />
   );
 }

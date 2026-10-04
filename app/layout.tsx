@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Barlow_Condensed, Inter } from "next/font/google";
+import { Barlow_Condensed, Source_Sans_3 } from "next/font/google";
 import { CartProvider } from "../components/CartContext";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -13,7 +13,7 @@ const display = Barlow_Condensed({
   display: "swap",
 });
 
-const body = Inter({
+const body = Source_Sans_3({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-body",

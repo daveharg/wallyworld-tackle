@@ -7,19 +7,21 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        night: {
-          950: "#0a0f1a",
-          900: "#101828",
-          850: "#152033",
-          800: "#1b2a41",
-          700: "#243650",
-          600: "#31465f",
+        // Exact tokens from the original Stillwater Tackle Co. theme.css
+        paper: {
+          DEFAULT: "#fdfdfb",
+          deep: "#f2efe7",
         },
-        ember: {
-          400: "#ffb020",
-          500: "#f97316",
-          600: "#ea580c",
-          700: "#c2410c",
+        pine: {
+          DEFAULT: "#12322b",
+          deep: "#0b231f",
+        },
+        signal: {
+          DEFAULT: "#e4572e",
+          dark: "#c94826",
+        },
+        gold: {
+          DEFAULT: "#b97e14",
         },
       },
       fontFamily: {
