@@ -3,7 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useCart } from "./CartContext";
+import AuthModal from "./AuthModal";
+import AccountMenu from "./AccountMenu";
 import { CATEGORIES } from "../lib/categories";
 
 const CAT_NAV = [
@@ -56,8 +59,11 @@ function SearchBox({ onDone, large }: { onDone?: () => void; large?: boolean }) 
 
 export default function Header() {
   const { count, openDrawer } = useCart();
+  const { status } = useSession();
   const [menuOpen, setMenuOpen] = useState(false);
   const [bannerOpen, setBannerOpen] = useState(true);
+  const [authOpen, setAuthOpen] = useState(false);
+  const loggedIn = status === "authenticated";
 
   return (
     <>
@@ -134,16 +140,21 @@ export default function Header() {
 
             {/* account + cart */}
             <div className="flex items-center gap-1 md:gap-2 ml-auto md:ml-0">
-              <button
-                className="hidden sm:grid place-items-center w-11 h-11 rounded-full text-pine hover:bg-paper-deep transition"
-                aria-label="Account"
-                title="Account"
-              >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                  <circle cx="12" cy="8" r="4" />
-                  <path d="M4 21c0-4 3.5-6.5 8-6.5s8 2.5 8 6.5" />
-                </svg>
-              </button>
+              {loggedIn ? (
+                <AccountMenu />
+              ) : (
+                <button
+                  onClick={() => setAuthOpen(true)}
+                  className="hidden sm:grid place-items-center w-11 h-11 rounded-full text-pine hover:bg-paper-deep transition"
+                  aria-label="Sign in or create account"
+                  title="Sign in"
+                >
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 21c0-4 3.5-6.5 8-6.5s8 2.5 8 6.5" />
+                  </svg>
+                </button>
+              )}
               <button
                 onClick={openDrawer}
                 className="relative grid place-items-center w-11 h-11 rounded-full bg-signal hover:bg-signal-dark text-white transition shadow-md"
@@ -227,6 +238,8 @@ export default function Header() {
           </nav>
         )}
       </header>
+
+      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
     </>
   );
 }

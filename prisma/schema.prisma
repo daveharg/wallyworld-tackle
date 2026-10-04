@@ -1,0 +1,109 @@
+// Wallyworld Tackle — accounts + loyalty database schema.
+//
+// Development: SQLite (DATABASE_URL="file:./dev.db").
+// Production (Vercel): switch the provider to "postgresql" and point
+// DATABASE_URL at your Vercel Postgres connection string — no schema
+// changes needed (Json/DateTime defaults are Postgres-compatible).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String?
+  passwordHash String? // null for Google-OAuth-only accounts
+  googleId     String?  @unique // set when the account is linked to Google
+  createdAt    DateTime @default(now())
+
+  loyalty    LoyaltyPoints?
+  pointsTx   PointsTransaction[]
+  savedCart  SavedCart?
+  addresses  Address[]
+  orders     Order[]
+  storeCredits StoreCredit[]
+}
+
+model LoyaltyPoints {
+  userId          String   @id
+  pointsBalance   Int      @default(0)
+  lifetimePoints  Int      @default(0)
+  updatedAt       DateTime @updatedAt
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PointsTransaction {
+  id        String   @id @default(cuid())
+  userId    String
+  points    Int // positive = earned, negative = redeemed
+  type      String // "earn" | "redeem" | "adjust"
+  orderId   String?
+  note      String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model SavedCart {
+  userId    String   @id
+  cartData  String // JSON array of CartItem (stored as text: valid on SQLite + Postgres)
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Address {
+  id         String  @id @default(cuid())
+  userId     String
+  label      String  @default("Home")
+  name       String
+  address1   String
+  address2   String?
+  city       String
+  province   String
+  postalCode String
+  country    String  @default("Canada")
+  phone      String?
+  isDefault  Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Order {
+  id              String   @id @default(cuid())
+  userId          String
+  shopifyOrderId  String? // filled if/when we can read it back
+  orderNumber     String?
+  total           Float
+  currency        String   @default("CAD")
+  email           String?
+  status          String   @default("pending") // pending | completed
+  pointsCredited  Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model StoreCredit {
+  id        String   @id @default(cuid())
+  userId    String
+  code      String   @unique // e.g. WALLY-7X2K9Q
+  amount    Float    // dollars off
+  currency  String   @default("CAD")
+  redeemed  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

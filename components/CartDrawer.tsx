@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { useCart } from "./CartContext";
 import { createCheckoutUrl, isShopifyConfigured } from "../lib/shopify";
 
@@ -18,6 +19,7 @@ function money(amount: number, currency: string): string {
 export default function CartDrawer() {
   const { items, count, subtotal, currencyCode, setQuantity, removeItem, clear, isDrawerOpen, closeDrawer } =
     useCart();
+  const { data: session } = useSession();
   const [error, setError] = useState<string | null>(null);
   const [checkingOut, setCheckingOut] = useState(false);
 
@@ -32,6 +34,22 @@ export default function CartDrawer() {
     }
     setCheckingOut(true);
     try {
+      // Record a pending order for signed-in users so points can be claimed later.
+      if (session?.user) {
+        try {
+          await fetch("/api/orders/record", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              total: subtotal,
+              currency: currencyCode,
+              email: session.user.email,
+            }),
+          });
+        } catch {
+          // non-fatal — checkout must still work
+        }
+      }
       const url = await createCheckoutUrl(
         items.map((i) => ({ merchandiseId: i.variantId, quantity: i.quantity }))
       );

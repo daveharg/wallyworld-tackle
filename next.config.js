@@ -1,6 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  experimental: {
+    // better-sqlite3 ships a native binding that webpack can't bundle —
+    // load it (and the Prisma adapter) externally at runtime instead.
+    serverComponentsExternalPackages: [
+      "better-sqlite3",
+      "@prisma/adapter-better-sqlite3",
+      "@prisma/client",
+    ],
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "cdn.shopify.com" },

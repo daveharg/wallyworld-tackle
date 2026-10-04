@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Barlow_Condensed, Source_Sans_3 } from "next/font/google";
 import { CartProvider } from "../components/CartContext";
+import AuthProviders from "../components/AuthProviders";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CartDrawer from "../components/CartDrawer";
@@ -30,12 +31,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={`${display.variable} ${body.variable}`}>
-        <CartProvider>
-          <Header />
-          <main className="min-h-[70vh]">{children}</main>
-          <Footer />
-          <CartDrawer />
-        </CartProvider>
+        <AuthProviders>
+          <CartProvider>
+            <Header />
+            <main className="min-h-[70vh]">{children}</main>
+            <Footer />
+            <CartDrawer />
+          </CartProvider>
+        </AuthProviders>
       </body>
     </html>
   );

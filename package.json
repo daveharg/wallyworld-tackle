@@ -1,1 +1,40 @@
-{"dependencies":{"next":"14.2.5","react":"18.3.1","react-dom":"18.3.1"},"description":"Wallyworld Tackle — freshwater fishing tackle storefront (Next.js + Shopify Storefront API)","devDependencies":{"@types/node":"20.14.0","@types/react":"18.3.3","@types/react-dom":"18.3.0","autoprefixer":"^10.6.1","postcss":"^8.5.28","tailwindcss":"^3.4.1","typescript":"5.5.3"},"engines":{"node":">=18.17.0"},"name":"wallyworld-tackle-store","private":true,"scripts":{"build":"next build","dev":"next dev","lint":"next lint","start":"next start"},"version":"1.0.0"}
+{
+  "dependencies": {
+    "@prisma/adapter-better-sqlite3": "^7.10.0",
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^13.0.3",
+    "next": "14.2.5",
+    "next-auth": "^4.24.15",
+    "pg": "^8.23.1",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "description": "Wallyworld Tackle — freshwater fishing tackle storefront (Next.js + Shopify Storefront API)",
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "20.14.0",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
+    "autoprefixer": "^10.6.1",
+    "postcss": "^8.5.28",
+    "prisma": "^7.10.0",
+    "tailwindcss": "^3.4.1",
+    "typescript": "5.5.3"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "name": "wallyworld-tackle-store",
+  "private": true,
+  "scripts": {
+    "build": "prisma generate && next build",
+    "dev": "next dev",
+    "lint": "next lint",
+    "start": "next start",
+    "db:migrate": "prisma migrate dev",
+    "postinstall": "prisma generate"
+  },
+  "version": "1.0.0"
+}
