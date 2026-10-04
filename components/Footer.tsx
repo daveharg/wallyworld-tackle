@@ -8,7 +8,7 @@ const SHOP_LINKS = [
   { label: "Jig Heads", href: "/tackle#jig-heads" },
   { label: "Tackle Boxes", href: "/tackle#tackle-boxes" },
   { label: "Tools & Accessories", href: "/tackle#tools" },
-  { label: "Hot Deals", href: "/#hot-deals" },
+  { label: "Walleye Picks", href: "/#walleye-picks" },
 ];
 
 const SUPPORT_LINKS = [

@@ -22,8 +22,8 @@ export default function ProductGallery({
   }
 
   return (
-    <div>
-      <div className="rounded-2xl overflow-hidden bg-white border border-pine/10 aspect-square">
+    <div className="-mx-4 sm:mx-0">
+      <div className="sm:rounded-2xl overflow-hidden bg-white border-y sm:border border-pine/10 aspect-square">
         {current && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -35,7 +35,7 @@ export default function ProductGallery({
         )}
       </div>
       {images.length > 1 && (
-        <div className="flex gap-2.5 mt-3 overflow-x-auto no-scrollbar pb-1">
+        <div className="flex gap-2.5 mt-3 overflow-x-auto no-scrollbar pb-1 px-4 sm:px-0">
           {images.map((img, i) => (
             <button
               key={img.url + i}

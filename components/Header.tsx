@@ -17,7 +17,7 @@ const CAT_NAV = [
   { label: "Jig Heads", href: "/tackle#jig-heads" },
   { label: "Tackle Boxes", href: "/tackle#tackle-boxes" },
   { label: "Tools & Accessories", href: "/tackle#tools" },
-  { label: "Deals", href: "/#hot-deals", hot: true },
+  { label: "Walleye", href: "/#walleye-picks", hot: true },
 ];
 
 function SearchBox({ onDone, large }: { onDone?: () => void; large?: boolean }) {
@@ -94,7 +94,7 @@ export default function Header() {
           <span className="font-semibold tracking-wide">Wallyworld Tackle · Winnipeg, MB</span>
           <span className="font-medium">Free shipping on orders over $75</span>
           <nav className="flex items-center gap-5" aria-label="Utility">
-            <Link href="/#hot-deals" className="hover:text-white transition">Deals</Link>
+            <Link href="/#walleye-picks" className="hover:text-white transition">Walleye Picks</Link>
             <Link href="/search?q=gift" className="hover:text-white transition">Gift Cards</Link>
             <Link href="/#playbook" className="hover:text-white transition">Help</Link>
             <Link href="#contact" className="hover:text-white transition">Contact</Link>
@@ -145,14 +145,18 @@ export default function Header() {
               ) : (
                 <button
                   onClick={() => setAuthOpen(true)}
-                  className="hidden sm:grid place-items-center w-11 h-11 rounded-full text-pine hover:bg-paper-deep transition"
-                  aria-label="Sign in or create account"
-                  title="Sign in"
+                  className="flex items-center gap-2 rounded-full bg-pine hover:bg-pine-deep text-white transition pl-3 pr-4 py-2.5 md:pl-4 md:pr-5 shadow-md"
+                  aria-label="Sign in or join Wallyworld Rewards"
+                  title="Sign in / Join Rewards"
                 >
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
                     <circle cx="12" cy="8" r="4" />
                     <path d="M4 21c0-4 3.5-6.5 8-6.5s8 2.5 8 6.5" />
                   </svg>
+                  <span className="text-sm font-bold whitespace-nowrap">
+                    Sign In
+                    <span className="hidden md:inline font-semibold text-gold"> · Join Rewards</span>
+                  </span>
                 </button>
               )}
               <button
@@ -219,6 +223,21 @@ export default function Header() {
         {menuOpen && (
           <nav className="md:hidden border-t border-pine/10 bg-paper-deep animate-fade-in">
             <div className="px-4 py-3">
+              {!loggedIn && (
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setAuthOpen(true);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-pine text-white font-bold py-3 mb-3 shadow-md"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 21c0-4 3.5-6.5 8-6.5s8 2.5 8 6.5" />
+                  </svg>
+                  Sign In · Join Wallyworld Rewards
+                </button>
+              )}
               <div className="text-xs text-pine/50 uppercase tracking-widest font-semibold mb-2">
                 Shop by category
               </div>

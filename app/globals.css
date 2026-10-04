@@ -16,6 +16,8 @@
 
 html {
   scroll-behavior: smooth;
+  /* Keep anchored sections clear of the sticky header on jump links. */
+  scroll-padding-top: 120px;
 }
 
 body {
