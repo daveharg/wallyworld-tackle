@@ -49,7 +49,9 @@ function mergeCarts(a: CartItem[], b: CartItem[]): CartItem[] {
     if (!item || typeof item.variantId !== "string") continue;
     const existing = map.get(item.variantId);
     if (existing) {
-      existing.quantity = Math.min(99, existing.quantity + (item.quantity || 1));
+      // Use max, not sum — prevents quantity doubling if merge runs twice
+      // (e.g. auth status flicker triggering a re-merge).
+      existing.quantity = Math.min(99, Math.max(existing.quantity, item.quantity || 1));
     } else {
       map.set(item.variantId, { ...item, quantity: Math.max(1, item.quantity || 1) });
     }

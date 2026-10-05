@@ -119,17 +119,12 @@ export default function ReelsClient({ products }: { products: ShopifyProduct[] }
                 {g.label}
               </h2>
             </div>
-            {/* Two rows: 2 cols mobile (4 products), 4 cols desktop (8 products) */}
+            {/* Two rows visible initially, scroll for more */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
-              {g.products.slice(0, 8).map((p) => (
+              {g.products.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
             </div>
-            {g.products.length > 8 && (
-              <p className="text-sm text-pine/50 mt-4 text-center">
-                Showing 8 of {g.products.length} — use Sort above to explore more
-              </p>
-            )}
           </section>
         ))}
       </div>
