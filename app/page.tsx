@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { getProducts, isShopifyConfigured } from "../lib/shopify";
-import { productsInCategory } from "../lib/categories";
 import Hero from "../components/Hero";
 import PromoBand from "../components/PromoBand";
-import ProductCarousel from "../components/ProductCarousel";
+import WalleyeCombos from "../components/WalleyeCombos";
 import CategoryTiles from "../components/CategoryTiles";
 import DarkBanner from "../components/DarkBanner";
 import ShopByCategory from "../components/ShopByCategory";
@@ -100,55 +99,19 @@ export default async function HomePage() {
     );
   }
 
-  // Recommended Walleye Products: jig heads first, then walleye-sized
-  // spinning reels (1000–4000 series), then walleye hard baits (minnow/crankbait).
-  const walleyeSizeRe = /(1000|2000|2500|3000|4000)/;
-  const walleyeHardBaitRe = /(minnow|crankbait|jerkbait)/;
-  const jigs = productsInCategory(products, "jigHeads");
-  const reels = productsInCategory(products, "reels");
-  const walleyeReels = reels.filter((p) =>
-    walleyeSizeRe.test(`${p.title} ${p.tags.join(" ")}`.toLowerCase())
-  );
-  const otherReels = reels.filter((p) => !walleyeReels.includes(p));
-  const walleyeBaits = productsInCategory(products, "hardBaits").filter((p) =>
-    walleyeHardBaitRe.test(`${p.title} ${p.tags.join(" ")}`.toLowerCase())
-  );
-  const walleyePicks = [...jigs, ...walleyeReels, ...walleyeBaits, ...otherReels].slice(0, 8);
-
-  // Dave's Picks: prefer tagged products, else top reels/rods.
-  const tagged = products.filter((p) => p.tags.some((t) => /dave'?s.?pick/i.test(t)));
-  const picks =
-    tagged.length > 0
-      ? tagged.slice(0, 10)
-      : [...productsInCategory(products, "reels"), ...productsInCategory(products, "rods")].slice(0, 10);
-
   return (
     <>
       <Hero />
 
       <PromoBand />
 
-      {/* Recommended Walleye Products */}
-      {walleyePicks.length > 0 && (
-        <section id="walleye-picks" className="max-w-7xl mx-auto px-4 mt-12 md:mt-16 scroll-mt-32">
-          <SectionHeading eyebrow="Dave's walleye picks" title="Recommended Walleye Products" href="/tackle" />
-          <ProductCarousel products={walleyePicks} />
-        </section>
-      )}
+      <WalleyeCombos products={products} />
 
       <CategoryTiles />
 
       <DarkBanner />
 
       <ShopByCategory />
-
-      {/* Dave's Picks */}
-      {picks.length > 0 && (
-        <section id="daves-picks" className="max-w-7xl mx-auto px-4 mt-12 md:mt-16 scroll-mt-32">
-          <SectionHeading eyebrow="Hand-chosen by Dave" title="Dave's Picks" href="/reels" />
-          <ProductCarousel products={picks} />
-        </section>
-      )}
 
       {/* Playbook */}
       <section id="playbook" className="max-w-7xl mx-auto px-4 mt-12 md:mt-16 scroll-mt-32">
