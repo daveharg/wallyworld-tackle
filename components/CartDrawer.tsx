@@ -6,8 +6,6 @@ import { useSession } from "next-auth/react";
 import { useCart } from "./CartContext";
 import { createCheckoutUrl, isShopifyConfigured } from "../lib/shopify";
 
-const FREE_SHIPPING_THRESHOLD = 75;
-
 function money(amount: number, currency: string): string {
   try {
     return new Intl.NumberFormat("en-CA", { style: "currency", currency }).format(amount);
@@ -22,9 +20,6 @@ export default function CartDrawer() {
   const { data: session } = useSession();
   const [error, setError] = useState<string | null>(null);
   const [checkingOut, setCheckingOut] = useState(false);
-
-  const remaining = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
-  const progress = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
 
   const handleCheckout = async () => {
     setError(null);
@@ -97,22 +92,15 @@ export default function CartDrawer() {
           </div>
         ) : (
           <>
-            {/* free shipping progress */}
+            {/* free shipping — always qualifies */}
             <div className="px-5 py-4 border-b border-pine/10 bg-paper-deep">
-              {remaining > 0 ? (
-                <p className="text-sm text-pine/70 mb-2">
-                  You&apos;re <strong className="text-signal">{money(remaining, currencyCode)}</strong> away
-                  from <strong>free shipping</strong>
-                </p>
-              ) : (
-                <p className="text-sm text-emerald-700 font-semibold mb-2">
-                  You&apos;ve unlocked FREE shipping!
-                </p>
-              )}
+              <p className="text-sm text-emerald-700 font-semibold mb-2">
+                You qualify for FREE shipping!
+              </p>
               <div className="h-2 rounded-full bg-pine/10 overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-signal transition-all duration-500"
-                  style={{ width: `${progress}%` }}
+                  className="h-full rounded-full bg-emerald-500 transition-all duration-500"
+                  style={{ width: "100%" }}
                 />
               </div>
             </div>
