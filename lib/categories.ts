@@ -38,15 +38,33 @@ function titleOf(p: ShopifyProduct): string {
 
 export function categoryOf(product: ShopifyProduct): CategoryKey {
   const t = titleOf(product);
-  // Check tools/accessories FIRST so "Reel Repair Tool Set" and "Rod Holder"
-  // don't get miscategorized as reels/rods.
-  if (/plier/.test(t) || /knife/.test(t) || /net\b/.test(t) || /tool/.test(t) || /accessor/.test(t) || /holder/.test(t) || /winder/.test(t) || /\bbelt\b/.test(t) || /repair/.test(t))
-    return "tools";
-  if (/\brod\b/.test(t)) return "rods";
-  if (/\breel\b/.test(t)) return "reels";
-  if (/\bjig\b/.test(t) || /jig head/.test(t)) return "jigHeads";
-  if (/tackle box/.test(t) || /organizer/.test(t)) return "tackleBoxes";
-  if (/\bgrub\b/.test(t) || /\bworm\b/.test(t) || /swimbait/.test(t)) return "softPlastics";
+
+  // Rods & reels first — most specific.
+  if (/\brod\b/.test(t) && !/jig head/.test(t)) return "rods";
+  if (/\breel\b/.test(t) && !/repair/.test(t) && !/tool/.test(t)) return "reels";
+
+  // Jig heads — specific "jig head" or standalone "jig" (not "jigging" rod).
+  if (/jig head/.test(t) || /\bjig\b/.test(t)) return "jigHeads";
+
+  // Soft plastics — expanded keywords.
+  if (
+    /\bgrub\b/.test(t) ||
+    /\bworm\b/.test(t) ||
+    /swimbait/.test(t) ||
+    /paddle tail/.test(t) ||
+    /soft plastic/.test(t) ||
+    /soft lure/.test(t) ||
+    /soft bait/.test(t) ||
+    /\bshad\b/.test(t) ||
+    /crawfish/.test(t) ||
+    /craw\b/.test(t) ||
+    /creature/.test(t) ||
+    /rubber/.test(t) && /lure|bait/.test(t)
+  )
+    return "softPlastics";
+
+  // Hard baits — BEFORE terminal tackle so "treble hook" doesn't misroute.
+  // Expanded: spoon, spinner (lure), jerkbait, popper, vib, hard lure.
   if (
     /crankbait/.test(t) ||
     /spinnerbait/.test(t) ||
@@ -54,11 +72,52 @@ export function categoryOf(product: ShopifyProduct): CategoryKey {
     /wobbler/.test(t) ||
     /minnow/.test(t) ||
     /frog/.test(t) ||
-    /topwater/.test(t)
+    /topwater/.test(t) ||
+    /jerkbait/.test(t) ||
+    /\bspoon\b/.test(t) ||
+    /spinner lure/.test(t) ||
+    /metal lure/.test(t) ||
+    /hard bait/.test(t) ||
+    /hard lure/.test(t) ||
+    /\bpopper\b/.test(t) ||
+    /\bvib\b/.test(t)
   )
     return "hardBaits";
-  if (/hook/.test(t) || /sinker/.test(t) || /swivel/.test(t) || /snap/.test(t) || /leader/.test(t))
+
+  // Tackle boxes.
+  if (/tackle box/.test(t) || /organizer/.test(t)) return "tackleBoxes";
+
+  // Terminal tackle — hooks, sinkers, swivels, snaps, leaders, line.
+  if (
+    /fish.?hook/.test(t) ||
+    /\bhooks\b/.test(t) ||
+    /sinker/.test(t) ||
+    /swivel/.test(t) ||
+    /\bsnap\b/.test(t) ||
+    /leader/.test(t) ||
+    /fishing line/.test(t) ||
+    /braided line/.test(t) ||
+    /nylon line/.test(t)
+  )
     return "terminalTackle";
+
+  // Tools & accessories — specific tool words only (not greedy).
+  if (
+    /plier/.test(t) ||
+    /\bknife\b/.test(t) ||
+    /fillet/.test(t) ||
+    /scissor/.test(t) ||
+    /\bnet\b/.test(t) ||
+    /landing net/.test(t) ||
+    /tool set/.test(t) ||
+    /repair kit/.test(t) ||
+    /rod holder/.test(t) ||
+    /line winder/.test(t) ||
+    /hook remover/.test(t) ||
+    /lip grip/.test(t)
+  )
+    return "tools";
+
   return "other";
 }
 
