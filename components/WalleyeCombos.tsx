@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ShopifyProduct } from "../lib/shopify";
+import { getProductByHandle, type ShopifyProduct } from "../lib/shopify";
 
 type ComboDef = {
   name: string;
@@ -121,7 +121,13 @@ function ComboCard({ combo, products }: { combo: ComboDef; products: ShopifyProd
   );
 }
 
-export default function WalleyeCombos({ products }: { products: ShopifyProduct[] }) {
+export default async function WalleyeCombos() {
+  // Fetch combo products directly by handle (homepage product list is capped
+  // and may not include them now that the catalog is 159+ products).
+  const handles = Array.from(new Set(COMBOS.flatMap((c) => [c.rodHandle, c.reelHandle])));
+  const fetched = await Promise.all(handles.map((h) => getProductByHandle(h).catch(() => null)));
+  const products = fetched.filter((p): p is ShopifyProduct => p !== null);
+
   return (
     <section id="walleye-combos" className="max-w-7xl mx-auto px-4 mt-12 md:mt-16 scroll-mt-32">
       <div className="text-center mb-8">

@@ -105,7 +105,7 @@ export default async function HomePage() {
 
       <PromoBand />
 
-      <WalleyeCombos products={products} />
+      <WalleyeCombos />
 
       <CategoryTiles />
 
