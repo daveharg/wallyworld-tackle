@@ -98,7 +98,7 @@ export default function Footer() {
           </div>
           <p className="text-white/55 text-sm leading-relaxed mb-5">
             Good gear, low prices. Freshwater tackle chosen by real Canadian
-            anglers — shipped direct from Winnipeg, MB.
+            anglers.
           </p>
           <div className="flex gap-2">
             {["Visa", "MC", "Amex", "PayPal"].map((p) => (
