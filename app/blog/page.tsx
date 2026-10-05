@@ -47,6 +47,13 @@ const POSTS = [
       "Everything you need for your first ice fishing trip — rods, jigs, safety gear, and what to skip.",
     date: "2026-10-05",
   },
+  {
+    slug: "best-walleye-jigs-guide",
+    title: "Best Walleye Jigs: What Actually Works (2026 Guide)",
+    excerpt:
+      "The best walleye jigs for Canadian waters — weights, colors, and techniques that put more fish in the boat.",
+    date: "2026-10-05",
+  },
 ];
 
 export default function BlogIndex() {
