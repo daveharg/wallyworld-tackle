@@ -5,6 +5,15 @@ import Link from "next/link";
 
 const SLIDES = [
   {
+    img: "/hero/ice-fishing-hero.jpg",
+    alt: "Blue insulated ice fishing tent standing alone on a frozen lake",
+    eyebrow: "Ice season is coming",
+    headline: "own the ice.",
+    sub: "Insulated pop-up shelters that set up in minutes — stay warm, fish longer.",
+    cta: "Shop Ice Fishing",
+    href: "/ice-fishing",
+  },
+  {
     img: "https://images.unsplash.com/photo-1541742425281-c1d3fc8aff96?auto=format&fit=crop&w=2000&q=75",
     alt: "Fishing rod silhouetted against a sunset over the water",
     eyebrow: "Chosen by real Canadian anglers",

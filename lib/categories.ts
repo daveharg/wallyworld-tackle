@@ -13,6 +13,7 @@ export type CategoryKey =
   | "tackleBoxes"
   | "tools"
   | "terminalTackle"
+  | "iceFishing"
   | "other";
 
 export interface Category {
@@ -30,6 +31,7 @@ export const CATEGORIES: Category[] = [
   { key: "tackleBoxes", label: "Tackle Boxes", href: "/tackle#tackle-boxes" },
   { key: "tools", label: "Tools & Accessories", href: "/tackle#tools" },
   { key: "terminalTackle", label: "Terminal Tackle", href: "/tackle#terminal-tackle" },
+  { key: "iceFishing", label: "Ice Fishing", href: "/ice-fishing" },
 ];
 
 function titleOf(p: ShopifyProduct): string {
@@ -38,6 +40,9 @@ function titleOf(p: ShopifyProduct): string {
 
 export function categoryOf(product: ShopifyProduct): CategoryKey {
   const t = titleOf(product);
+
+  // Ice fishing — FIRST, since "ice fishing rod" contains "rod".
+  if (/ice[ -]?fish/.test(t) || /ice (shelter|tent|shack|hut)/.test(t)) return "iceFishing";
 
   // Rods & reels first — most specific.
   if (/\brod\b/.test(t) && !/jig head/.test(t)) return "rods";

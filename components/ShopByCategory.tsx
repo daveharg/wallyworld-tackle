@@ -32,6 +32,12 @@ const TILES = [
     alt: "Wooden dock on a calm lake",
   },
   {
+    label: "Ice Fishing",
+    href: "/ice-fishing",
+    img: "/hero/ice-fishing-hero.jpg",
+    alt: "Blue ice fishing tent on a frozen lake",
+  },
+  {
     label: "Tools",
     href: "/tackle#tools",
     img: "https://images.unsplash.com/photo-1609859682240-6860cf3d99d5?auto=format&fit=crop&w=600&q=70",
@@ -46,7 +52,7 @@ export default function ShopByCategory() {
       <h2 className="font-display font-bold uppercase text-3xl md:text-4xl text-pine tracking-wide text-center mb-8">
         Shop by Category
       </h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-4">
         {TILES.map((t) => (
           <Link
             key={t.label}
