@@ -72,10 +72,6 @@ export default function ProductTabs({
               Most items ship <strong className="text-pine">direct from our suppliers</strong>,
               which keeps prices low. Please allow 7–14 business days for delivery.
             </p>
-            <p>
-              Not happy? You&apos;re covered by our{" "}
-              <strong className="text-pine">30-day hassle-free return</strong> policy.
-            </p>
           </div>
         )}
       </div>

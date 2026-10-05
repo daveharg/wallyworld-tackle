@@ -198,8 +198,8 @@ export default function ProductDetailClient({
           {/* reassurances */}
           <div className="grid grid-cols-3 gap-2 mt-6 text-center">
             {[
-              { t: "Free ship $75+", s: "Tracked delivery" },
-              { t: "30-Day Returns", s: "Hassle-free" },
+              { t: "Free Shipping", s: "On all orders" },
+              { t: "Good Gear", s: "Hand-picked" },
               { t: "Secure Checkout", s: "Via Shopify" },
             ].map((r) => (
               <div key={r.t} className="rounded-xl bg-paper-deep border border-pine/10 px-2 py-3">

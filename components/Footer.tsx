@@ -12,17 +12,15 @@ const SHOP_LINKS = [
 ];
 
 const SUPPORT_LINKS = [
-  { label: "Shipping Info", href: "/#newsletter" },
-  { label: "Returns", href: "/#newsletter" },
+  { label: "Shipping Info", href: "/shipping" },
   { label: "The Playbook", href: "/#playbook" },
   { label: "FAQ", href: "/#playbook" },
   { label: "Contact Us", href: "#contact" },
 ];
 
 const ABOUT_LINKS = [
-  { label: "Our Story", href: "/#newsletter" },
+  { label: "Our Story", href: "/our-story" },
   { label: "Dave's Picks", href: "/#daves-picks" },
-  { label: "Reviews", href: "/#daves-picks" },
   { label: "Wallyworld Rewards", href: "/#newsletter" },
 ];
 
@@ -39,8 +37,8 @@ const UTILITY = [
     ),
   },
   {
-    title: "Easy Returns",
-    sub: "30-day hassle-free returns",
+    title: "Good Gear",
+    sub: "Hand-picked for Canadian waters",
     icon: (
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M3 12a9 9 0 1 0 3-6.7" />
