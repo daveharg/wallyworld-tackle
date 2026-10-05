@@ -51,7 +51,7 @@ export default function Post() {
           logo, the marketing, and the pro staff — not necessarily better engineering.
         </p>
         <p>
-          We've tested (well, fished with) reels across the price spectrum. The gap between
+          We've chosen reels across the price spectrum for this guide. The gap between
           a $35 reel and a $80 reel is much smaller than the gap between a $15 reel and a
           $35 reel. That $30–50 sweet spot is where the real value lives.
         </p>
