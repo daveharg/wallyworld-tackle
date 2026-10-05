@@ -132,6 +132,46 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Fishing Guides */}
+      <section className="max-w-7xl mx-auto px-4 mt-12 md:mt-16">
+        <SectionHeading eyebrow="Fishing Guides" title="Learn something new" />
+        <p className="text-pine/70 max-w-2xl -mt-3 mb-8">
+          Honest gear advice from people who actually fish. No fluff, no sponsored picks.
+        </p>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <a
+            href="/blog/best-budget-spinning-rods-canada"
+            className="rounded-xl bg-white border border-pine/10 p-6 hover:border-signal/40 hover:shadow-lg transition-all"
+          >
+            <h3 className="font-display font-bold uppercase text-xl text-pine tracking-wide mb-2">
+              Best Budget Spinning Rods in Canada
+            </h3>
+            <p className="text-sm text-pine/70 leading-relaxed">
+              You don&apos;t need to spend $200+ for a great spinning rod. Our top picks for
+              quality budget rods.
+            </p>
+            <span className="inline-block mt-4 text-signal font-semibold text-sm">Read guide →</span>
+          </a>
+          <a
+            href="/blog/best-budget-spinning-reels-under-50"
+            className="rounded-xl bg-white border border-pine/10 p-6 hover:border-signal/40 hover:shadow-lg transition-all"
+          >
+            <h3 className="font-display font-bold uppercase text-xl text-pine tracking-wide mb-2">
+              Best Budget Spinning Reels Under $50
+            </h3>
+            <p className="text-sm text-pine/70 leading-relaxed">
+              Smooth drag, solid build, under fifty bucks. Reels that punch way above their price.
+            </p>
+            <span className="inline-block mt-4 text-signal font-semibold text-sm">Read guide →</span>
+          </a>
+        </div>
+        <div className="mt-6 text-center">
+          <a href="/blog" className="text-signal font-semibold hover:underline">
+            View all guides →
+          </a>
+        </div>
+      </section>
+
       <Newsletter />
     </>
   );
