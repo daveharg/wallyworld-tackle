@@ -29,10 +29,30 @@ const COMBOS: ComboDef[] = [
     tagline: "Step up with the 2000-series reel — smoother drag, more backbone.",
     badge: "Pro Pick",
     rodHandle:
-      "sougayilang-1-8m-2-sections-carbon-fishing-rod-spinning-casting-rod-ultralight-solid-tip-lure-rod-portable-travel-fishing-pole",
+      "sougayilang-2-sections-ultralight-lure-fishing-rod-comfortable-eva-handle-high-sensitivity-solid-carbon-rod-body-strong-durable",
     reelHandle:
       "billings-spinning-reel-metal-spinning-fishing-reel-12kg-max-drag-for-freshwater-saltwater-5-2-1-gear-ratio-fishing-reels",
     accent: "from-sky-400 to-blue-700",
+  },
+  {
+    name: "Casting Combo",
+    tagline: "Cork handle sensitivity meets magnetic brake control — built for precision casting.",
+    badge: "Casting",
+    rodHandle:
+      "sougayilang-carbon-fishing-rod-1-68m-1-8m-spinning-casting-rod-1-6lb-line-weight-cork-handle-ultralight-lure-rod-for-trout-perch",
+    reelHandle:
+      "billings-baitcaster-reel-7-2-1-baitcasting-fishing-reel-6kg-drag-magnetic-brake-system-carretilha-de-pesca-for-fresh-saltwater",
+    accent: "from-emerald-400 to-teal-700",
+  },
+  {
+    name: "Budget Baitcaster Combo",
+    tagline: "Get into baitcasting without breaking the bank — travel-ready and tough.",
+    badge: "Best Value",
+    rodHandle:
+      "sougayilang-4-sections-fishing-rod-carbon-casting-spinning-rod-4-10lb-portable-travel-fishing-pole-for-freshwater-bass-fishing",
+    reelHandle:
+      "billings-baitcasting-reel-ak-series-7-2-1-gear-ratio-18-1bb-18lb-max-drag-shallow-spool-for-freshwater-saltwate",
+    accent: "from-violet-400 to-purple-700",
   },
 ];
 
@@ -148,7 +168,7 @@ export default async function WalleyeCombos() {
           Dave&apos;s hand-picked pairings
         </p>
         <h2 className="font-display font-bold uppercase text-3xl md:text-5xl text-pine tracking-wide mb-3">
-          Recommended Walleye Combos
+          Recommended Combos
         </h2>
         <p className="text-pine/70 max-w-2xl mx-auto">
           Rod + reel, matched to work together. Grab both and hit the water.
