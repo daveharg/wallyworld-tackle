@@ -18,3 +18,7 @@ dist/
 *.log
 .vercel
 dev.db
+
+# typescript
+tsconfig.tsbuildinfo
+*.tsbuildinfo
