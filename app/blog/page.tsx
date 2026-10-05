@@ -40,6 +40,13 @@ const POSTS = [
       "A beginner's guide to picking a rod and reel combo that won't hold you back — or empty your wallet.",
     date: "2026-10-05",
   },
+  {
+    slug: "ice-fishing-gear-checklist-beginners",
+    title: "Ice Fishing Gear Checklist for Beginners (Canada)",
+    excerpt:
+      "Everything you need for your first ice fishing trip — rods, jigs, safety gear, and what to skip.",
+    date: "2026-10-05",
+  },
 ];
 
 export default function BlogIndex() {
