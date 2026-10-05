@@ -6,7 +6,7 @@ import Link from "next/link";
 const SLIDES = [
   {
     img: "/hero/ice-fishing-hero.jpg",
-    alt: "Blue insulated ice fishing tent standing alone on a frozen lake",
+    alt: "Insulated pop-up ice fishing shelter on a frozen lake",
     eyebrow: "Ice season is coming",
     headline: "own the ice.",
     sub: "Insulated pop-up shelters that set up in minutes — stay warm, fish longer.",
