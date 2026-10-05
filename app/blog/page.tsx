@@ -54,6 +54,27 @@ const POSTS = [
       "The best walleye jigs for Canadian waters — weights, colors, and techniques that put more fish in the boat.",
     date: "2026-10-05",
   },
+  {
+    slug: "best-crankbaits-for-bass",
+    title: "Best Crankbaits for Bass: A Beginner's Guide (2026)",
+    excerpt:
+      "The best crankbaits for bass fishing — diving depths, colors, and when to throw each one.",
+    date: "2026-10-05",
+  },
+  {
+    slug: "best-soft-plastics-for-walleye",
+    title: "Best Soft Plastics for Walleye (2026)",
+    excerpt:
+      "The best soft plastic baits for walleye — swimbaits, grubs, and creature baits that catch more fish.",
+    date: "2026-10-05",
+  },
+  {
+    slug: "how-to-choose-first-fishing-combo",
+    title: "How to Choose Your First Fishing Combo (2026)",
+    excerpt:
+      "A beginner's guide to picking a rod and reel combo that won't hold you back — or empty your wallet.",
+    date: "2026-10-05",
+  },
 ];
 
 export default function BlogIndex() {
