@@ -29,9 +29,17 @@ export default function Newsletter() {
         ) : (
           <form
             className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto"
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
-              if (email.includes("@")) setDone(true);
+              if (!email.includes("@")) return;
+              try {
+                await fetch("/api/newsletter", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ email }),
+                });
+              } catch {}
+              setDone(true);
             }}
           >
             <input
