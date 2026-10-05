@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     "soft plastics",
     "tackle boxes",
     "Canada fishing gear",
-    "cheap fishing tackle Canada",
+    "budget fishing tackle Canada",
   ],
   openGraph: {
     type: "website",
@@ -51,12 +51,21 @@ export const metadata: Metadata = {
     description:
       "Rods, reels and tackle chosen for performance per dollar. Free shipping. Good gear, low prices.",
     url: "https://www.wallyworldtackle.ca",
+    images: [
+      {
+        url: "https://www.wallyworldtackle.ca/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Wallyworld Tackle — good gear, low prices",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Wallyworld Tackle — good gear, low prices",
     description:
       "Rods, reels and tackle chosen for performance per dollar. Free shipping.",
+    images: ["https://www.wallyworldtackle.ca/og-image.png"],
   },
   robots: {
     index: true,
