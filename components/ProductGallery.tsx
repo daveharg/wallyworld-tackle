@@ -22,9 +22,9 @@ export default function ProductGallery({
   }
 
   return (
-    <div className="-mx-4 sm:mx-0">
+    <div className="sm:mx-0 sm:rounded-2xl overflow-hidden bg-white sm:border border-pine/10">
       {/* Main image - simple, centered, fills width on mobile */}
-      <div className="bg-white border-y sm:border sm:rounded-2xl border-pine/10 overflow-hidden">
+      <div className="bg-white">
         {current && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -32,7 +32,6 @@ export default function ProductGallery({
             src={current.url}
             alt={current.altText ?? title}
             className="block w-full h-auto"
-            style={{ maxHeight: "70vh", objectFit: "contain", margin: "0 auto" }}
           />
         )}
       </div>
