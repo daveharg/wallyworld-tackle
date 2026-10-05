@@ -27,6 +27,9 @@ export const metadata: Metadata = {
     default: "Wallyworld Tackle — good gear, low prices",
     template: "%s | Wallyworld Tackle",
   },
+  verification: {
+    google: "5fEkkNP8ESb6REMIPAImMACavGL2TDzh2z0hlOsm3LA",
+  },
   description:
     "Freshwater fishing tackle: rods, reels, jigs, soft plastics, hard baits, tackle boxes and more. Chosen by Canadian anglers. Good gear, low prices. Free shipping.",
   keywords: [
