@@ -27,6 +27,27 @@ export default async function ProductPage({ params }: { params: { handle: string
   const product = await getProductByHandle(params.handle).catch(() => null);
   if (!product) notFound();
 
+  // JSON-LD structured data for Google rich snippets
+  const prices = product.variants.map((v) => parseFloat(v.price.amount));
+  const lowPrice = Math.min(...prices);
+  const highPrice = Math.max(...prices);
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.title,
+    description: product.description.slice(0, 500),
+    image: product.images.map((i) => i.url),
+    brand: { "@type": "Brand", name: "Wallyworld Tackle" },
+    offers: {
+      "@type": "AggregateOffer",
+      priceCurrency: "CAD",
+      lowPrice: lowPrice.toFixed(2),
+      highPrice: highPrice.toFixed(2),
+      offerCount: product.variants.length,
+      availability: "https://schema.org/InStock",
+    },
+  };
+
   // Related: same category, excluding this product.
   let related: Awaited<ReturnType<typeof getProducts>> = [];
   try {
@@ -43,5 +64,13 @@ export default async function ProductPage({ params }: { params: { handle: string
     related = [];
   }
 
-  return <ProductDetailClient product={product} related={related} />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <ProductDetailClient product={product} related={related} />
+    </>
+  );
 }

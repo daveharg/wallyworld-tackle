@@ -23,9 +23,42 @@ const body = Source_Sans_3({
 });
 
 export const metadata: Metadata = {
-  title: "Wallyworld Tackle — good gear, low prices",
+  title: {
+    default: "Wallyworld Tackle — good gear, low prices",
+    template: "%s | Wallyworld Tackle",
+  },
   description:
-    "Freshwater fishing tackle: rods, reels, jigs, soft plastics, hard baits, tackle boxes and more. Good gear, low prices.",
+    "Freshwater fishing tackle: rods, reels, jigs, soft plastics, hard baits, tackle boxes and more. Chosen by Canadian anglers. Good gear, low prices. Free shipping.",
+  keywords: [
+    "fishing tackle",
+    "fishing rods",
+    "fishing reels",
+    "walleye fishing",
+    "fishing lures",
+    "jig heads",
+    "soft plastics",
+    "tackle boxes",
+    "Canada fishing gear",
+    "cheap fishing tackle Canada",
+  ],
+  openGraph: {
+    type: "website",
+    siteName: "Wallyworld Tackle",
+    title: "Wallyworld Tackle — good gear, low prices",
+    description:
+      "Rods, reels and tackle chosen for performance per dollar. Free shipping. Good gear, low prices.",
+    url: "https://www.wallyworldtackle.ca",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Wallyworld Tackle — good gear, low prices",
+    description:
+      "Rods, reels and tackle chosen for performance per dollar. Free shipping.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
