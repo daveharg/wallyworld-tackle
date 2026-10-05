@@ -134,3 +134,19 @@ export function rodsAndReels(products: ShopifyProduct[]) {
     reels: productsInCategory(products, "reels"),
   };
 }
+
+export type RodSubcategory = "spinning" | "casting";
+
+/**
+ * Split rods into spinning vs casting. A rod can match both (e.g. "Spinning
+ * Casting Rod" in the title) and will then appear in both sections.
+ */
+export function rodSubcategoriesOf(product: ShopifyProduct): RodSubcategory[] {
+  const t = titleOf(product);
+  const out: RodSubcategory[] = [];
+  if (/spinning/.test(t)) out.push("spinning");
+  if (/casting/.test(t) || /baitcast/.test(t)) out.push("casting");
+  // Default: if neither matched, treat as spinning (most common).
+  if (out.length === 0) out.push("spinning");
+  return out;
+}

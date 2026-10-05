@@ -71,7 +71,7 @@ export default function Header() {
       {bannerOpen && (
         <div className="bg-pine-deep text-white text-center text-[13px] py-2 px-10 relative">
           <span className="font-semibold">
-            Free shipping on orders over $75 — good gear, low prices
+            Free shipping — good gear, low prices
           </span>{" "}
           <Link href="/rods" className="underline font-bold text-gold hover:text-white transition">
             Shop Now
@@ -92,10 +92,9 @@ export default function Header() {
       <div className="hidden md:block bg-pine text-paper/75 text-xs">
         <div className="max-w-7xl mx-auto px-4 h-8 flex items-center justify-between">
           <span className="font-semibold tracking-wide">Wallyworld Tackle · Winnipeg, MB</span>
-          <span className="font-medium">Free shipping on orders over $75</span>
+          <span className="font-medium">Free shipping</span>
           <nav className="flex items-center gap-5" aria-label="Utility">
             <Link href="/#walleye-picks" className="hover:text-white transition">Walleye Picks</Link>
-            <Link href="/search?q=gift" className="hover:text-white transition">Gift Cards</Link>
             <Link href="/#playbook" className="hover:text-white transition">Help</Link>
             <Link href="#contact" className="hover:text-white transition">Contact</Link>
           </nav>

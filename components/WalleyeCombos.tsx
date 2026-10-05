@@ -7,6 +7,8 @@ type ComboDef = {
   badge: string;
   rodHandle: string;
   reelHandle: string;
+  // Optional: specific variant to feature (uses its image + price)
+  reelVariantTitle?: string;
   accent: string;
 };
 
@@ -19,6 +21,7 @@ const COMBOS: ComboDef[] = [
       "casting-spinning-lure-fishing-rod-solid-ml-tip-1-8-2-1m-ultralight-trout-jigging-pole-4-5-sections-pesca",
     reelHandle:
       "billings-spinning-fishing-reel-for-freshwater-saltwater-ultralight-spool-fold-rocker-left-right-interchangeable-easy-to-carry",
+    reelVariantTitle: "Blue / 2000 Series",
     accent: "from-amber-400 to-orange-600",
   },
   {
@@ -44,11 +47,21 @@ function ComboCard({ combo, products }: { combo: ComboDef; products: ShopifyProd
   const reel = products.find((p) => p.handle === combo.reelHandle);
   if (!rod || !reel) return null;
 
+  // If a specific reel variant is requested (e.g. Blue / 2000 Series),
+  // use its image and price.
+  const reelVariant = combo.reelVariantTitle
+    ? reel.variants.find((v) => v.title === combo.reelVariantTitle)
+    : undefined;
+  const reelImage = reelVariant?.image?.url ?? reel.images[0]?.url;
+  const reelPrice = reelVariant
+    ? parseFloat(reelVariant.price.amount)
+    : priceOf(reel);
+
   const rodPrice = priceOf(rod);
-  const reelPrice = priceOf(reel);
   const total = rodPrice + reelPrice;
-  const fmt = (n: number) =>
-    `$${n.toFixed(2)}`;
+  const fmt = (n: number) => `$${n.toFixed(2)}`;
+
+  const reelLabel = reelVariant ? `${reelVariant.title}` : "Reel";
 
   return (
     <div className="relative rounded-3xl overflow-hidden bg-pine text-white shadow-2xl">
@@ -69,20 +82,20 @@ function ComboCard({ combo, products }: { combo: ComboDef; products: ShopifyProd
         {/* rod + reel */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           {[
-            { product: rod, label: "Rod", price: rodPrice },
-            { product: reel, label: "Reel", price: reelPrice },
-          ].map(({ product, label, price }) => (
+            { product: rod, label: "Rod", price: rodPrice, image: rod.images[0]?.url },
+            { product: reel, label: reelLabel, price: reelPrice, image: reelImage },
+          ].map(({ product, label, price, image }) => (
             <Link
               key={product.id}
               href={`/products/${product.handle}`}
               className="group bg-white/10 hover:bg-white/15 rounded-2xl p-3 transition-colors"
             >
               <div className="aspect-square rounded-xl overflow-hidden bg-white mb-3">
-                {product.images[0] && (
+                {image && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={product.images[0].url}
-                    alt={product.images[0].altText ?? product.title}
+                    src={image}
+                    alt={product.title}
                     className="w-full h-full object-contain group-hover:scale-105 transition-transform"
                     loading="lazy"
                   />

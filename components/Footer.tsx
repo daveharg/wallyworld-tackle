@@ -29,7 +29,7 @@ const ABOUT_LINKS = [
 const UTILITY = [
   {
     title: "Free Shipping",
-    sub: "On orders over $75",
+    sub: "On all orders",
     icon: (
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M3 7h11v10H3zM14 10h4l4 4v3h-8z" />

@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import type { ShopifyProduct } from "../../lib/shopify";
 import {
   reelSubcategoryOf,
-  hasLargeSeriesVariants,
   hasStandardSeriesVariants,
 } from "../../lib/categories";
-import ProductRow, { CategoryJumpNav } from "../../components/ProductRow";
+import ProductCard from "../../components/ProductCard";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import WalleyeReelGuide from "../../components/WalleyeReelGuide";
 
@@ -55,21 +55,14 @@ export default function ReelsClient({ products }: { products: ShopifyProduct[] }
     ),
     sort
   );
-  const largeSpecies = sortProducts(
-    products.filter((p) => hasLargeSeriesVariants(p)),
-    sort
-  );
   const otherReels = sortProducts(
-    products.filter(
-      (p) => reelSubcategoryOf(p) === "other" && !hasLargeSeriesVariants(p)
-    ),
+    products.filter((p) => reelSubcategoryOf(p) === "other"),
     sort
   );
 
   const groups = [
     { id: "baitcaster-reels", label: "Baitcaster Reels", products: baitcasters },
     { id: "spinner-reels", label: "Spinner Reels", products: spinners },
-    { id: "large-species-reels", label: "Large Species Reels", products: largeSpecies },
     { id: "other-reels", label: "Other Reels", products: otherReels },
   ].filter((g) => g.products.length > 0);
 
@@ -118,15 +111,26 @@ export default function ReelsClient({ products }: { products: ShopifyProduct[] }
         </div>
       </div>
 
-      {groups.length > 1 && (
-        <div className="mb-8">
-          <CategoryJumpNav items={groups.map((g) => ({ id: g.id, label: g.label }))} />
-        </div>
-      )}
-
       <div className="space-y-12">
         {groups.map((g) => (
-          <ProductRow key={g.id} id={g.id} title={g.label} products={g.products} />
+          <section key={g.id} id={g.id} className="scroll-mt-28">
+            <div className="flex items-end justify-between mb-5">
+              <h2 className="font-display font-bold uppercase text-3xl md:text-4xl text-pine tracking-wide">
+                {g.label}
+              </h2>
+            </div>
+            {/* Two rows: 2 cols mobile (4 products), 4 cols desktop (8 products) */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-5">
+              {g.products.slice(0, 8).map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+            {g.products.length > 8 && (
+              <p className="text-sm text-pine/50 mt-4 text-center">
+                Showing 8 of {g.products.length} — use Sort above to explore more
+              </p>
+            )}
+          </section>
         ))}
       </div>
       </div>

@@ -66,8 +66,7 @@ export default function ProductTabs({
         {tab === "Shipping" && (
           <div className="space-y-3">
             <p>
-              <strong className="text-pine">Free shipping</strong> on orders over $75.
-              Orders under $75 ship at flat tracked rates shown at checkout.
+              <strong className="text-pine">Free shipping</strong> on all orders.
             </p>
             <p>
               Most items ship <strong className="text-pine">direct from our suppliers</strong>,
