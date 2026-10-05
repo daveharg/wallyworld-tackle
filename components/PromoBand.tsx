@@ -38,7 +38,6 @@ export default function PromoBand() {
           </p>
           <Link
             href={loyaltyHref}
-            onClick={handleLoyaltyClick}
             className="inline-block rounded-lg bg-white text-[#7f1d1d] font-display font-bold uppercase tracking-widest px-7 py-3 hover:bg-white/90 transition"
           >
             Join Free
@@ -60,7 +59,6 @@ export default function PromoBand() {
           </p>
           <Link
             href={loyaltyHref}
-            onClick={handleLoyaltyClick}
             className="inline-block rounded-lg bg-pine-deep text-white font-display font-bold uppercase tracking-widest px-7 py-3 hover:bg-pine transition"
           >
             View Rewards

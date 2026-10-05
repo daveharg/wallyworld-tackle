@@ -8,7 +8,7 @@ const SHOP_LINKS = [
   { label: "Jig Heads", href: "/tackle#jig-heads" },
   { label: "Tackle Boxes", href: "/tackle#tackle-boxes" },
   { label: "Tools & Accessories", href: "/tackle#tools" },
-  { label: "Walleye Picks", href: "/#walleye-picks" },
+  { label: "Walleye Picks", href: "/#walleye-combos" },
 ];
 
 const SUPPORT_LINKS = [
@@ -20,7 +20,7 @@ const SUPPORT_LINKS = [
 
 const ABOUT_LINKS = [
   { label: "Our Story", href: "/our-story" },
-  { label: "Dave's Picks", href: "/#daves-picks" },
+  { label: "Dave's Picks", href: "/#walleye-combos" },
   { label: "Wallyworld Rewards", href: "/#newsletter" },
 ];
 
