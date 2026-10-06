@@ -9,19 +9,11 @@ import AuthModal from "./AuthModal";
 import AccountMenu from "./AccountMenu";
 import { CATEGORIES } from "../lib/categories";
 
-const CAT_NAV = [
+const CAT_NAV: { label: string; href: string; hot?: boolean }[] = [
   { label: "Rods", href: "/rods" },
   { label: "Reels", href: "/reels" },
-  { label: "Hard Baits", href: "/tackle#hard-baits" },
-  { label: "Soft Plastics", href: "/tackle#soft-plastics" },
-  { label: "Jig Heads", href: "/tackle#jig-heads" },
-  { label: "Tackle Boxes", href: "/tackle#tackle-boxes" },
+  { label: "Tackle", href: "/tackle" },
   { label: "Tools & Accessories", href: "/tackle#tools" },
-  { label: "Knives", href: "/tackle#knives" },
-  { label: "Fish Finders", href: "/tackle#electronics" },
-  { label: "Nets", href: "/tackle#nets" },
-  { label: "Ice Fishing", href: "/ice-fishing" },
-  { label: "Walleye", href: "/#walleye-picks", hot: true },
 ];
 
 function SearchBox({ onDone, large }: { onDone?: () => void; large?: boolean }) {
