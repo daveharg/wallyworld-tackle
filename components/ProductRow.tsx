@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ShopifyProduct } from "../lib/shopify";
-import ProductCard from "./ProductCard";
+import ProductCarousel from "./ProductCarousel";
 
 /**
  * Horizontal-scroll product row: one category per row, same-sized cards.
@@ -44,13 +44,7 @@ export default function ProductRow({
           </Link>
         )}
       </div>
-      <div className="flex gap-4 md:gap-5 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
-        {products.map((p) => (
-          <div key={p.id} className="w-[220px] md:w-[250px] shrink-0">
-            <ProductCard product={p} />
-          </div>
-        ))}
-      </div>
+      <ProductCarousel products={products} cardWidth="w-[220px] md:w-[250px]" />
     </section>
   );
 }

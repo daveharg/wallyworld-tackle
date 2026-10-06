@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { ShopifyProduct } from "../lib/shopify";
 import { categoryOf, type CategoryKey } from "../lib/categories";
-import ProductCard from "./ProductCard";
+import ProductCarousel from "./ProductCarousel";
 import ProductRow, { CategoryJumpNav } from "./ProductRow";
 import Breadcrumbs from "./Breadcrumbs";
 
@@ -216,13 +216,7 @@ export default function ProductListing({
       ) : flat.length === 0 ? (
         <EmptyState onClear={clearFilters} />
       ) : (
-        <div className="flex gap-4 md:gap-5 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
-          {flat.map((p) => (
-            <div key={p.id} className="w-[220px] md:w-[250px] shrink-0">
-              <ProductCard product={p} />
-            </div>
-          ))}
-        </div>
+        <ProductCarousel products={flat} cardWidth="w-[220px] md:w-[250px]" />
       )}
     </div>
   );

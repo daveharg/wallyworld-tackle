@@ -37,7 +37,7 @@ export default function ProductCarousel({ products, cardWidth = "w-[240px] md:w-
       <button
         onClick={() => scrollBy(-1)}
         aria-label="Scroll products left"
-        className="hidden md:grid absolute -left-5 top-[38%] place-items-center w-11 h-11 rounded-full bg-white border border-pine/15 shadow-lg text-pine hover:text-signal hover:border-signal/50 transition opacity-0 group-hover/carousel:opacity-100"
+        className="hidden md:grid absolute -left-5 top-[38%] place-items-center w-11 h-11 rounded-full bg-white border border-pine/15 shadow-lg text-pine hover:text-signal hover:border-signal/50 transition"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="m15 6-6 6 6 6" />
@@ -46,7 +46,7 @@ export default function ProductCarousel({ products, cardWidth = "w-[240px] md:w-
       <button
         onClick={() => scrollBy(1)}
         aria-label="Scroll products right"
-        className="hidden md:grid absolute -right-5 top-[38%] place-items-center w-11 h-11 rounded-full bg-white border border-pine/15 shadow-lg text-pine hover:text-signal hover:border-signal/50 transition opacity-0 group-hover/carousel:opacity-100"
+        className="hidden md:grid absolute -right-5 top-[38%] place-items-center w-11 h-11 rounded-full bg-white border border-pine/15 shadow-lg text-pine hover:text-signal hover:border-signal/50 transition"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="m9 6 6 6-6 6" />
