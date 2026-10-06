@@ -13,6 +13,7 @@ const SHOP_LINKS = [
 
 const SUPPORT_LINKS = [
   { label: "Shipping Info", href: "/shipping" },
+  { label: "Returns & Refunds", href: "/returns" },
   { label: "The Playbook", href: "/#playbook" },
   { label: "FAQ", href: "/#playbook" },
   { label: "Contact Us", href: "#contact" },

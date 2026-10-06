@@ -10,6 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/reels`, changeFrequency: "daily", priority: 0.9 },
     { url: `${BASE}/tackle`, changeFrequency: "daily", priority: 0.9 },
     { url: `${BASE}/ice-fishing`, changeFrequency: "daily", priority: 0.9 },
+    { url: `${BASE}/returns`, changeFrequency: "monthly", priority: 0.5 },
   ];
 
   try {
