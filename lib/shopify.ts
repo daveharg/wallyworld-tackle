@@ -137,19 +137,39 @@ function mapProduct(node: any): ShopifyProduct {
   };
 }
 
+interface ProductsPage {
+  products: {
+    edges: { node: any; cursor: string }[];
+    pageInfo: { hasNextPage: boolean };
+  };
+}
+
 export async function getProducts(first = 100): Promise<ShopifyProduct[]> {
-  const data = await storefront<{ products: { edges: { node: any }[] } }>(
-    `
+  // Paginate through the whole catalog — the store now has more products
+  // than a single Storefront API page, so keep fetching until hasNextPage
+  // is false (safety cap at 2000 products).
+  const pageSize = Math.min(Math.max(first, 100), 250);
+  const out: ShopifyProduct[] = [];
+  let cursor: string | null = null;
+  for (;;) {
+    const data: ProductsPage = await storefront(
+      `
     ${PRODUCT_FRAGMENT}
-    query GetProducts($first: Int!) {
-      products(first: $first) {
-        edges { node { ...ProductFields } }
+    query GetProducts($first: Int!, $after: String) {
+      products(first: $first, after: $after) {
+        edges { node { ...ProductFields } cursor }
+        pageInfo { hasNextPage }
       }
     }
     `,
-    { first }
-  );
-  return data.products.edges.map((e) => mapProduct(e.node));
+      { first: pageSize, after: cursor }
+    );
+    for (const e of data.products.edges) out.push(mapProduct(e.node));
+    if (!data.products.edges.length || !data.products.pageInfo.hasNextPage) break;
+    cursor = data.products.edges[data.products.edges.length - 1].cursor;
+    if (out.length >= 2000) break;
+  }
+  return out;
 }
 
 export async function getProductByHandle(handle: string): Promise<ShopifyProduct | null> {

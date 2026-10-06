@@ -1,6 +1,7 @@
 // Category sorting: assign products to store sections by title keywords.
-// rod → Rods, reel → Reels, jig → Jig Heads, tackle box/organizer → Tackle Boxes,
-// grub/worm/swimbait → Soft Plastics, everything else → Tackle & More.
+// rod → Rods, reel → Reels, jig → Jig Heads, tackle box/bag → Tackle Boxes,
+// grub/worm/swimbait → Soft Plastics, knife → Knives, fish finder/sonar →
+// Fish Finders & Electronics, net → Nets, everything else → Tackle & More.
 
 import type { ShopifyProduct } from "./shopify";
 
@@ -14,6 +15,9 @@ export type CategoryKey =
   | "tools"
   | "terminalTackle"
   | "iceFishing"
+  | "knives"
+  | "electronics"
+  | "nets"
   | "other";
 
 export interface Category {
@@ -31,6 +35,9 @@ export const CATEGORIES: Category[] = [
   { key: "tackleBoxes", label: "Tackle Boxes", href: "/tackle#tackle-boxes" },
   { key: "tools", label: "Tools & Accessories", href: "/tackle#tools" },
   { key: "terminalTackle", label: "Terminal Tackle", href: "/tackle#terminal-tackle" },
+  { key: "knives", label: "Knives", href: "/tackle#knives" },
+  { key: "electronics", label: "Fish Finders & Electronics", href: "/tackle#electronics" },
+  { key: "nets", label: "Nets", href: "/tackle#nets" },
   { key: "iceFishing", label: "Ice Fishing", href: "/ice-fishing" },
 ];
 
@@ -42,7 +49,37 @@ export function categoryOf(product: ShopifyProduct): CategoryKey {
   const t = titleOf(product);
 
   // Ice fishing — FIRST, since "ice fishing rod" contains "rod".
-  if (/ice[ -]?fish/.test(t) || /ice (shelter|tent|shack|hut)/.test(t)) return "iceFishing";
+  if (/ice[ -]?fish/.test(t) || /ice (shelter|tent|shack|hut|auger)/.test(t)) return "iceFishing";
+
+  // Tackle storage — before rods, since rod-carrier bags contain "rod".
+  if (
+    /tackle box/.test(t) ||
+    /tackle.*(box|bag|backpack|organizer|storage|carrier)/.test(t) ||
+    /organizer/.test(t) ||
+    /lure storage/.test(t) ||
+    /fanny pack/.test(t) ||
+    /fish bucket/.test(t) ||
+    /floating fish bag/.test(t)
+  )
+    return "tackleBoxes";
+
+  // Knives — own category (before tools).
+  if (/\bknife\b/.test(t) || /knives/.test(t) || /cleaver/.test(t) || /fillet/.test(t)) return "knives";
+
+  // Fish finders & electronics.
+  if (
+    /fish finder/.test(t) ||
+    /depth finder/.test(t) ||
+    /sonar/.test(t) ||
+    /echo sounder/.test(t) ||
+    /underwater fishing camera/.test(t) ||
+    /bait boat/.test(t)
+  )
+    return "electronics";
+
+  // Nets — own category (before tools).
+  if (/\bnet\b/.test(t) || /landing net/.test(t) || /cast net/.test(t) || /fish trap/.test(t) || /fish creel/.test(t))
+    return "nets";
 
   // Rods & reels first — most specific.
   if (/\brod\b/.test(t) && !/jig head/.test(t)) return "rods";
@@ -51,11 +88,12 @@ export function categoryOf(product: ShopifyProduct): CategoryKey {
   // Jig heads — specific "jig head" or standalone "jig" (not "jigging" rod).
   if (/jig head/.test(t) || /\bjig\b/.test(t)) return "jigHeads";
 
-  // Soft plastics — expanded keywords.
+  // Soft plastics — expanded keywords. "swimbait" is excluded when the title
+  // carries hard-bait signals (jointed/minnow/hard bait), which route below.
   if (
     /\bgrub\b/.test(t) ||
     /\bworm\b/.test(t) ||
-    /swimbait/.test(t) ||
+    (/swimbait/.test(t) && !/jointed|minnow|hard bait|hard lure/.test(t)) ||
     /paddle tail/.test(t) ||
     /soft plastic/.test(t) ||
     /soft lure/.test(t) ||
@@ -64,12 +102,13 @@ export function categoryOf(product: ShopifyProduct): CategoryKey {
     /crawfish/.test(t) ||
     /craw\b/.test(t) ||
     /creature/.test(t) ||
+    /squid/.test(t) ||
     /rubber/.test(t) && /lure|bait/.test(t)
   )
     return "softPlastics";
 
   // Hard baits — BEFORE terminal tackle so "treble hook" doesn't misroute.
-  // Expanded: spoon, spinner (lure), jerkbait, popper, vib, hard lure.
+  // Expanded: spoon, spinner (lure), jerkbait, popper, vib, hard lure, jointed.
   if (
     /crankbait/.test(t) ||
     /spinnerbait/.test(t) ||
@@ -79,6 +118,7 @@ export function categoryOf(product: ShopifyProduct): CategoryKey {
     /frog/.test(t) ||
     /topwater/.test(t) ||
     /jerkbait/.test(t) ||
+    /jointed/.test(t) ||
     /\bspoon\b/.test(t) ||
     /spinner lure/.test(t) ||
     /metal lure/.test(t) ||
@@ -89,37 +129,37 @@ export function categoryOf(product: ShopifyProduct): CategoryKey {
   )
     return "hardBaits";
 
-  // Tackle boxes.
-  if (/tackle box/.test(t) || /organizer/.test(t)) return "tackleBoxes";
-
   // Terminal tackle — hooks, sinkers, swivels, snaps, leaders, line.
+  // Tool words (pliers, grippers, removers, cutters) route to tools instead.
   if (
-    /fish.?hook/.test(t) ||
-    /\bhooks\b/.test(t) ||
-    /sinker/.test(t) ||
-    /swivel/.test(t) ||
-    /\bsnap\b/.test(t) ||
-    /leader/.test(t) ||
-    /fishing line/.test(t) ||
-    /braided line/.test(t) ||
-    /nylon line/.test(t)
+    (/fish.?hook/.test(t) ||
+      /\bhooks\b/.test(t) ||
+      /sinker/.test(t) ||
+      /swivel/.test(t) ||
+      /\bsnap\b/.test(t) ||
+      /leader/.test(t) ||
+      /fishing line/.test(t) ||
+      /braided line/.test(t) ||
+      /nylon line/.test(t) ||
+      /fluorocarbon/.test(t)) &&
+    !/plier|gripper|tweezer|controller|clamp|remover|cutter|scissor/.test(t)
   )
     return "terminalTackle";
 
   // Tools & accessories — specific tool words only (not greedy).
   if (
     /plier/.test(t) ||
-    /\bknife\b/.test(t) ||
-    /fillet/.test(t) ||
     /scissor/.test(t) ||
-    /\bnet\b/.test(t) ||
-    /landing net/.test(t) ||
+    /gripper/.test(t) ||
+    /hook remover/.test(t) ||
+    /lip grip/.test(t) ||
+    /fish controller/.test(t) ||
     /tool set/.test(t) ||
     /repair kit/.test(t) ||
     /rod holder/.test(t) ||
     /line winder/.test(t) ||
-    /hook remover/.test(t) ||
-    /lip grip/.test(t)
+    /tweezer/.test(t) ||
+    /glove/.test(t)
   )
     return "tools";
 

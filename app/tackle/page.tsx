@@ -12,6 +12,9 @@ const TACKLE_KEYS: CategoryKey[] = [
   "tackleBoxes",
   "tools",
   "terminalTackle",
+  "knives",
+  "electronics",
+  "nets",
 ];
 
 const ROW_GROUPS: { key: CategoryKey; id: string; label: string }[] = [
@@ -21,6 +24,9 @@ const ROW_GROUPS: { key: CategoryKey; id: string; label: string }[] = [
   { key: "tackleBoxes", id: "tackle-boxes", label: "Tackle Boxes" },
   { key: "tools", id: "tools", label: "Tools & Accessories" },
   { key: "terminalTackle", id: "terminal-tackle", label: "Terminal Tackle" },
+  { key: "knives", id: "knives", label: "Knives" },
+  { key: "electronics", id: "electronics", label: "Fish Finders & Electronics" },
+  { key: "nets", id: "nets", label: "Nets" },
 ];
 
 export default async function TacklePage() {
@@ -37,7 +43,7 @@ export default async function TacklePage() {
   return (
     <ProductListing
       title="Tackle & More"
-      subtitle="Jigs, plastics, hard baits, boxes, tools and terminal tackle — everything else you need in the boat."
+      subtitle="Jigs, plastics, hard baits, boxes, tools, knives, fish finders, nets and terminal tackle — everything else you need in the boat."
       products={tackle}
       breadcrumbs={[{ label: "Home", href: "/" }, { label: "Tackle & More" }]}
       rowGroups={ROW_GROUPS}

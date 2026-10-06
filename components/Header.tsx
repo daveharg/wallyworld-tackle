@@ -17,6 +17,9 @@ const CAT_NAV = [
   { label: "Jig Heads", href: "/tackle#jig-heads" },
   { label: "Tackle Boxes", href: "/tackle#tackle-boxes" },
   { label: "Tools & Accessories", href: "/tackle#tools" },
+  { label: "Knives", href: "/tackle#knives" },
+  { label: "Fish Finders", href: "/tackle#electronics" },
+  { label: "Nets", href: "/tackle#nets" },
   { label: "Ice Fishing", href: "/ice-fishing" },
   { label: "Walleye", href: "/#walleye-picks", hot: true },
 ];
