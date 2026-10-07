@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLake, getLakes, getZone, getGuideUrl } from "@/lib/fishmb";
+import { lakePhotoUrl } from "@/lib/fishmb-constants";
 
 export const revalidate = 3600;
 
@@ -51,14 +52,12 @@ export default function LakeDetailPage({ params }: { params: { id: string } }) {
 
       {/* Hero */}
       <div className="relative mt-4 rounded-3xl overflow-hidden bg-pine-deep">
-        {lake.photo && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={lake.photo}
-            alt={lake.name}
-            className="w-full h-64 md:h-96 object-cover"
-          />
-        )}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={lakePhotoUrl(lake.id, 1600)}
+          alt={lake.name}
+          className="w-full h-64 md:h-96 object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-pine-deep/85 via-pine-deep/20 to-transparent" />
         <div className="absolute bottom-0 inset-x-0 p-6 md:p-8">
           <p className="text-gold font-bold uppercase tracking-[0.24em] text-xs mb-2">

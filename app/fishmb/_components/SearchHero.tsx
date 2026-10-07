@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { FISHMB_HERO_PHOTO } from "@/lib/fishmb-constants";
 
 interface LakeHit {
   id: string;
@@ -71,8 +72,8 @@ export default function SearchHero() {
       {/* backdrop */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="https://images.unsplash.com/photo-1500930287596-c1ecaa373bb2?auto=format&fit=crop&w=2000&q=70"
-        alt="Manitoba lake at dawn"
+        src={FISHMB_HERO_PHOTO}
+        alt="Wooden dock on a calm Manitoba lake"
         className="absolute inset-0 w-full h-full object-cover"
       />
       <div className="absolute inset-0 bg-gradient-to-r from-pine-deep/90 via-pine-deep/55 to-pine-deep/20" />

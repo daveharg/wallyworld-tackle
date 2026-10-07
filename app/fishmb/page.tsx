@@ -10,6 +10,7 @@ import {
   getZones,
   getLakes,
 } from "@/lib/fishmb";
+import { FISHMB_CTA_PHOTO } from "@/lib/fishmb-constants";
 
 export const revalidate = 3600;
 
@@ -145,8 +146,8 @@ export default function FishMBHome() {
         <div className="relative overflow-hidden rounded-3xl bg-pine-deep">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://images.unsplash.com/photo-1516683037151-9a17603a8cee?auto=format&fit=crop&w=1800&q=70"
-            alt="Angler holding a walleye at sunset"
+            src={FISHMB_CTA_PHOTO}
+            alt="Fishing rods silhouetted over the water at sunset"
             className="absolute inset-0 w-full h-full object-cover opacity-40"
             loading="lazy"
           />

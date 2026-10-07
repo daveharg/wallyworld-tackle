@@ -1,5 +1,6 @@
 import Link from "next/link";
-import type { Lake, Lodge, HotLake } from "@/lib/fishmb";
+import type { Lodge, HotLake } from "@/lib/fishmb";
+import { lakePhotoUrl } from "@/lib/fishmb-constants";
 
 function SpeciesLine({ species }: { species: string[] }) {
   return (
@@ -33,7 +34,7 @@ export function LakeCard({
     >
       <div className="relative h-36 md:h-44 bg-pine-deep/10">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        {lake.photo && <img src={lake.photo} alt={lake.name} className="w-full h-full object-cover" loading="lazy" />}
+        <img src={lakePhotoUrl(lake.id)} alt={lake.name} className="w-full h-full object-cover" loading="lazy" />
         {lake.stocked && (
           <span className="absolute top-2.5 left-2.5 text-[10px] font-black uppercase tracking-wider text-white bg-[#5E8F3E] rounded-md px-2 py-1">
             Stocked
