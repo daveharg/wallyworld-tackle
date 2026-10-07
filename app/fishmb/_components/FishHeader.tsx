@@ -11,6 +11,7 @@ const NAV = [
   { href: "/fishmb/regulations", label: "Regulations" },
   { href: "/fishmb/hot-lakes", label: "Hot Lakes" },
   { href: "/fishmb/tournaments", label: "Tournaments" },
+  { href: "/fishmb/tips", label: "Tips" },
 ];
 
 export function Wordmark({ light = false }: { light?: boolean }) {

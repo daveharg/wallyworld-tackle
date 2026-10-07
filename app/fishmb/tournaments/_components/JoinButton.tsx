@@ -5,7 +5,15 @@ import { useRouter } from "next/navigation";
 import { useFishAuth } from "../../_components/FishAuth";
 import { fishFetch } from "../../_components/fishFetch";
 
-export function JoinButton({ tournamentId, tournamentName }: { tournamentId: string; tournamentName: string }) {
+export function JoinButton({
+  tournamentId,
+  tournamentName,
+  inviteCode,
+}: {
+  tournamentId: string;
+  tournamentName: string;
+  inviteCode?: string;
+}) {
   const { user, openLogin } = useFishAuth();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -19,7 +27,11 @@ export function JoinButton({ tournamentId, tournamentName }: { tournamentId: str
     setBusy(true);
     setError(null);
     try {
-      await fishFetch(`/api/fishmb/tournaments/${tournamentId}/join`, { method: "POST" });
+      await fishFetch(`/api/fishmb/tournaments/${tournamentId}/join`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ invite_code: inviteCode ?? "" }),
+      });
       router.push(`/fishmb/tournaments/${tournamentId}`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not join.");

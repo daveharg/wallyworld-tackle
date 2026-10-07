@@ -22,6 +22,8 @@ export async function PATCH(req: NextRequest) {
   const me = await fishUserFromRequest(req);
   if (!me) return unauthorized();
 
+  await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS bio text NOT NULL DEFAULT ''`);
+
   let body: Record<string, unknown>;
   try {
     body = await req.json();
@@ -46,6 +48,10 @@ export async function PATCH(req: NextRequest) {
   if (typeof body.stats_public === "boolean") {
     params.push(body.stats_public);
     updates.push(`stats_public = $${params.length}`);
+  }
+  if (typeof body.bio === "string") {
+    params.push(body.bio.trim().slice(0, 500));
+    updates.push(`bio = $${params.length}`);
   }
   if (updates.length === 0) return badRequest("Nothing to update.");
 

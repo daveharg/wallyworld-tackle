@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFishAuth } from "../../_components/FishAuth";
 import { fishFetch } from "../../_components/fishFetch";
+import { PayoutEditor } from "./PayoutEditor";
+import type { PayoutTier } from "@/lib/fish/tournaments";
 
 interface LakeOpt {
   id: string;
@@ -29,6 +31,8 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
   const [lakeIds, setLakeIds] = useState<string[]>([]);
   const [speciesInput, setSpeciesInput] = useState("");
   const [species, setSpecies] = useState<string[]>(["Walleye"]);
+  const [entryFee, setEntryFee] = useState("");
+  const [payouts, setPayouts] = useState<PayoutTier[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -64,6 +68,8 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
           rules: rules.trim(),
           scoring,
           max_participants: null,
+          entry_fee_cents: Math.max(0, Math.round((parseFloat(entryFee) || 0) * 100)),
+          payouts,
         }),
       });
       router.push(`/fishmb/tournaments/${data.tournament.id}/manage`);
@@ -132,6 +138,30 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
           <div>
             <label className={labelCls}>Rules</label>
             <textarea value={rules} onChange={(e) => setRules(e.target.value)} rows={4} placeholder="Catch-photo rules, measuring requirements, boundaries, prizes…" className={inputCls} />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={labelCls}>Entry fee per angler ($)</label>
+              <input
+                value={entryFee}
+                onChange={(e) => setEntryFee(e.target.value.replace(/[^0-9.]/g, ""))}
+                inputMode="decimal"
+                placeholder="0 = free"
+                className={inputCls}
+              />
+            </div>
+            <div className="flex items-end pb-3">
+              <p className="text-xs text-pine/50">
+                The pot is entry fee × anglers. Payouts below are taken from it.
+              </p>
+            </div>
+          </div>
+          <div>
+            <label className={labelCls}>Payouts</label>
+            <PayoutEditor value={payouts} onChange={setPayouts} />
+            <p className="text-xs text-pine/50 mt-2">
+              Each place pays a % of the pot or a fixed $ amount. Leave empty for bragging rights.
+            </p>
           </div>
         </div>
       )}
@@ -208,6 +238,10 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
             <div className="flex justify-between"><dt className="text-pine/55 font-bold uppercase text-xs tracking-wider">Scoring</dt><dd className="text-pine capitalize">{scoring === "longest" ? "Longest fish" : scoring === "total" ? "Total length" : "Most fish"}</dd></div>
             <div className="flex justify-between"><dt className="text-pine/55 font-bold uppercase text-xs tracking-wider">Waters</dt><dd className="text-pine text-right">{lakeIds.length ? lakeIds.map(lakeName).join(", ") : "Any Manitoba water"}</dd></div>
             <div className="flex justify-between"><dt className="text-pine/55 font-bold uppercase text-xs tracking-wider">Species</dt><dd className="text-pine text-right">{species.join(", ") || "—"}</dd></div>
+            <div className="flex justify-between"><dt className="text-pine/55 font-bold uppercase text-xs tracking-wider">Entry fee</dt><dd className="text-pine text-right">{parseFloat(entryFee) > 0 ? `$${parseFloat(entryFee).toFixed(2)} / angler` : "Free"}</dd></div>
+            {payouts.length > 0 && (
+              <div className="flex justify-between"><dt className="text-pine/55 font-bold uppercase text-xs tracking-wider">Payouts</dt><dd className="text-pine text-right">{payouts.map((p) => `${p.place}${p.type === "percent" ? ` (${p.value}%)` : ` ($${p.value})`}`).join(", ")}</dd></div>
+            )}
           </dl>
           {!user && (
             <p className="text-sm text-pine/60 bg-gold/15 border border-gold/40 rounded-2xl p-4">

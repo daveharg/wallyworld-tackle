@@ -8,7 +8,6 @@ import { CommunityBox } from "./_components/CommunityBox";
 import { RegsSearch } from "./_components/RegsSearch";
 import {
   getHotLakes,
-  getStockedLakes,
   getLodges,
   getZones,
   getLakes,
@@ -39,7 +38,6 @@ function toCardLake(l: ReturnType<typeof getLakesForSpecies>[number]) {
 
 export default function FishMBHome() {
   const hot = getHotLakes();
-  const stocked = getStockedLakes(12);
   const lodges = getLodges().slice(0, 12);
   const zones = getZones();
   const shows = getYoutubeShows();
@@ -218,21 +216,6 @@ export default function FishMBHome() {
         <HSlider>
           {lodges.map((l) => (
             <LodgeCard key={l.id} lodge={l} />
-          ))}
-        </HSlider>
-      </section>
-
-      {/* Stocked waters */}
-      <section className="max-w-7xl mx-auto px-4 mt-12 md:mt-16">
-        <SectionHeading
-          eyebrow="Put-and-take"
-          title="Stocked waters"
-          href="/fishmb/lakes"
-          linkLabel="All lakes"
-        />
-        <HSlider>
-          {stocked.map((l) => (
-            <LakeCard key={l.id} lake={toCardLake(l)} />
           ))}
         </HSlider>
       </section>

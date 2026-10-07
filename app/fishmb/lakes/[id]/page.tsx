@@ -150,6 +150,38 @@ export default function LakeDetailPage({ params }: { params: { id: string } }) {
 
           {/* Regulations */}
           <section className="bg-white rounded-3xl border border-pine/10 p-6 md:p-8">
+            {lake.id === "clear-lake" && (
+              <div className="bg-pine text-white rounded-2xl p-5 md:p-6 mb-6">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-gold mb-2">
+                  🏛️ National park water — different rules
+                </p>
+                <p className="text-white/90 text-sm leading-relaxed mb-3">
+                  Clear Lake is inside Riding Mountain National Park, so the
+                  Manitoba Anglers&apos; Guide does <strong>not</strong> apply here.
+                  Your provincial licence is <strong>not valid</strong> — you need
+                  a Parks Canada national park fishing permit instead (youth under
+                  16 fish free with a permit-holding adult).
+                </p>
+                <ul className="text-white/85 text-sm space-y-1.5 list-disc pl-5 mb-3">
+                  <li>Season: May 15 to March 31.</li>
+                  <li>Barbless hooks only — pinch every barb.</li>
+                  <li>No lead tackle under 50 g.</li>
+                  <li>No live or dead fish bait (earthworms &amp; nightcrawlers OK).</li>
+                  <li>One line at a time, angling only, no night fishing.</li>
+                  <li>Limits: pike 3 (only 1 over 76 cm), walleye 2, perch 5, whitefish 5 — 5 fish combined max.</li>
+                  <li>Smallmouth bass are invasive here: <strong>kill and keep every one</strong>, no limit, and report them to Parks Canada.</li>
+                  <li>All watercraft and gear need a Parks Canada invasive-species inspection — Clean, Drain, Dry.</li>
+                </ul>
+                <a
+                  href="https://parks.canada.ca/pn-np/mb/riding/activ/rec/activ1-fsh?wbdisable=true"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block bg-gold text-pine font-bold uppercase tracking-wider text-xs px-5 py-2.5 rounded-full hover:bg-white transition-colors"
+                >
+                  Parks Canada fishing rules →
+                </a>
+              </div>
+            )}
             <p className="text-signal text-xs font-bold uppercase tracking-[0.24em] mb-2">
               2026 Manitoba Anglers&apos; Guide
             </p>

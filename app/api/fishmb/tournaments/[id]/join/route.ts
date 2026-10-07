@@ -1,4 +1,6 @@
 // POST /api/fishmb/tournaments/[id]/join — join a tournament (auth required).
+// An invite code is required to join someone else's tournament (Dave's rule —
+// no open joins). The organizer is exempt.
 
 import { NextRequest, NextResponse } from "next/server";
 import {
@@ -21,6 +23,23 @@ export async function POST(
   if (await isParticipant(t.id, me.id)) {
     return NextResponse.json({ joined: true });
   }
+
+  let body: Record<string, unknown> = {};
+  try {
+    body = await req.json();
+  } catch {
+    // no body — code check below will reject
+  }
+  const code =
+    typeof body.invite_code === "string" ? body.invite_code.trim().toUpperCase() : "";
+  const isOrganizer = t.organizer_id === me.id;
+  if (!isOrganizer && code !== t.invite_code.toUpperCase()) {
+    return NextResponse.json(
+      { error: "You need the tournament's invite code to join." },
+      { status: 403 }
+    );
+  }
+
   if (t.max_participants !== null && t.participant_count >= t.max_participants) {
     return badRequest("This tournament is full.");
   }

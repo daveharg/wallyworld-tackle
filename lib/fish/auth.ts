@@ -17,6 +17,7 @@ export interface FishUser {
   avatar_url: string | null;
   stats_public: boolean;
   play_balance: number;
+  bio: string;
   created_at: string;
 }
 
@@ -43,6 +44,7 @@ export interface ApiUser {
   avatar_url: string | null;
   stats_public: boolean;
   play_balance: number;
+  bio: string;
   is_anonymous: boolean;
   created_at: string;
 }
@@ -54,6 +56,7 @@ export function toApiUser(u: FishUser): ApiUser {
     email: u.email,
     avatar_url: u.avatar_url,
     stats_public: u.stats_public,
+    bio: (u as { bio?: string }).bio ?? "", 
     play_balance: u.play_balance,
     is_anonymous: isAnonymousUser(u),
     created_at: u.created_at,

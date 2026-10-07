@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSpeciesAdvice, getSpeciesBySlug, slugifySpecies } from "@/lib/fishmb-species";
 import { getLakes } from "@/lib/fishmb";
+import { SpeciesTips } from "../_components/SpeciesTips";
 
 export async function generateStaticParams() {
   return getSpeciesAdvice().map((s) => ({ slug: slugifySpecies(s.species) }));
@@ -94,6 +95,8 @@ export default function SpeciesGuidePage({ params }: { params: { slug: string } 
           </Link>
         </>
       )}
+
+      <SpeciesTips species={advice.species} />
     </div>
   );
 }

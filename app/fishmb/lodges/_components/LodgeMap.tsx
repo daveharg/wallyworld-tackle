@@ -44,9 +44,15 @@ export function LodgeMap({ lodges }: { lodges: MapLodge[] }) {
       const L = (await import("leaflet")).default;
       layerRef.current?.remove();
       const layer = L.layerGroup();
+      const dot = L.divIcon({
+        className: "",
+        html: `<div style="width:10px;height:10px;border-radius:50%;background:#D64524;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.45)"></div>`,
+        iconSize: [10, 10],
+        iconAnchor: [5, 5],
+      });
       const bounds: [number, number][] = [];
       for (const lodge of lodges.slice(0, 200)) {
-        const marker = L.marker([lodge.lat, lodge.lng]).bindPopup(
+        const marker = L.marker([lodge.lat, lodge.lng], { icon: dot }).bindPopup(
           `<strong>${escapeHtml(lodge.name)}</strong><br/>${escapeHtml(lodge.location)}<br/><a href="/fishmb/lodges/${lodge.id}">View →</a>`
         );
         marker.addTo(layer);

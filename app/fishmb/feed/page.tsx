@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
@@ -14,6 +15,7 @@ interface FeedItem {
   photo_url: string | null;
   species: string | null;
   length_in: number | null;
+  visibility?: string;
   comment_count: number;
   created_at: string;
 }
@@ -122,9 +124,16 @@ export default function FeedPage() {
   const [items, setItems] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"all" | "catch" | "post">("all");
+  const [mode, setMode] = useState<"post" | "catch">("post");
   const [draft, setDraft] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
   const [posting, setPosting] = useState(false);
+  const [visibility, setVisibility] = useState<"public" | "friends" | "private">("public");
+  const [catchSpecies, setCatchSpecies] = useState("");
+  const [catchLength, setCatchLength] = useState("");
+  const [myTournaments, setMyTournaments] = useState<{ id: string; name: string }[]>([]);
+  const [tournamentId, setTournamentId] = useState("");
+  const [catchNote, setCatchNote] = useState<string | null>(null);
   const [openComments, setOpenComments] = useState<Set<string>>(new Set());
 
   const load = useCallback(async () => {
@@ -142,6 +151,28 @@ export default function FeedPage() {
     load();
   }, [load]);
 
+  // My tournaments for the "also enter in tournament" picker.
+  useEffect(() => {
+    if (!user) return;
+    fishFetch("/api/fishmb/tournaments?mine=1")
+      .then((d) => setMyTournaments(d.tournaments ?? []))
+      .catch(() => {});
+  }, [user]);
+
+  const uploadPhoto = async (file: File): Promise<string> => {
+    const token = localStorage.getItem(FISHMB_TOKEN_KEY);
+    const form = new FormData();
+    form.append("file", file);
+    const upRes = await fetch("/api/fish/photos/upload", {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: form,
+    });
+    const up = await upRes.json();
+    if (!upRes.ok) throw new Error(up.error || "Photo upload failed.");
+    return up.url as string;
+  };
+
   const post = async () => {
     if (!user) {
       openLogin();
@@ -149,31 +180,88 @@ export default function FeedPage() {
     }
     if (!draft.trim() || posting) return;
     setPosting(true);
+    setCatchNote(null);
     try {
       let photoUrl: string | null = null;
-      if (photo) {
-        const token = localStorage.getItem(FISHMB_TOKEN_KEY);
-        const form = new FormData();
-        form.append("file", photo);
-        const upRes = await fetch("/api/fish/photos/upload", {
-          method: "POST",
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-          body: form,
-        });
-        const up = await upRes.json();
-        if (!upRes.ok) throw new Error(up.error || "Photo upload failed.");
-        photoUrl = up.url;
-      }
+      if (photo) photoUrl = await uploadPhoto(photo);
       const d = await fishFetch("/api/fishmb/feed", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ body: draft.trim(), photo_url: photoUrl }),
+        body: JSON.stringify({
+          body: draft.trim(),
+          photo_url: photoUrl,
+          visibility: visibility === "private" ? "public" : visibility,
+        }),
       });
       setItems([d.item, ...items]);
       setDraft("");
       setPhoto(null);
-    } catch {
-      // non-fatal
+    } catch (e) {
+      setCatchNote(e instanceof Error ? e.message : "Could not post.");
+    } finally {
+      setPosting(false);
+    }
+  };
+
+  const logCatch = async () => {
+    if (!user) {
+      openLogin();
+      return;
+    }
+    if (posting) return;
+    const lengthIn = parseFloat(catchLength);
+    if (!catchSpecies.trim()) {
+      setCatchNote("What species was it?");
+      return;
+    }
+    if (!Number.isFinite(lengthIn) || lengthIn <= 0) {
+      setCatchNote("Enter the length in inches.");
+      return;
+    }
+    if (!photo) {
+      setCatchNote("Add a photo of your catch.");
+      return;
+    }
+    setPosting(true);
+    setCatchNote(null);
+    try {
+      const photoUrl = await uploadPhoto(photo);
+      await fishFetch("/api/fish/catches", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          species: catchSpecies.trim(),
+          length_in: lengthIn,
+          photo_measure_url: photoUrl,
+          photo_hold_url: photoUrl,
+          visibility,
+          note: draft.trim() || null,
+        }),
+      });
+      if (tournamentId) {
+        await fishFetch(`/api/fishmb/tournaments/${tournamentId}/entries`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            photo_url: photoUrl,
+            species: catchSpecies.trim(),
+            length_inches: lengthIn,
+            notes: draft.trim(),
+            captured_at: new Date().toISOString(),
+          }),
+        });
+        setCatchNote("Catch logged — and sent to your tournament for review! 🎣");
+      } else {
+        setCatchNote("Catch logged! 🎣");
+      }
+      setCatchSpecies("");
+      setCatchLength("");
+      setDraft("");
+      setPhoto(null);
+      setTournamentId("");
+      load();
+    } catch (e) {
+      setCatchNote(e instanceof Error ? e.message : "Could not log the catch.");
     } finally {
       setPosting(false);
     }
@@ -202,31 +290,142 @@ export default function FeedPage() {
       <div className="bg-white border border-pine/10 rounded-3xl p-5 mb-6">
         {user ? (
           <>
-            <textarea
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              rows={3}
-              placeholder="How's the bite? Share a report…"
-              className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal resize-none"
-            />
-            <div className="flex items-center justify-between mt-3">
-              <label className="text-sm font-bold text-signal-dark cursor-pointer">
-                {photo ? `📷 ${photo.name.slice(0, 24)}` : "📷 Add photo"}
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  className="hidden"
-                  onChange={(e) => setPhoto(e.target.files?.[0] || null)}
-                />
-              </label>
-              <button
-                onClick={post}
-                disabled={posting || !draft.trim()}
-                className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-6 py-2.5 rounded-full disabled:opacity-40 transition-colors"
-              >
-                {posting ? "Posting…" : "Post"}
-              </button>
+            <div className="flex gap-2 mb-4">
+              {(
+                [
+                  ["post", "Share a post"],
+                  ["catch", "🐟 Log a catch"],
+                ] as const
+              ).map(([v, label]) => (
+                <button
+                  key={v}
+                  onClick={() => {
+                    setMode(v);
+                    setCatchNote(null);
+                  }}
+                  className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors ${
+                    mode === v ? "bg-pine text-white" : "bg-pine/5 text-pine/60 hover:bg-pine/10"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
+
+            {mode === "post" ? (
+              <>
+                <textarea
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  rows={3}
+                  placeholder="How's the bite? Share a report…"
+                  className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal resize-none"
+                />
+                <div className="flex items-center justify-between mt-3 gap-2 flex-wrap">
+                  <label className="text-sm font-bold text-signal-dark cursor-pointer">
+                    {photo ? `📷 ${photo.name.slice(0, 24)}` : "📷 Add photo"}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      className="hidden"
+                      onChange={(e) => setPhoto(e.target.files?.[0] || null)}
+                    />
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={visibility === "private" ? "public" : visibility}
+                      onChange={(e) => setVisibility(e.target.value as "public" | "friends")}
+                      className="bg-paper-deep border border-pine/15 rounded-full px-3 py-2 text-xs font-bold text-pine focus:outline-none"
+                      aria-label="Who can see this"
+                    >
+                      <option value="public">🌍 Everyone</option>
+                      <option value="friends">👥 Friends only</option>
+                    </select>
+                    <button
+                      onClick={post}
+                      disabled={posting || !draft.trim()}
+                      className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-6 py-2.5 rounded-full disabled:opacity-40 transition-colors"
+                    >
+                      {posting ? "Posting…" : "Post"}
+                    </button>
+                  </div>
+                </div>
+                {catchNote && <p className="text-sm text-signal-dark mt-3">{catchNote}</p>}
+              </>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <input
+                    value={catchSpecies}
+                    onChange={(e) => setCatchSpecies(e.target.value)}
+                    placeholder="Species * (e.g. Walleye)"
+                    className="bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal"
+                  />
+                  <input
+                    value={catchLength}
+                    onChange={(e) => setCatchLength(e.target.value.replace(/[^0-9.]/g, ""))}
+                    inputMode="decimal"
+                    placeholder="Length (in) *"
+                    className="bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal"
+                  />
+                </div>
+                <textarea
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  rows={2}
+                  placeholder="Notes — where, how, on what…"
+                  className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal resize-none mt-3"
+                />
+                <div className="flex items-center justify-between mt-3 gap-2 flex-wrap">
+                  <label className="text-sm font-bold text-signal-dark cursor-pointer">
+                    {photo ? `📷 ${photo.name.slice(0, 24)}` : "📷 Add photo *"}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      className="hidden"
+                      onChange={(e) => setPhoto(e.target.files?.[0] || null)}
+                    />
+                  </label>
+                  <select
+                    value={visibility}
+                    onChange={(e) => setVisibility(e.target.value as "public" | "friends" | "private")}
+                    className="bg-paper-deep border border-pine/15 rounded-full px-3 py-2 text-xs font-bold text-pine focus:outline-none"
+                    aria-label="Who can see this"
+                  >
+                    <option value="public">🌍 Everyone</option>
+                    <option value="friends">👥 Friends only</option>
+                    <option value="private">🔒 Only me</option>
+                  </select>
+                </div>
+                {myTournaments.length > 0 && (
+                  <div className="mt-3">
+                    <label className="text-xs font-bold uppercase tracking-wider text-pine/55">
+                      Also enter in tournament
+                    </label>
+                    <select
+                      value={tournamentId}
+                      onChange={(e) => setTournamentId(e.target.value)}
+                      className="w-full mt-1 bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-sm text-pine focus:outline-none focus:border-signal"
+                    >
+                      <option value="">Just the feed — no tournament</option>
+                      {myTournaments.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                <button
+                  onClick={logCatch}
+                  disabled={posting}
+                  className="w-full mt-4 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3.5 rounded-full disabled:opacity-40 transition-colors"
+                >
+                  {posting ? "Logging…" : "Log catch"}
+                </button>
+                {catchNote && <p className="text-sm text-pine mt-3">{catchNote}</p>}
+              </>
+            )}
           </>
         ) : (
           <div className="text-center py-2">
@@ -242,6 +441,12 @@ export default function FeedPage() {
           </div>
         )}
       </div>
+
+      <p className="text-center text-sm text-pine/55 mb-6">
+        <Link href="/fishmb/friends" className="font-bold text-signal-dark">
+          Manage your friends →
+        </Link>
+      </p>
 
       {/* Tabs */}
       <div className="flex gap-2 mb-6">
@@ -283,6 +488,7 @@ export default function FeedPage() {
                   <p className="font-bold text-pine text-sm">{item.user_name}</p>
                   <p className="text-xs text-pine/45">
                     {timeAgo(item.created_at)} · {item.kind === "catch" ? "logged a catch" : "posted"}
+                    {item.visibility === "friends" && " · 👥 friends only"}
                   </p>
                 </div>
                 {item.kind === "catch" && (

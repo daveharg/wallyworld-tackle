@@ -18,6 +18,7 @@ export function TournamentActions({ tournamentId }: { tournamentId: string }) {
   const [detail, setDetail] = useState<Detail | null>(null);
   const [joining, setJoining] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [code, setCode] = useState("");
   const [showSubmit, setShowSubmit] = useState(false);
 
   useEffect(() => {
@@ -35,10 +36,18 @@ export function TournamentActions({ tournamentId }: { tournamentId: string }) {
       openLogin();
       return;
     }
+    if (!code.trim()) {
+      setError("Enter the invite code to join.");
+      return;
+    }
     setJoining(true);
     setError(null);
     try {
-      await fishFetch(`/api/fishmb/tournaments/${tournamentId}/join`, { method: "POST" });
+      await fishFetch(`/api/fishmb/tournaments/${tournamentId}/join`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ invite_code: code.trim() }),
+      });
       const d = await fishFetch(`/api/fishmb/tournaments/${tournamentId}`);
       setDetail(d);
     } catch (e) {
@@ -64,13 +73,23 @@ export function TournamentActions({ tournamentId }: { tournamentId: string }) {
           </Link>
         )}
         {!detail.joined ? (
-          <button
-            onClick={join}
-            disabled={joining}
-            className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors disabled:opacity-50"
-          >
-            {joining ? "Joining…" : user ? "Join tournament" : "Log in to join"}
-          </button>
+          <div className="flex items-center gap-2">
+            <input
+              value={code}
+              onChange={(e) => setCode(e.target.value.toUpperCase())}
+              placeholder="Invite code"
+              maxLength={12}
+              className="w-32 bg-white border border-pine/20 rounded-full px-4 py-2.5 text-sm font-bold uppercase tracking-widest text-pine placeholder:text-pine/35 placeholder:font-normal placeholder:tracking-normal focus:outline-none focus:border-signal"
+              aria-label="Invite code"
+            />
+            <button
+              onClick={join}
+              disabled={joining}
+              className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors disabled:opacity-50"
+            >
+              {joining ? "Joining…" : user ? "Join" : "Log in to join"}
+            </button>
+          </div>
         ) : (
           !detail.is_organizer && (
             <button

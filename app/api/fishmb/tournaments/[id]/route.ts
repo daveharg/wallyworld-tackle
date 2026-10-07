@@ -80,6 +80,31 @@ export async function PATCH(
     set("status", body.status);
   if (body.max_participants === null || (typeof body.max_participants === "number" && body.max_participants > 0))
     set("max_participants", body.max_participants === null ? null : Math.min(Math.floor(body.max_participants as number), 10000));
+  if (typeof body.entry_fee_cents === "number" && body.entry_fee_cents >= 0)
+    set("entry_fee_cents", Math.min(Math.floor(body.entry_fee_cents), 10000000));
+  if (Array.isArray(body.payouts))
+    set(
+      "payouts",
+      JSON.stringify(
+        body.payouts
+          .filter(
+            (p): p is { place: number; type: string; value: number } =>
+              typeof p === "object" &&
+              p !== null &&
+              typeof p.place === "number" &&
+              (p.type === "percent" || p.type === "amount") &&
+              typeof p.value === "number" &&
+              p.value > 0
+          )
+          .map((p) => ({
+            place: Math.min(Math.max(Math.floor(p.place), 1), 100),
+            type: p.type as "percent" | "amount",
+            value: p.type === "percent" ? Math.min(p.value, 100) : Math.min(p.value, 1000000),
+          }))
+          .sort((a, b) => a.place - b.place)
+          .slice(0, 20)
+      )
+    );
 
   if (updates.length === 0) return badRequest("Nothing to update.");
   values.push(t.id);

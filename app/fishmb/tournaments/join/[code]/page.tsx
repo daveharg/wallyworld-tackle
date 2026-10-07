@@ -22,7 +22,7 @@ export default async function JoinTournamentPage({ params }: { params: { code: s
       <p className="text-pine/60 mb-8">
         {t.participant_count} {t.participant_count === 1 ? "angler" : "anglers"} in so far
       </p>
-      <JoinButton tournamentId={t.id} tournamentName={t.name} />
+      <JoinButton tournamentId={t.id} tournamentName={t.name} inviteCode={params.code} />
       <p className="mt-6">
         <Link href="/fishmb/tournaments" className="text-sm font-bold text-signal uppercase tracking-wider">
           Browse all tournaments

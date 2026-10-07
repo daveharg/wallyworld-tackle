@@ -51,9 +51,15 @@ export function LakeMap({ lakes }: { lakes: MapLake[] }) {
       const L = (await import("leaflet")).default;
       layerRef.current?.remove();
       const layer = L.layerGroup();
+      const dot = L.divIcon({
+        className: "",
+        html: `<div style="width:10px;height:10px;border-radius:50%;background:#D64524;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.45)"></div>`,
+        iconSize: [10, 10],
+        iconAnchor: [5, 5],
+      });
       const bounds: [number, number][] = [];
       for (const lake of lakes.slice(0, 200)) {
-        const marker = L.marker([lake.lat, lake.lng]).bindPopup(
+        const marker = L.marker([lake.lat, lake.lng], { icon: dot }).bindPopup(
           `<strong>${escapeHtml(lake.name)}</strong><br/>${escapeHtml(lake.region)}<br/><a href="/fishmb/lakes/${lake.id}">View lake →</a>`
         );
         marker.addTo(layer);

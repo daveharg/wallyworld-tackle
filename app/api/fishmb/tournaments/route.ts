@@ -14,8 +14,31 @@ import {
 } from "@/lib/fish/tournaments";
 import { queryOne } from "@/lib/fish/db";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   await ensureTournamentTables();
+  const mine = new URL(req.url).searchParams.get("mine") === "1";
+  if (mine) {
+    let me: { id: string } | null = null;
+    try {
+      me = await fishUserFromRequest(req);
+    } catch {
+      return NextResponse.json({ tournaments: [] });
+    }
+    if (!me) return NextResponse.json({ tournaments: [] });
+    const { query } = await import("@/lib/fish/db");
+    const tournaments = await query(
+      `SELECT t.*, u.name AS organizer_name,
+         (SELECT COUNT(*) FROM fm_tournament_participants p WHERE p.tournament_id = t.id)::int AS participant_count,
+         (SELECT COUNT(*) FROM fm_tournament_entries e WHERE e.tournament_id = t.id AND e.status = 'approved')::int AS entry_count
+       FROM fm_tournaments t
+       JOIN fm_users u ON u.id = t.organizer_id
+       JOIN fm_tournament_participants p ON p.tournament_id = t.id AND p.user_id = $1
+       WHERE t.status IN ('upcoming', 'active')
+       ORDER BY t.starts_at ASC`,
+      [me.id]
+    );
+    return NextResponse.json({ tournaments });
+  }
   const tournaments = await listTournaments();
   return NextResponse.json({ tournaments });
 }
@@ -55,14 +78,37 @@ export async function POST(req: NextRequest) {
     typeof body.max_participants === "number" && body.max_participants > 0
       ? Math.min(Math.floor(body.max_participants), 10000)
       : null;
+  const entryFeeCents =
+    typeof body.entry_fee_cents === "number" && body.entry_fee_cents > 0
+      ? Math.min(Math.floor(body.entry_fee_cents), 10000000)
+      : 0;
+  const payouts = Array.isArray(body.payouts)
+    ? body.payouts
+        .filter(
+          (p): p is { place: number; type: string; value: number } =>
+            typeof p === "object" &&
+            p !== null &&
+            typeof p.place === "number" &&
+            (p.type === "percent" || p.type === "amount") &&
+            typeof p.value === "number" &&
+            p.value > 0
+        )
+        .map((p) => ({
+          place: Math.min(Math.max(Math.floor(p.place), 1), 100),
+          type: p.type as "percent" | "amount",
+          value: p.type === "percent" ? Math.min(p.value, 100) : Math.min(p.value, 1000000),
+        }))
+        .sort((a, b) => a.place - b.place)
+        .slice(0, 20)
+    : [];
 
   const inviteCode = await generateInviteCode();
   const created = await queryOne<{ id: string }>(
     `INSERT INTO fm_tournaments
-       (name, description, organizer_id, lake_ids, species, starts_at, ends_at, rules, scoring, invite_code, max_participants)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+       (name, description, organizer_id, lake_ids, species, starts_at, ends_at, rules, scoring, invite_code, max_participants, entry_fee_cents, payouts)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
      RETURNING id`,
-    [name, description, me.id, lakeIds, species, start.toISOString(), end.toISOString(), rules, scoring, inviteCode, maxParticipants]
+    [name, description, me.id, lakeIds, species, start.toISOString(), end.toISOString(), rules, scoring, inviteCode, maxParticipants, entryFeeCents, JSON.stringify(payouts)]
   );
   // The organizer is automatically a participant.
   await queryOne(

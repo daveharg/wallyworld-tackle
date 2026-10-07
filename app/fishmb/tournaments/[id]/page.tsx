@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getTournament, getLeaderboard, getEntries } from "@/lib/fish/tournaments";
 import { getLakes } from "@/lib/fishmb";
 import { TournamentActions } from "../_components/TournamentActions";
+import { PrizePot, LicenceNotice } from "../_components/PrizePot";
 import { formatDateTime } from "../../_components/formatDate";
 
 export const dynamic = "force-dynamic";
@@ -59,6 +60,15 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
           <p className="text-pine/75 text-sm whitespace-pre-line">{t.rules}</p>
         </div>
       )}
+
+      <div className="grid md:grid-cols-2 gap-4 mt-4">
+        <PrizePot
+          entryFeeCents={t.entry_fee_cents ?? 0}
+          participantCount={t.participant_count}
+          payouts={t.payouts ?? []}
+        />
+      </div>
+      <LicenceNotice participantCount={t.participant_count} maxParticipants={t.max_participants} />
 
       {/* Leaderboard */}
       <div className="flex items-center justify-between mt-12 mb-4">

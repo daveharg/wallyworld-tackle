@@ -1,5 +1,6 @@
 import { getLakes } from "@/lib/fishmb";
 import { TournamentBuilder } from "../_components/TournamentBuilder";
+import { LicenceNotice } from "../_components/PrizePot";
 
 export default function CreateTournamentPage() {
   const lakes = getLakes().map((l) => ({ id: l.id, name: l.name, region: l.region }));
@@ -17,6 +18,9 @@ export default function CreateTournamentPage() {
         you review every catch before it hits the leaderboard.
       </p>
       <TournamentBuilder lakes={lakes} />
+      <div className="mt-6">
+        <LicenceNotice participantCount={0} maxParticipants={null} />
+      </div>
     </div>
   );
 }

@@ -20,6 +20,8 @@ export interface DiscussionRow {
   body: string;
   kind: string;
   photo_url: string | null;
+  visibility: string;
+  species_tag: string | null;
   comment_count: string;
   created_at: string;
   name: string;
@@ -32,6 +34,8 @@ function toItem(d: DiscussionRow) {
     body: d.body,
     kind: d.kind === "ad" ? "ad" : "post",
     photo_url: d.photo_url,
+    visibility: d.visibility ?? "public",
+    species_tag: d.species_tag ?? null,
     comment_count: Number(d.comment_count ?? 0),
     created_at: d.created_at,
     user: { id: d.user_id, name: d.name, avatar_url: d.avatar_url },
@@ -43,17 +47,43 @@ const SELECT = `SELECT d.*, u.name, u.avatar_url,
                 FROM fm_discussions d
                 JOIN fm_users u ON u.id = d.user_id`;
 
+/** Friends-only rows are visible to the author and their accepted friends. Ads are always public. */
+const VISIBLE_SQL = `
+  (d.kind = 'ad'
+   OR d.visibility = 'public'
+   OR ($1::uuid IS NOT NULL AND (d.user_id = $1::uuid
+     OR (d.visibility = 'friends' AND EXISTS (
+       SELECT 1 FROM fm_friendships f
+       WHERE f.status = 'accepted'
+         AND ((f.requester_id = $1::uuid AND f.addressee_id = d.user_id)
+           OR (f.requester_id = d.user_id AND f.addressee_id = $1::uuid))
+     )))))`;
+
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const limit = Math.min(Math.max(parseInt(url.searchParams.get("limit") ?? "20", 10) || 20, 1), 50);
   const offset = Math.max(parseInt(url.searchParams.get("offset") ?? "0", 10) || 0, 0);
+  let viewerId: string | null = null;
+  try {
+    const me = await fishUserFromRequest(req);
+    viewerId = me ? me.id : null;
+  } catch {
+    // guests see public items only
+  }
+  // Species tips for the how-to-fish pages: ?species_tag=walleye (public only).
+  const speciesTag = url.searchParams.get("species_tag");
+
+  await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS visibility text NOT NULL DEFAULT 'public'`);
+  await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS species_tag text`);
 
   const rows = await query<DiscussionRow>(
-    `${SELECT} ORDER BY d.created_at DESC LIMIT $1 OFFSET $2`,
-    [limit, offset]
+    `${SELECT} WHERE ${VISIBLE_SQL}${speciesTag ? ` AND d.visibility = 'public' AND LOWER(d.species_tag) = LOWER($4)` : ""}
+     ORDER BY d.created_at DESC LIMIT $2 OFFSET $3`,
+    speciesTag ? [viewerId, limit, offset, speciesTag] : [viewerId, limit, offset]
   );
   const total = await queryOne<{ n: string }>(
-    `SELECT COUNT(*) AS n FROM fm_discussions`
+    `SELECT COUNT(*) AS n FROM fm_discussions d WHERE ${VISIBLE_SQL}`,
+    [viewerId]
   );
   return NextResponse.json({
     discussions: rows.map(toItem),
@@ -69,6 +99,9 @@ export async function POST(req: NextRequest) {
   const me = await fishUserFromRequest(req);
   if (!me) return unauthorized();
 
+  await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS visibility text NOT NULL DEFAULT 'public'`);
+  await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS species_tag text`);
+
   let body: Record<string, unknown>;
   try {
     body = await req.json();
@@ -83,6 +116,11 @@ export async function POST(req: NextRequest) {
   }
 
   const kind = body.kind === "ad" ? "ad" : "post";
+  const visibility = body.visibility === "friends" ? "friends" : "public";
+  const speciesTag =
+    typeof body.species_tag === "string" && body.species_tag.trim()
+      ? body.species_tag.trim().slice(0, 60)
+      : null;
 
   let photoUrl: string | null = null;
   if (body.photo_url != null && body.photo_url !== "") {
@@ -108,12 +146,12 @@ export async function POST(req: NextRequest) {
   }
 
   const rows = await query<DiscussionRow>(
-    `INSERT INTO fm_discussions (user_id, body, kind, photo_url)
-     VALUES ($1, $2, $3, $4)
+    `INSERT INTO fm_discussions (user_id, body, kind, photo_url, visibility, species_tag)
+     VALUES ($1, $2, $3, $4, $5, $6)
      RETURNING *, 0 AS comment_count,
                    (SELECT name FROM fm_users WHERE id = $1) AS name,
                    (SELECT avatar_url FROM fm_users WHERE id = $1) AS avatar_url`,
-    [me.id, text, kind, photoUrl]
+    [me.id, text, kind, photoUrl, visibility, speciesTag]
   );
   return NextResponse.json({ discussion: toItem(rows[0]) }, { status: 201 });
 }

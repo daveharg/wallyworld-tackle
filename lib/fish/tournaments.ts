@@ -20,6 +20,12 @@
 import { randomBytes } from "crypto";
 import { query, queryOne } from "./db";
 
+export interface PayoutTier {
+  place: number;
+  type: "percent" | "amount";
+  value: number; // percent of pot (0-100) or dollars
+}
+
 export interface Tournament {
   id: string;
   name: string;
@@ -35,6 +41,8 @@ export interface Tournament {
   invite_code: string;
   status: string;
   max_participants: number | null;
+  entry_fee_cents: number;
+  payouts: PayoutTier[];
   created_at: string;
   participant_count: number;
   entry_count: number;
@@ -109,6 +117,9 @@ export async function ensureTournamentTables(): Promise<void> {
   // Offline app support: the phone's capture timestamp + any clock-tamper flag.
   await query(`ALTER TABLE fm_tournament_entries ADD COLUMN IF NOT EXISTS captured_at timestamptz`);
   await query(`ALTER TABLE fm_tournament_entries ADD COLUMN IF NOT EXISTS time_flag text`);
+  // Money: entry fee in cents + payout structure (JSON array of {place,type:'percent'|'amount',value}).
+  await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS entry_fee_cents int NOT NULL DEFAULT 0`);
+  await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS payouts jsonb NOT NULL DEFAULT '[]'`);
   await query(
     `CREATE INDEX IF NOT EXISTS fm_tournament_entries_tournament_idx ON fm_tournament_entries(tournament_id, status)`
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
   FISHMB_GOOGLE_CLIENT_ID,
@@ -225,6 +226,20 @@ export function FishLoginButton() {
         <>
           <div className="fixed inset-0 z-10" onClick={() => setMenu(false)} />
           <div className="absolute right-0 mt-2 z-20 bg-paper border border-pine/10 rounded-2xl shadow-xl py-2 w-44">
+            <Link
+              href="/fishmb/profile"
+              onClick={() => setMenu(false)}
+              className="block px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70 hover:text-signal hover:bg-pine/5"
+            >
+              My profile
+            </Link>
+            <Link
+              href="/fishmb/friends"
+              onClick={() => setMenu(false)}
+              className="block px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70 hover:text-signal hover:bg-pine/5"
+            >
+              Friends
+            </Link>
             <button
               onClick={() => {
                 logout();
