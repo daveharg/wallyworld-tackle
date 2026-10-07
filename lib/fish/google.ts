@@ -46,7 +46,11 @@ function b64urlToBuffer(s: string): Buffer {
 
 /** Audiences we trust: the web client ID plus the iOS client ID if set. */
 function allowedAudiences(): string[] {
-  const ids = [process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_IOS_CLIENT_ID];
+  const ids = [
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_IOS_CLIENT_ID,
+    process.env.GOOGLE_WEB_CLIENT_ID,
+  ];
   return ids.filter((v): v is string => !!v);
 }
 
