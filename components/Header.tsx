@@ -13,6 +13,8 @@ const CAT_NAV: { label: string; href: string; hot?: boolean }[] = [
   { label: "Rods", href: "/rods" },
   { label: "Reels", href: "/reels" },
   { label: "Tackle", href: "/tackle" },
+  { label: "Packages", href: "/packages" },
+  { label: "Guides", href: "/guides" },
   { label: "Tools & Accessories", href: "/tackle#tools" },
 ];
 
