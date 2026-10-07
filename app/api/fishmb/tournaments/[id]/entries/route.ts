@@ -31,7 +31,7 @@ export async function GET(
   const me = await fishUserFromRequest(req);
   const organizer = !!me && me.id === t.organizer_id;
   const entries = await getEntries(t.id, organizer ? ["pending", "approved", "rejected"] : ["approved"]);
-  return NextResponse.json({ entries, is_organizer: organizer });
+  return NextResponse.json({ tournament: t, entries, is_organizer: organizer });
 }
 
 export async function POST(
