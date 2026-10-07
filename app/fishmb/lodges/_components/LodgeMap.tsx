@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export interface MapLodge {
   id: string;
@@ -13,38 +13,35 @@ export interface MapLodge {
 /** Manitoba lodge/guide map (Leaflet). Search results appear as pins. */
 export function LodgeMap({ lodges }: { lodges: MapLodge[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<any>(null);
-  const layerRef = useRef<any>(null);
+  const [map, setMap] = useState<any>(null);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const L = (await import("leaflet")).default;
       await import("leaflet/dist/leaflet.css");
-      if (cancelled || !containerRef.current || mapRef.current) return;
-      const map = L.map(containerRef.current, {
+      if (cancelled || !containerRef.current) return;
+      const m = L.map(containerRef.current, {
         scrollWheelZoom: false,
       }).setView([53.5, -96.5], 5);
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         maxZoom: 12,
-      }).addTo(map);
-      map.on("focus", () => map.scrollWheelZoom.enable());
-      map.on("blur", () => map.scrollWheelZoom.disable());
-      mapRef.current = map;
+      }).addTo(m);
+      m.on("focus", () => m.scrollWheelZoom.enable());
+      m.on("blur", () => m.scrollWheelZoom.disable());
+      if (!cancelled) setMap(m);
     })();
     return () => {
       cancelled = true;
-      mapRef.current?.remove();
-      mapRef.current = null;
     };
   }, []);
 
+  const layerRef = useRef<any>(null);
   useEffect(() => {
+    if (!map) return;
     (async () => {
       const L = (await import("leaflet")).default;
-      const map = mapRef.current;
-      if (!map) return;
       layerRef.current?.remove();
       const layer = L.layerGroup();
       const bounds: [number, number][] = [];
@@ -61,7 +58,7 @@ export function LodgeMap({ lodges }: { lodges: MapLodge[] }) {
         map.fitBounds(L.latLngBounds(bounds).pad(0.15), { animate: true });
       }
     })();
-  }, [lodges]);
+  }, [lodges, map]);
 
   return (
     <div className="rounded-3xl overflow-hidden border border-pine/10 shadow-sm">

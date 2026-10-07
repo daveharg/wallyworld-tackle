@@ -18,7 +18,7 @@ import {
 } from "@/lib/fishmb";
 import { getSpeciesAdvice } from "@/lib/fishmb-species";
 import { FISHMB_CTA_PHOTO } from "@/lib/fishmb-constants";
-import { listPublicTournaments } from "@/lib/fish/tournaments";
+import { LiveTournaments } from "./_components/LiveTournaments";
 
 export const revalidate = 3600;
 
@@ -37,8 +37,7 @@ function toCardLake(l: ReturnType<typeof getLakesForSpecies>[number]) {
   };
 }
 
-export default async function FishMBHome() {
-  const liveTournaments = await listPublicTournaments().catch(() => []);
+export default function FishMBHome() {
   const hot = getHotLakes();
   const stocked = getStockedLakes(12);
   const lodges = getLodges().slice(0, 12);
@@ -179,46 +178,7 @@ export default async function FishMBHome() {
                 All tournaments →
               </Link>
             </div>
-            {liveTournaments.length === 0 ? (
-              <p className="text-pine/55 text-sm bg-white border border-pine/10 rounded-2xl p-6">
-                No tournaments posted yet —{" "}
-                <Link href="/fishmb/tournaments/create" className="text-signal-dark font-bold">
-                  be the first to run one
-                </Link>
-                .
-              </p>
-            ) : (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {liveTournaments.map((t) => (
-                  <Link
-                    key={t.id}
-                    href={`/fishmb/tournaments/${t.id}`}
-                    className="bg-white border border-pine/10 rounded-2xl p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all"
-                  >
-                    <p className="text-[11px] font-black uppercase tracking-[0.18em] text-signal mb-1.5">
-                      {t.status === "active" ? "● Happening now" : "Upcoming"}
-                    </p>
-                    <h4 className="font-display font-bold text-pine text-lg uppercase tracking-wide leading-tight mb-1">
-                      {t.name}
-                    </h4>
-                    <p className="text-pine/55 text-sm">
-                      {t.lake_ids?.length > 1
-                        ? `${t.lake_ids.length} lakes`
-                        : t.lake_ids?.length === 1
-                          ? "1 lake"
-                          : "Open waters"}{" "}
-                      · {t.species?.length ? t.species.join(", ") : "All species"}
-                    </p>
-                    <p className="text-pine/45 text-xs mt-2">
-                      {new Date(t.starts_at).toLocaleDateString("en-CA", { month: "short", day: "numeric" })}
-                      {" → "}
-                      {new Date(t.ends_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}
-                      {" · "}{t.entry_count} {t.entry_count === 1 ? "catch" : "catches"}
-                    </p>
-                  </Link>
-                ))}
-              </div>
-            )}
+            <LiveTournaments />
           </div>
         </div>
       </section>

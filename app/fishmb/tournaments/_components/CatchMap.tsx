@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export interface CatchPin {
   id: string;
@@ -13,38 +13,35 @@ export interface CatchPin {
 /** Organizer view: every catch with GPS plotted on a map. */
 export function CatchMap({ pins }: { pins: CatchPin[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<any>(null);
+  const [map, setMap] = useState<any>(null);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       const L = (await import("leaflet")).default;
       await import("leaflet/dist/leaflet.css");
-      if (cancelled || !containerRef.current || mapRef.current) return;
-      const map = L.map(containerRef.current, { scrollWheelZoom: false }).setView(
+      if (cancelled || !containerRef.current) return;
+      const m = L.map(containerRef.current, { scrollWheelZoom: false }).setView(
         [53.5, -96.5],
         5
       );
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         maxZoom: 14,
-      }).addTo(map);
-      map.on("focus", () => map.scrollWheelZoom.enable());
-      map.on("blur", () => map.scrollWheelZoom.disable());
-      mapRef.current = map;
+      }).addTo(m);
+      m.on("focus", () => m.scrollWheelZoom.enable());
+      m.on("blur", () => m.scrollWheelZoom.disable());
+      if (!cancelled) setMap(m);
     })();
     return () => {
       cancelled = true;
-      mapRef.current?.remove();
-      mapRef.current = null;
     };
   }, []);
 
   useEffect(() => {
+    if (!map) return;
     (async () => {
       const L = (await import("leaflet")).default;
-      const map = mapRef.current;
-      if (!map) return;
       // Clear old pins.
       map.eachLayer((layer: any) => {
         if (layer instanceof L.Marker) map.removeLayer(layer);
@@ -67,7 +64,7 @@ export function CatchMap({ pins }: { pins: CatchPin[] }) {
         map.fitBounds(L.latLngBounds(bounds).pad(0.2));
       }
     })();
-  }, [pins]);
+  }, [pins, map]);
 
   if (pins.length === 0) return null;
 
