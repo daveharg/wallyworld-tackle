@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLake, getLakes, getZone, getGuideUrl } from "@/lib/fishmb";
-import { lakePhotoUrl } from "@/lib/fishmb-constants";
+import { lakePhotoUrl, hasRealLakePhoto, lakePhotoCredit } from "@/lib/fishmb-constants";
 
 export const revalidate = 3600;
 
@@ -58,6 +58,11 @@ export default function LakeDetailPage({ params }: { params: { id: string } }) {
           alt={lake.name}
           className="w-full h-64 md:h-96 object-cover"
         />
+        {hasRealLakePhoto(lake.id) && (
+          <p className="text-[11px] text-pine/45 mt-1.5 text-right pr-1">
+            {lakePhotoCredit(lake.id)}
+          </p>
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-pine-deep/85 via-pine-deep/20 to-transparent" />
         <div className="absolute bottom-0 inset-x-0 p-6 md:p-8">
           <p className="text-gold font-bold uppercase tracking-[0.24em] text-xs mb-2">

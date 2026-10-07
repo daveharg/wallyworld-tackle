@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { FishLoginButton, useFishAuth } from "./FishAuth";
 
 const NAV = [
   { href: "/fishmb/lakes", label: "Lakes" },
@@ -23,6 +24,7 @@ export function Wordmark({ light = false }: { light?: boolean }) {
 export default function FishHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { user, openLogin, logout } = useFishAuth();
   return (
     <header className="sticky top-0 z-40 bg-paper/95 backdrop-blur border-b border-pine/10">
       <div className="max-w-7xl mx-auto px-4">
@@ -46,12 +48,7 @@ export default function FishHeader() {
             ))}
           </nav>
           <div className="flex items-center gap-3">
-            <Link
-              href="/fishmb/app"
-              className="hidden sm:inline-flex bg-signal hover:bg-signal-dark text-white text-sm font-bold uppercase tracking-wider px-5 py-2.5 rounded-full transition-colors"
-            >
-              Get the app
-            </Link>
+            <FishLoginButton />
             <button
               className="md:hidden p-2 text-pine"
               onClick={() => setOpen((o) => !o)}
@@ -78,13 +75,27 @@ export default function FishHeader() {
               {n.label}
             </Link>
           ))}
-          <Link
-            href="/fishmb/app"
-            onClick={() => setOpen(false)}
-            className="mt-2 inline-flex justify-center bg-signal text-white text-sm font-bold uppercase tracking-wider px-5 py-3 rounded-full"
-          >
-            Get the app
-          </Link>
+          {user ? (
+            <button
+              onClick={() => {
+                logout();
+                setOpen(false);
+              }}
+              className="mt-2 inline-flex justify-center bg-pine/10 text-pine text-sm font-bold uppercase tracking-wider px-5 py-3 rounded-full"
+            >
+              Log out ({user.name})
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                setOpen(false);
+                openLogin();
+              }}
+              className="mt-2 inline-flex justify-center bg-signal text-white text-sm font-bold uppercase tracking-wider px-5 py-3 rounded-full"
+            >
+              Log in
+            </button>
+          )}
         </nav>
       )}
     </header>

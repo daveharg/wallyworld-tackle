@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Lodge, HotLake } from "@/lib/fishmb";
-import { lakePhotoUrl } from "@/lib/fishmb-constants";
+import { lakePhotoUrl, lodgePhotoUrl } from "@/lib/fishmb-constants";
 
 function SpeciesLine({ species }: { species: string[] }) {
   return (
@@ -58,11 +58,18 @@ export function LakeCard({
 }
 
 export function LodgeCard({ lodge }: { lodge: Lodge }) {
+  const photo = lodgePhotoUrl(lodge.id);
   return (
     <Link
       href={`/fishmb/lodges/${lodge.id}`}
       className="snap-start shrink-0 w-[240px] md:w-[280px] bg-white rounded-2xl overflow-hidden border border-pine/10 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all"
     >
+      {photo && (
+        <div className="relative h-36 md:h-44 bg-pine-deep/10">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={photo} alt={lodge.name} className="w-full h-full object-cover" loading="lazy" />
+        </div>
+      )}
       <div className="p-5">
         <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold mb-1.5 capitalize">
           {lodge.kind}

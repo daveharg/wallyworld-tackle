@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLodge, getLodges } from "@/lib/fishmb";
+import { lodgePhotoUrl } from "@/lib/fishmb-constants";
 
 export const revalidate = 3600;
 
@@ -36,6 +37,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 export default function LodgeDetailPage({ params }: { params: { id: string } }) {
   const lodge = getLodge(params.id);
   if (!lodge) notFound();
+  const photo = lodgePhotoUrl(lodge.id);
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 md:py-12">
@@ -45,6 +47,13 @@ export default function LodgeDetailPage({ params }: { params: { id: string } }) 
       >
         ← All lodges &amp; guides
       </Link>
+
+      {photo && (
+        <div className="relative mt-4 rounded-3xl overflow-hidden bg-pine-deep">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={photo} alt={lodge.name} className="w-full h-64 md:h-96 object-cover" />
+        </div>
+      )}
 
       <div className="mt-4 mb-8">
         <p className="text-gold font-bold uppercase tracking-[0.24em] text-xs mb-2 capitalize">

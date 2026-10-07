@@ -80,6 +80,21 @@ export interface HotLake {
   report: string;
 }
 
+export interface YoutubeShow {
+  name: string;
+  description: string;
+  url: string;
+}
+
+export interface Tournament {
+  name: string;
+  dates: string;
+  location: string;
+  entry: string;
+  description: string;
+  url: string;
+}
+
 interface FishData {
   updated: string;
   regulations: {
@@ -147,6 +162,20 @@ export function getWalleyeLakes(limit = 12): Lake[] {
   return getLakes()
     .filter((l) => l.species.some((s) => s.toLowerCase().includes("walleye")))
     .slice(0, limit);
+}
+
+export function getYoutubeShows(): YoutubeShow[] {
+  return getFishData().youtube_shows as YoutubeShow[];
+}
+
+/** Upcoming Manitoba fishing tournaments (researched periodically). Empty when the file is missing. */
+export function getTournaments(): { updated: string; tournaments: Tournament[] } {
+  try {
+    const p = path.join(process.cwd(), "public", "fishmb", "tournaments.json");
+    return JSON.parse(fs.readFileSync(p, "utf8"));
+  } catch {
+    return { updated: "", tournaments: [] };
+  }
 }
 
 export function getStockedLakes(limit = 12): Lake[] {
