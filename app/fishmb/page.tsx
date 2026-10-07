@@ -272,6 +272,53 @@ export default function FishMBHome() {
         </section>
       )}
 
+      {/* Run your own tournament */}
+      <section className="bg-paper-deep border-y border-pine/10 mt-12 md:mt-16">
+        <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
+          <p className="text-signal font-bold uppercase tracking-[0.28em] text-sm mb-3">
+            Organizers
+          </p>
+          <h2 className="font-display font-bold uppercase text-pine text-3xl md:text-4xl tracking-wide mb-4">
+            Run your own fishing tournament
+          </h2>
+          <p className="text-pine/65 max-w-3xl mb-8">
+            Set up a catch-photo tournament in minutes — for your club, your
+            lake, or a full licensed event with hundreds of anglers. No entry
+            caps, no platform cut. And every catch is verified before it
+            touches the leaderboard:
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+            {[
+              ["📸", "Photo required", "No photo, no entry. Every catch needs a picture."],
+              ["🕐", "Server-stamped time", "Our server records when the catch was submitted — not the angler's phone clock. Catches only count inside the tournament window."],
+              ["📍", "GPS location stamp", "Coordinates are attached to every catch and shown to you on a map. Catches outside Manitoba are rejected automatically."],
+              ["🔍", "Duplicate detection", "The same photo submitted twice — by anyone — gets flagged for your review."],
+              ["✅", "Organizer review", "You approve every catch before it hits the leaderboard, and can disqualify with one tap."],
+            ].map(([icon, title, body]) => (
+              <div key={title} className="bg-white rounded-2xl border border-pine/10 p-5">
+                <p className="text-2xl mb-2">{icon}</p>
+                <h3 className="font-bold text-pine text-sm uppercase tracking-wide mb-1.5">{title}</h3>
+                <p className="text-pine/60 text-sm">{body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/fishmb/tournaments/create"
+              className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors"
+            >
+              Create a tournament
+            </Link>
+            <Link
+              href="/fishmb/tournaments"
+              className="border border-pine/25 text-pine hover:bg-pine/5 font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors"
+            >
+              Browse tournaments
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Stats band */}
       <section className="max-w-7xl mx-auto px-4 mt-12 md:mt-16">
         <div className="bg-pine rounded-3xl px-6 py-10 md:py-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
