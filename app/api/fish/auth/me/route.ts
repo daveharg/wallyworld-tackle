@@ -8,25 +8,14 @@ import {
   fishUserFromRequest,
   unauthorized,
   badRequest,
+  toApiUser,
   type FishUser,
 } from "@/lib/fish/auth";
-
-function toProfile(u: FishUser) {
-  return {
-    id: u.id,
-    name: u.name,
-    email: u.email,
-    avatar_url: u.avatar_url,
-    stats_public: u.stats_public,
-    play_balance: u.play_balance,
-    created_at: u.created_at,
-  };
-}
 
 export async function GET(req: NextRequest) {
   const me = await fishUserFromRequest(req);
   if (!me) return unauthorized();
-  return NextResponse.json({ user: toProfile(me) });
+  return NextResponse.json({ user: toApiUser(me) });
 }
 
 export async function PATCH(req: NextRequest) {
@@ -65,5 +54,5 @@ export async function PATCH(req: NextRequest) {
     `UPDATE fm_users SET ${updates.join(", ")} WHERE id = $${params.length} RETURNING *`,
     params
   );
-  return NextResponse.json({ user: toProfile(rows[0]) });
+  return NextResponse.json({ user: toApiUser(rows[0]) });
 }

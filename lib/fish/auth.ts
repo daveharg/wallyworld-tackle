@@ -30,6 +30,36 @@ export function publicUser(u: FishUser): PublicUser {
   return { id: u.id, name: u.name, avatar_url: u.avatar_url };
 }
 
+/** True when the user signed up anonymously (no Google account linked yet). */
+export function isAnonymousUser(u: { google_sub: string }): boolean {
+  return u.google_sub.startsWith("anon:");
+}
+
+/** Public API shape for a user, returned by the auth/me endpoints. */
+export interface ApiUser {
+  id: string;
+  name: string;
+  email: string | null;
+  avatar_url: string | null;
+  stats_public: boolean;
+  play_balance: number;
+  is_anonymous: boolean;
+  created_at: string;
+}
+
+export function toApiUser(u: FishUser): ApiUser {
+  return {
+    id: u.id,
+    name: u.name,
+    email: u.email,
+    avatar_url: u.avatar_url,
+    stats_public: u.stats_public,
+    play_balance: u.play_balance,
+    is_anonymous: isAnonymousUser(u),
+    created_at: u.created_at,
+  };
+}
+
 const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 export function getBearerToken(req: NextRequest): string | null {
