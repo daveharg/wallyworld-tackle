@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getTournament, getLeaderboard, getEntries } from "@/lib/fish/tournaments";
 import { getLakes } from "@/lib/fishmb";
 import { TournamentActions } from "../_components/TournamentActions";
-import { formatDateTime } from "../../_components/fishFetch";
+import { formatDateTime } from "../../_components/formatDate";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 30;
