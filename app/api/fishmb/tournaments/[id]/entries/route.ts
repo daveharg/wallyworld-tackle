@@ -2,9 +2,14 @@
 //
 // GET  — entries. Organizer sees all; everyone else sees approved only.
 // POST — submit an entry (auth + must have joined). Anti-cheat enforced:
-//   * tournament must be live on the SERVER clock (no backdating)
 //   * photo is required; its bytes are SHA-256 hashed for duplicate detection
 //   * GPS coordinates, when provided, must fall inside Manitoba
+//   * the tournament window is enforced on the CAPTURE time:
+//     - online submissions: capture time = server receipt time
+//     - offline app submissions: the phone's capture timestamp is accepted,
+//       but a capture time in the future (beyond clock-skew tolerance) is
+//       flagged for the organizer, and created_at always records when our
+//       server actually received the entry
 
 import { NextRequest, NextResponse } from "next/server";
 import { createHash } from "crypto";
@@ -46,17 +51,38 @@ export async function POST(
     return NextResponse.json({ error: "Join the tournament before submitting a catch." }, { status: 403 });
   }
 
-  // Server clock is the official tournament clock — no backdating.
-  const now = Date.now();
-  if (now < new Date(t.starts_at).getTime()) return badRequest("This tournament hasn't started yet.");
-  if (now > new Date(t.ends_at).getTime()) return badRequest("This tournament has ended.");
-
   let body: Record<string, unknown>;
   try {
     body = await req.json();
   } catch {
     return badRequest("Invalid JSON body.");
   }
+
+  // Capture time: online submissions use the server clock; the offline app
+  // sends the phone's capture timestamp (Dave's call — entries are stamped
+  // when the picture was taken, wherever the angler is).
+  const now = Date.now();
+  let capturedAt: Date;
+  let timeFlag: string | null = null;
+  if (typeof body.captured_at === "string" && body.captured_at) {
+    const parsed = new Date(body.captured_at);
+    if (isNaN(parsed.getTime())) return badRequest("Invalid capture time.");
+    if (parsed.getTime() > now + 5 * 60 * 1000) {
+      // Claimed capture is in the future beyond clock-skew tolerance —
+      // impossible; flag for the organizer instead of silently accepting.
+      timeFlag = "future_timestamp";
+    }
+    capturedAt = parsed;
+  } else {
+    capturedAt = new Date(now);
+  }
+
+  // The tournament window is enforced on the capture time, not the sync time —
+  // a catch made inside the window still counts even if it uploads late.
+  if (capturedAt.getTime() < new Date(t.starts_at).getTime())
+    return badRequest("This catch was made before the tournament started.");
+  if (capturedAt.getTime() > new Date(t.ends_at).getTime())
+    return badRequest("This catch was made after the tournament ended.");
 
   const photoUrl = typeof body.photo_url === "string" ? body.photo_url.trim() : "";
   if (!photoUrl || !/^https?:\/\//.test(photoUrl)) return badRequest("A photo is required for every catch.");
@@ -90,10 +116,10 @@ export async function POST(
 
   const entry = await queryOne(
     `INSERT INTO fm_tournament_entries
-       (tournament_id, user_id, photo_url, species, length_inches, latitude, longitude, gps_accuracy, notes, photo_hash)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+       (tournament_id, user_id, photo_url, species, length_inches, latitude, longitude, gps_accuracy, notes, photo_hash, captured_at, time_flag)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
      RETURNING *`,
-    [t.id, me.id, photoUrl, species, lengthIn, lat, lng, acc, notes, photoHash]
+    [t.id, me.id, photoUrl, species, lengthIn, lat, lng, acc, notes, photoHash, capturedAt.toISOString(), timeFlag]
   );
   return NextResponse.json({ entry }, { status: 201 });
 }

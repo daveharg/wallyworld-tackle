@@ -57,6 +57,8 @@ export interface TournamentEntry {
   status: string;
   review_note: string | null;
   created_at: string;
+  captured_at: string | null;
+  time_flag: string | null;
 }
 
 let ensured = false;
@@ -104,6 +106,9 @@ export async function ensureTournamentTables(): Promise<void> {
     review_note text,
     created_at timestamptz NOT NULL DEFAULT now()
   )`);
+  // Offline app support: the phone's capture timestamp + any clock-tamper flag.
+  await query(`ALTER TABLE fm_tournament_entries ADD COLUMN IF NOT EXISTS captured_at timestamptz`);
+  await query(`ALTER TABLE fm_tournament_entries ADD COLUMN IF NOT EXISTS time_flag text`);
   await query(
     `CREATE INDEX IF NOT EXISTS fm_tournament_entries_tournament_idx ON fm_tournament_entries(tournament_id, status)`
   );

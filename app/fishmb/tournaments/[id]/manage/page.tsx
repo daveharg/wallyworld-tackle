@@ -19,6 +19,8 @@ interface Entry {
   status: string;
   review_note: string | null;
   created_at: string;
+  captured_at: string | null;
+  time_flag: string | null;
 }
 
 interface Detail {
@@ -174,6 +176,11 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
                 {e.duplicate_of && (
                   <p className="text-xs font-bold text-signal-dark bg-signal/10 rounded-xl px-3 py-2 mt-2">
                     ⚠ Duplicate photo — this exact image was already submitted in this tournament.
+                  </p>
+                )}
+                {e.time_flag === "future_timestamp" && (
+                  <p className="text-xs font-bold text-signal-dark bg-signal/10 rounded-xl px-3 py-2 mt-2">
+                    ⚠ Clock flag — the phone claimed a capture time in the future. Verify before approving.
                   </p>
                 )}
                 {e.notes && <p className="text-xs text-pine/60 mt-2">“{e.notes}”</p>}
