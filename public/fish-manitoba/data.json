@@ -5107,7 +5107,7 @@
    ],
    "size_text": "0.63 km\u00b2",
    "max_depth_text": "9.2 m",
-   "description": "A small reservoir inside St. Malo Provincial Park in southeastern Manitoba, St. Malo Lake is a well-studied multi-species fishery. Provincial assessments document northern pike, walleye, rock bass, yellow perch and black crappie, with walleye fry stocked regularly through 2022. Only electric motors are allowed, and the park offers camping, a beach and trails, making it an easy family fishing getaway southeast of Winnipeg.",
+   "description": "A stocked walleye lake beside the community of St. Malo in southeastern Manitoba, just east of PTH 59, provincially stocked with walleye fry. St. Malo Provincial Park on the lake offers campgrounds, new mini cabins and beaches with seasonal food service.",
    "depth_map_url": "https://gov.mb.ca/nrnd/fish-wildlife/pubs/lifa/pdf/stmalo_map.pdf",
    "stocked": false,
    "stocked_species": [],
@@ -5130,8 +5130,17 @@
     "note": "",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "St. Malo Provincial Park campground (mini cabins available)"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "The Prairie Alchemist",
+     "detail": "St. Malo"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6085,7 +6094,7 @@
    ],
    "size_text": "",
    "max_depth_text": "",
-   "description": "A shallow provincially stocked lake in Turtle Mountain Provincial Park, stocked with northern pike by Manitoba Fisheries. Its campground and beach access make it a popular family fishing stop.",
+   "description": "A shallow provincially stocked lake in Turtle Mountain Provincial Park, stocked with northern pike by Manitoba Fisheries. Its campground and beach access make it a popular family fishing stop. Adam Lake Campground offers 105 campsites, a boat launch, beach access and a fish-cleaning station.",
    "depth_map_url": null,
    "stocked": true,
    "stocked_species": [
@@ -6105,8 +6114,33 @@
     "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Parkside Inn Motel",
+     "detail": "http://www.stayparkside.ca/"
+    },
+    {
+     "name": "The Home Hotel",
+     "detail": "http://www.thehomehotel.ca/"
+    },
+    {
+     "name": "Adam Lake Campground (Turtle Mountain Provincial Park)"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Choy's Restaurant",
+     "detail": "Boissevain"
+    },
+    {
+     "name": "Chicken Chef - Boissevain",
+     "detail": "Boissevain"
+    },
+    {
+     "name": "Busy B Drive In",
+     "detail": "Boissevain"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6139,8 +6173,26 @@
     "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Wescana Inn",
+     "detail": "http://www.wescanainn.com/"
+    },
+    {
+     "name": "Kikiwak Inn",
+     "detail": "https://www.kikiwakinn.ca/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "John & Jessie's Steak and Ribs",
+     "detail": "The Pas"
+    },
+    {
+     "name": "Golden Star Chinese Food",
+     "detail": "The Pas"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6177,8 +6229,34 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Gateway Motel",
+     "detail": "http://www.gatewaymotel.ca/"
+    },
+    {
+     "name": "Valley Motor Lodge",
+     "detail": "https://valleymotel.ca/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Dari Isle Drive-In",
+     "detail": "Minnedosa"
+    },
+    {
+     "name": "Sun Sun Chinese Restaurant",
+     "detail": "Minnedosa"
+    },
+    {
+     "name": "Corner Stone Grill",
+     "detail": "Minnedosa"
+    },
+    {
+     "name": "RD's on Main",
+     "detail": "Minnedosa"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6211,8 +6289,22 @@
     "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Ste Rose Hotel and Motel",
+     "detail": "http://strosehotel.ca/"
+    },
+    {
+     "name": "Ste Rose Inn Chicken Chef",
+     "detail": "https://www.chickenchef.com/locations/ste-rose-du-lac/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Ste Rose Inn Chicken Chef",
+     "detail": "Ste. Rose du Lac"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6247,8 +6339,29 @@
     "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Rossburn Hotel",
+     "detail": "https://www.facebook.com/TheOasisRossburnHotel/"
+    },
+    {
+     "name": "Rossman Lakeview Restaurant & Camping"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Choy's Cafe",
+     "detail": "Rossburn"
+    },
+    {
+     "name": "Kopper Kettle",
+     "detail": "Rossburn"
+    },
+    {
+     "name": "N L Restaurant",
+     "detail": "Rossburn"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6283,8 +6396,34 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "The Hotel at Falcon Lake",
+     "detail": "https://www.travelmanitoba.com/directory/the-hotel-at-falcon-lake/"
+    },
+    {
+     "name": "Falcon Trails Resort",
+     "detail": "http://falcontrailsresort.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Scotty's Drive-In",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon's Nest Cafe",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon Lake Bakery & Whiteshell Brewpub",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "1964 Restaurant (at The Hotel at Falcon Lake)",
+     "detail": "Falcon Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6319,8 +6458,26 @@
     "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Wescana Inn",
+     "detail": "http://www.wescanainn.com/"
+    },
+    {
+     "name": "Kikiwak Inn",
+     "detail": "https://www.kikiwakinn.ca/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "John & Jessie's Steak and Ribs",
+     "detail": "The Pas"
+    },
+    {
+     "name": "Golden Star Chinese Food",
+     "detail": "The Pas"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6353,8 +6510,22 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Tallpine Lodges",
+     "detail": "https://www.tallpinelodges.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Hi-Point Restaurant and Lounge",
+     "detail": "West Hawk Lake"
+    },
+    {
+     "name": "Nite Hawk Cafe",
+     "detail": "West Hawk Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6387,8 +6558,34 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "The Hotel at Falcon Lake",
+     "detail": "https://www.travelmanitoba.com/directory/the-hotel-at-falcon-lake/"
+    },
+    {
+     "name": "Falcon Trails Resort",
+     "detail": "http://falcontrailsresort.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Scotty's Drive-In",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon's Nest Cafe",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon Lake Bakery & Whiteshell Brewpub",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "1964 Restaurant (at The Hotel at Falcon Lake)",
+     "detail": "Falcon Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6423,8 +6620,34 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "New Country Motel",
+     "detail": "http://www.newcountrymotel.ca/"
+    },
+    {
+     "name": "Westwood Inn",
+     "detail": "http://www.westwoodinn.ca/"
+    },
+    {
+     "name": "Timberland Inn & Restaurant",
+     "detail": "http://www.timberlandinn.ca/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Chen's Restaurant",
+     "detail": "Swan River"
+    },
+    {
+     "name": "Northern Lights Eatery",
+     "detail": "Swan River"
+    },
+    {
+     "name": "A&W Restaurant",
+     "detail": "Swan River"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6461,8 +6684,18 @@
     "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Lakeview Hecla Resort",
+     "detail": "http://www.lakeviewhotels.com/hecla"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Seagull's Restaurant & Lounge",
+     "detail": "Hecla Village"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6499,8 +6732,37 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "New Country Motel",
+     "detail": "http://www.newcountrymotel.ca/"
+    },
+    {
+     "name": "Westwood Inn",
+     "detail": "http://www.westwoodinn.ca/"
+    },
+    {
+     "name": "Timberland Inn & Restaurant",
+     "detail": "http://www.timberlandinn.ca/"
+    },
+    {
+     "name": "Duck Mountain Provincial Park \u2013 Blue Lakes Campground"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Chen's Restaurant",
+     "detail": "Swan River"
+    },
+    {
+     "name": "Northern Lights Eatery",
+     "detail": "Swan River"
+    },
+    {
+     "name": "A&W Restaurant",
+     "detail": "Swan River"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6537,8 +6799,34 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "The Hotel at Falcon Lake",
+     "detail": "https://www.travelmanitoba.com/directory/the-hotel-at-falcon-lake/"
+    },
+    {
+     "name": "Falcon Trails Resort",
+     "detail": "http://falcontrailsresort.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Scotty's Drive-In",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon's Nest Cafe",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon Lake Bakery & Whiteshell Brewpub",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "1964 Restaurant (at The Hotel at Falcon Lake)",
+     "detail": "Falcon Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6571,8 +6859,34 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Roblin Motor Inn",
+     "detail": "http://roblin-motor-inn.poi.place/"
+    },
+    {
+     "name": "Harvest Moon Inn",
+     "detail": "http://www.harvestmoonroblin.com/"
+    },
+    {
+     "name": "Stay Easy Inn",
+     "detail": "http://www.stayeasyinn.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Chicken Chef",
+     "detail": "Roblin"
+    },
+    {
+     "name": "Golden River Restaurant",
+     "detail": "Roblin"
+    },
+    {
+     "name": "The Vinyl Diner",
+     "detail": "Roblin"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6639,8 +6953,34 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "The Hotel at Falcon Lake",
+     "detail": "https://www.travelmanitoba.com/directory/the-hotel-at-falcon-lake/"
+    },
+    {
+     "name": "Falcon Trails Resort",
+     "detail": "http://falcontrailsresort.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Scotty's Drive-In",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon's Nest Cafe",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon Lake Bakery & Whiteshell Brewpub",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "1964 Restaurant (at The Hotel at Falcon Lake)",
+     "detail": "Falcon Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6701,8 +7041,22 @@
     "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Ste Rose Hotel and Motel",
+     "detail": "http://strosehotel.ca/"
+    },
+    {
+     "name": "Ste Rose Inn Chicken Chef",
+     "detail": "https://www.chickenchef.com/locations/ste-rose-du-lac/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Ste Rose Inn Chicken Chef",
+     "detail": "Ste. Rose du Lac"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6737,8 +7091,26 @@
     "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Wescana Inn",
+     "detail": "http://www.wescanainn.com/"
+    },
+    {
+     "name": "Kikiwak Inn",
+     "detail": "https://www.kikiwakinn.ca/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "John & Jessie's Steak and Ribs",
+     "detail": "The Pas"
+    },
+    {
+     "name": "Golden Star Chinese Food",
+     "detail": "The Pas"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6801,8 +7173,25 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Sandy Lake Motel and Campground"
+    },
+    {
+     "name": "Sandy Lake Hotel",
+     "detail": "https://findyourcanada.com/sandylakehotel"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Sandy Lake Hotel Restaurant",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Sandy Lake Golf Course",
+     "detail": "Sandy Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6835,8 +7224,22 @@
     "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Ste Rose Hotel and Motel",
+     "detail": "http://strosehotel.ca/"
+    },
+    {
+     "name": "Ste Rose Inn Chicken Chef",
+     "detail": "https://www.chickenchef.com/locations/ste-rose-du-lac/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Ste Rose Inn Chicken Chef",
+     "detail": "Ste. Rose du Lac"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6927,8 +7330,25 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Sandy Lake Motel and Campground"
+    },
+    {
+     "name": "Sandy Lake Hotel",
+     "detail": "https://findyourcanada.com/sandylakehotel"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Sandy Lake Hotel Restaurant",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Sandy Lake Golf Course",
+     "detail": "Sandy Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6963,8 +7383,28 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Lac House Inn"
+    },
+    {
+     "name": "Motel Lakeview"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Chicken Chef Lac du Bonnet",
+     "detail": "Lac du Bonnet"
+    },
+    {
+     "name": "Santa Lucia Pizza Lac du Bonnet",
+     "detail": "Lac du Bonnet"
+    },
+    {
+     "name": "Kays Kitchen",
+     "detail": "Lac du Bonnet"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -6991,8 +7431,18 @@
     "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Bronx Motel",
+     "detail": "http://www.thebronxmotel.ca/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Route 391 Bar & Grill",
+     "detail": "Lynn Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7025,8 +7475,49 @@
     "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Gateway Motel",
+     "detail": "http://www.gatewaymotel.ca/"
+    },
+    {
+     "name": "Valley Motor Lodge",
+     "detail": "https://valleymotel.ca/"
+    },
+    {
+     "name": "Minnedosa Inn"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Dari Isle Drive-In",
+     "detail": "Minnedosa"
+    },
+    {
+     "name": "Sun Sun Chinese Restaurant",
+     "detail": "Minnedosa"
+    },
+    {
+     "name": "Corner Stone Grill",
+     "detail": "Minnedosa"
+    },
+    {
+     "name": "RD's on Main",
+     "detail": "Minnedosa"
+    },
+    {
+     "name": "Chicken Delight",
+     "detail": "Minnedosa"
+    },
+    {
+     "name": "Farmhouse 50",
+     "detail": "Minnedosa"
+    },
+    {
+     "name": "Minnedosa Bar & Grill",
+     "detail": "Minnedosa"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7059,8 +7550,28 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Lac House Inn"
+    },
+    {
+     "name": "Motel Lakeview"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Chicken Chef Lac du Bonnet",
+     "detail": "Lac du Bonnet"
+    },
+    {
+     "name": "Santa Lucia Pizza Lac du Bonnet",
+     "detail": "Lac du Bonnet"
+    },
+    {
+     "name": "Kays Kitchen",
+     "detail": "Lac du Bonnet"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7093,8 +7604,34 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "The Hotel at Falcon Lake",
+     "detail": "https://www.travelmanitoba.com/directory/the-hotel-at-falcon-lake/"
+    },
+    {
+     "name": "Falcon Trails Resort",
+     "detail": "http://falcontrailsresort.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Scotty's Drive-In",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon's Nest Cafe",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon Lake Bakery & Whiteshell Brewpub",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "1964 Restaurant (at The Hotel at Falcon Lake)",
+     "detail": "Falcon Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7132,8 +7669,28 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Lac House Inn"
+    },
+    {
+     "name": "Motel Lakeview"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Chicken Chef Lac du Bonnet",
+     "detail": "Lac du Bonnet"
+    },
+    {
+     "name": "Santa Lucia Pizza Lac du Bonnet",
+     "detail": "Lac du Bonnet"
+    },
+    {
+     "name": "Kays Kitchen",
+     "detail": "Lac du Bonnet"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7166,8 +7723,22 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Tallpine Lodges",
+     "detail": "https://www.tallpinelodges.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Hi-Point Restaurant and Lounge",
+     "detail": "West Hawk Lake"
+    },
+    {
+     "name": "Nite Hawk Cafe",
+     "detail": "West Hawk Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7206,8 +7777,17 @@
     "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Northbrook Inn"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Northbrook Inn",
+     "detail": "Grand Rapids"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7240,8 +7820,28 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Lac House Inn"
+    },
+    {
+     "name": "Motel Lakeview"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Chicken Chef Lac du Bonnet",
+     "detail": "Lac du Bonnet"
+    },
+    {
+     "name": "Santa Lucia Pizza Lac du Bonnet",
+     "detail": "Lac du Bonnet"
+    },
+    {
+     "name": "Kays Kitchen",
+     "detail": "Lac du Bonnet"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7276,8 +7876,18 @@
     "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Bronx Motel",
+     "detail": "http://www.thebronxmotel.ca/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Route 391 Bar & Grill",
+     "detail": "Lynn Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7310,8 +7920,25 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Parkview Motel",
+     "detail": "http://www.parkviewmotel.ca/"
+    },
+    {
+     "name": "Grandview Motor Inn"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Kings Lodge Chinese Restaurant",
+     "detail": "Grandview"
+    },
+    {
+     "name": "Friendly Corner Bake Shop",
+     "detail": "Grandview"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7344,8 +7971,37 @@
     "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Sandy Lake Motel & Campground",
+     "detail": "https://www.sandylakemotelandcampground.com/about-us"
+    },
+    {
+     "name": "Sandy Lake Hotel"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Wolf Den Cafe",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Frontier House",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Moose Caboose Coffee",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Sandy Lake Fine Foods Express",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Sandy Lake Drive-inn",
+     "detail": "Sandy Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7385,8 +8041,38 @@
     "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Lakeview Gimli Resort",
+     "detail": "http://www.lakeviewhotels.com/gimli/"
+    },
+    {
+     "name": "Autumnwood Motel & RV Resort",
+     "detail": "http://www.autumnwoodresort.ca/"
+    },
+    {
+     "name": "Camp Morton Provincial Park",
+     "detail": "https://www.gov.mb.ca/sd/parks/park-maps-and-locations/central/camp_morton.html"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Ship & Plough Tavern",
+     "detail": "Gimli"
+    },
+    {
+     "name": "Beach Boy Restaurant",
+     "detail": "Gimli"
+    },
+    {
+     "name": "Seagull's Restaurant & Lounge",
+     "detail": "Gimli"
+    },
+    {
+     "name": "Carlo's Cucina",
+     "detail": "Gimli"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7424,8 +8110,18 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Riverside Motel",
+     "detail": "https://www.tripadvisor.ca/Hotel_Review-g7092299-d7085426-Reviews-Riverside_Motel-Hadashville_Manitoba.html"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Pahalwan Dhaba",
+     "detail": "Hadashville"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7458,8 +8154,26 @@
     "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Victoria Inn Flin Flon",
+     "detail": "https://flinflon.vicinn.com/"
+    },
+    {
+     "name": "Oreland Motel",
+     "detail": "https://orelandmotel.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Aurora + Pine Bistro",
+     "detail": "Flin Flon"
+    },
+    {
+     "name": "Chicken Chef",
+     "detail": "Flin Flon"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7497,8 +8211,46 @@
     "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Virden Motel",
+     "detail": "https://hotelni.com/virdenmotel"
+    },
+    {
+     "name": "Virden Central Hotel",
+     "detail": "https://www.virdencentralhotel.com/"
+    },
+    {
+     "name": "Jays Inn and Suites",
+     "detail": "https://jaysinn.ca/"
+    },
+    {
+     "name": "Comfort Inn & Suites",
+     "detail": "https://www.choicehotels.com/manitoba/virden/comfort-inn-hotels/cn966?mc=llrscncn&pmf=canada"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "A&W",
+     "detail": "Virden"
+    },
+    {
+     "name": "Chicken Chef",
+     "detail": "Virden"
+    },
+    {
+     "name": "T's Dining & Lounge",
+     "detail": "Virden"
+    },
+    {
+     "name": "W & L Chinese Restaurant",
+     "detail": "Virden"
+    },
+    {
+     "name": "Bento Sushi",
+     "detail": "Virden"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7531,8 +8283,37 @@
     "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Sandy Lake Motel & Campground",
+     "detail": "https://www.sandylakemotelandcampground.com/about-us"
+    },
+    {
+     "name": "Sandy Lake Hotel"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Wolf Den Cafe",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Frontier House",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Moose Caboose Coffee",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Sandy Lake Fine Foods Express",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Sandy Lake Drive-inn",
+     "detail": "Sandy Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7599,8 +8380,54 @@
     "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Bay Hill Inns & Suites",
+     "detail": "http://www.bayhillinns.com/"
+    },
+    {
+     "name": "Vivian Motor Hotel",
+     "detail": "https://www.facebook.com/HotelNeepawa/"
+    },
+    {
+     "name": "Neepawa Motel",
+     "detail": "https://hotelni.com/neepawamotel"
+    },
+    {
+     "name": "Best Western Plus Neepawa Hotel",
+     "detail": "https://www.bestwestern.com/en_US/book/hotel-rooms.63022.html?iata=00171880&ssob=BLBWI0004G"
+    },
+    {
+     "name": "Westway Inn Motel",
+     "detail": "https://www.westwayinnneepawa.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Bamboo Garden Restaurant",
+     "detail": "Neepawa"
+    },
+    {
+     "name": "Brews Brothers Bistro",
+     "detail": "Neepawa"
+    },
+    {
+     "name": "Lee's Village Restaurant",
+     "detail": "Neepawa"
+    },
+    {
+     "name": "Dairy Queen",
+     "detail": "Neepawa"
+    },
+    {
+     "name": "Tsibog's Eatery",
+     "detail": "Neepawa"
+    },
+    {
+     "name": "Vegos",
+     "detail": "Neepawa"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7633,8 +8460,17 @@
     "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Nordic Inn"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "McMunnys Restaurant",
+     "detail": "Erickson"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7669,8 +8505,54 @@
     "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Bay Hill Inns & Suites",
+     "detail": "http://www.bayhillinns.com/"
+    },
+    {
+     "name": "Vivian Motor Hotel",
+     "detail": "https://www.facebook.com/HotelNeepawa/"
+    },
+    {
+     "name": "Neepawa Motel",
+     "detail": "https://hotelni.com/neepawamotel"
+    },
+    {
+     "name": "Best Western Plus Neepawa Hotel",
+     "detail": "https://www.bestwestern.com/en_US/book/hotel-rooms.63022.html?iata=00171880&ssob=BLBWI0004G"
+    },
+    {
+     "name": "Westway Inn Motel",
+     "detail": "https://www.westwayinnneepawa.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Bamboo Garden Restaurant",
+     "detail": "Neepawa"
+    },
+    {
+     "name": "Brews Brothers Bistro",
+     "detail": "Neepawa"
+    },
+    {
+     "name": "Lee's Village Restaurant",
+     "detail": "Neepawa"
+    },
+    {
+     "name": "Dairy Queen",
+     "detail": "Neepawa"
+    },
+    {
+     "name": "Tsibog's Eatery",
+     "detail": "Neepawa"
+    },
+    {
+     "name": "Vegos",
+     "detail": "Neepawa"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7708,7 +8590,16 @@
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
    "lodging": [],
-   "restaurants": [],
+   "restaurants": [
+    {
+     "name": "Oakbank Bar & Grill",
+     "detail": "Oakbank"
+    },
+    {
+     "name": "Back At The Ranch",
+     "detail": "Oakbank"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7745,8 +8636,24 @@
     "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Snow Lake Motor Inn"
+    },
+    {
+     "name": "Bluenose Bed & Breakfast"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Angilina's Pizza & Chicken",
+     "detail": "Snow Lake"
+    },
+    {
+     "name": "Hannahs Place Asian Cuisine",
+     "detail": "Snow Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7811,8 +8718,28 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Lac House Inn"
+    },
+    {
+     "name": "Motel Lakeview"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Chicken Chef Lac du Bonnet",
+     "detail": "Lac du Bonnet"
+    },
+    {
+     "name": "Santa Lucia Pizza Lac du Bonnet",
+     "detail": "Lac du Bonnet"
+    },
+    {
+     "name": "Kays Kitchen",
+     "detail": "Lac du Bonnet"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7851,8 +8778,28 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Lac House Inn"
+    },
+    {
+     "name": "Motel Lakeview"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Chicken Chef Lac du Bonnet",
+     "detail": "Lac du Bonnet"
+    },
+    {
+     "name": "Santa Lucia Pizza Lac du Bonnet",
+     "detail": "Lac du Bonnet"
+    },
+    {
+     "name": "Kays Kitchen",
+     "detail": "Lac du Bonnet"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7885,7 +8832,11 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
+   "lodging": [
+    {
+     "name": "Richer Inn Motor Hotel"
+    }
+   ],
    "restaurants": [],
    "boat_rentals": []
   },
@@ -7919,8 +8870,37 @@
     "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Sandy Lake Motel & Campground",
+     "detail": "https://www.sandylakemotelandcampground.com/about-us"
+    },
+    {
+     "name": "Sandy Lake Hotel"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Wolf Den Cafe",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Frontier House",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Moose Caboose Coffee",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Sandy Lake Fine Foods Express",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Sandy Lake Drive-inn",
+     "detail": "Sandy Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7953,8 +8933,34 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Roblin Motor Inn",
+     "detail": "http://roblin-motor-inn.poi.place/"
+    },
+    {
+     "name": "Harvest Moon Inn",
+     "detail": "http://www.harvestmoonroblin.com/"
+    },
+    {
+     "name": "Stay Easy Inn",
+     "detail": "http://www.stayeasyinn.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Chicken Chef",
+     "detail": "Roblin"
+    },
+    {
+     "name": "Golden River Restaurant",
+     "detail": "Roblin"
+    },
+    {
+     "name": "The Vinyl Diner",
+     "detail": "Roblin"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -7989,8 +8995,17 @@
     "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Whitewater Inn"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Susan's Art Cafe",
+     "detail": "Leaf Rapids"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8025,8 +9040,26 @@
     "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Riverton Motor Inn",
+     "detail": "https://interlaketourism.com/hotels_motels/riverton-motor-inn/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "My Baba",
+     "detail": "Riverton"
+    },
+    {
+     "name": "Lil B's Restaurant",
+     "detail": "Riverton"
+    },
+    {
+     "name": "The Mixed Grill",
+     "detail": "Riverton"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8059,8 +9092,37 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "New Country Motel",
+     "detail": "http://www.newcountrymotel.ca/"
+    },
+    {
+     "name": "Westwood Inn",
+     "detail": "http://www.westwoodinn.ca/"
+    },
+    {
+     "name": "Timberland Inn & Restaurant",
+     "detail": "http://www.timberlandinn.ca/"
+    },
+    {
+     "name": "Duck Mountain Provincial Park \u2013 Blue Lakes Campground"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Chen's Restaurant",
+     "detail": "Swan River"
+    },
+    {
+     "name": "Northern Lights Eatery",
+     "detail": "Swan River"
+    },
+    {
+     "name": "A&W Restaurant",
+     "detail": "Swan River"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8093,8 +9155,37 @@
     "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Sandy Lake Motel & Campground",
+     "detail": "https://www.sandylakemotelandcampground.com/about-us"
+    },
+    {
+     "name": "Sandy Lake Hotel"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Wolf Den Cafe",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Frontier House",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Moose Caboose Coffee",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Sandy Lake Fine Foods Express",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Sandy Lake Drive-inn",
+     "detail": "Sandy Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8129,8 +9220,26 @@
     "note": "Stocked trout water \u2014 open to fishing all year; general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Best Western Thompson Hotel & Suites",
+     "detail": "https://www.bestwestern.com/en_US/book/hotel-rooms.63014.html?iata=00171880&ssob=BLBWI0004G"
+    },
+    {
+     "name": "The Burntwood Hotel",
+     "detail": "https://www.burntwoodhotel.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "River View Restaurant",
+     "detail": "Thompson"
+    },
+    {
+     "name": "Hub Of The North Restaurant",
+     "detail": "Thompson"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8163,8 +9272,22 @@
     "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Spruce Woods Inn",
+     "detail": "http://sprucewoodsinn.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Glenboro Drive In",
+     "detail": "Glenboro"
+    },
+    {
+     "name": "Ho Ho Cafe",
+     "detail": "Glenboro"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8191,8 +9314,21 @@
     "note": "Stocked water \u2014 general Southern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Manitou Motor Inn"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "DominYon's Burger Restaurant",
+     "detail": "Manitou"
+    },
+    {
+     "name": "Manitou Pizza Corner",
+     "detail": "Manitou"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8231,8 +9367,34 @@
     "note": "Stocked trout water \u2014 open to fishing all year; general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "The Hotel at Falcon Lake",
+     "detail": "https://www.travelmanitoba.com/directory/the-hotel-at-falcon-lake/"
+    },
+    {
+     "name": "Falcon Trails Resort",
+     "detail": "http://falcontrailsresort.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Scotty's Drive-In",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon's Nest Cafe",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon Lake Bakery & Whiteshell Brewpub",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "1964 Restaurant (at The Hotel at Falcon Lake)",
+     "detail": "Falcon Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8301,8 +9463,26 @@
     "note": "Stocked trout water \u2014 open to fishing all year; general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Best Western Thompson Hotel & Suites",
+     "detail": "https://www.bestwestern.com/en_US/book/hotel-rooms.63014.html?iata=00171880&ssob=BLBWI0004G"
+    },
+    {
+     "name": "The Burntwood Hotel",
+     "detail": "https://www.burntwoodhotel.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "River View Restaurant",
+     "detail": "Thompson"
+    },
+    {
+     "name": "Hub Of The North Restaurant",
+     "detail": "Thompson"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8335,8 +9515,28 @@
     "note": "Stocked trout water \u2014 open to fishing all year; general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Lac House Inn"
+    },
+    {
+     "name": "Motel Lakeview"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Chicken Chef Lac du Bonnet",
+     "detail": "Lac du Bonnet"
+    },
+    {
+     "name": "Santa Lucia Pizza Lac du Bonnet",
+     "detail": "Lac du Bonnet"
+    },
+    {
+     "name": "Kays Kitchen",
+     "detail": "Lac du Bonnet"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8371,8 +9571,49 @@
     "note": "Stocked trout water \u2014 open to fishing all year; general Western Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Gateway Motel",
+     "detail": "http://www.gatewaymotel.ca/"
+    },
+    {
+     "name": "Valley Motor Lodge",
+     "detail": "https://valleymotel.ca/"
+    },
+    {
+     "name": "Minnedosa Inn"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Dari Isle Drive-In",
+     "detail": "Minnedosa"
+    },
+    {
+     "name": "Sun Sun Chinese Restaurant",
+     "detail": "Minnedosa"
+    },
+    {
+     "name": "Corner Stone Grill",
+     "detail": "Minnedosa"
+    },
+    {
+     "name": "RD's on Main",
+     "detail": "Minnedosa"
+    },
+    {
+     "name": "Chicken Delight",
+     "detail": "Minnedosa"
+    },
+    {
+     "name": "Farmhouse 50",
+     "detail": "Minnedosa"
+    },
+    {
+     "name": "Minnedosa Bar & Grill",
+     "detail": "Minnedosa"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8385,7 +9626,7 @@
    ],
    "size_text": "",
    "max_depth_text": "",
-   "description": "The reservoir at the City of Morden's Lake Minnewasta recreation area, stocked with walleye fry. Offers a beach, trails, and easy shore access close to town.",
+   "description": "The reservoir at the City of Morden's Lake Minnewasta recreation area, stocked with walleye fry. Offers a beach, trails, and easy shore access close to town. The City of Morden's Lake Minnewasta recreation area also runs a campground with a boat launch and canoe launch on the lake.",
    "depth_map_url": null,
    "stocked": true,
    "stocked_species": [
@@ -8405,8 +9646,32 @@
     "note": "Stocked water \u2014 general Southern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Best Western Plus Morden"
+    },
+    {
+     "name": "Morden Motor Inn"
+    },
+    {
+     "name": "Lake Minnewasta Campground",
+     "detail": "https://www.rvparx.com/parks/lake-minnewasta-morden-mb.html"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Coffee Culture Cafe & Eatery",
+     "detail": "Morden"
+    },
+    {
+     "name": "Leparq Pizzeria",
+     "detail": "Morden"
+    },
+    {
+     "name": "Boston Pizza",
+     "detail": "Morden"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8439,8 +9704,37 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "New Country Motel",
+     "detail": "http://www.newcountrymotel.ca/"
+    },
+    {
+     "name": "Westwood Inn",
+     "detail": "http://www.westwoodinn.ca/"
+    },
+    {
+     "name": "Timberland Inn & Restaurant",
+     "detail": "http://www.timberlandinn.ca/"
+    },
+    {
+     "name": "Duck Mountain Provincial Park \u2013 Blue Lakes Campground"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Chen's Restaurant",
+     "detail": "Swan River"
+    },
+    {
+     "name": "Northern Lights Eatery",
+     "detail": "Swan River"
+    },
+    {
+     "name": "A&W Restaurant",
+     "detail": "Swan River"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8475,8 +9769,34 @@
     "note": "Stocked trout water \u2014 open to fishing all year; general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "New Country Motel",
+     "detail": "http://www.newcountrymotel.ca/"
+    },
+    {
+     "name": "Westwood Inn",
+     "detail": "http://www.westwoodinn.ca/"
+    },
+    {
+     "name": "Timberland Inn & Restaurant",
+     "detail": "http://www.timberlandinn.ca/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Chen's Restaurant",
+     "detail": "Swan River"
+    },
+    {
+     "name": "Northern Lights Eatery",
+     "detail": "Swan River"
+    },
+    {
+     "name": "A&W Restaurant",
+     "detail": "Swan River"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8509,8 +9829,22 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Tallpine Lodges",
+     "detail": "https://www.tallpinelodges.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Hi-Point Restaurant and Lounge",
+     "detail": "West Hawk Lake"
+    },
+    {
+     "name": "Nite Hawk Cafe",
+     "detail": "West Hawk Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8543,8 +9877,34 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "New Country Motel",
+     "detail": "http://www.newcountrymotel.ca/"
+    },
+    {
+     "name": "Westwood Inn",
+     "detail": "http://www.westwoodinn.ca/"
+    },
+    {
+     "name": "Timberland Inn & Restaurant",
+     "detail": "http://www.timberlandinn.ca/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Chen's Restaurant",
+     "detail": "Swan River"
+    },
+    {
+     "name": "Northern Lights Eatery",
+     "detail": "Swan River"
+    },
+    {
+     "name": "A&W Restaurant",
+     "detail": "Swan River"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8577,8 +9937,37 @@
     "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Sandy Lake Motel & Campground",
+     "detail": "https://www.sandylakemotelandcampground.com/about-us"
+    },
+    {
+     "name": "Sandy Lake Hotel"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Wolf Den Cafe",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Frontier House",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Moose Caboose Coffee",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Sandy Lake Fine Foods Express",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Sandy Lake Drive-inn",
+     "detail": "Sandy Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8611,8 +10000,34 @@
     "note": "Stocked trout water \u2014 open to fishing all year; general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "The Hotel at Falcon Lake",
+     "detail": "https://www.travelmanitoba.com/directory/the-hotel-at-falcon-lake/"
+    },
+    {
+     "name": "Falcon Trails Resort",
+     "detail": "http://falcontrailsresort.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Scotty's Drive-In",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon's Nest Cafe",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon Lake Bakery & Whiteshell Brewpub",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "1964 Restaurant (at The Hotel at Falcon Lake)",
+     "detail": "Falcon Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8645,8 +10060,34 @@
     "note": "Stocked trout water \u2014 open to fishing all year; general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "New Country Motel",
+     "detail": "http://www.newcountrymotel.ca/"
+    },
+    {
+     "name": "Westwood Inn",
+     "detail": "http://www.westwoodinn.ca/"
+    },
+    {
+     "name": "Timberland Inn & Restaurant",
+     "detail": "http://www.timberlandinn.ca/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Chen's Restaurant",
+     "detail": "Swan River"
+    },
+    {
+     "name": "Northern Lights Eatery",
+     "detail": "Swan River"
+    },
+    {
+     "name": "A&W Restaurant",
+     "detail": "Swan River"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8683,8 +10124,34 @@
     "note": "Stocked trout water \u2014 open to fishing all year; general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "The Hotel at Falcon Lake",
+     "detail": "https://www.travelmanitoba.com/directory/the-hotel-at-falcon-lake/"
+    },
+    {
+     "name": "Falcon Trails Resort",
+     "detail": "http://falcontrailsresort.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Scotty's Drive-In",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon's Nest Cafe",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon Lake Bakery & Whiteshell Brewpub",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "1964 Restaurant (at The Hotel at Falcon Lake)",
+     "detail": "Falcon Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8717,8 +10184,26 @@
     "note": "Stocked trout water \u2014 open to fishing all year; general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Victoria Inn Flin Flon",
+     "detail": "https://flinflon.vicinn.com/"
+    },
+    {
+     "name": "Oreland Motel",
+     "detail": "https://orelandmotel.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Aurora + Pine Bistro",
+     "detail": "Flin Flon"
+    },
+    {
+     "name": "Chicken Chef",
+     "detail": "Flin Flon"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8751,8 +10236,34 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "The Hotel at Falcon Lake",
+     "detail": "https://www.travelmanitoba.com/directory/the-hotel-at-falcon-lake/"
+    },
+    {
+     "name": "Falcon Trails Resort",
+     "detail": "http://falcontrailsresort.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Scotty's Drive-In",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon's Nest Cafe",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon Lake Bakery & Whiteshell Brewpub",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "1964 Restaurant (at The Hotel at Falcon Lake)",
+     "detail": "Falcon Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8785,8 +10296,26 @@
     "note": "Stocked trout water \u2014 open to fishing all year; general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Best Western Thompson Hotel & Suites",
+     "detail": "https://www.bestwestern.com/en_US/book/hotel-rooms.63014.html?iata=00171880&ssob=BLBWI0004G"
+    },
+    {
+     "name": "The Burntwood Hotel",
+     "detail": "https://www.burntwoodhotel.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "River View Restaurant",
+     "detail": "Thompson"
+    },
+    {
+     "name": "Hub Of The North Restaurant",
+     "detail": "Thompson"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8821,8 +10350,37 @@
     "note": "Stocked trout water \u2014 open to fishing all year; general Western Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Sandy Lake Motel & Campground",
+     "detail": "https://www.sandylakemotelandcampground.com/about-us"
+    },
+    {
+     "name": "Sandy Lake Hotel"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Wolf Den Cafe",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Frontier House",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Moose Caboose Coffee",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Sandy Lake Fine Foods Express",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Sandy Lake Drive-inn",
+     "detail": "Sandy Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8851,8 +10409,26 @@
     "note": "Stocked trout water \u2014 open to fishing all year; general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Riverton Motor Inn",
+     "detail": "https://interlaketourism.com/hotels_motels/riverton-motor-inn/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "My Baba",
+     "detail": "Riverton"
+    },
+    {
+     "name": "Lil B's Restaurant",
+     "detail": "Riverton"
+    },
+    {
+     "name": "The Mixed Grill",
+     "detail": "Riverton"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8885,7 +10461,12 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
+   "lodging": [
+    {
+     "name": "Northern Wings Bed & Breakfast",
+     "detail": "https://www.tripadvisor.ca/Hotel_Review-g781300-d1653585-Reviews-Northern_Wings_Bed_Breakfast-Bissett_Manitoba.html"
+    }
+   ],
    "restaurants": [],
    "boat_rentals": []
   },
@@ -8919,8 +10500,22 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Tallpine Lodges",
+     "detail": "https://www.tallpinelodges.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Hi-Point Restaurant and Lounge",
+     "detail": "West Hawk Lake"
+    },
+    {
+     "name": "Nite Hawk Cafe",
+     "detail": "West Hawk Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8953,8 +10548,26 @@
     "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Arborg Hotel",
+     "detail": "http://www.arborghotel.com/"
+    },
+    {
+     "name": "Blue Crescent Hotels - Arborg",
+     "detail": "https://www.bluecrescent.ca/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Golden Lake Restaurant",
+     "detail": "Arborg"
+    },
+    {
+     "name": "Arborg Chicken Chef",
+     "detail": "Arborg"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -8989,8 +10602,34 @@
     "note": "Stocked trout water \u2014 open to fishing all year; general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "The Hotel at Falcon Lake",
+     "detail": "https://www.travelmanitoba.com/directory/the-hotel-at-falcon-lake/"
+    },
+    {
+     "name": "Falcon Trails Resort",
+     "detail": "http://falcontrailsresort.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Scotty's Drive-In",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon's Nest Cafe",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon Lake Bakery & Whiteshell Brewpub",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "1964 Restaurant (at The Hotel at Falcon Lake)",
+     "detail": "Falcon Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9027,8 +10666,26 @@
     "note": "Stocked trout water \u2014 open to fishing all year; general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Victoria Inn Flin Flon",
+     "detail": "https://flinflon.vicinn.com/"
+    },
+    {
+     "name": "Oreland Motel",
+     "detail": "https://orelandmotel.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Aurora + Pine Bistro",
+     "detail": "Flin Flon"
+    },
+    {
+     "name": "Chicken Chef",
+     "detail": "Flin Flon"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9061,8 +10718,28 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Shoal Lake Motor Inn"
+    },
+    {
+     "name": "Canway Inn & Suites"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Benny's Astoria Pizzaria",
+     "detail": "Shoal Lake"
+    },
+    {
+     "name": "Shoal Lake Motor Inn",
+     "detail": "Shoal Lake"
+    },
+    {
+     "name": "Cheryl's Cove",
+     "detail": "Shoal Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9123,8 +10800,37 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "New Country Motel",
+     "detail": "http://www.newcountrymotel.ca/"
+    },
+    {
+     "name": "Westwood Inn",
+     "detail": "http://www.westwoodinn.ca/"
+    },
+    {
+     "name": "Timberland Inn & Restaurant",
+     "detail": "http://www.timberlandinn.ca/"
+    },
+    {
+     "name": "Duck Mountain Provincial Park \u2013 Blue Lakes Campground"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Chen's Restaurant",
+     "detail": "Swan River"
+    },
+    {
+     "name": "Northern Lights Eatery",
+     "detail": "Swan River"
+    },
+    {
+     "name": "A&W Restaurant",
+     "detail": "Swan River"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9157,8 +10863,25 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Rossman Lakeview Restaurant & Camping"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Kopper Kettle",
+     "detail": "Rossburn"
+    },
+    {
+     "name": "Choy's Cafe",
+     "detail": "Rossburn"
+    },
+    {
+     "name": "N L Restaurant",
+     "detail": "Rossburn"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9197,8 +10920,34 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "The Hotel at Falcon Lake",
+     "detail": "https://www.travelmanitoba.com/directory/the-hotel-at-falcon-lake/"
+    },
+    {
+     "name": "Falcon Trails Resort",
+     "detail": "http://falcontrailsresort.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Scotty's Drive-In",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon's Nest Cafe",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon Lake Bakery & Whiteshell Brewpub",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "1964 Restaurant (at The Hotel at Falcon Lake)",
+     "detail": "Falcon Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9231,8 +10980,25 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Rossman Lakeview Restaurant & Camping"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Kopper Kettle",
+     "detail": "Rossburn"
+    },
+    {
+     "name": "Choy's Cafe",
+     "detail": "Rossburn"
+    },
+    {
+     "name": "N L Restaurant",
+     "detail": "Rossburn"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9267,8 +11033,26 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Asessippi Inn",
+     "detail": "https://asessippiinn.ca/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "The Russell Inn",
+     "detail": "Russell"
+    },
+    {
+     "name": "Connie's Drive In",
+     "detail": "Russell"
+    },
+    {
+     "name": "Chicken Chef - Russell",
+     "detail": "Russell"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9329,7 +11113,11 @@
     "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
+   "lodging": [
+    {
+     "name": "Wood'n Bell Motel"
+    }
+   ],
    "restaurants": [],
    "boat_rentals": []
   },
@@ -9367,8 +11155,21 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Ste Rose Inn"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Ste Rose Inn Chicken Chef",
+     "detail": "Ste. Rose du Lac"
+    },
+    {
+     "name": "Lions Cafe",
+     "detail": "Ste. Rose du Lac"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9401,8 +11202,54 @@
     "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Bay Hill Inns & Suites",
+     "detail": "http://www.bayhillinns.com/"
+    },
+    {
+     "name": "Vivian Motor Hotel",
+     "detail": "https://www.facebook.com/HotelNeepawa/"
+    },
+    {
+     "name": "Neepawa Motel",
+     "detail": "https://hotelni.com/neepawamotel"
+    },
+    {
+     "name": "Best Western Plus Neepawa Hotel",
+     "detail": "https://www.bestwestern.com/en_US/book/hotel-rooms.63022.html?iata=00171880&ssob=BLBWI0004G"
+    },
+    {
+     "name": "Westway Inn Motel",
+     "detail": "https://www.westwayinnneepawa.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Bamboo Garden Restaurant",
+     "detail": "Neepawa"
+    },
+    {
+     "name": "Brews Brothers Bistro",
+     "detail": "Neepawa"
+    },
+    {
+     "name": "Lee's Village Restaurant",
+     "detail": "Neepawa"
+    },
+    {
+     "name": "Dairy Queen",
+     "detail": "Neepawa"
+    },
+    {
+     "name": "Tsibog's Eatery",
+     "detail": "Neepawa"
+    },
+    {
+     "name": "Vegos",
+     "detail": "Neepawa"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9437,8 +11284,34 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "The Hotel at Falcon Lake",
+     "detail": "https://www.travelmanitoba.com/directory/the-hotel-at-falcon-lake/"
+    },
+    {
+     "name": "Falcon Trails Resort",
+     "detail": "http://falcontrailsresort.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Scotty's Drive-In",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon's Nest Cafe",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon Lake Bakery & Whiteshell Brewpub",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "1964 Restaurant (at The Hotel at Falcon Lake)",
+     "detail": "Falcon Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9471,8 +11344,25 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Rossman Lakeview Restaurant & Camping"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Kopper Kettle",
+     "detail": "Rossburn"
+    },
+    {
+     "name": "Choy's Cafe",
+     "detail": "Rossburn"
+    },
+    {
+     "name": "N L Restaurant",
+     "detail": "Rossburn"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9509,8 +11399,34 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Roblin Motor Inn",
+     "detail": "http://roblin-motor-inn.poi.place/"
+    },
+    {
+     "name": "Harvest Moon Inn",
+     "detail": "http://www.harvestmoonroblin.com/"
+    },
+    {
+     "name": "Stay Easy Inn",
+     "detail": "http://www.stayeasyinn.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Chicken Chef",
+     "detail": "Roblin"
+    },
+    {
+     "name": "Golden River Restaurant",
+     "detail": "Roblin"
+    },
+    {
+     "name": "The Vinyl Diner",
+     "detail": "Roblin"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9543,8 +11459,29 @@
     "note": "Stocked water \u2014 general Southern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Days Inn by Wyndham Steinbach",
+     "detail": "https://www.travelocity.com/Steinbach-Hotels-Days-Inn-By-Wyndham-Steinbach.h535402.Hotel-Information"
+    },
+    {
+     "name": "Frantz Inn"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Smitty's Family Restaurant",
+     "detail": "Steinbach"
+    },
+    {
+     "name": "Bigg Smoak BBQ Smokehouse And Grill",
+     "detail": "Steinbach"
+    },
+    {
+     "name": "Viet House Restaurant",
+     "detail": "Steinbach"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9579,8 +11516,18 @@
     "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Lakeview Hecla Resort",
+     "detail": "http://www.lakeviewhotels.com/hecla"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Seagull's Restaurant & Lounge",
+     "detail": "Hecla Village"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9613,8 +11560,34 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "The Hotel at Falcon Lake",
+     "detail": "https://www.travelmanitoba.com/directory/the-hotel-at-falcon-lake/"
+    },
+    {
+     "name": "Falcon Trails Resort",
+     "detail": "http://falcontrailsresort.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Scotty's Drive-In",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon's Nest Cafe",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon Lake Bakery & Whiteshell Brewpub",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "1964 Restaurant (at The Hotel at Falcon Lake)",
+     "detail": "Falcon Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9649,8 +11622,34 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "The Hotel at Falcon Lake",
+     "detail": "https://www.travelmanitoba.com/directory/the-hotel-at-falcon-lake/"
+    },
+    {
+     "name": "Falcon Trails Resort",
+     "detail": "http://falcontrailsresort.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Scotty's Drive-In",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon's Nest Cafe",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon Lake Bakery & Whiteshell Brewpub",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "1964 Restaurant (at The Hotel at Falcon Lake)",
+     "detail": "Falcon Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9711,8 +11710,34 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "The Hotel at Falcon Lake",
+     "detail": "https://www.travelmanitoba.com/directory/the-hotel-at-falcon-lake/"
+    },
+    {
+     "name": "Falcon Trails Resort",
+     "detail": "http://falcontrailsresort.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Scotty's Drive-In",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon's Nest Cafe",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon Lake Bakery & Whiteshell Brewpub",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "1964 Restaurant (at The Hotel at Falcon Lake)",
+     "detail": "Falcon Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9747,8 +11772,26 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Dauphin Inn Express",
+     "detail": "http://www.dauphininn.ca/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Corrina's on Main",
+     "detail": "Dauphin"
+    },
+    {
+     "name": "Smitty's",
+     "detail": "Dauphin"
+    },
+    {
+     "name": "MR MIKES SteakhouseCasual",
+     "detail": "Dauphin"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9781,8 +11824,25 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Parkview Motel",
+     "detail": "http://www.parkviewmotel.ca/"
+    },
+    {
+     "name": "Grandview Motor Inn"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Kings Lodge Chinese Restaurant",
+     "detail": "Grandview"
+    },
+    {
+     "name": "Friendly Corner Bake Shop",
+     "detail": "Grandview"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9815,8 +11875,34 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "New Country Motel",
+     "detail": "http://www.newcountrymotel.ca/"
+    },
+    {
+     "name": "Westwood Inn",
+     "detail": "http://www.westwoodinn.ca/"
+    },
+    {
+     "name": "Timberland Inn & Restaurant",
+     "detail": "http://www.timberlandinn.ca/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Chen's Restaurant",
+     "detail": "Swan River"
+    },
+    {
+     "name": "Northern Lights Eatery",
+     "detail": "Swan River"
+    },
+    {
+     "name": "A&W Restaurant",
+     "detail": "Swan River"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9827,9 +11913,9 @@
    "species": [
     "Walleye"
    ],
-   "size_text": "",
-   "max_depth_text": "",
-   "description": "A reservoir on the Little Saskatchewan River near Rivers, provincially stocked with walleye fry and known for walleye, pike and perch. Rivers Provincial Park on its shore offers a popular beach and fishing access.",
+   "size_text": "638.5 ha (1,578 acres)",
+   "max_depth_text": "15 m (50 ft)",
+   "description": "A reservoir on the Little Saskatchewan River near Rivers, provincially stocked with walleye fry and known for walleye, pike and perch. Rivers Provincial Park on its shore offers a popular beach and fishing access. The lake has multiple boat launches, and Rivers Provincial Park on the north shore provides boat access, camping and a beach.",
    "depth_map_url": null,
    "stocked": true,
    "stocked_species": [
@@ -9854,9 +11940,47 @@
     "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
-   "boat_rentals": []
+   "lodging": [
+    {
+     "name": "Rivers Provincial Park (campground)"
+    },
+    {
+     "name": "Victoria Inn Hotel & Convention Centre"
+    },
+    {
+     "name": "Canad Inns Destination Centre Brandon"
+    },
+    {
+     "name": "Super 8 by Wyndham Brandon"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Lee's Restaurant",
+     "detail": "Rivers"
+    },
+    {
+     "name": "The Tempo Place Emporium Restaurant",
+     "detail": "Rivers"
+    },
+    {
+     "name": "Chilli Chutney",
+     "detail": "Brandon"
+    },
+    {
+     "name": "The Dock on Princess",
+     "detail": "Brandon"
+    },
+    {
+     "name": "Pizza Express",
+     "detail": "Brandon"
+    }
+   ],
+   "boat_rentals": [
+    {
+     "name": "paddle bros"
+    }
+   ]
   },
   {
    "id": "wargatie-lake",
@@ -9888,8 +12012,25 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "Sandy Lake Motel and Campground"
+    },
+    {
+     "name": "Sandy Lake Hotel",
+     "detail": "https://findyourcanada.com/sandylakehotel"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Sandy Lake Hotel Restaurant",
+     "detail": "Sandy Lake"
+    },
+    {
+     "name": "Sandy Lake Golf Course",
+     "detail": "Sandy Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9922,8 +12063,34 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "The Hotel at Falcon Lake",
+     "detail": "https://www.travelmanitoba.com/directory/the-hotel-at-falcon-lake/"
+    },
+    {
+     "name": "Falcon Trails Resort",
+     "detail": "http://falcontrailsresort.com/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Scotty's Drive-In",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon's Nest Cafe",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "Falcon Lake Bakery & Whiteshell Brewpub",
+     "detail": "Falcon Lake"
+    },
+    {
+     "name": "1964 Restaurant (at The Hotel at Falcon Lake)",
+     "detail": "Falcon Lake"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -9958,7 +12125,12 @@
     "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
+   "lodging": [
+    {
+     "name": "Viking Lodge",
+     "detail": "http://www.vikinglodge.ca/"
+    }
+   ],
    "restaurants": [],
    "boat_rentals": []
   },
@@ -9992,8 +12164,37 @@
     "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
+   "lodging": [
+    {
+     "name": "New Country Motel",
+     "detail": "http://www.newcountrymotel.ca/"
+    },
+    {
+     "name": "Westwood Inn",
+     "detail": "http://www.westwoodinn.ca/"
+    },
+    {
+     "name": "Timberland Inn & Restaurant",
+     "detail": "http://www.timberlandinn.ca/"
+    },
+    {
+     "name": "Duck Mountain Provincial Park \u2013 Blue Lakes Campground"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Chen's Restaurant",
+     "detail": "Swan River"
+    },
+    {
+     "name": "Northern Lights Eatery",
+     "detail": "Swan River"
+    },
+    {
+     "name": "A&W Restaurant",
+     "detail": "Swan River"
+    }
+   ],
    "boat_rentals": []
   },
   {
@@ -10026,9 +12227,36 @@
     "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
-   "restaurants": [],
-   "boat_rentals": []
+   "lodging": [
+    {
+     "name": "Victoria Inn Hotel & Convention Centre"
+    },
+    {
+     "name": "Canad Inns Destination Centre Brandon"
+    },
+    {
+     "name": "Super 8 by Wyndham Brandon"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Chilli Chutney",
+     "detail": "Brandon"
+    },
+    {
+     "name": "The Dock on Princess",
+     "detail": "Brandon"
+    },
+    {
+     "name": "Pizza Express",
+     "detail": "Brandon"
+    }
+   ],
+   "boat_rentals": [
+    {
+     "name": "paddle bros"
+    }
+   ]
   },
   {
    "id": "whitemouth-lake",
@@ -10060,7 +12288,12 @@
     "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
     "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
    },
-   "lodging": [],
+   "lodging": [
+    {
+     "name": "Sprague Motel",
+     "detail": "https://www.expedia.com.au/Sprague-Hotels-Sprague-Motel.h91869687.Hotel-Information"
+    }
+   ],
    "restaurants": [],
    "boat_rentals": []
   }
