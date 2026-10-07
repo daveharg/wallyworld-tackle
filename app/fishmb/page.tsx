@@ -3,16 +3,20 @@ import SearchHero from "./_components/SearchHero";
 import HSlider, { SectionHeading } from "./_components/HSlider";
 import { LakeCard, LodgeCard, HotLakeCard } from "./_components/Cards";
 import { LoginCtaSection } from "./_components/LoginCta";
+import { SpeciesLakes, type SpeciesTab } from "./_components/SpeciesLakes";
+import { CommunityBox } from "./_components/CommunityBox";
+import { RegsSearch } from "./_components/RegsSearch";
 import {
   getHotLakes,
-  getWalleyeLakes,
   getStockedLakes,
   getLodges,
   getZones,
   getLakes,
+  getLakesForSpecies,
   getYoutubeShows,
   getTournaments,
 } from "@/lib/fishmb";
+import { getSpeciesAdvice } from "@/lib/fishmb-species";
 import { FISHMB_CTA_PHOTO } from "@/lib/fishmb-constants";
 
 export const revalidate = 3600;
@@ -20,9 +24,20 @@ export const revalidate = 3600;
 const GUIDE_URL =
   "https://www.gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf";
 
+function toCardLake(l: ReturnType<typeof getLakesForSpecies>[number]) {
+  return {
+    id: l.id,
+    name: l.name,
+    region: l.region,
+    species: l.species,
+    stocked: l.stocked,
+    photo: l.photo,
+    regulations: { division: l.regulations?.division ?? "" },
+  };
+}
+
 export default function FishMBHome() {
   const hot = getHotLakes();
-  const walleye = getWalleyeLakes(12);
   const stocked = getStockedLakes(12);
   const lodges = getLodges().slice(0, 12);
   const zones = getZones();
@@ -31,9 +46,87 @@ export default function FishMBHome() {
   const lakeCount = getLakes().length;
   const lodgeCount = getLodges().length;
 
+  const speciesTabs: SpeciesTab[] = getSpeciesAdvice().map((a) => ({
+    species: a.species,
+    lakes: getLakesForSpecies(a.species, 12).map(toCardLake),
+  }));
+
   return (
     <>
       <SearchHero />
+
+      {/* Run your own tournament — first section */}
+      <section className="bg-paper-deep border-b border-pine/10">
+        <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
+          <p className="text-signal font-bold uppercase tracking-[0.28em] text-sm mb-3">
+            Organizers
+          </p>
+          <h2 className="font-display font-bold uppercase text-pine text-3xl md:text-4xl tracking-wide mb-4">
+            Run your own fishing tournament
+          </h2>
+          <p className="text-pine/65 max-w-3xl mb-8">
+            Set up a catch-photo tournament in minutes — for your club, your
+            lake, or a full licensed event with hundreds of anglers. No entry
+            caps, no platform cut. Fish any lake in Manitoba, or lock your
+            event to specific waters. And every catch is verified before it
+            touches the leaderboard:
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            {[
+              [
+                "📸",
+                "Picture time is server-stamped",
+                "The clock that counts is ours — the catch is stamped the moment the picture is taken inside the FishMB app. An old photo from last summer can't be entered: it only counts if the picture was taken inside your tournament window.",
+              ],
+              [
+                "📍",
+                "GPS on every catch",
+                "Coordinates are stamped with each photo and shown to you on a map. Catches outside Manitoba are rejected automatically.",
+              ],
+              [
+                "🗺️",
+                "Your waters, your boundaries",
+                "Set the tournament for any lake — or a list of lakes. Want a specific bay or stretch? Pull the full list of catches with their GPS pins and enforce your own boundaries.",
+              ],
+              [
+                "🔍",
+                "Duplicate detection",
+                "The same photo submitted twice — by anyone — gets flagged for your review.",
+              ],
+              [
+                "✅",
+                "Organizer review",
+                "You approve every catch before it hits the leaderboard, and can disqualify with one tap.",
+              ],
+              [
+                "📶",
+                "Works with no signal",
+                "Catches are logged offline at the boat and upload automatically when anglers are back in range — stamped with the time the picture was taken.",
+              ],
+            ].map(([icon, title, body]) => (
+              <div key={title} className="bg-white rounded-2xl border border-pine/10 p-5">
+                <p className="text-2xl mb-2">{icon}</p>
+                <h3 className="font-bold text-pine text-sm uppercase tracking-wide mb-1.5">{title}</h3>
+                <p className="text-pine/60 text-sm">{body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/fishmb/tournaments/create"
+              className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors"
+            >
+              Create a tournament
+            </Link>
+            <Link
+              href="/fishmb/tournaments"
+              className="border border-pine/25 text-pine hover:bg-pine/5 font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors"
+            >
+              Browse tournaments
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* Biting right now */}
       <section className="max-w-7xl mx-auto px-4 mt-12 md:mt-16">
@@ -50,20 +143,11 @@ export default function FishMBHome() {
         </HSlider>
       </section>
 
-      {/* Top walleye lakes */}
-      <section className="max-w-7xl mx-auto px-4 mt-12 md:mt-16">
-        <SectionHeading
-          eyebrow="Walleye country"
-          title="Top walleye lakes"
-          href="/fishmb/lakes"
-          linkLabel="All lakes"
-        />
-        <HSlider>
-          {walleye.map((l) => (
-            <LakeCard key={l.id} lake={l} />
-          ))}
-        </HSlider>
-      </section>
+      {/* Species-tabbed lakes */}
+      <SpeciesLakes tabs={speciesTabs} />
+
+      {/* Community */}
+      <CommunityBox />
 
       {/* Top lodges & guides */}
       <section className="max-w-7xl mx-auto px-4 mt-12 md:mt-16">
@@ -90,7 +174,7 @@ export default function FishMBHome() {
         />
         <HSlider>
           {stocked.map((l) => (
-            <LakeCard key={l.id} lake={l} />
+            <LakeCard key={l.id} lake={toCardLake(l)} />
           ))}
         </HSlider>
       </section>
@@ -163,7 +247,7 @@ export default function FishMBHome() {
         </div>
       </section>
 
-      {/* Regulations teaser */}
+      {/* Regulations teaser with lake search */}
       <section className="bg-paper-deep border-b border-pine/10">
         <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
           <SectionHeading
@@ -172,11 +256,11 @@ export default function FishMBHome() {
             href="/fishmb/regulations"
             linkLabel="Full regulations"
           />
-          <p className="text-pine/65 max-w-2xl -mt-3 mb-8">
-            Possession limits, size restrictions and seasons for every Manitoba
-            division — plus waterbody-specific rules on all {lakeCount} lake
-            pages.
+          <p className="text-pine/65 max-w-2xl -mt-3 mb-6">
+            Search your lake below — pick it from the results to see its full
+            2026 limits table.
           </p>
+          <RegsSearch />
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {zones.map((z) => (
               <Link
@@ -271,53 +355,6 @@ export default function FishMBHome() {
           </HSlider>
         </section>
       )}
-
-      {/* Run your own tournament */}
-      <section className="bg-paper-deep border-y border-pine/10 mt-12 md:mt-16">
-        <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
-          <p className="text-signal font-bold uppercase tracking-[0.28em] text-sm mb-3">
-            Organizers
-          </p>
-          <h2 className="font-display font-bold uppercase text-pine text-3xl md:text-4xl tracking-wide mb-4">
-            Run your own fishing tournament
-          </h2>
-          <p className="text-pine/65 max-w-3xl mb-8">
-            Set up a catch-photo tournament in minutes — for your club, your
-            lake, or a full licensed event with hundreds of anglers. No entry
-            caps, no platform cut. And every catch is verified before it
-            touches the leaderboard:
-          </p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-            {[
-              ["📸", "Photo required", "No photo, no entry. Every catch needs a picture."],
-              ["🕐", "Server-stamped time", "Our server records when the catch was submitted — not the angler's phone clock. Catches only count inside the tournament window."],
-              ["📍", "GPS location stamp", "Coordinates are attached to every catch and shown to you on a map. Catches outside Manitoba are rejected automatically."],
-              ["🔍", "Duplicate detection", "The same photo submitted twice — by anyone — gets flagged for your review."],
-              ["✅", "Organizer review", "You approve every catch before it hits the leaderboard, and can disqualify with one tap."],
-            ].map(([icon, title, body]) => (
-              <div key={title} className="bg-white rounded-2xl border border-pine/10 p-5">
-                <p className="text-2xl mb-2">{icon}</p>
-                <h3 className="font-bold text-pine text-sm uppercase tracking-wide mb-1.5">{title}</h3>
-                <p className="text-pine/60 text-sm">{body}</p>
-              </div>
-            ))}
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/fishmb/tournaments/create"
-              className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors"
-            >
-              Create a tournament
-            </Link>
-            <Link
-              href="/fishmb/tournaments"
-              className="border border-pine/25 text-pine hover:bg-pine/5 font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors"
-            >
-              Browse tournaments
-            </Link>
-          </div>
-        </div>
-      </section>
 
       {/* Stats band */}
       <section className="max-w-7xl mx-auto px-4 mt-12 md:mt-16">

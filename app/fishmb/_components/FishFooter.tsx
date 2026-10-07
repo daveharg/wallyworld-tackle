@@ -25,11 +25,11 @@ export default function FishFooter() {
         </div>
         <div>
           <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gold mb-4">
-            The app
+            Community
           </h3>
           <ul className="space-y-2.5 text-sm">
-            <li><Link href="/fishmb/app" className="text-white/70 hover:text-white">Get FishMB</Link></li>
-            <li><Link href="/fish-manitoba-preview/" className="text-white/70 hover:text-white">Open web preview</Link></li>
+            <li><Link href="/fishmb/feed" className="text-white/70 hover:text-white">Angler feed</Link></li>
+            <li><Link href="/fishmb/tournaments" className="text-white/70 hover:text-white">Tournaments</Link></li>
           </ul>
         </div>
         <div>

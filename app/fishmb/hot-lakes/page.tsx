@@ -36,13 +36,13 @@ export default function HotLakesPage() {
           Fishing one of these?
         </h2>
         <p className="text-white/70 mb-5">
-          Log your catch in the FishMB app and it shows up in the angler feed.
+          Share your report and it shows up in the angler feed.
         </p>
         <Link
-          href="/fish-manitoba-preview/"
+          href="/fishmb/feed"
           className="inline-block bg-signal hover:bg-signal-dark text-white text-sm font-bold uppercase tracking-wider px-7 py-3 rounded-full transition-colors"
         >
-          Open the app
+          Join the feed
         </Link>
       </div>
     </div>

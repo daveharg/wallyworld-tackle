@@ -36,10 +36,10 @@ export function LoginCtaSection() {
               </button>
             )}
             <Link
-              href="/fish-manitoba-preview/"
+              href="/fishmb/feed"
               className="border border-white/40 text-white hover:bg-white/10 font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors"
             >
-              Open the app
+              Visit the community feed
             </Link>
           </div>
         </div>

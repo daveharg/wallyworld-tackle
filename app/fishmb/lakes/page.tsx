@@ -30,14 +30,18 @@ export default function LakesPage({
         Lake directory
       </p>
       <h1 className="font-display font-bold uppercase text-4xl md:text-5xl text-pine tracking-wide mb-3">
-        Every lake, every reg
+        Lake directory
       </h1>
       <p className="text-pine/65 max-w-2xl mb-8">
         {lakes.length} Manitoba lakes with species, 2026 Anglers&apos; Guide
         regulations, stocking history and nearby services. Pick a lake to see
-        its full limits table.
+        its full limits table — and if your lake isn&apos;t here yet,{" "}
+        <a href="#request-lake" className="text-signal-dark font-bold">
+          request it below
+        </a>
+        .
       </p>
-      <LakeDirectory lakes={lakes} />
+      <LakeDirectory lakes={lakes} initialQuery={searchParams.q ?? ""} />
     </div>
   );
 }

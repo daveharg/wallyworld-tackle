@@ -79,17 +79,16 @@ export default function SearchHero() {
       <div className="absolute inset-0 bg-gradient-to-r from-pine-deep/90 via-pine-deep/55 to-pine-deep/20" />
       <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-pine-deep/70 to-transparent" />
 
-      <div className="relative max-w-4xl mx-auto px-4 pt-20 pb-24 md:pt-28 md:pb-32 text-center">
-        <p className="text-gold font-bold uppercase tracking-[0.28em] text-sm mb-4">
+      <div className="relative max-w-4xl mx-auto px-4 pt-12 pb-14 md:pt-16 md:pb-20 text-center">
+        <p className="text-gold font-bold uppercase tracking-[0.28em] text-sm mb-3">
           Manitoba fishing, all in one place
         </p>
-        <h1 className="font-display font-bold uppercase text-white leading-[0.95] tracking-wide text-5xl md:text-7xl mb-5">
-          Find your next<br />bite.
+        <h1 className="font-display font-bold uppercase text-white leading-[0.95] tracking-wide text-4xl md:text-6xl mb-4">
+          Find your next bite.
         </h1>
-        <p className="text-white/85 text-lg md:text-xl max-w-2xl mx-auto mb-8">
-          Search your lake or lodge to look up fishing regulations, stocking
-          info, nearby towns, lodges and more — everything in the FishMB app,
-          right here.
+        <p className="text-white/85 text-base md:text-lg max-w-2xl mx-auto mb-6">
+          Search your lake or lodge for fishing regulations, stocking info,
+          nearby towns and more.
         </p>
 
         <div ref={boxRef} className="relative max-w-2xl mx-auto text-left">

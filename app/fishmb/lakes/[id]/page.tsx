@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLake, getLakes, getZone, getGuideUrl } from "@/lib/fishmb";
+import { slugifySpecies, getSpeciesAdvice } from "@/lib/fishmb-species";
 import { lakePhotoUrl, hasRealLakePhoto, lakePhotoCredit } from "@/lib/fishmb-constants";
 
 export const revalidate = 3600;
@@ -31,6 +32,55 @@ function Chip({ children }: { children: React.ReactNode }) {
   );
 }
 
+const GUIDE_SLUGS = new Set(getSpeciesAdvice().map((a) => slugifySpecies(a.species)));
+function speciesGuideSlug(name: string): string | null {
+  const slug = slugifySpecies(name);
+  return GUIDE_SLUGS.has(slug) ? slug : null;
+}
+
+function LakeTitle({ lake, light }: { lake: { name: string; region: string; stocked: boolean; species: string[] }; light?: boolean }) {
+  const chip = light
+    ? "text-white/90 bg-white/15 hover:bg-white/30"
+    : "text-pine bg-pine/10 hover:bg-pine/20";
+  return (
+    <>
+      <p className="text-gold font-bold uppercase tracking-[0.24em] text-xs mb-2">
+        {lake.region} Manitoba
+      </p>
+      <h1 className="font-display font-bold uppercase text-white text-4xl md:text-6xl tracking-wide">
+        {lake.name}
+      </h1>
+      <div className="flex flex-wrap gap-2 mt-3">
+        {lake.stocked && (
+          <span className="text-[11px] font-black uppercase tracking-wider text-white bg-[#5E8F3E] rounded-md px-2.5 py-1">
+            Stocked
+          </span>
+        )}
+        {lake.species.map((s) => {
+          const guide = speciesGuideSlug(s);
+          return guide ? (
+            <Link
+              key={s}
+              href={`/fishmb/species/${guide}`}
+              className={`text-[11px] font-bold uppercase tracking-wider rounded-md px-2.5 py-1 transition-colors ${chip}`}
+              title={`How to fish ${s}`}
+            >
+              {s}
+            </Link>
+          ) : (
+            <span
+              key={s}
+              className="text-[11px] font-bold uppercase tracking-wider text-white/90 bg-white/15 rounded-md px-2.5 py-1"
+            >
+              {s}
+            </span>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
 export default function LakeDetailPage({ params }: { params: { id: string } }) {
   const lake = getLake(params.id);
   if (!lake) notFound();
@@ -50,44 +100,28 @@ export default function LakeDetailPage({ params }: { params: { id: string } }) {
         ← All lakes
       </Link>
 
-      {/* Hero */}
-      <div className="relative mt-4 rounded-3xl overflow-hidden bg-pine-deep">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={lakePhotoUrl(lake.id, 1600)}
-          alt={lake.name}
-          className="w-full h-64 md:h-96 object-cover"
-        />
-        {hasRealLakePhoto(lake.id) && (
-          <p className="text-[11px] text-pine/45 mt-1.5 text-right pr-1">
+      {/* Hero — real photo only when we have a verified true photo of this lake */}
+      {hasRealLakePhoto(lake.id) ? (
+        <div className="relative mt-4 rounded-3xl overflow-hidden bg-pine-deep">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={lakePhotoUrl(lake.id, 1600)}
+            alt={lake.name}
+            className="w-full h-64 md:h-96 object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-pine-deep/85 via-pine-deep/20 to-transparent" />
+          <div className="absolute bottom-0 inset-x-0 p-6 md:p-8">
+            <LakeTitle lake={lake} light />
+          </div>
+          <p className="absolute top-3 right-4 text-[11px] text-white/70">
             {lakePhotoCredit(lake.id)}
           </p>
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-pine-deep/85 via-pine-deep/20 to-transparent" />
-        <div className="absolute bottom-0 inset-x-0 p-6 md:p-8">
-          <p className="text-gold font-bold uppercase tracking-[0.24em] text-xs mb-2">
-            {lake.region} Manitoba
-          </p>
-          <h1 className="font-display font-bold uppercase text-white text-4xl md:text-6xl tracking-wide">
-            {lake.name}
-          </h1>
-          <div className="flex flex-wrap gap-2 mt-3">
-            {lake.stocked && (
-              <span className="text-[11px] font-black uppercase tracking-wider text-white bg-[#5E8F3E] rounded-md px-2.5 py-1">
-                Stocked
-              </span>
-            )}
-            {lake.species.map((s) => (
-              <span
-                key={s}
-                className="text-[11px] font-bold uppercase tracking-wider text-white/90 bg-white/15 rounded-md px-2.5 py-1"
-              >
-                {s}
-              </span>
-            ))}
-          </div>
         </div>
-      </div>
+      ) : (
+        <div className="mt-4 rounded-3xl bg-pine-deep p-6 md:p-8">
+          <LakeTitle lake={lake} light />
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-3 gap-8 mt-8">
         <div className="lg:col-span-2 space-y-8">
@@ -259,17 +293,16 @@ export default function LakeDetailPage({ params }: { params: { id: string } }) {
           )}
           <div className="bg-pine rounded-3xl p-6 text-white">
             <h3 className="font-display font-bold uppercase text-lg tracking-wide mb-2">
-              Log it in the app
+              Fished here lately?
             </h3>
             <p className="text-white/70 text-sm mb-4">
-              Catch something here? Log it in FishMB with a photo and it counts
-              toward your stats.
+              Share your report with Manitoba anglers in the community feed.
             </p>
             <Link
-              href="/fish-manitoba-preview/"
+              href="/fishmb/feed"
               className="inline-block bg-signal hover:bg-signal-dark text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full transition-colors"
             >
-              Open the app
+              Join the feed
             </Link>
           </div>
         </aside>

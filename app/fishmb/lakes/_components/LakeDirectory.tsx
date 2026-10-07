@@ -2,29 +2,47 @@
 
 import { useMemo, useState } from "react";
 import { LakeCard, type LakeCardLake } from "../../_components/Cards";
+import { LakeMap, type MapLake } from "./LakeMap";
+import { RequestLake } from "./RequestLake";
+import { searchLakes } from "@/lib/fishmb-search";
 import { LAKE_REGIONS } from "@/lib/fishmb-constants";
+import coordsJson from "@/public/fishmb/lake-coords.json";
 
-export default function LakeDirectory({ lakes }: { lakes: LakeCardLake[] }) {
-  const [q, setQ] = useState("");
+const COORDS = coordsJson as Record<string, { lat: number; lng: number }>;
+
+export default function LakeDirectory({ lakes, initialQuery = "" }: { lakes: LakeCardLake[]; initialQuery?: string }) {
+  const [q, setQ] = useState(initialQuery);
   const [region, setRegion] = useState("All");
   const [stockedOnly, setStockedOnly] = useState(false);
 
   const filtered = useMemo(() => {
-    const needle = q.trim().toLowerCase();
-    return lakes.filter((l) => {
-      if (region !== "All" && l.region !== region) return false;
-      if (stockedOnly && !l.stocked) return false;
-      if (!needle) return true;
-      return (
-        l.name.toLowerCase().includes(needle) ||
-        l.region.toLowerCase().includes(needle) ||
-        l.species.some((s) => s.toLowerCase().includes(needle))
-      );
-    });
+    let list = lakes;
+    if (region !== "All") list = list.filter((l) => l.region === region);
+    if (stockedOnly) list = list.filter((l) => l.stocked);
+    if (q.trim()) list = searchLakes(list, q);
+    return list;
   }, [q, region, stockedOnly, lakes]);
+
+  const mapLakes: MapLake[] = useMemo(
+    () =>
+      filtered
+        .filter((l) => COORDS[l.id])
+        .map((l) => ({
+          id: l.id,
+          name: l.name,
+          region: l.region,
+          lat: COORDS[l.id].lat,
+          lng: COORDS[l.id].lng,
+        })),
+    [filtered]
+  );
 
   return (
     <>
+      <div id="map" className="mb-8 scroll-mt-24">
+        <LakeMap lakes={mapLakes} />
+      </div>
+
       <div className="bg-white rounded-2xl border border-pine/10 p-4 md:p-5 shadow-sm mb-8">
         <input
           value={q}
@@ -66,7 +84,7 @@ export default function LakeDirectory({ lakes }: { lakes: LakeCardLake[] }) {
 
       {filtered.length === 0 ? (
         <p className="text-pine/60 py-12 text-center">
-          No lakes match. Try a different search.
+          No lakes match. Try a different search — or request it below.
         </p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
@@ -75,6 +93,8 @@ export default function LakeDirectory({ lakes }: { lakes: LakeCardLake[] }) {
           ))}
         </div>
       )}
+
+      <RequestLake />
     </>
   );
 }

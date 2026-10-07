@@ -1,0 +1,179 @@
+[
+ {
+  "species": "Walleye",
+  "overview": "Manitoba's signature sport fish. Lake Winnipeg's famous green-backed walleye draw ice anglers from around the world, while the Red River offers a strong fall run near Lockport.",
+  "techniques": [
+   "Jigging live minnows near bottom on structure",
+   "Trolling crankbaits along contours in open water",
+   "Drifting with bottom bouncers and nightcrawlers",
+   "Ice fishing with rattle baits and jigging spoons",
+   "Deadstick rod with live bait next to an active jigging rod"
+  ],
+  "baits": [
+   "Live minnows on jigs",
+   "Crankbaits",
+   "Jigging spoons",
+   "Rattle baits",
+   "Bottom bouncers with nightcrawlers"
+  ],
+  "best_seasons": "Spring and fall open water; September-October fall run on the Red River; prime ice fishing December through March."
+ },
+ {
+  "species": "Northern Pike",
+  "overview": "Manitoba's aggressive ambush predator, found in everything from Lake Winnipeg's bays to remote northern fly-in lakes, with true trophy potential.",
+  "techniques": [
+   "Casting spoons, spinnerbaits and jerkbaits along weed edges and rocky points",
+   "Fly fishing with large streamers and poppers on an 8-weight rod",
+   "Ice fishing with tip-ups baited with large shiners or sucker minnows",
+   "Trolling to cover water and locate active fish"
+  ],
+  "baits": [
+   "Large spoons",
+   "Spinnerbaits",
+   "Jerkbaits",
+   "Large streamers (fly)",
+   "Large shiners or sucker minnows on tip-ups"
+  ],
+  "best_seasons": "Spring, when pike pack into warming bays and river mouths; steady summer action on weedlines; fall for trophy fish on points and windblown shorelines; winter ice season with tip-ups."
+ },
+ {
+  "species": "Lake Trout",
+  "overview": "Deep, cold shield lakes in northern Manitoba \u2014 Lake Athapapuskow, Clearwater, the Cranberry Chain, Wekusko and Kississing \u2014 hold some of the biggest lake trout anywhere, and they're very catchable through the ice.",
+  "techniques": [
+   "Jigging heavy tubes, jigs and spoons on deep structure",
+   "Dead sticking with ciscos on points or saddles",
+   "Trolling deep with downriggers or lead-core line in summer",
+   "Casting bucktail jigs in shallow water during spring and fall"
+  ],
+  "baits": [
+   "Tubes and jigging plastics",
+   "Heavy spoons",
+   "Jigging Rap-style baits",
+   "Ciscos (dead bait)",
+   "Deep-diving crankbaits",
+   "Bucktail jigs"
+  ],
+  "best_seasons": "Winter through the ice; late August to early September when big females move onto shallow rocky reefs for the fall spawn; early spring when trout ride higher in the water column."
+ },
+ {
+  "species": "Channel Catfish",
+  "overview": "The Red River below the Lockport Dam is one of North America's premier trophy channel cat fisheries, with 20-plus-pound fish common and 30-pounders attainable.",
+  "techniques": [
+   "Slip-sinker bottom rigging behind an anchored boat",
+   "Slip-bobber float fishing along current edges",
+   "Anchoring at the head or edge of holes and casting rigs downriver"
+  ],
+  "baits": [
+   "Cut goldeye",
+   "Cut suckers or ciscos",
+   "Frozen shrimp",
+   "Chicken livers",
+   "Nightcrawlers",
+   "Leopard frogs",
+   "Stink baits"
+  ],
+  "best_seasons": "Late May-June prespawn bite in tailwaters is the peak; fishing stays strong through summer and into October."
+ },
+ {
+  "species": "Smallmouth Bass",
+  "overview": "Clear Canadian Shield lakes in Nopiming and Whiteshell Provincial Parks grow aggressive smallmouth that feed heavily on crayfish around rocks and boulders.",
+  "techniques": [
+   "Casting tube jigs along rocky points and boulders",
+   "Drop shotting near deeper structure",
+   "Jerkbait retrieves along shorelines",
+   "Topwater walking baits early in the day",
+   "Finesse presentations on subtle points and corners"
+  ],
+  "baits": [
+   "Tube jigs (brown, pumpkinseed)",
+   "Soft-plastic craws",
+   "Jerkbaits",
+   "Crankbaits",
+   "Topwater walkers",
+   "Live crayfish or minnows"
+  ],
+  "best_seasons": "Late spring through early fall; late fall can produce when fish school up."
+ },
+ {
+  "species": "Yellow Perch",
+  "overview": "Manitoba's Interlake shoal lakes produce jumbo perch, and Lake Winnipeg perch keep ice anglers busy all winter with fast, tasty action.",
+  "techniques": [
+   "Jigging small tungsten jigs and spoons tipped with bait",
+   "Dead sticking with live minnows on ultra-light rods",
+   "Rattle baits when perch are aggressive"
+  ],
+  "baits": [
+   "Tungsten jigs",
+   "Small spoons",
+   "Wax worms",
+   "Live or salted minnows",
+   "Small soft plastics"
+  ],
+  "best_seasons": "Winter ice season, especially late ice in March when perch move shallow; summer jigging in deeper water."
+ },
+ {
+  "species": "Burbot",
+  "overview": "Manitoba's freshwater cod is a winter specialty \u2014 Cedar Lake is famous for its burbot spawn under the ice, and the Red River's deeper stretches hold them too.",
+  "techniques": [
+   "Night jigging with heavy glow spoons",
+   "Dead sticking with scented bait near bottom",
+   "Tip-ups rigged just off bottom overnight"
+  ],
+  "baits": [
+   "Glow jigging spoons",
+   "Heavy jigs",
+   "Large minnows",
+   "Cut bait (smelt, herring)",
+   "Nightcrawlers"
+  ],
+  "best_seasons": "Winter, peaking around the March spawn under the ice."
+ },
+ {
+  "species": "Lake Whitefish",
+  "overview": "An underrated ice-fishing target in Manitoba \u2014 Lake Winnipeg and Cedar Lake both hold trophy-class whitefish that reward a finesse approach.",
+  "techniques": [
+   "Finesse jigging with compact spoons and jigs",
+   "Staying mobile to locate roaming schools",
+   "Light presentations that keep the lure above the fish"
+  ],
+  "baits": [
+   "Compact spoons",
+   "Small jigs",
+   "Pieces of minnow"
+  ],
+  "best_seasons": "Winter through the ice."
+ },
+ {
+  "species": "Goldeye",
+  "overview": "A Manitoba river classic \u2014 bright silver, eager biters in the Red, Assiniboine and Winnipeg Rivers, and the province's famous smoked fish delicacy.",
+  "techniques": [
+   "Slip-bobber fishing with worms close to shore",
+   "Casting small spinners, spoons and jigs"
+  ],
+  "baits": [
+   "Worms on small hooks",
+   "Small spinners",
+   "Spoons",
+   "Crankbaits",
+   "Small jigs"
+  ],
+  "best_seasons": "Spring and early summer as river water warms; active through the summer months."
+ },
+ {
+  "species": "Rainbow Trout",
+  "overview": "Manitoba stocks rainbows in lakes like Footprint Lake and throughout the Whiteshell, giving shore and ice anglers fun, hard-fighting trout close to home.",
+  "techniques": [
+   "Still fishing with a small jig and nightcrawler a foot or two off bottom",
+   "Casting small spoons and spinners",
+   "Fly fishing with streamers and leech patterns in fall"
+  ],
+  "baits": [
+   "Small jigs",
+   "Nightcrawlers",
+   "Deli shrimp",
+   "Small spoons and spinners",
+   "Woolly buggers"
+  ],
+  "best_seasons": "Fall, when stocked trout feed aggressively on shallow weed flats; winter through the ice; spring after ice-out."
+ }
+]

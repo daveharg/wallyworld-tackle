@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { searchLakes, matchScore } from "./fishmb-search";
 
 export { LAKE_REGIONS } from "./fishmb-constants";
 
@@ -159,8 +160,14 @@ export function getGuideUrl(): string {
 
 /** Lakes known to hold walleye, for the "Top walleye lakes" row. */
 export function getWalleyeLakes(limit = 12): Lake[] {
+  return getLakesForSpecies("walleye", limit);
+}
+
+/** Lakes where the given species is listed, for the homepage species tabs. */
+export function getLakesForSpecies(species: string, limit = 12): Lake[] {
+  const needle = species.toLowerCase();
   return getLakes()
-    .filter((l) => l.species.some((s) => s.toLowerCase().includes("walleye")))
+    .filter((l) => l.species.some((s) => s.toLowerCase().includes(needle)))
     .slice(0, limit);
 }
 
@@ -189,22 +196,20 @@ export function searchAll(q: string, limit = 8): {
 } {
   const needle = q.trim().toLowerCase();
   if (needle.length < 2) return { lakes: [], lodges: [] };
-  const lakes = getLakes()
-    .filter(
-      (l) =>
-        l.name.toLowerCase().includes(needle) ||
-        l.region.toLowerCase().includes(needle) ||
-        l.species.some((s) => s.toLowerCase().includes(needle))
-    )
-    .slice(0, limit);
+  const lakes = searchLakes(getLakes(), q).slice(0, limit);
   const lodges = getLodges()
-    .filter(
-      (l) =>
-        l.name.toLowerCase().includes(needle) ||
-        (l.location ?? "").toLowerCase().includes(needle) ||
-        l.species.some((s) => s.toLowerCase().includes(needle)) ||
-        (l.fishing_waters ?? []).some((w) => w.toLowerCase().includes(needle))
-    )
+    .map((l) => ({
+      lodge: l,
+      score: Math.max(
+        matchScore(l.name, needle),
+        matchScore(l.location ?? "", needle) * 0.6,
+        ...l.species.map((s) => matchScore(s, needle) * 0.7),
+        ...(l.fishing_waters ?? []).map((w) => matchScore(w, needle) * 0.7)
+      ),
+    }))
+    .filter((s) => s.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map((s) => s.lodge)
     .slice(0, limit);
   return { lakes, lodges };
 }

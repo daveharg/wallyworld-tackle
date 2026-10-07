@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useFishAuth } from "../../../_components/FishAuth";
 import { fishFetch, formatDateTime } from "../../../_components/fishFetch";
+import { CatchMap } from "../../_components/CatchMap";
 
 interface Entry {
   id: string;
@@ -122,6 +123,21 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
       </Link>
       <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide mt-4 mb-2">{t.name}</h1>
       <p className="text-pine/60 mb-8">Organizer dashboard</p>
+
+      {/* Catch map — every GPS-stamped catch plotted, for boundary checks */}
+      <section className="mb-8">
+        <CatchMap
+          pins={detail.entries
+            .filter((e) => e.latitude !== null && e.longitude !== null)
+            .map((e) => ({
+              id: e.id,
+              lat: e.latitude as number,
+              lng: e.longitude as number,
+              label: `${e.user_name} — ${e.species}${e.length_inches ? ` ${e.length_inches}″` : ""}`,
+              status: e.status,
+            }))}
+        />
+      </section>
 
       {/* Invite */}
       <section className="bg-pine rounded-3xl p-6 md:p-8 mb-8">

@@ -1,6 +1,9 @@
 import Link from "next/link";
 import type { Lodge, HotLake } from "@/lib/fishmb";
-import { lakePhotoUrl, lodgePhotoUrl } from "@/lib/fishmb-constants";
+
+// Dave's rule: cards never show photos. Real photos appear only on the lake
+// or lodge detail page, and only when it's a verified true photo of that
+// lake or lodge.
 
 function SpeciesLine({ species }: { species: string[] }) {
   return (
@@ -30,21 +33,19 @@ export function LakeCard({
   return (
     <Link
       href={`/fishmb/lakes/${lake.id}`}
-      className={`${className} bg-white rounded-2xl overflow-hidden border border-pine/10 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all block`}
+      className={`${className} bg-white rounded-2xl border border-pine/10 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all block`}
     >
-      <div className="relative h-36 md:h-44 bg-pine-deep/10">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={lakePhotoUrl(lake.id)} alt={lake.name} className="w-full h-full object-cover" loading="lazy" />
-        {lake.stocked && (
-          <span className="absolute top-2.5 left-2.5 text-[10px] font-black uppercase tracking-wider text-white bg-[#5E8F3E] rounded-md px-2 py-1">
-            Stocked
-          </span>
-        )}
-      </div>
       <div className="p-4">
-        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-signal mb-1">
-          {lake.region}
-        </p>
+        <div className="flex items-center justify-between mb-1">
+          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-signal">
+            {lake.region}
+          </p>
+          {lake.stocked && (
+            <span className="text-[10px] font-black uppercase tracking-wider text-white bg-[#5E8F3E] rounded-md px-2 py-1">
+              Stocked
+            </span>
+          )}
+        </div>
         <h3 className="font-display font-bold text-lg text-pine leading-tight mb-1 truncate">
           {lake.name}
         </h3>
@@ -58,18 +59,11 @@ export function LakeCard({
 }
 
 export function LodgeCard({ lodge }: { lodge: Lodge }) {
-  const photo = lodgePhotoUrl(lodge.id);
   return (
     <Link
       href={`/fishmb/lodges/${lodge.id}`}
-      className="snap-start shrink-0 w-[240px] md:w-[280px] bg-white rounded-2xl overflow-hidden border border-pine/10 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all"
+      className="snap-start shrink-0 w-[240px] md:w-[280px] bg-white rounded-2xl border border-pine/10 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all"
     >
-      {photo && (
-        <div className="relative h-36 md:h-44 bg-pine-deep/10">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={photo} alt={lodge.name} className="w-full h-full object-cover" loading="lazy" />
-        </div>
-      )}
       <div className="p-5">
         <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-gold mb-1.5 capitalize">
           {lodge.kind}
