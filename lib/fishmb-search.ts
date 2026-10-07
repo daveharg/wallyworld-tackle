@@ -53,20 +53,32 @@ export function matchScore(haystack: string, query: string): number {
 export interface Searchable {
   id: string;
   name: string;
+  aliases?: string[];
   species: string[];
   region: string;
+  stocked?: boolean;
 }
 
-/** Fuzzy lake search: matches name, species, and region. Typo-tolerant. */
+/** Fuzzy lake search: matches name, species, and region. Typo-tolerant.
+ *  Multi-word queries score per word ("stocked trout" finds stocked trout
+ *  lakes); the word "stocked" filters to stocked waters. */
 export function searchLakes<T extends Searchable>(lakes: T[], query: string): T[] {
   const q = normalize(query);
   if (!q) return lakes;
+  const words = q.split(" ").filter(Boolean);
+  const stockedOnly = words.includes("stocked") || words.includes("stocking");
+  const terms = words.filter((w) => w !== "stocked" && w !== "stocking");
   const scored: { lake: T; score: number }[] = [];
   for (const lake of lakes) {
-    const nameScore = matchScore(lake.name, q);
-    const speciesScore = Math.max(0, ...lake.species.map((s) => matchScore(s, q) * 0.7));
-    const regionScore = matchScore(lake.region, q) * 0.4;
-    const score = Math.max(nameScore, speciesScore, regionScore);
+    if (stockedOnly && !lake.stocked) continue;
+    let score = 0;
+    for (const t of terms.length ? terms : [q]) {
+      const nameScore = matchScore(lake.name, t);
+      const aliasScore = Math.max(0, ...(lake.aliases ?? []).map((a) => matchScore(a, t)));
+      const speciesScore = Math.max(0, ...lake.species.map((s) => matchScore(s, t) * 0.7));
+      const regionScore = matchScore(lake.region, t) * 0.4;
+      score += Math.max(nameScore, aliasScore, speciesScore, regionScore);
+    }
     if (score > 0) scored.push({ lake, score });
   }
   scored.sort((a, b) => b.score - a.score);

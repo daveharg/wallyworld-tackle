@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { listTournaments } from "@/lib/fish/tournaments";
-import { getLakes } from "@/lib/fishmb";
+import { getLakes, getTournaments as getTraditionalTournaments } from "@/lib/fishmb";
 import { JoinByCode } from "./_components/JoinByCode";
 
 export const dynamic = "force-dynamic";
@@ -9,6 +9,7 @@ export const revalidate = 60;
 export default async function TournamentsPage() {
   const tournaments = await listTournaments();
   const lakeNames = new Map(getLakes().map((l) => [l.id, l.name]));
+  const traditional = getTraditionalTournaments().tournaments;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 md:py-14">
@@ -18,11 +19,20 @@ export default async function TournamentsPage() {
       <h1 className="font-display font-bold uppercase text-pine text-4xl md:text-5xl tracking-wide mb-4">
         Fishing tournaments
       </h1>
-      <p className="text-pine/65 max-w-2xl mb-8">
-        Run your own catch-photo tournament with real anti-cheat — server
-        timestamps, GPS-stamped catches, duplicate-photo detection and
+      <p className="text-pine/65 max-w-2xl mb-6">
+        Run your own catch-photo tournament with real anti-cheat — phone-timestamped
+        catches, GPS stamps, duplicate-photo detection and
         organizer review — or join one below. No entry caps, no platform cut.
       </p>
+
+      <div className="bg-pine rounded-2xl px-5 py-4 mb-10 flex items-center gap-4">
+        <span className="text-2xl">📱</span>
+        <p className="text-white/90 text-sm">
+          <strong className="text-white">FishMB app launching soon.</strong>{" "}
+          Everything here already works in your browser — the app adds offline
+          catch logging for when you&apos;re out of service.
+        </p>
+      </div>
 
       <div className="flex flex-wrap gap-3 mb-10">
         <Link
@@ -71,6 +81,44 @@ export default async function TournamentsPage() {
               )}
             </Link>
           ))}
+        </div>
+      )}
+
+      {/* Traditional (non-digital) Manitoba tournaments */}
+      {traditional.length > 0 && (
+        <div className="mt-16">
+          <h2 className="font-display font-bold uppercase text-pine text-3xl tracking-wide mb-2">
+            Traditional tournaments
+          </h2>
+          <p className="text-pine/60 text-sm mb-6 max-w-2xl">
+            Classic Manitoba derbies and ice-fishing tournaments run by local
+            organizers — weigh-ins, prizes and all. Always confirm dates and
+            entry details with the organizer.
+          </p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {traditional.map((t) => (
+              <a
+                key={t.name}
+                href={t.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-paper-deep border border-pine/10 rounded-3xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all"
+              >
+                <p className="text-signal font-bold uppercase tracking-[0.2em] text-xs mb-2">
+                  {t.dates}
+                </p>
+                <h3 className="font-display font-bold text-pine text-2xl uppercase tracking-wide mb-1">
+                  {t.name}
+                </h3>
+                <p className="text-pine/55 text-sm mb-3 font-bold">{t.location}</p>
+                <p className="text-pine/70 text-sm line-clamp-3 mb-3">{t.description}</p>
+                {t.entry && <p className="text-pine/55 text-sm">Entry: {t.entry}</p>}
+                <span className="text-signal-dark text-sm font-bold uppercase tracking-wider mt-3 inline-block">
+                  Details →
+                </span>
+              </a>
+            ))}
+          </div>
         </div>
       )}
     </div>

@@ -22,6 +22,8 @@ export interface LakeRegulations {
 export interface Lake {
   id: string;
   name: string;
+  /** Alternate/local names that should also match in search (e.g. "Rivers Lake" for Lake Wahtopanah). */
+  aliases?: string[];
   region: string;
   photo: string | null;
   species: string[];

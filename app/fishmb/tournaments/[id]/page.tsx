@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTournament, getLeaderboard, getEntries } from "@/lib/fish/tournaments";
+import { getTournament, getLeaderboard } from "@/lib/fish/tournaments";
 import { getLakes } from "@/lib/fishmb";
 import { TournamentActions } from "../_components/TournamentActions";
+import { CatchesGrid } from "../_components/CatchesGrid";
 import { PrizePot, LicenceNotice } from "../_components/PrizePot";
 import { formatDateTime } from "../../_components/formatDate";
 
@@ -13,7 +14,6 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
   const t = await getTournament(params.id);
   if (!t) notFound();
   const leaderboard = await getLeaderboard(t.id, t.scoring);
-  const entries = await getEntries(t.id, ["approved"]);
   const lakeNames = new Map(getLakes().map((l) => [l.id, l.name]));
 
   const scoreLabel = t.scoring === "total" ? "Total in." : t.scoring === "count" ? "Fish" : "Best in.";
@@ -107,28 +107,11 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
         </div>
       )}
 
-      {/* Approved catches */}
+      {/* Catches */}
       <h2 className="font-display font-bold uppercase text-pine text-2xl md:text-3xl tracking-wide mt-12 mb-4">
         Catches
       </h2>
-      {entries.length === 0 ? (
-        <p className="text-pine/55">Nothing approved yet.</p>
-      ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {entries.map((e) => (
-            <div key={e.id} className="bg-white border border-pine/10 rounded-2xl overflow-hidden">
-              <div className="aspect-square bg-pine-deep/10">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={e.photo_url} alt={`${e.species} caught by ${e.user_name}`} className="w-full h-full object-cover" loading="lazy" />
-              </div>
-              <div className="p-4">
-                <p className="font-bold text-pine text-sm">{e.species}{e.length_inches ? ` · ${Number(e.length_inches).toFixed(1)}"` : ""}</p>
-                <p className="text-pine/55 text-xs mt-1">{e.user_name} · {formatDateTime(e.created_at)}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <CatchesGrid tournamentId={t.id} />
     </div>
   );
 }

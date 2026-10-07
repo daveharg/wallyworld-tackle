@@ -1,1137 +1,1141 @@
 {
- "big-sand-lake": {
-  "lat": 57.7108,
-  "lng": -99.7428,
-  "name": "Big Sand Lake, Unorganized Division No. 23, Manitoba, Canada"
- },
- "big-whiteshell-lake": {
-  "lat": 50.0832,
-  "lng": -95.3458,
-  "name": "Big Whiteshell Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "cedar-lake": {
-  "lat": 53.3404,
-  "lng": -100.3619,
-  "name": "Cedar Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "clearwater-lake": {
-  "lat": 54.064,
-  "lng": -101.0802,
-  "name": "Clearwater Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "cross-lake": {
-  "lat": 54.612,
-  "lng": -98.0507,
-  "name": "Cross Lake, Unorganized Division No. 22, Manitoba, R0B 0J0, Canada"
- },
- "crowduck-lake": {
-  "lat": 50.1343,
-  "lng": -95.2482,
-  "name": "Crowduck Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "dauphin-lake": {
-  "lat": 51.2959,
-  "lng": -99.7997,
-  "name": "Dauphin Lake, Rural Municipality of Lakeshore, Manitoba, Canada"
- },
- "falcon-lake": {
-  "lat": 49.7007,
-  "lng": -95.2579,
-  "name": "Falcon Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "gods-lake": {
-  "lat": 54.6197,
-  "lng": -94.4203,
-  "name": "Gods Lake, Unorganized Division No. 22, Manitoba, Canada"
- },
- "gunisao-lake": {
-  "lat": 53.5433,
-  "lng": -96.34,
-  "name": "Gunisao Lake, Unorganized Division No. 22, Manitoba, Canada"
- },
- "high-lake": {
-  "lat": 49.6964,
-  "lng": -95.1427,
-  "name": "High Lake, Unorganized Kenora District, Kenora District, Northwestern Ontario, O"
- },
- "kississing-lake": {
-  "lat": 55.1506,
-  "lng": -101.5372,
-  "name": "Kississing Lake, Sherridon, Unorganized Division No. 21, Manitoba, Canada"
- },
- "lake-athapapuskow": {
-  "lat": 54.6217,
-  "lng": -101.6559,
-  "name": "Athapapuskow Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "lake-manitoba": {
-  "lat": 50.9959,
-  "lng": -98.7987,
-  "name": "Lake Manitoba, Manitoba, R0H 0T0, Canada"
- },
- "lake-st-martin": {
-  "lat": 51.6506,
-  "lng": -98.4972,
-  "name": "Lake St. Martin, Unorganized Division No. 19, Manitoba, Canada"
- },
- "lake-winnipeg": {
-  "lat": 52.119,
-  "lng": -97.9692,
-  "name": "Lake Winnipeg, Manitoba, Canada"
- },
- "lake-winnipegosis": {
-  "lat": 52.376,
-  "lng": -100.0467,
-  "name": "Lake Winnipegosis, Manitoba, Canada"
- },
- "lake-of-the-prairies": {
-  "lat": 51.0426,
-  "lng": -101.4032,
-  "name": "Lake of the Prairies, Rural Municipality of Riding Mountain West, Manitoba, Cana"
- },
- "laurie-lake": {
-  "lat": 51.5466,
-  "lng": -101.0824,
-  "name": "Laurie Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
- },
- "paint-lake": {
-  "lat": 55.3676,
-  "lng": -98.2028,
-  "name": "Paint Lake, Local Government District of Mystery Lake, Manitoba, Canada"
- },
- "reed-lake": {
-  "lat": 54.6482,
-  "lng": -100.3304,
-  "name": "Reed Lake, Snow Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "schist-lake": {
-  "lat": 54.6667,
-  "lng": -101.7833,
-  "name": "Schist Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "setting-lake": {
-  "lat": 54.9856,
-  "lng": -98.6362,
-  "name": "Setting Lake, Wabowden, Unorganized Division No. 22, Manitoba, Canada"
- },
- "wekusko-lake": {
-  "lat": 54.773,
-  "lng": -99.8292,
-  "name": "Wekusko Lake, Snow Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "west-hawk-lake": {
-  "lat": 49.7696,
-  "lng": -95.1907,
-  "name": "West Hawk Lake, Unorganized Division No. 1, Northwestern Ontario, Manitoba, Cana"
- },
- "aikens-lake": {
-  "lat": 51.1951,
-  "lng": -95.3311,
-  "name": "Aikens Lake, Unorganized Division No. 19, Manitoba, Canada"
- },
- "beautiful-lake": {
-  "lat": 51.5636,
-  "lng": -101.0006,
-  "name": "Beautiful Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
- },
- "berens-lake": {
-  "lat": 55.7297,
-  "lng": -97.8636,
-  "name": "Petro-Canada, 98, Berens Road, Thompson, Local Government District of Mystery La"
- },
- "beresford-lake": {
-  "lat": 50.8711,
-  "lng": -95.2401,
-  "name": "Beresford Lake, Unorganized Division No. 19, Manitoba, Canada"
- },
- "betula-lake": {
-  "lat": 50.0814,
-  "lng": -95.5732,
-  "name": "Betula Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "big-bobs-lake": {
-  "lat": 51.8456,
-  "lng": -101.0412,
-  "name": "Big Bobs Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
- },
- "bird-lake": {
-  "lat": 50.4746,
-  "lng": -95.3332,
-  "name": "Bird Lake, Unorganized Division No. 19, Manitoba, Canada"
- },
- "black-lake-nopiming": {
-  "lat": 50.6581,
-  "lng": -95.3596,
-  "name": "Black Lake, Unorganized Division No. 19, Manitoba, Canada"
- },
- "boissevain-reservoir": {
-  "lat": 49.2055,
-  "lng": -100.0209,
-  "name": "Boissevain Reservoir, Boissevain, Municipality of Boissevain \u2013 Morton, Manitoba,"
- },
- "bolton-lake": {
-  "lat": 54.2867,
-  "lng": -95.6956,
-  "name": "Bolton Lake, Unorganized Division No. 22, Manitoba, Canada"
- },
- "booster-lake": {
-  "lat": 50.4397,
-  "lng": -95.2605,
-  "name": "Booster Lake, Unorganized Division No. 19, Manitoba, Canada"
- },
- "bower-lake": {
-  "lat": 49.0556,
-  "lng": -100.0732,
-  "name": "Bower Lake, Municipality of Boissevain \u2013 Morton, Manitoba, Canada"
- },
- "brereton-lake": {
-  "lat": 49.9047,
-  "lng": -95.5422,
-  "name": "Brereton Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "burge-lake": {
-  "lat": 56.9062,
-  "lng": -101.031,
-  "name": "Burge Lake, Lynn Lake, Manitoba, Canada"
- },
- "burntwood-lake": {
-  "lat": 55.4989,
-  "lng": -100.6576,
-  "name": "Burntwood Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "caddy-lake": {
-  "lat": 49.8105,
-  "lng": -95.2076,
-  "name": "Caddy Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "carroll-lake": {
-  "lat": 51.1114,
-  "lng": -95.155,
-  "name": "Carroll Lake, Unorganized Kenora District, Unorganized Division No. 19, Northwes"
- },
- "childs-lake": {
-  "lat": 51.6051,
-  "lng": -101.0829,
-  "name": "Childs Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
- },
- "cormorant-lake": {
-  "lat": 54.2237,
-  "lng": -100.8258,
-  "name": "Cormorant Lake, Cormorant, Unorganized Division No. 21, Manitoba, Canada"
- },
- "deep-lake-porcupine": {
-  "lat": 54.7512,
-  "lng": -100.3841,
-  "name": "Deep Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "deloraine-reservoir": {
-  "lat": 49.1426,
-  "lng": -100.407,
-  "name": "Deloraine Reservoir, Municipality of Deloraine \u2013 Winchester, Manitoba, Canada"
- },
- "east-blue-lake": {
-  "lat": 51.5963,
-  "lng": -100.9161,
-  "name": "East Blue Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
- },
- "east-goose-lake": {
-  "lat": 51.2237,
-  "lng": -101.3543,
-  "name": "Goose Lake Drive East, Roblin, Municipality of Roblin, Manitoba, R0L 1P0, Canada"
- },
- "east-shoal-lake": {
-  "lat": 50.3659,
-  "lng": -97.6142,
-  "name": "East Shoal Lake, Rural Municipality of St. Laurent, Manitoba, Canada"
- },
- "edmund-lake": {
-  "lat": 54.718,
-  "lng": -93.3543,
-  "name": "Edmund Lake, Unorganized Division No. 22, Manitoba, Canada"
- },
- "elgin-reservoir": {
-  "lat": 49.4326,
-  "lng": -100.2325,
-  "name": "Elgin Reservoir, Elgin, Municipality of Grassland, Manitoba, Canada"
- },
- "family-lake": {
-  "lat": 51.9831,
-  "lng": -95.4879,
-  "name": "Family Lake, Unorganized Division No. 19, Manitoba, Canada"
- },
- "fishing-lake": {
-  "lat": 52.2246,
-  "lng": -95.3755,
-  "name": "Fishing Lake, Unorganized Division No. 19, Manitoba, Canada"
- },
- "gass-lake": {
-  "lat": 52.6077,
-  "lng": -101.4279,
-  "name": "Gass Lake, Unorganized Division No. 20 (North), Manitoba, Canada"
- },
- "glad-lake": {
-  "lat": 56.9061,
-  "lng": -101.1521,
-  "name": "Glad Lake, Lynn Lake, Manitoba, Canada"
- },
- "goudney-reservoir": {
-  "lat": 49.2029,
-  "lng": -98.9515,
-  "name": "Goudney Reservoir, Municipality of Louise, Manitoba, Canada"
- },
- "grayling-lake": {
-  "lat": 50.7821,
-  "lng": -99.9877,
-  "name": "Grayling Lake, Unorganized Division No. 17, Manitoba, Canada"
- },
- "gull-lake-duck-mountain": {
-  "lat": 51.5745,
-  "lng": -101.0419,
-  "name": "Gull Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
- },
- "gull-lake-beaconia": {
-  "lat": 51.5745,
-  "lng": -101.0419,
-  "name": "Gull Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
- },
- "happy-lake": {
-  "lat": 50.8384,
-  "lng": -95.5368,
-  "name": "Happy Lake, Unorganized Division No. 19, Manitoba, Canada"
- },
- "hunt-lake": {
-  "lat": 49.7427,
-  "lng": -95.1767,
-  "name": "Hunt Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "jessica-lake": {
-  "lat": 50.0107,
-  "lng": -95.4979,
-  "name": "Jessica Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "kenton-reservoir": {
-  "lat": 49.9798,
-  "lng": -100.6109,
-  "name": "Kenton Reservoir, Kenton, Rural Municipality of Wallace \u2013 Woodworth, Manitoba, C"
- },
- "killarney-lake": {
-  "lat": 49.18,
-  "lng": -99.6847,
-  "name": "Killarney Lake, Killarney, Municipality of Killarney-Turtle Mountain, Manitoba, "
- },
- "kiskittogisu-lake": {
-  "lat": 54.2656,
-  "lng": -98.2354,
-  "name": "Kiskittogisu Lake, Unorganized Division No. 22, Manitoba, Canada"
- },
- "knee-lake": {
-  "lat": 54.9966,
-  "lng": -94.7247,
-  "name": "Knee Lake, Unorganized Division No. 22, Manitoba, Canada"
- },
- "lake-audy": {
-  "lat": 50.7493,
-  "lng": -100.2492,
-  "name": "Lake Audy, Unorganized Division No. 17, Manitoba, Canada"
- },
- "lake-irwin": {
-  "lat": 50.2006,
-  "lng": -99.4251,
-  "name": "Lake Irwin, Neepawa, Municipality of North Cypress \u2013 Langford, Manitoba, Canada"
- },
- "lake-katherine-riding-mountain": {
-  "lat": 50.6579,
-  "lng": -99.8947,
-  "name": "Lake Katherine, Unorganized Division No. 17, Manitoba, Canada"
- },
- "lake-minnewasta": {
-  "lat": 49.179,
-  "lng": -98.1351,
-  "name": "Lake Minnewasta, Morden, Rural Municipality of Stanley, Manitoba, Canada"
- },
- "lake-st-andrews": {
-  "lat": 50.3762,
-  "lng": -96.8346,
-  "name": "Hardman Lake, Rural Municipality of St. Andrews, Manitoba, Canada"
- },
- "lake-st-george": {
-  "lat": 51.7283,
-  "lng": -97.4036,
-  "name": "Lake St. George Provincial Park, Unorganized Division No. 19, Manitoba, Canada"
- },
- "lake-wahtopanah": {
-  "lat": 50.06,
-  "lng": -100.1721,
-  "name": "Lake Wahtopanah, Riverdale Municipality, Manitoba, Canada"
- },
- "laurie-lake-duck-mountain": {
-  "lat": 56.5951,
-  "lng": -101.8631,
-  "name": "Laurie Lake, Unorganized Division No. 23, Manitoba, Canada"
- },
- "little-duck-lake": {
-  "lat": 52.4398,
-  "lng": -100.7232,
-  "name": "Little Duck Lake, Unorganized Division No. 19, Manitoba, Canada"
- },
- "little-limestone-lake": {
-  "lat": 53.7807,
-  "lng": -99.3305,
-  "name": "Little Limestone Lake Park Reserve, Unorganized Division No. 21, Manitoba, Canad"
- },
- "lyons-lake": {
-  "lat": 49.7338,
-  "lng": -95.1772,
-  "name": "Lyons Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "manigotagan-lake": {
-  "lat": 50.8667,
-  "lng": -95.6107,
-  "name": "Manigotagan Lake, Unorganized Division No. 19, Manitoba, Canada"
- },
- "mantagao-lake": {
-  "lat": 51.2001,
-  "lng": -97.9356,
-  "name": "Mantagao Lake Wildlife Management Area, Rural Municipality of Grahamdale, Manito"
- },
- "mary-jane-reservoir": {
-  "lat": 49.2918,
-  "lng": -98.6144,
-  "name": "Mary Jane Reservoir, Municipality of Pembina, Manitoba, Canada"
- },
- "max-lake": {
-  "lat": 55.3735,
-  "lng": -98.2661,
-  "name": "Max Lake, Local Government District of Mystery Lake, Manitoba, Canada"
- },
- "mcgavock-lake": {
-  "lat": 56.5486,
-  "lng": -101.4892,
-  "name": "McGavock Lake, Unorganized Division No. 23, Manitoba, Canada"
- },
- "molson-lake": {
-  "lat": 54.2167,
-  "lng": -96.8597,
-  "name": "Molson Lake, Unorganized Division No. 22, Manitoba, Canada"
- },
- "moon-lake-riding-mountain": {
-  "lat": 54.0843,
-  "lng": -99.5169,
-  "name": "Moon Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "moose-lake": {
-  "lat": 53.7043,
-  "lng": -100.3188,
-  "name": "\u14a8\u14f5\u1472\u1426\u1403\u1472\u1423 Mosakahiken, Manitoba, R0B 0Y0, Canada"
- },
- "nejanilini-lake": {
-  "lat": 59.6081,
-  "lng": -97.6749,
-  "name": "Nejanilini Lake, Unorganized Division No. 23, Manitoba, Canada"
- },
- "neso-lake": {
-  "lat": 54.6662,
-  "lng": -101.547,
-  "name": "Neso Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "norris-lake": {
-  "lat": 54.8882,
-  "lng": -100.5035,
-  "name": "Norris Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "north-cross-lake": {
-  "lat": 49.8931,
-  "lng": -95.2982,
-  "name": "North Cross Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "north-knife-lake": {
-  "lat": 58.076,
-  "lng": -97.0869,
-  "name": "North Knife Lake, Unorganized Division No. 23, Manitoba, Canada"
- },
- "north-shoal-lake": {
-  "lat": 50.4889,
-  "lng": -97.6692,
-  "name": "North Shoal Lake, Rural Municipality of St. Laurent, Manitoba, Canada"
- },
- "north-steeprock-lake": {
-  "lat": 52.6014,
-  "lng": -101.3787,
-  "name": "North Steeprock Lake, Unorganized Division No. 20 (North), Manitoba, Canada"
- },
- "nutimik-lake": {
-  "lat": 50.1592,
-  "lng": -95.6732,
-  "name": "Nutimik Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "oak-lake": {
-  "lat": 49.7672,
-  "lng": -100.6325,
-  "name": "Oak Lake, Rural Municipality of Sifton, Manitoba, R0M 1P0, Canada"
- },
- "obukowin-lake": {
-  "lat": 51.0776,
-  "lng": -95.1986,
-  "name": "Obukowin Lake, Unorganized Kenora District, Unorganized Division No. 19, Northwe"
- },
- "pelican-lake": {
-  "lat": 49.3389,
-  "lng": -99.568,
-  "name": "Pelican Lake, Municipality of Killarney-Turtle Mountain, Manitoba, Canada"
- },
- "perch-lake-duck-mountain": {
-  "lat": 51.6512,
-  "lng": -100.899,
-  "name": "Perch Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
- },
- "persse-lake": {
-  "lat": 51.5569,
-  "lng": -101.4346,
-  "name": "Persse Lake, Municipality of Roblin, Manitoba, Canada"
- },
- "playgreen-lake": {
-  "lat": 54.0491,
-  "lng": -98.2204,
-  "name": "Playgreen Lake, Unorganized Division No. 22, Manitoba, Canada"
- },
- "quesnel-lake": {
-  "lat": 50.9209,
-  "lng": -95.6428,
-  "name": "Quesnel Lake, Unorganized Division No. 19, Manitoba, Canada"
- },
- "red-rock-lake": {
-  "lat": 49.9851,
-  "lng": -95.5198,
-  "name": "Red Rock Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "rock-lake": {
-  "lat": 49.7872,
-  "lng": -95.4731,
-  "name": "Rock Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "rocky-lake": {
-  "lat": 54.1378,
-  "lng": -101.4691,
-  "name": "Rocky Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "rossman-lake": {
-  "lat": 50.7401,
-  "lng": -100.7008,
-  "name": "Rossman Lake, Rossburn Municipality, Manitoba, Canada"
- },
- "sandy-lake": {
-  "lat": 50.528,
-  "lng": -100.1775,
-  "name": "Sandy Lake, Municipality of Harrison Park, Manitoba, Canada"
- },
- "sasaginnigak-lake": {
-  "lat": 51.5936,
-  "lng": -95.6372,
-  "name": "Sasaginnigak Lake, Unorganized Division No. 19, Manitoba, Canada"
- },
- "shoe-lake": {
-  "lat": 50.6591,
-  "lng": -95.4646,
-  "name": "Shoe Lake, Unorganized Division No. 19, Manitoba, Canada"
- },
- "siderock-lake": {
-  "lat": 50.9913,
-  "lng": -95.2715,
-  "name": "Siderock Lake, Unorganized Division No. 19, Manitoba, Canada"
- },
- "simonhouse-lake": {
-  "lat": 54.5329,
-  "lng": -101.1893,
-  "name": "Simonhouse Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "singush-lake": {
-  "lat": 51.6083,
-  "lng": -100.7859,
-  "name": "Singush Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
- },
- "sipiwesk-lake": {
-  "lat": 54.9107,
-  "lng": -98.3135,
-  "name": "Sipiwesk Lake, Unorganized Division No. 22, Manitoba, Canada"
- },
- "snail-lake": {
-  "lat": 52.5314,
-  "lng": -101.4125,
-  "name": "Snail Lake, Unorganized Division No. 20 (North), Manitoba, Canada"
- },
- "south-cross-lake": {
-  "lat": 49.8513,
-  "lng": -95.2672,
-  "name": "South Cross Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "southern-indian-lake": {
-  "lat": 57.1483,
-  "lng": -99.2506,
-  "name": "Southern Indian Lake, Unorganized Division No. 23, Manitoba, Canada"
- },
- "split-lake": {
-  "lat": 56.1695,
-  "lng": -96.1566,
-  "name": "Split Lake, Unorganized Division No. 22, Manitoba, Canada"
- },
- "spray-lake": {
-  "lat": 51.7317,
-  "lng": -100.957,
-  "name": "Spray Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
- },
- "st-malo-lake": {
-  "lat": 49.3163,
-  "lng": -96.9334,
-  "name": "St. Malo Lake, St. Malo, Rural Municipality of De Salaberry, Manitoba, Canada"
- },
- "star-lake": {
-  "lat": 55.1507,
-  "lng": -100.8894,
-  "name": "Star Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "stephenfield-lake": {
-  "lat": 49.5266,
-  "lng": -98.2962,
-  "name": "Stephenfield Lake, Rural Municipality of Dufferin, Manitoba, Canada"
- },
- "stormon-lake": {
-  "lat": 49.0052,
-  "lng": -100.0649,
-  "name": "Lake Stormon, Municipality of Boissevain \u2013 Morton, Manitoba, Canada"
- },
- "sturgeon-bay": {
-  "lat": 51.996,
-  "lng": -97.9174,
-  "name": "Sturgeon Bay, Unorganized Division No. 19, Manitoba, Canada"
- },
- "swan-lake-south": {
-  "lat": 52.4962,
-  "lng": -100.7681,
-  "name": "Swan Lake, Unorganized Division No. 19, Manitoba, Canada"
- },
- "tadoule-lake": {
-  "lat": 58.7195,
-  "lng": -98.4859,
-  "name": "\u155e\u1421 \u15c0\u1405\u141f\u1544 \u1564\u1427\u1401 Tadoule Lake (Tes-He-Olie Twe), Manitoba, Canada"
- },
- "tokaryk-lake": {
-  "lat": 50.6447,
-  "lng": -100.546,
-  "name": "Tokaryk Lake, Rossburn Municipality, Manitoba, Canada"
- },
- "twin-lakes": {
-  "lat": 54.4491,
-  "lng": -92.9028,
-  "name": "Twin Lakes, Unorganized Division No. 22, Manitoba, Canada"
- },
- "two-mile-lake": {
-  "lat": 51.7781,
-  "lng": -100.9082,
-  "name": "Two Mile Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
- },
- "utik-lake": {
-  "lat": 55.2853,
-  "lng": -95.9626,
-  "name": "Utik Lake, Unorganized Division No. 22, Manitoba, Canada"
- },
- "vini-lake": {
-  "lat": 52.5967,
-  "lng": -101.4305,
-  "name": "Vini Lake, Unorganized Division No. 20 (North), Manitoba, Canada"
- },
- "wallace-lake": {
-  "lat": 51.0262,
-  "lng": -95.3584,
-  "name": "Wallace Lake, Unorganized Division No. 19, Manitoba, Canada"
- },
- "war-eagle-lake": {
-  "lat": 49.93,
-  "lng": -95.6424,
-  "name": "War Eagle Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "washow-bay": {
-  "lat": 51.2158,
-  "lng": -97.0102,
-  "name": "Washow Bay, Rural Municipality of Bifrost \u2013 Riverton, Manitoba, Canada"
- },
- "waterhen-lake": {
-  "lat": 52.0892,
-  "lng": -99.5709,
-  "name": "Waterhen Lake, Unorganized Division No. 19, Manitoba, Canada"
- },
- "wellman-lake": {
-  "lat": 51.8269,
-  "lng": -100.886,
-  "name": "Wellman Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
- },
- "west-blue-lake": {
-  "lat": 51.6044,
-  "lng": -100.9231,
-  "name": "West Blue Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
- },
- "west-shoal-lake": {
-  "lat": 50.333,
-  "lng": -97.6752,
-  "name": "West Shoal Lake, Rural Municipality of St. Laurent, Manitoba, Canada"
- },
- "whirlpool-lake": {
-  "lat": 50.7145,
-  "lng": -99.7909,
-  "name": "Whirlpool Lake, Unorganized Division No. 17, Manitoba, Canada"
- },
- "white-lake-whiteshell": {
-  "lat": 54.697,
-  "lng": -101.7449,
-  "name": "White Lake, Schist Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "whitefish-lake": {
-  "lat": 52.3355,
-  "lng": -101.6083,
-  "name": "Whitefish Lake, Unorganized Division No. 20 (North), Manitoba, Canada"
- },
- "william-lake": {
-  "lat": 49.0382,
-  "lng": -99.9742,
-  "name": "William Lake, Municipality of Boissevain \u2013 Morton, Manitoba, Canada"
- },
- "wintering-lake": {
-  "lat": 55.2934,
-  "lng": -97.9623,
-  "name": "Wintering Lake, Local Government District of Mystery Lake, Manitoba, Canada"
- },
- "adam-lake": {
-  "lat": 56.7627,
-  "lng": -100.1541,
-  "name": "Adam Lake, Unorganized Division No. 23, Manitoba, Canada"
- },
- "amphipod-lake": {
-  "lat": 54.6915,
-  "lng": -101.118,
-  "name": "Amphipod Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "antons-lake": {
-  "lat": 50.2734,
-  "lng": -99.9072,
-  "name": "Antons Lake, Rural Municipality of Minto - Odanah, Manitoba, Canada"
- },
- "archies-lake": {
-  "lat": 50.5702,
-  "lng": -100.3299,
-  "name": "Archies Lake, Manitoba, Canada"
- },
- "arrow-lake": {
-  "lat": 51.833,
-  "lng": -100.9927,
-  "name": "Arrow Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
- },
- "bagguley-lake": {
-  "lat": 50.1995,
-  "lng": -95.4916,
-  "name": "Bagguley Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "barbe-lake": {
-  "lat": 54.2832,
-  "lng": -101.473,
-  "name": "Barbe Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "barren-lake": {
-  "lat": 49.7122,
-  "lng": -95.2888,
-  "name": "Barren Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "bear-lake": {
-  "lat": 54.7557,
-  "lng": -101.7129,
-  "name": "Bear Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "bell-lake": {
-  "lat": 52.5292,
-  "lng": -101.2472,
-  "name": "Bell Lake, Unorganized Division No. 20 (North), Manitoba, Canada"
- },
- "black-beaver-lake": {
-  "lat": 51.7732,
-  "lng": -100.8883,
-  "name": "Black Beaver Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
- },
- "cache-lake": {
-  "lat": 56.3163,
-  "lng": -94.8404,
-  "name": "Cache Lake, Gillam, Manitoba, Canada"
- },
- "camp-lake": {
-  "lat": 55.1336,
-  "lng": -101.1024,
-  "name": "Camp Lake, Sherridon, Unorganized Division No. 21, Manitoba, Canada"
- },
- "chitek-lake": {
-  "lat": 52.4208,
-  "lng": -99.4025,
-  "name": "Chitek Lake, Unorganized Division No. 19, Manitoba, Canada"
- },
- "clear-creek": {
-  "lat": 50.6752,
-  "lng": -100.0995,
-  "name": "Clear Creek, Municipality of Harrison Park, Manitoba, Canada"
- },
- "crab-lake": {
-  "lat": 52.2762,
-  "lng": -99.3531,
-  "name": "Crab Lake, Unorganized Division No. 19, Manitoba, Canada"
- },
- "crater-lake": {
-  "lat": 56.4829,
-  "lng": -99.9971,
-  "name": "Crater Lake, Leaf Rapids, Manitoba, Canada"
- },
- "crawford-lake": {
-  "lat": 50.5164,
-  "lng": -100.262,
-  "name": "Crawford Lake, Rural Municipality of Yellowhead, Manitoba, Canada"
- },
- "czornyj-lake": {
-  "lat": 50.6746,
-  "lng": -100.3521,
-  "name": "Czornyj Lake, Municipality of Harrison Park, Manitoba, Canada"
- },
- "davidson-lake": {
-  "lat": 50.4511,
-  "lng": -95.168,
-  "name": "Davidson Lake, Unorganized Kenora District, Unorganized Division No. 19, Northwe"
- },
- "digney-lake": {
-  "lat": 56.7343,
-  "lng": -101.2349,
-  "name": "Digney Lake, Lynn Lake, Manitoba, Canada"
- },
- "ditch-lake": {
-  "lat": 50.5684,
-  "lng": -99.9263,
-  "name": "Ditch Lake, Municipality of Clanwilliam \u2013 Erickson, Manitoba, Canada"
- },
- "falcon-creek": {
-  "lat": 49.7112,
-  "lng": -95.3431,
-  "name": "Falcon Creek, Unorganized Division No. 1, Manitoba, R0E 2H0, Canada"
- },
- "flanders-lake": {
-  "lat": 50.4291,
-  "lng": -95.2164,
-  "name": "Flanders Lake, Unorganized Division No. 19, Manitoba, Canada"
- },
- "florence-lake": {
-  "lat": 54.9718,
-  "lng": -101.8667,
-  "name": "Florence Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "garner-lake": {
-  "lat": 50.8235,
-  "lng": -95.1663,
-  "name": "Garner Lake, Unorganized Kenora District, Unorganized Division No. 19, Northwest"
- },
- "gemmell-lake": {
-  "lat": 56.7332,
-  "lng": -101.2499,
-  "name": "Gemmell Lake, Lynn Lake, Manitoba, Canada"
- },
- "groszok-lake": {
-  "lat": 50.6793,
-  "lng": -100.3282,
-  "name": "Groszok Lake, Municipality of Harrison Park, Manitoba, Canada"
- },
- "hadashville-pond": {
-  "lat": 49.6479,
-  "lng": -95.8515,
-  "name": "Hadashville Pond, Rural Municipality of Reynolds, Manitoba, Canada"
- },
- "hidden-lake": {
-  "lat": 54.78,
-  "lng": -101.8778,
-  "name": "Hidden Lake, Flin Flon, Unorganized Division No. 21, Manitoba, Canada"
- },
- "imrie-lake": {
-  "lat": 50.6682,
-  "lng": -100.2189,
-  "name": "Imrie Lake, Municipality of Harrison Park, Manitoba, Canada"
- },
- "inland-lake": {
-  "lat": 52.2864,
-  "lng": -99.6772,
-  "name": "Inland Lake, Unorganized Division No. 19, Manitoba, Canada"
- },
- "irwin-lake": {
-  "lat": 50.2006,
-  "lng": -99.4251,
-  "name": "Lake Irwin, Neepawa, Municipality of North Cypress \u2013 Langford, Manitoba, Canada"
- },
- "jackfish-lake": {
-  "lat": 50.5122,
-  "lng": -100.0728,
-  "name": "Jackfish Lake, Municipality of Harrison Park, Manitoba, Canada"
- },
- "kerr-lake": {
-  "lat": 51.2469,
-  "lng": -101.1696,
-  "name": "Kerr Lake, Municipality of Roblin, Manitoba, Canada"
- },
- "kingfisher-lake": {
-  "lat": 50.0111,
-  "lng": -96.8809,
-  "name": "Kingfisher Lake, West Pine Ridge, Rural Municipality of Springfield, Manitoba, C"
- },
- "kormans-lake": {
-  "lat": 54.8716,
-  "lng": -99.8825,
-  "name": "Kormans Lake, Snow Lake, Manitoba, Canada"
- },
- "lac-du-bonnet": {
-  "lat": 50.2549,
-  "lng": -96.0621,
-  "name": "Lac du Bonnet, Manitoba, Canada"
- },
- "lac-du-bonnet-ponds": {
-  "lat": 50.2952,
-  "lng": -96.0197,
-  "name": "Lac du Bonnet Ponds, Rural Municipality of Lac du Bonnet, Manitoba, Canada"
- },
- "lake-400": {
-  "lat": 50.5217,
-  "lng": -100.172,
-  "name": "Lake 400, Sandy Lake, Municipality of Harrison Park, Manitoba, Canada"
- },
- "leaf-lake": {
-  "lat": 56.4509,
-  "lng": -100.0238,
-  "name": "Leaf Lake, Leaf Rapids, Manitoba, Canada"
- },
- "line-lake": {
-  "lat": 51.7944,
-  "lng": -100.9383,
-  "name": "Line Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
- },
- "marshs-lake": {
-  "lat": 49.6749,
-  "lng": -99.2774,
-  "name": "Marshs Lake, Municipality of Glenboro \u2013 South Cypress, Manitoba, Canada"
- },
- "mccoys-creek": {
-  "lat": 49.26,
-  "lng": -98.7234,
-  "name": "McCoys Creek, Municipality of Pembina, Manitoba, Canada"
- },
- "mchugh-lake": {
-  "lat": 49.7286,
-  "lng": -95.2036,
-  "name": "McHugh Lake, West Hawk Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "mckinnon-creek": {
-  "lat": 50.7396,
-  "lng": -99.705,
-  "name": "McKinnon Creek, Unorganized Division No. 17, Manitoba, Canada"
- },
- "mid-lake": {
-  "lat": 55.5034,
-  "lng": -98.0961,
-  "name": "Mid Lake, Unorganized Division No. 22, Manitoba, Canada"
- },
- "minnewasta-lake": {
-  "lat": 49.179,
-  "lng": -98.1351,
-  "name": "Lake Minnewasta, Morden, Rural Municipality of Stanley, Manitoba, Canada"
- },
- "mossberry-lake": {
-  "lat": 51.6072,
-  "lng": -101.0134,
-  "name": "Mossberry Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
- },
- "nick-lake": {
-  "lat": 52.6125,
-  "lng": -101.4365,
-  "name": "Nick Lake, Unorganized Division No. 20 (North), Manitoba, Canada"
- },
- "nora-lake": {
-  "lat": 49.8693,
-  "lng": -95.231,
-  "name": "Nora Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "north-lake": {
-  "lat": 52.5724,
-  "lng": -101.2929,
-  "name": "North Lake, Unorganized Division No. 20 (North), Manitoba, Canada"
- },
- "north-thomas-lake": {
-  "lat": 50.5878,
-  "lng": -100.2389,
-  "name": "North Thomas Lake, Rural Municipality of Yellowhead, Manitoba, Canada"
- },
- "ohanly-pond": {
-  "lat": 50.7541,
-  "lng": -96.1527,
-  "name": "O'Hanly Pond, Unorganized Division No. 19, Manitoba, Canada"
- },
- "olson-lake": {
-  "lat": 54.8697,
-  "lng": -100.0147,
-  "name": "Olson Street, Snow Lake, Manitoba, R0B 1M0, Canada"
- },
- "one-lake": {
-  "lat": 50.0407,
-  "lng": -95.2247,
-  "name": "One Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "one-portage-lake": {
-  "lat": 54.7559,
-  "lng": -101.6751,
-  "name": "One Portage Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "rice-lake": {
-  "lat": 51.0147,
-  "lng": -95.6739,
-  "name": "Rice Lake, Bisset, Unorganized Division No. 19, Manitoba, Canada"
- },
- "sailing-lake": {
-  "lat": 49.9254,
-  "lng": -95.3164,
-  "name": "Sailing Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "saskatoon-pond": {
-  "lat": 49.6354,
-  "lng": -95.4617,
-  "name": "Saskatoon Pond, Rural Municipality of Reynolds, Manitoba, Canada"
- },
- "scotty-lake": {
-  "lat": 54.7335,
-  "lng": -101.671,
-  "name": "Scotty Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "seech-lake": {
-  "lat": 50.6758,
-  "lng": -100.4571,
-  "name": "Seech Lake, Municipality of Harrison Park, Manitoba, Canada"
- },
- "shell-lake": {
-  "lat": 49.766,
-  "lng": -95.3094,
-  "name": "Shell Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "shilliday-lake": {
-  "lat": 51.5855,
-  "lng": -100.9297,
-  "name": "Shilliday Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
- },
- "south-thomas-lake": {
-  "lat": 50.5669,
-  "lng": -100.2483,
-  "name": "South Thomas Lake, Rural Municipality of Yellowhead, Manitoba, Canada"
- },
- "st-andrew-lake": {
-  "lat": 51.6812,
-  "lng": -97.403,
-  "name": "Lake St. Andrew Provincial Park, Unorganized Division No. 19, Manitoba, Canada"
- },
- "stony-creek": {
-  "lat": 50.217,
-  "lng": -99.4894,
-  "name": "Stony Creek, Neepawa, Municipality of North Cypress \u2013 Langford, Manitoba, Canada"
- },
- "strawberry-pond": {
-  "lat": 49.6315,
-  "lng": -95.5107,
-  "name": "Strawberry Pond, Rural Municipality of Reynolds, Manitoba, Canada"
- },
- "stuart-lake": {
-  "lat": 56.7127,
-  "lng": -101.0252,
-  "name": "Stuart Lake, Lynn Lake, Manitoba, Canada"
- },
- "tees-lake": {
-  "lat": 51.5477,
-  "lng": -101.4269,
-  "name": "Tees Lake, Municipality of Roblin, Manitoba, Canada"
- },
- "the-lily-pond": {
-  "lat": 49.816,
-  "lng": -95.2658,
-  "name": "The Lily Pond, Unorganized Division No. 1, Manitoba, Canada"
- },
- "tugby-lake": {
-  "lat": 50.1781,
-  "lng": -95.3884,
-  "name": "Tugby Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "twin-lake": {
-  "lat": 54.6657,
-  "lng": -101.4532,
-  "name": "Twin Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "two-lake": {
-  "lat": 50.0317,
-  "lng": -95.2103,
-  "name": "Two Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "verrall-lake": {
-  "lat": 51.8524,
-  "lng": -100.8833,
-  "name": "Verrall Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
- },
- "virgin-lake": {
-  "lat": 52.6303,
-  "lng": -101.4402,
-  "name": "Virgin Lake, Unorganized Division No. 20 (North), Manitoba, Canada"
- },
- "wahtopanah-lake": {
-  "lat": 50.06,
-  "lng": -100.1721,
-  "name": "Lake Wahtopanah, Riverdale Municipality, Manitoba, Canada"
- },
- "wargatie-lake": {
-  "lat": 50.6089,
-  "lng": -100.342,
-  "name": "Wargatie Lake, Municipality of Harrison Park, Manitoba, Canada"
- },
- "wasp-lake": {
-  "lat": 50.307,
-  "lng": -95.4553,
-  "name": "Wasp Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "webster-lake": {
-  "lat": 54.5197,
-  "lng": -101.0946,
-  "name": "Webster Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "whiskey-jack-lake": {
-  "lat": 58.4476,
-  "lng": -101.8846,
-  "name": "Whiskey Jack Lake, Unorganized Division No. 23, Manitoba, Canada"
- },
- "whitemouth-lake": {
-  "lat": 49.242,
-  "lng": -95.6835,
-  "name": "Whitemouth Lake, Unorganized Division No. 1, Manitoba, Canada"
- },
- "lake-of-the-woods": {
-  "lat": 49.3016,
-  "lng": -94.6696,
-  "name": "Lake of the Woods, Rainy River District, Northwestern Ontario, Ontario, P0X 1C0,"
- },
- "lake-metigoshe": {
-  "lat": 48.9833,
-  "lng": -100.3504,
-  "name": "Metigoshe Lake, Lake Metigoshe Bike Path, Bottineau County, North Dakota, United"
- },
- "cranberry-lakes": {
-  "lat": 54.647,
-  "lng": -101.1871,
-  "name": "Second Cranberry Lake, Unorganized Division No. 21, Manitoba, Canada"
- },
- "minnedosa-trout-pond": {
-  "lat": 50.2499,
-  "lng": -99.8385,
-  "name": "Minnedosa, Manitoba, R0J 1E0, Canada"
- },
- "minnedosa-lake": {
-  "lat": 50.2499,
-  "lng": -99.8385,
-  "name": "Minnedosa, Manitoba, R0J 1E0, Canada"
- }
+  "big-sand-lake": {
+    "lat": 57.7108,
+    "lng": -99.7428,
+    "name": "Big Sand Lake, Unorganized Division No. 23, Manitoba, Canada"
+  },
+  "big-whiteshell-lake": {
+    "lat": 50.0832,
+    "lng": -95.3458,
+    "name": "Big Whiteshell Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "cedar-lake": {
+    "lat": 53.3404,
+    "lng": -100.3619,
+    "name": "Cedar Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "clearwater-lake": {
+    "lat": 54.064,
+    "lng": -101.0802,
+    "name": "Clearwater Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "cross-lake": {
+    "lat": 54.612,
+    "lng": -98.0507,
+    "name": "Cross Lake, Unorganized Division No. 22, Manitoba, R0B 0J0, Canada"
+  },
+  "crowduck-lake": {
+    "lat": 50.1343,
+    "lng": -95.2482,
+    "name": "Crowduck Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "dauphin-lake": {
+    "lat": 51.2959,
+    "lng": -99.7997,
+    "name": "Dauphin Lake, Rural Municipality of Lakeshore, Manitoba, Canada"
+  },
+  "falcon-lake": {
+    "lat": 49.7007,
+    "lng": -95.2579,
+    "name": "Falcon Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "gods-lake": {
+    "lat": 54.6197,
+    "lng": -94.4203,
+    "name": "Gods Lake, Unorganized Division No. 22, Manitoba, Canada"
+  },
+  "gunisao-lake": {
+    "lat": 53.5433,
+    "lng": -96.34,
+    "name": "Gunisao Lake, Unorganized Division No. 22, Manitoba, Canada"
+  },
+  "high-lake": {
+    "lat": 49.6964,
+    "lng": -95.1427,
+    "name": "High Lake, Unorganized Kenora District, Kenora District, Northwestern Ontario, O"
+  },
+  "kississing-lake": {
+    "lat": 55.1506,
+    "lng": -101.5372,
+    "name": "Kississing Lake, Sherridon, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "lake-athapapuskow": {
+    "lat": 54.6217,
+    "lng": -101.6559,
+    "name": "Athapapuskow Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "lake-manitoba": {
+    "lat": 50.9959,
+    "lng": -98.7987,
+    "name": "Lake Manitoba, Manitoba, R0H 0T0, Canada"
+  },
+  "lake-st-martin": {
+    "lat": 51.6506,
+    "lng": -98.4972,
+    "name": "Lake St. Martin, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "lake-winnipeg": {
+    "lat": 52.119,
+    "lng": -97.9692,
+    "name": "Lake Winnipeg, Manitoba, Canada"
+  },
+  "lake-winnipegosis": {
+    "lat": 52.376,
+    "lng": -100.0467,
+    "name": "Lake Winnipegosis, Manitoba, Canada"
+  },
+  "lake-of-the-prairies": {
+    "lat": 51.0426,
+    "lng": -101.4032,
+    "name": "Lake of the Prairies, Rural Municipality of Riding Mountain West, Manitoba, Cana"
+  },
+  "laurie-lake": {
+    "lat": 51.5466,
+    "lng": -101.0824,
+    "name": "Laurie Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
+  },
+  "paint-lake": {
+    "lat": 55.3676,
+    "lng": -98.2028,
+    "name": "Paint Lake, Local Government District of Mystery Lake, Manitoba, Canada"
+  },
+  "reed-lake": {
+    "lat": 54.6482,
+    "lng": -100.3304,
+    "name": "Reed Lake, Snow Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "schist-lake": {
+    "lat": 54.6667,
+    "lng": -101.7833,
+    "name": "Schist Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "setting-lake": {
+    "lat": 54.9856,
+    "lng": -98.6362,
+    "name": "Setting Lake, Wabowden, Unorganized Division No. 22, Manitoba, Canada"
+  },
+  "wekusko-lake": {
+    "lat": 54.773,
+    "lng": -99.8292,
+    "name": "Wekusko Lake, Snow Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "west-hawk-lake": {
+    "lat": 49.7696,
+    "lng": -95.1907,
+    "name": "West Hawk Lake, Unorganized Division No. 1, Northwestern Ontario, Manitoba, Cana"
+  },
+  "aikens-lake": {
+    "lat": 51.1951,
+    "lng": -95.3311,
+    "name": "Aikens Lake, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "beautiful-lake": {
+    "lat": 51.5636,
+    "lng": -101.0006,
+    "name": "Beautiful Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
+  },
+  "berens-lake": {
+    "lat": 55.7297,
+    "lng": -97.8636,
+    "name": "Petro-Canada, 98, Berens Road, Thompson, Local Government District of Mystery La"
+  },
+  "beresford-lake": {
+    "lat": 50.8711,
+    "lng": -95.2401,
+    "name": "Beresford Lake, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "betula-lake": {
+    "lat": 50.0814,
+    "lng": -95.5732,
+    "name": "Betula Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "big-bobs-lake": {
+    "lat": 51.8456,
+    "lng": -101.0412,
+    "name": "Big Bobs Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
+  },
+  "bird-lake": {
+    "lat": 50.4746,
+    "lng": -95.3332,
+    "name": "Bird Lake, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "black-lake-nopiming": {
+    "lat": 50.6581,
+    "lng": -95.3596,
+    "name": "Black Lake, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "boissevain-reservoir": {
+    "lat": 49.2055,
+    "lng": -100.0209,
+    "name": "Boissevain Reservoir, Boissevain, Municipality of Boissevain \u2013 Morton, Manitoba,"
+  },
+  "bolton-lake": {
+    "lat": 54.2867,
+    "lng": -95.6956,
+    "name": "Bolton Lake, Unorganized Division No. 22, Manitoba, Canada"
+  },
+  "booster-lake": {
+    "lat": 50.4397,
+    "lng": -95.2605,
+    "name": "Booster Lake, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "bower-lake": {
+    "lat": 49.0556,
+    "lng": -100.0732,
+    "name": "Bower Lake, Municipality of Boissevain \u2013 Morton, Manitoba, Canada"
+  },
+  "brereton-lake": {
+    "lat": 49.9047,
+    "lng": -95.5422,
+    "name": "Brereton Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "burge-lake": {
+    "lat": 56.9062,
+    "lng": -101.031,
+    "name": "Burge Lake, Lynn Lake, Manitoba, Canada"
+  },
+  "burntwood-lake": {
+    "lat": 55.4989,
+    "lng": -100.6576,
+    "name": "Burntwood Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "caddy-lake": {
+    "lat": 49.8105,
+    "lng": -95.2076,
+    "name": "Caddy Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "carroll-lake": {
+    "lat": 51.1114,
+    "lng": -95.155,
+    "name": "Carroll Lake, Unorganized Kenora District, Unorganized Division No. 19, Northwes"
+  },
+  "childs-lake": {
+    "lat": 51.6051,
+    "lng": -101.0829,
+    "name": "Childs Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
+  },
+  "cormorant-lake": {
+    "lat": 54.2237,
+    "lng": -100.8258,
+    "name": "Cormorant Lake, Cormorant, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "deep-lake-porcupine": {
+    "lat": 54.7512,
+    "lng": -100.3841,
+    "name": "Deep Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "deloraine-reservoir": {
+    "lat": 49.1426,
+    "lng": -100.407,
+    "name": "Deloraine Reservoir, Municipality of Deloraine \u2013 Winchester, Manitoba, Canada"
+  },
+  "east-blue-lake": {
+    "lat": 51.5963,
+    "lng": -100.9161,
+    "name": "East Blue Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
+  },
+  "east-goose-lake": {
+    "lat": 51.2237,
+    "lng": -101.3543,
+    "name": "Goose Lake Drive East, Roblin, Municipality of Roblin, Manitoba, R0L 1P0, Canada"
+  },
+  "east-shoal-lake": {
+    "lat": 50.3659,
+    "lng": -97.6142,
+    "name": "East Shoal Lake, Rural Municipality of St. Laurent, Manitoba, Canada"
+  },
+  "edmund-lake": {
+    "lat": 54.718,
+    "lng": -93.3543,
+    "name": "Edmund Lake, Unorganized Division No. 22, Manitoba, Canada"
+  },
+  "elgin-reservoir": {
+    "lat": 49.4326,
+    "lng": -100.2325,
+    "name": "Elgin Reservoir, Elgin, Municipality of Grassland, Manitoba, Canada"
+  },
+  "family-lake": {
+    "lat": 51.9831,
+    "lng": -95.4879,
+    "name": "Family Lake, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "fishing-lake": {
+    "lat": 52.2246,
+    "lng": -95.3755,
+    "name": "Fishing Lake, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "gass-lake": {
+    "lat": 52.6077,
+    "lng": -101.4279,
+    "name": "Gass Lake, Unorganized Division No. 20 (North), Manitoba, Canada"
+  },
+  "glad-lake": {
+    "lat": 56.9061,
+    "lng": -101.1521,
+    "name": "Glad Lake, Lynn Lake, Manitoba, Canada"
+  },
+  "goudney-reservoir": {
+    "lat": 49.2029,
+    "lng": -98.9515,
+    "name": "Goudney Reservoir, Municipality of Louise, Manitoba, Canada"
+  },
+  "grayling-lake": {
+    "lat": 50.7821,
+    "lng": -99.9877,
+    "name": "Grayling Lake, Unorganized Division No. 17, Manitoba, Canada"
+  },
+  "gull-lake-duck-mountain": {
+    "lat": 51.5745,
+    "lng": -101.0419,
+    "name": "Gull Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
+  },
+  "gull-lake-beaconia": {
+    "lat": 51.5745,
+    "lng": -101.0419,
+    "name": "Gull Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
+  },
+  "happy-lake": {
+    "lat": 50.8384,
+    "lng": -95.5368,
+    "name": "Happy Lake, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "hunt-lake": {
+    "lat": 49.7427,
+    "lng": -95.1767,
+    "name": "Hunt Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "jessica-lake": {
+    "lat": 50.0107,
+    "lng": -95.4979,
+    "name": "Jessica Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "kenton-reservoir": {
+    "lat": 49.9798,
+    "lng": -100.6109,
+    "name": "Kenton Reservoir, Kenton, Rural Municipality of Wallace \u2013 Woodworth, Manitoba, C"
+  },
+  "killarney-lake": {
+    "lat": 49.18,
+    "lng": -99.6847,
+    "name": "Killarney Lake, Killarney, Municipality of Killarney-Turtle Mountain, Manitoba, "
+  },
+  "kiskittogisu-lake": {
+    "lat": 54.2656,
+    "lng": -98.2354,
+    "name": "Kiskittogisu Lake, Unorganized Division No. 22, Manitoba, Canada"
+  },
+  "knee-lake": {
+    "lat": 54.9966,
+    "lng": -94.7247,
+    "name": "Knee Lake, Unorganized Division No. 22, Manitoba, Canada"
+  },
+  "lake-audy": {
+    "lat": 50.7493,
+    "lng": -100.2492,
+    "name": "Lake Audy, Unorganized Division No. 17, Manitoba, Canada"
+  },
+  "lake-irwin": {
+    "lat": 50.2006,
+    "lng": -99.4251,
+    "name": "Lake Irwin, Neepawa, Municipality of North Cypress \u2013 Langford, Manitoba, Canada"
+  },
+  "lake-katherine-riding-mountain": {
+    "lat": 50.6579,
+    "lng": -99.8947,
+    "name": "Lake Katherine, Unorganized Division No. 17, Manitoba, Canada"
+  },
+  "lake-minnewasta": {
+    "lat": 49.179,
+    "lng": -98.1351,
+    "name": "Lake Minnewasta, Morden, Rural Municipality of Stanley, Manitoba, Canada"
+  },
+  "lake-st-andrews": {
+    "lat": 50.3762,
+    "lng": -96.8346,
+    "name": "Hardman Lake, Rural Municipality of St. Andrews, Manitoba, Canada"
+  },
+  "lake-st-george": {
+    "lat": 51.7283,
+    "lng": -97.4036,
+    "name": "Lake St. George Provincial Park, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "lake-wahtopanah": {
+    "lat": 50.06,
+    "lng": -100.1721,
+    "name": "Lake Wahtopanah, Riverdale Municipality, Manitoba, Canada"
+  },
+  "laurie-lake-duck-mountain": {
+    "lat": 56.5951,
+    "lng": -101.8631,
+    "name": "Laurie Lake, Unorganized Division No. 23, Manitoba, Canada"
+  },
+  "little-duck-lake": {
+    "lat": 52.4398,
+    "lng": -100.7232,
+    "name": "Little Duck Lake, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "little-limestone-lake": {
+    "lat": 53.7807,
+    "lng": -99.3305,
+    "name": "Little Limestone Lake Park Reserve, Unorganized Division No. 21, Manitoba, Canad"
+  },
+  "lyons-lake": {
+    "lat": 49.7338,
+    "lng": -95.1772,
+    "name": "Lyons Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "manigotagan-lake": {
+    "lat": 50.8667,
+    "lng": -95.6107,
+    "name": "Manigotagan Lake, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "mantagao-lake": {
+    "lat": 51.2001,
+    "lng": -97.9356,
+    "name": "Mantagao Lake Wildlife Management Area, Rural Municipality of Grahamdale, Manito"
+  },
+  "mary-jane-reservoir": {
+    "lat": 49.2918,
+    "lng": -98.6144,
+    "name": "Mary Jane Reservoir, Municipality of Pembina, Manitoba, Canada"
+  },
+  "max-lake": {
+    "lat": 55.3735,
+    "lng": -98.2661,
+    "name": "Max Lake, Local Government District of Mystery Lake, Manitoba, Canada"
+  },
+  "mcgavock-lake": {
+    "lat": 56.5486,
+    "lng": -101.4892,
+    "name": "McGavock Lake, Unorganized Division No. 23, Manitoba, Canada"
+  },
+  "molson-lake": {
+    "lat": 54.2167,
+    "lng": -96.8597,
+    "name": "Molson Lake, Unorganized Division No. 22, Manitoba, Canada"
+  },
+  "moon-lake-riding-mountain": {
+    "lat": 54.0843,
+    "lng": -99.5169,
+    "name": "Moon Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "moose-lake": {
+    "lat": 53.7043,
+    "lng": -100.3188,
+    "name": "\u14a8\u14f5\u1472\u1426\u1403\u1472\u1423 Mosakahiken, Manitoba, R0B 0Y0, Canada"
+  },
+  "nejanilini-lake": {
+    "lat": 59.6081,
+    "lng": -97.6749,
+    "name": "Nejanilini Lake, Unorganized Division No. 23, Manitoba, Canada"
+  },
+  "neso-lake": {
+    "lat": 54.6662,
+    "lng": -101.547,
+    "name": "Neso Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "norris-lake": {
+    "lat": 54.8882,
+    "lng": -100.5035,
+    "name": "Norris Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "north-cross-lake": {
+    "lat": 49.8931,
+    "lng": -95.2982,
+    "name": "North Cross Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "north-knife-lake": {
+    "lat": 58.076,
+    "lng": -97.0869,
+    "name": "North Knife Lake, Unorganized Division No. 23, Manitoba, Canada"
+  },
+  "north-shoal-lake": {
+    "lat": 50.4889,
+    "lng": -97.6692,
+    "name": "North Shoal Lake, Rural Municipality of St. Laurent, Manitoba, Canada"
+  },
+  "north-steeprock-lake": {
+    "lat": 52.6014,
+    "lng": -101.3787,
+    "name": "North Steeprock Lake, Unorganized Division No. 20 (North), Manitoba, Canada"
+  },
+  "nutimik-lake": {
+    "lat": 50.1592,
+    "lng": -95.6732,
+    "name": "Nutimik Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "oak-lake": {
+    "lat": 49.7672,
+    "lng": -100.6325,
+    "name": "Oak Lake, Rural Municipality of Sifton, Manitoba, R0M 1P0, Canada"
+  },
+  "obukowin-lake": {
+    "lat": 51.0776,
+    "lng": -95.1986,
+    "name": "Obukowin Lake, Unorganized Kenora District, Unorganized Division No. 19, Northwe"
+  },
+  "pelican-lake": {
+    "lat": 49.3389,
+    "lng": -99.568,
+    "name": "Pelican Lake, Municipality of Killarney-Turtle Mountain, Manitoba, Canada"
+  },
+  "perch-lake-duck-mountain": {
+    "lat": 51.6512,
+    "lng": -100.899,
+    "name": "Perch Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
+  },
+  "persse-lake": {
+    "lat": 51.5569,
+    "lng": -101.4346,
+    "name": "Persse Lake, Municipality of Roblin, Manitoba, Canada"
+  },
+  "playgreen-lake": {
+    "lat": 54.0491,
+    "lng": -98.2204,
+    "name": "Playgreen Lake, Unorganized Division No. 22, Manitoba, Canada"
+  },
+  "quesnel-lake": {
+    "lat": 50.9209,
+    "lng": -95.6428,
+    "name": "Quesnel Lake, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "red-rock-lake": {
+    "lat": 49.9851,
+    "lng": -95.5198,
+    "name": "Red Rock Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "rock-lake": {
+    "lat": 49.7872,
+    "lng": -95.4731,
+    "name": "Rock Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "rocky-lake": {
+    "lat": 54.1378,
+    "lng": -101.4691,
+    "name": "Rocky Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "rossman-lake": {
+    "lat": 50.7401,
+    "lng": -100.7008,
+    "name": "Rossman Lake, Rossburn Municipality, Manitoba, Canada"
+  },
+  "sandy-lake": {
+    "lat": 50.528,
+    "lng": -100.1775,
+    "name": "Sandy Lake, Municipality of Harrison Park, Manitoba, Canada"
+  },
+  "sasaginnigak-lake": {
+    "lat": 51.5936,
+    "lng": -95.6372,
+    "name": "Sasaginnigak Lake, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "shoe-lake": {
+    "lat": 50.6591,
+    "lng": -95.4646,
+    "name": "Shoe Lake, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "siderock-lake": {
+    "lat": 50.9913,
+    "lng": -95.2715,
+    "name": "Siderock Lake, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "simonhouse-lake": {
+    "lat": 54.5329,
+    "lng": -101.1893,
+    "name": "Simonhouse Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "singush-lake": {
+    "lat": 51.6083,
+    "lng": -100.7859,
+    "name": "Singush Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
+  },
+  "sipiwesk-lake": {
+    "lat": 54.9107,
+    "lng": -98.3135,
+    "name": "Sipiwesk Lake, Unorganized Division No. 22, Manitoba, Canada"
+  },
+  "snail-lake": {
+    "lat": 52.5314,
+    "lng": -101.4125,
+    "name": "Snail Lake, Unorganized Division No. 20 (North), Manitoba, Canada"
+  },
+  "south-cross-lake": {
+    "lat": 49.8513,
+    "lng": -95.2672,
+    "name": "South Cross Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "southern-indian-lake": {
+    "lat": 57.1483,
+    "lng": -99.2506,
+    "name": "Southern Indian Lake, Unorganized Division No. 23, Manitoba, Canada"
+  },
+  "split-lake": {
+    "lat": 56.1695,
+    "lng": -96.1566,
+    "name": "Split Lake, Unorganized Division No. 22, Manitoba, Canada"
+  },
+  "spray-lake": {
+    "lat": 51.7317,
+    "lng": -100.957,
+    "name": "Spray Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
+  },
+  "st-malo-lake": {
+    "lat": 49.3163,
+    "lng": -96.9334,
+    "name": "St. Malo Lake, St. Malo, Rural Municipality of De Salaberry, Manitoba, Canada"
+  },
+  "star-lake": {
+    "lat": 55.1507,
+    "lng": -100.8894,
+    "name": "Star Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "stephenfield-lake": {
+    "lat": 49.5266,
+    "lng": -98.2962,
+    "name": "Stephenfield Lake, Rural Municipality of Dufferin, Manitoba, Canada"
+  },
+  "stormon-lake": {
+    "lat": 49.0052,
+    "lng": -100.0649,
+    "name": "Lake Stormon, Municipality of Boissevain \u2013 Morton, Manitoba, Canada"
+  },
+  "sturgeon-bay": {
+    "lat": 51.996,
+    "lng": -97.9174,
+    "name": "Sturgeon Bay, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "swan-lake-south": {
+    "lat": 52.4962,
+    "lng": -100.7681,
+    "name": "Swan Lake, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "tadoule-lake": {
+    "lat": 58.7195,
+    "lng": -98.4859,
+    "name": "\u155e\u1421 \u15c0\u1405\u141f\u1544 \u1564\u1427\u1401 Tadoule Lake (Tes-He-Olie Twe), Manitoba, Canada"
+  },
+  "tokaryk-lake": {
+    "lat": 50.6447,
+    "lng": -100.546,
+    "name": "Tokaryk Lake, Rossburn Municipality, Manitoba, Canada"
+  },
+  "twin-lakes": {
+    "lat": 54.4491,
+    "lng": -92.9028,
+    "name": "Twin Lakes, Unorganized Division No. 22, Manitoba, Canada"
+  },
+  "two-mile-lake": {
+    "lat": 51.7781,
+    "lng": -100.9082,
+    "name": "Two Mile Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
+  },
+  "utik-lake": {
+    "lat": 55.2853,
+    "lng": -95.9626,
+    "name": "Utik Lake, Unorganized Division No. 22, Manitoba, Canada"
+  },
+  "vini-lake": {
+    "lat": 52.5967,
+    "lng": -101.4305,
+    "name": "Vini Lake, Unorganized Division No. 20 (North), Manitoba, Canada"
+  },
+  "wallace-lake": {
+    "lat": 51.0262,
+    "lng": -95.3584,
+    "name": "Wallace Lake, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "war-eagle-lake": {
+    "lat": 49.93,
+    "lng": -95.6424,
+    "name": "War Eagle Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "washow-bay": {
+    "lat": 51.2158,
+    "lng": -97.0102,
+    "name": "Washow Bay, Rural Municipality of Bifrost \u2013 Riverton, Manitoba, Canada"
+  },
+  "waterhen-lake": {
+    "lat": 52.0892,
+    "lng": -99.5709,
+    "name": "Waterhen Lake, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "wellman-lake": {
+    "lat": 51.8269,
+    "lng": -100.886,
+    "name": "Wellman Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
+  },
+  "west-blue-lake": {
+    "lat": 51.6044,
+    "lng": -100.9231,
+    "name": "West Blue Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
+  },
+  "west-shoal-lake": {
+    "lat": 50.333,
+    "lng": -97.6752,
+    "name": "West Shoal Lake, Rural Municipality of St. Laurent, Manitoba, Canada"
+  },
+  "whirlpool-lake": {
+    "lat": 50.7145,
+    "lng": -99.7909,
+    "name": "Whirlpool Lake, Unorganized Division No. 17, Manitoba, Canada"
+  },
+  "white-lake-whiteshell": {
+    "lat": 54.697,
+    "lng": -101.7449,
+    "name": "White Lake, Schist Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "whitefish-lake": {
+    "lat": 52.3355,
+    "lng": -101.6083,
+    "name": "Whitefish Lake, Unorganized Division No. 20 (North), Manitoba, Canada"
+  },
+  "william-lake": {
+    "lat": 49.0382,
+    "lng": -99.9742,
+    "name": "William Lake, Municipality of Boissevain \u2013 Morton, Manitoba, Canada"
+  },
+  "wintering-lake": {
+    "lat": 55.2934,
+    "lng": -97.9623,
+    "name": "Wintering Lake, Local Government District of Mystery Lake, Manitoba, Canada"
+  },
+  "adam-lake": {
+    "lat": 56.7627,
+    "lng": -100.1541,
+    "name": "Adam Lake, Unorganized Division No. 23, Manitoba, Canada"
+  },
+  "amphipod-lake": {
+    "lat": 54.6915,
+    "lng": -101.118,
+    "name": "Amphipod Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "antons-lake": {
+    "lat": 50.2734,
+    "lng": -99.9072,
+    "name": "Antons Lake, Rural Municipality of Minto - Odanah, Manitoba, Canada"
+  },
+  "archies-lake": {
+    "lat": 50.5702,
+    "lng": -100.3299,
+    "name": "Archies Lake, Manitoba, Canada"
+  },
+  "arrow-lake": {
+    "lat": 51.833,
+    "lng": -100.9927,
+    "name": "Arrow Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
+  },
+  "bagguley-lake": {
+    "lat": 50.1995,
+    "lng": -95.4916,
+    "name": "Bagguley Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "barbe-lake": {
+    "lat": 54.2832,
+    "lng": -101.473,
+    "name": "Barbe Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "barren-lake": {
+    "lat": 49.7122,
+    "lng": -95.2888,
+    "name": "Barren Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "bear-lake": {
+    "lat": 54.7557,
+    "lng": -101.7129,
+    "name": "Bear Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "bell-lake": {
+    "lat": 52.5292,
+    "lng": -101.2472,
+    "name": "Bell Lake, Unorganized Division No. 20 (North), Manitoba, Canada"
+  },
+  "black-beaver-lake": {
+    "lat": 51.7732,
+    "lng": -100.8883,
+    "name": "Black Beaver Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
+  },
+  "cache-lake": {
+    "lat": 56.3163,
+    "lng": -94.8404,
+    "name": "Cache Lake, Gillam, Manitoba, Canada"
+  },
+  "camp-lake": {
+    "lat": 55.1336,
+    "lng": -101.1024,
+    "name": "Camp Lake, Sherridon, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "chitek-lake": {
+    "lat": 52.4208,
+    "lng": -99.4025,
+    "name": "Chitek Lake, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "clear-creek": {
+    "lat": 50.6752,
+    "lng": -100.0995,
+    "name": "Clear Creek, Municipality of Harrison Park, Manitoba, Canada"
+  },
+  "crab-lake": {
+    "lat": 52.2762,
+    "lng": -99.3531,
+    "name": "Crab Lake, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "crater-lake": {
+    "lat": 56.4829,
+    "lng": -99.9971,
+    "name": "Crater Lake, Leaf Rapids, Manitoba, Canada"
+  },
+  "crawford-lake": {
+    "lat": 50.5164,
+    "lng": -100.262,
+    "name": "Crawford Lake, Rural Municipality of Yellowhead, Manitoba, Canada"
+  },
+  "czornyj-lake": {
+    "lat": 50.6746,
+    "lng": -100.3521,
+    "name": "Czornyj Lake, Municipality of Harrison Park, Manitoba, Canada"
+  },
+  "davidson-lake": {
+    "lat": 50.4511,
+    "lng": -95.168,
+    "name": "Davidson Lake, Unorganized Kenora District, Unorganized Division No. 19, Northwe"
+  },
+  "digney-lake": {
+    "lat": 56.7343,
+    "lng": -101.2349,
+    "name": "Digney Lake, Lynn Lake, Manitoba, Canada"
+  },
+  "ditch-lake": {
+    "lat": 50.5684,
+    "lng": -99.9263,
+    "name": "Ditch Lake, Municipality of Clanwilliam \u2013 Erickson, Manitoba, Canada"
+  },
+  "falcon-creek": {
+    "lat": 49.7112,
+    "lng": -95.3431,
+    "name": "Falcon Creek, Unorganized Division No. 1, Manitoba, R0E 2H0, Canada"
+  },
+  "flanders-lake": {
+    "lat": 50.4291,
+    "lng": -95.2164,
+    "name": "Flanders Lake, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "florence-lake": {
+    "lat": 54.9718,
+    "lng": -101.8667,
+    "name": "Florence Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "garner-lake": {
+    "lat": 50.8235,
+    "lng": -95.1663,
+    "name": "Garner Lake, Unorganized Kenora District, Unorganized Division No. 19, Northwest"
+  },
+  "gemmell-lake": {
+    "lat": 56.7332,
+    "lng": -101.2499,
+    "name": "Gemmell Lake, Lynn Lake, Manitoba, Canada"
+  },
+  "groszok-lake": {
+    "lat": 50.6793,
+    "lng": -100.3282,
+    "name": "Groszok Lake, Municipality of Harrison Park, Manitoba, Canada"
+  },
+  "hadashville-pond": {
+    "lat": 49.6479,
+    "lng": -95.8515,
+    "name": "Hadashville Pond, Rural Municipality of Reynolds, Manitoba, Canada"
+  },
+  "hidden-lake": {
+    "lat": 54.78,
+    "lng": -101.8778,
+    "name": "Hidden Lake, Flin Flon, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "imrie-lake": {
+    "lat": 50.6682,
+    "lng": -100.2189,
+    "name": "Imrie Lake, Municipality of Harrison Park, Manitoba, Canada"
+  },
+  "inland-lake": {
+    "lat": 52.2864,
+    "lng": -99.6772,
+    "name": "Inland Lake, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "irwin-lake": {
+    "lat": 50.2006,
+    "lng": -99.4251,
+    "name": "Lake Irwin, Neepawa, Municipality of North Cypress \u2013 Langford, Manitoba, Canada"
+  },
+  "jackfish-lake": {
+    "lat": 50.5122,
+    "lng": -100.0728,
+    "name": "Jackfish Lake, Municipality of Harrison Park, Manitoba, Canada"
+  },
+  "kerr-lake": {
+    "lat": 51.2469,
+    "lng": -101.1696,
+    "name": "Kerr Lake, Municipality of Roblin, Manitoba, Canada"
+  },
+  "kingfisher-lake": {
+    "lat": 50.0111,
+    "lng": -96.8809,
+    "name": "Kingfisher Lake, West Pine Ridge, Rural Municipality of Springfield, Manitoba, C"
+  },
+  "kormans-lake": {
+    "lat": 54.8716,
+    "lng": -99.8825,
+    "name": "Kormans Lake, Snow Lake, Manitoba, Canada"
+  },
+  "lac-du-bonnet": {
+    "lat": 50.2549,
+    "lng": -96.0621,
+    "name": "Lac du Bonnet, Manitoba, Canada"
+  },
+  "lac-du-bonnet-ponds": {
+    "lat": 50.2952,
+    "lng": -96.0197,
+    "name": "Lac du Bonnet Ponds, Rural Municipality of Lac du Bonnet, Manitoba, Canada"
+  },
+  "lake-400": {
+    "lat": 50.5217,
+    "lng": -100.172,
+    "name": "Lake 400, Sandy Lake, Municipality of Harrison Park, Manitoba, Canada"
+  },
+  "leaf-lake": {
+    "lat": 56.4509,
+    "lng": -100.0238,
+    "name": "Leaf Lake, Leaf Rapids, Manitoba, Canada"
+  },
+  "line-lake": {
+    "lat": 51.7944,
+    "lng": -100.9383,
+    "name": "Line Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
+  },
+  "marshs-lake": {
+    "lat": 49.6749,
+    "lng": -99.2774,
+    "name": "Marshs Lake, Municipality of Glenboro \u2013 South Cypress, Manitoba, Canada"
+  },
+  "mccoys-creek": {
+    "lat": 49.26,
+    "lng": -98.7234,
+    "name": "McCoys Creek, Municipality of Pembina, Manitoba, Canada"
+  },
+  "mchugh-lake": {
+    "lat": 49.7286,
+    "lng": -95.2036,
+    "name": "McHugh Lake, West Hawk Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "mckinnon-creek": {
+    "lat": 50.7396,
+    "lng": -99.705,
+    "name": "McKinnon Creek, Unorganized Division No. 17, Manitoba, Canada"
+  },
+  "mid-lake": {
+    "lat": 55.5034,
+    "lng": -98.0961,
+    "name": "Mid Lake, Unorganized Division No. 22, Manitoba, Canada"
+  },
+  "minnewasta-lake": {
+    "lat": 49.179,
+    "lng": -98.1351,
+    "name": "Lake Minnewasta, Morden, Rural Municipality of Stanley, Manitoba, Canada"
+  },
+  "mossberry-lake": {
+    "lat": 51.6072,
+    "lng": -101.0134,
+    "name": "Mossberry Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
+  },
+  "nick-lake": {
+    "lat": 52.6125,
+    "lng": -101.4365,
+    "name": "Nick Lake, Unorganized Division No. 20 (North), Manitoba, Canada"
+  },
+  "nora-lake": {
+    "lat": 49.8693,
+    "lng": -95.231,
+    "name": "Nora Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "north-lake": {
+    "lat": 52.5724,
+    "lng": -101.2929,
+    "name": "North Lake, Unorganized Division No. 20 (North), Manitoba, Canada"
+  },
+  "north-thomas-lake": {
+    "lat": 50.5878,
+    "lng": -100.2389,
+    "name": "North Thomas Lake, Rural Municipality of Yellowhead, Manitoba, Canada"
+  },
+  "ohanly-pond": {
+    "lat": 50.7541,
+    "lng": -96.1527,
+    "name": "O'Hanly Pond, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "olson-lake": {
+    "lat": 54.8697,
+    "lng": -100.0147,
+    "name": "Olson Street, Snow Lake, Manitoba, R0B 1M0, Canada"
+  },
+  "one-lake": {
+    "lat": 50.0407,
+    "lng": -95.2247,
+    "name": "One Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "one-portage-lake": {
+    "lat": 54.7559,
+    "lng": -101.6751,
+    "name": "One Portage Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "rice-lake": {
+    "lat": 51.0147,
+    "lng": -95.6739,
+    "name": "Rice Lake, Bisset, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "sailing-lake": {
+    "lat": 49.9254,
+    "lng": -95.3164,
+    "name": "Sailing Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "saskatoon-pond": {
+    "lat": 49.6354,
+    "lng": -95.4617,
+    "name": "Saskatoon Pond, Rural Municipality of Reynolds, Manitoba, Canada"
+  },
+  "scotty-lake": {
+    "lat": 54.7335,
+    "lng": -101.671,
+    "name": "Scotty Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "seech-lake": {
+    "lat": 50.6758,
+    "lng": -100.4571,
+    "name": "Seech Lake, Municipality of Harrison Park, Manitoba, Canada"
+  },
+  "shell-lake": {
+    "lat": 49.766,
+    "lng": -95.3094,
+    "name": "Shell Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "shilliday-lake": {
+    "lat": 51.5855,
+    "lng": -100.9297,
+    "name": "Shilliday Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
+  },
+  "south-thomas-lake": {
+    "lat": 50.5669,
+    "lng": -100.2483,
+    "name": "South Thomas Lake, Rural Municipality of Yellowhead, Manitoba, Canada"
+  },
+  "st-andrew-lake": {
+    "lat": 51.6812,
+    "lng": -97.403,
+    "name": "Lake St. Andrew Provincial Park, Unorganized Division No. 19, Manitoba, Canada"
+  },
+  "stony-creek": {
+    "lat": 50.217,
+    "lng": -99.4894,
+    "name": "Stony Creek, Neepawa, Municipality of North Cypress \u2013 Langford, Manitoba, Canada"
+  },
+  "strawberry-pond": {
+    "lat": 49.6315,
+    "lng": -95.5107,
+    "name": "Strawberry Pond, Rural Municipality of Reynolds, Manitoba, Canada"
+  },
+  "stuart-lake": {
+    "lat": 56.7127,
+    "lng": -101.0252,
+    "name": "Stuart Lake, Lynn Lake, Manitoba, Canada"
+  },
+  "tees-lake": {
+    "lat": 51.5477,
+    "lng": -101.4269,
+    "name": "Tees Lake, Municipality of Roblin, Manitoba, Canada"
+  },
+  "the-lily-pond": {
+    "lat": 49.816,
+    "lng": -95.2658,
+    "name": "The Lily Pond, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "tugby-lake": {
+    "lat": 50.1781,
+    "lng": -95.3884,
+    "name": "Tugby Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "twin-lake": {
+    "lat": 54.6657,
+    "lng": -101.4532,
+    "name": "Twin Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "two-lake": {
+    "lat": 50.0317,
+    "lng": -95.2103,
+    "name": "Two Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "verrall-lake": {
+    "lat": 51.8524,
+    "lng": -100.8833,
+    "name": "Verrall Lake, Unorganized Division No. 20 (South), Manitoba, Canada"
+  },
+  "virgin-lake": {
+    "lat": 52.6303,
+    "lng": -101.4402,
+    "name": "Virgin Lake, Unorganized Division No. 20 (North), Manitoba, Canada"
+  },
+  "wahtopanah-lake": {
+    "lat": 50.06,
+    "lng": -100.1721,
+    "name": "Lake Wahtopanah, Riverdale Municipality, Manitoba, Canada"
+  },
+  "wargatie-lake": {
+    "lat": 50.6089,
+    "lng": -100.342,
+    "name": "Wargatie Lake, Municipality of Harrison Park, Manitoba, Canada"
+  },
+  "wasp-lake": {
+    "lat": 50.307,
+    "lng": -95.4553,
+    "name": "Wasp Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "webster-lake": {
+    "lat": 54.5197,
+    "lng": -101.0946,
+    "name": "Webster Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "whiskey-jack-lake": {
+    "lat": 58.4476,
+    "lng": -101.8846,
+    "name": "Whiskey Jack Lake, Unorganized Division No. 23, Manitoba, Canada"
+  },
+  "whitemouth-lake": {
+    "lat": 49.242,
+    "lng": -95.6835,
+    "name": "Whitemouth Lake, Unorganized Division No. 1, Manitoba, Canada"
+  },
+  "lake-of-the-woods": {
+    "lat": 49.3016,
+    "lng": -94.6696,
+    "name": "Lake of the Woods, Rainy River District, Northwestern Ontario, Ontario, P0X 1C0,"
+  },
+  "lake-metigoshe": {
+    "lat": 48.9833,
+    "lng": -100.3504,
+    "name": "Metigoshe Lake, Lake Metigoshe Bike Path, Bottineau County, North Dakota, United"
+  },
+  "cranberry-lakes": {
+    "lat": 54.647,
+    "lng": -101.1871,
+    "name": "Second Cranberry Lake, Unorganized Division No. 21, Manitoba, Canada"
+  },
+  "minnedosa-trout-pond": {
+    "lat": 50.2499,
+    "lng": -99.8385,
+    "name": "Minnedosa, Manitoba, R0J 1E0, Canada"
+  },
+  "minnedosa-lake": {
+    "lat": 50.2499,
+    "lng": -99.8385,
+    "name": "Minnedosa, Manitoba, R0J 1E0, Canada"
+  },
+  "beaufort-lake": {
+    "lat": 50.5361142,
+    "lng": -100.1898459
+  }
 }

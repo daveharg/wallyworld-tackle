@@ -105,10 +105,10 @@ export async function POST(req: NextRequest) {
   const inviteCode = await generateInviteCode();
   const created = await queryOne<{ id: string }>(
     `INSERT INTO fm_tournaments
-       (name, description, organizer_id, lake_ids, species, starts_at, ends_at, rules, scoring, invite_code, max_participants, entry_fee_cents, payouts)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+       (name, description, organizer_id, lake_ids, species, starts_at, ends_at, rules, scoring, invite_code, max_participants, entry_fee_cents, payouts, auto_approve_entries)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
      RETURNING id`,
-    [name, description, me.id, lakeIds, species, start.toISOString(), end.toISOString(), rules, scoring, inviteCode, maxParticipants, entryFeeCents, JSON.stringify(payouts)]
+    [name, description, me.id, lakeIds, species, start.toISOString(), end.toISOString(), rules, scoring, inviteCode, maxParticipants, entryFeeCents, JSON.stringify(payouts), body.auto_approve_entries === true]
   );
   // The organizer is automatically a participant.
   await queryOne(

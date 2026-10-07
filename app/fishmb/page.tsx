@@ -108,8 +108,8 @@ export default function FishMBHome() {
             {[
               [
                 "📸",
-                "Picture time is server-stamped",
-                "The clock that counts is ours — the catch is stamped the moment the picture is taken inside the FishMB app. An old photo from last summer can't be entered: it only counts if the picture was taken inside your tournament window.",
+                "Phone timestamp is official",
+                "The catch is stamped with the phone's clock the moment the picture is taken — on the website or in the app, even with no service. A catch made inside your tournament window counts even if it uploads hours later. The app snaps photos in-app only; every website entry passes organizer review.",
               ],
               [
                 "📍",
@@ -180,6 +180,49 @@ export default function FishMBHome() {
           </div>
         </div>
       </section>
+
+      {/* Upcoming tournaments */}
+      {tournaments.length > 0 && (
+        <section className="max-w-7xl mx-auto px-4 mt-12 md:mt-16">
+          <SectionHeading
+            eyebrow="Compete"
+            title="Upcoming Manitoba tournaments"
+          />
+          <p className="-mt-3 mb-6 text-sm text-pine/55">
+            Researched {tourneyUpdated ? `on ${tourneyUpdated}` : "recently"} —
+            always confirm dates and entry details with the organizer.
+          </p>
+          <HSlider>
+            {tournaments.map((t) => (
+              <a
+                key={t.name}
+                href={t.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="snap-start shrink-0 w-72 md:w-80 bg-white border border-pine/10 rounded-2xl p-6 flex flex-col hover:-translate-y-1 hover:shadow-xl transition-all"
+              >
+                <p className="text-signal font-bold uppercase tracking-[0.2em] text-xs mb-2">
+                  {t.dates}
+                </p>
+                <h3 className="font-display font-bold text-pine text-xl uppercase tracking-wide mb-1">
+                  {t.name}
+                </h3>
+                <p className="text-pine/55 text-sm font-bold mb-3">{t.location}</p>
+                <p className="text-pine/70 text-sm line-clamp-4 flex-1">
+                  {t.description}
+                </p>
+                {t.entry && (
+                  <p className="text-pine/55 text-sm mt-3">Entry: {t.entry}</p>
+                )}
+                <span className="text-signal-dark text-sm font-bold uppercase tracking-wider mt-4">
+                  Details →
+                </span>
+              </a>
+            ))}
+          </HSlider>
+        </section>
+      )}
+
 
       {/* Biting right now */}
       <section className="max-w-7xl mx-auto px-4 mt-12 md:mt-16">
@@ -354,48 +397,6 @@ export default function FishMBHome() {
           ))}
         </HSlider>
       </section>
-
-      {/* Upcoming tournaments */}
-      {tournaments.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 mt-12 md:mt-16">
-          <SectionHeading
-            eyebrow="Compete"
-            title="Upcoming Manitoba tournaments"
-          />
-          <p className="-mt-3 mb-6 text-sm text-pine/55">
-            Researched {tourneyUpdated ? `on ${tourneyUpdated}` : "recently"} —
-            always confirm dates and entry details with the organizer.
-          </p>
-          <HSlider>
-            {tournaments.map((t) => (
-              <a
-                key={t.name}
-                href={t.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="snap-start shrink-0 w-72 md:w-80 bg-white border border-pine/10 rounded-2xl p-6 flex flex-col hover:-translate-y-1 hover:shadow-xl transition-all"
-              >
-                <p className="text-signal font-bold uppercase tracking-[0.2em] text-xs mb-2">
-                  {t.dates}
-                </p>
-                <h3 className="font-display font-bold text-pine text-xl uppercase tracking-wide mb-1">
-                  {t.name}
-                </h3>
-                <p className="text-pine/55 text-sm font-bold mb-3">{t.location}</p>
-                <p className="text-pine/70 text-sm line-clamp-4 flex-1">
-                  {t.description}
-                </p>
-                {t.entry && (
-                  <p className="text-pine/55 text-sm mt-3">Entry: {t.entry}</p>
-                )}
-                <span className="text-signal-dark text-sm font-bold uppercase tracking-wider mt-4">
-                  Details →
-                </span>
-              </a>
-            ))}
-          </HSlider>
-        </section>
-      )}
 
       {/* Stats band */}
       <section className="max-w-7xl mx-auto px-4 mt-12 md:mt-16">

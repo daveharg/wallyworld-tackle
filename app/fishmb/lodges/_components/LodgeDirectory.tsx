@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { LodgeMap, type MapLodge } from "./LodgeMap";
+import { RequestLodge } from "./RequestLodge";
 import coordsJson from "@/public/fishmb/lodge-coords.json";
 
 const COORDS = coordsJson as Record<string, { lat: number; lng: number }>;
@@ -115,6 +116,7 @@ export default function LodgeDirectory({ lodges }: { lodges: SlimLodge[] }) {
       {filtered.length === 0 && (
         <p className="text-pine/60 py-12 text-center">No matches. Try a different search.</p>
       )}
+      <RequestLodge />
     </>
   );
 }

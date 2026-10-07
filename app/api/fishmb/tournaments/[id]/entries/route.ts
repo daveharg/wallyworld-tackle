@@ -22,6 +22,7 @@ import {
 import {
   getTournament,
   getEntries,
+  getEntriesForViewer,
   isParticipant,
   gpsInManitoba,
 } from "@/lib/fish/tournaments";
@@ -35,7 +36,11 @@ export async function GET(
   if (!t) return notFound("Tournament not found.");
   const me = await fishUserFromRequest(req);
   const organizer = !!me && me.id === t.organizer_id;
-  const entries = await getEntries(t.id, organizer ? ["pending", "approved", "rejected"] : ["approved"]);
+  // Organizers see everything; anglers see approved entries plus their own
+  // pending ones (so a submission never feels like it vanished).
+  const entries = organizer
+    ? await getEntries(t.id, ["pending", "approved", "rejected"])
+    : await getEntriesForViewer(t.id, me ? me.id : null);
   return NextResponse.json({ tournament: t, entries, is_organizer: organizer });
 }
 
@@ -116,10 +121,10 @@ export async function POST(
 
   const entry = await queryOne(
     `INSERT INTO fm_tournament_entries
-       (tournament_id, user_id, photo_url, species, length_inches, latitude, longitude, gps_accuracy, notes, photo_hash, captured_at, time_flag)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
+       (tournament_id, user_id, photo_url, species, length_inches, latitude, longitude, gps_accuracy, notes, photo_hash, captured_at, time_flag, status)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
      RETURNING *`,
-    [t.id, me.id, photoUrl, species, lengthIn, lat, lng, acc, notes, photoHash, capturedAt.toISOString(), timeFlag]
+    [t.id, me.id, photoUrl, species, lengthIn, lat, lng, acc, notes, photoHash, capturedAt.toISOString(), timeFlag, t.auto_approve_entries ? "approved" : "pending"]
   );
   return NextResponse.json({ entry }, { status: 201 });
 }

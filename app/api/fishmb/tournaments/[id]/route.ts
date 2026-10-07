@@ -82,6 +82,8 @@ export async function PATCH(
     set("max_participants", body.max_participants === null ? null : Math.min(Math.floor(body.max_participants as number), 10000));
   if (typeof body.entry_fee_cents === "number" && body.entry_fee_cents >= 0)
     set("entry_fee_cents", Math.min(Math.floor(body.entry_fee_cents), 10000000));
+  if (typeof body.auto_approve_entries === "boolean")
+    set("auto_approve_entries", body.auto_approve_entries);
   if (Array.isArray(body.payouts))
     set(
       "payouts",

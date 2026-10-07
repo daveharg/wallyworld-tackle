@@ -43,6 +43,7 @@ export interface Tournament {
   max_participants: number | null;
   entry_fee_cents: number;
   payouts: PayoutTier[];
+  auto_approve_entries: boolean;
   created_at: string;
   participant_count: number;
   entry_count: number;
@@ -120,6 +121,26 @@ export async function ensureTournamentTables(): Promise<void> {
   // Money: entry fee in cents + payout structure (JSON array of {place,type:'percent'|'amount',value}).
   await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS entry_fee_cents int NOT NULL DEFAULT 0`);
   await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS payouts jsonb NOT NULL DEFAULT '[]'`);
+  // Friendly/demo tournaments can skip organizer review (Dave's call — real
+  // tournaments keep manual approval as the anti-cheat default).
+  await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS auto_approve_entries boolean NOT NULL DEFAULT false`);
+  // One-time repair: the seeded demo's posted rules say entries are
+  // auto-approved, so honor that and clear the stuck "pending" backlog.
+  // (Organizer ownership is left alone — it isn't needed for this fix.)
+  await query(`
+    UPDATE fm_tournaments
+       SET auto_approve_entries = true
+     WHERE UPPER(invite_code) = 'DEMO12'
+       AND auto_approve_entries = false
+  `);
+  await query(`
+    UPDATE fm_tournament_entries e
+       SET status = 'approved'
+      FROM fm_tournaments t
+     WHERE e.tournament_id = t.id
+       AND UPPER(t.invite_code) = 'DEMO12'
+       AND e.status = 'pending'
+  `);
   await query(
     `CREATE INDEX IF NOT EXISTS fm_tournament_entries_tournament_idx ON fm_tournament_entries(tournament_id, status)`
   );
@@ -199,6 +220,27 @@ export async function getEntries(tournamentId: string, statuses: string[]): Prom
      WHERE e.tournament_id = $1 AND e.status = ANY($2)
      ORDER BY e.created_at DESC`,
     [tournamentId, statuses]
+  );
+}
+
+/** What a non-organizer may see: approved entries plus their own pending ones. */
+export async function getEntriesForViewer(
+  tournamentId: string,
+  viewerId: string | null
+): Promise<TournamentEntry[]> {
+  await ensureTournamentTables();
+  return query<TournamentEntry>(
+    `SELECT e.*, u.name AS user_name, u.avatar_url,
+       (SELECT d.id FROM fm_tournament_entries d
+         WHERE d.tournament_id = e.tournament_id AND d.photo_hash = e.photo_hash
+           AND d.id <> e.id AND d.created_at < e.created_at
+         ORDER BY d.created_at ASC LIMIT 1) AS duplicate_of
+     FROM fm_tournament_entries e
+     JOIN fm_users u ON u.id = e.user_id
+     WHERE e.tournament_id = $1
+       AND (e.status = 'approved' OR ($2::uuid IS NOT NULL AND e.user_id = $2::uuid AND e.status = 'pending'))
+     ORDER BY e.created_at DESC`,
+    [tournamentId, viewerId]
   );
 }
 

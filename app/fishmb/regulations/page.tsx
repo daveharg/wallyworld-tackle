@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getZones, getGuideUrl, getLakes } from "@/lib/fishmb";
+import { LakeSearch } from "./_components/LakeSearch";
 
 export const metadata: Metadata = {
   title: "Manitoba fishing regulations 2026",
@@ -38,11 +39,13 @@ export default function RegulationsPage() {
         href={guideUrl}
         target="_blank"
         rel="noreferrer"
-        className="inline-flex items-center gap-2 bg-pine text-white text-sm font-bold uppercase tracking-wider px-6 py-3 rounded-full hover:bg-pine-deep transition-colors mb-10"
+        className="inline-flex items-center gap-2 bg-pine text-white text-sm font-bold uppercase tracking-wider px-6 py-3 rounded-full hover:bg-pine-deep transition-colors mb-8"
       >
         Official Anglers&apos; Guide (PDF)
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17 17 7M8 7h9v9" /></svg>
       </a>
+
+      <LakeSearch />
 
       <div className="space-y-10">
         {zones.map((z) => (

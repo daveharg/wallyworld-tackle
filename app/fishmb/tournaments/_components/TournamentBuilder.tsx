@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useFishAuth } from "../../_components/FishAuth";
 import { fishFetch } from "../../_components/fishFetch";
 import { PayoutEditor } from "./PayoutEditor";
+import { RULE_TEMPLATES } from "./ruleTemplates";
 import type { PayoutTier } from "@/lib/fish/tournaments";
 
 interface LakeOpt {
@@ -33,6 +34,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
   const [species, setSpecies] = useState<string[]>(["Walleye"]);
   const [entryFee, setEntryFee] = useState("");
   const [payouts, setPayouts] = useState<PayoutTier[]>([]);
+  const [autoApprove, setAutoApprove] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -70,6 +72,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
           max_participants: null,
           entry_fee_cents: Math.max(0, Math.round((parseFloat(entryFee) || 0) * 100)),
           payouts,
+          auto_approve_entries: autoApprove,
         }),
       });
       router.push(`/fishmb/tournaments/${data.tournament.id}/manage`);
@@ -137,7 +140,21 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
           </div>
           <div>
             <label className={labelCls}>Rules</label>
-            <textarea value={rules} onChange={(e) => setRules(e.target.value)} rows={4} placeholder="Catch-photo rules, measuring requirements, boundaries, prizes…" className={inputCls} />
+            <div className="flex flex-wrap gap-2 mb-2">
+              <span className="text-xs text-pine/50 self-center mr-1">Start from:</span>
+              {RULE_TEMPLATES.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  title={t.description}
+                  onClick={() => setRules(t.rules)}
+                  className="text-xs font-bold bg-white border border-pine/20 text-pine/70 hover:border-signal hover:text-signal-dark rounded-full px-3.5 py-1.5 transition-colors"
+                >
+                  {t.name}
+                </button>
+              ))}
+            </div>
+            <textarea value={rules} onChange={(e) => setRules(e.target.value)} rows={6} placeholder="Catch-photo rules, measuring requirements, boundaries, prizes… or pick a template above." className={inputCls} />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -162,6 +179,22 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
             <p className="text-xs text-pine/50 mt-2">
               Each place pays a % of the pot or a fixed $ amount. Leave empty for bragging rights.
             </p>
+          </div>
+          <div className="flex items-start gap-3 bg-white border border-pine/15 rounded-2xl p-4">
+            <input
+              type="checkbox"
+              id="autoApprove"
+              checked={autoApprove}
+              onChange={(e) => setAutoApprove(e.target.checked)}
+              className="mt-1 w-4 h-4 accent-[#C2410C]"
+            />
+            <label htmlFor="autoApprove" className="text-sm text-pine">
+              <span className="font-bold">Auto-approve catches</span>
+              <span className="block text-pine/55 text-xs mt-1">
+                For friendly and demo tournaments — catches hit the leaderboard instantly. Leave off
+                for competitive tournaments so you review every catch first.
+              </span>
+            </label>
           </div>
         </div>
       )}

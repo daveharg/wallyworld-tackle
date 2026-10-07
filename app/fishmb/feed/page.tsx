@@ -9,14 +9,19 @@ import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 interface FeedItem {
   id: string;
   kind: "catch" | "post";
+  user_id: string;
   user_name: string;
   avatar_url: string | null;
   body: string | null;
   photo_url: string | null;
+  photos: string[];
   species: string | null;
   length_in: number | null;
   visibility?: string;
   comment_count: number;
+  like_count: number;
+  dislike_count: number;
+  viewer_reaction: 1 | -1 | null;
   created_at: string;
 }
 
@@ -45,6 +50,120 @@ function Avatar({ name, url }: { name: string; url: string | null }) {
     <span className="w-10 h-10 rounded-full bg-signal text-white flex items-center justify-center font-bold">
       {name.charAt(0).toUpperCase()}
     </span>
+  );
+}
+
+/** Photos for a card: all attached photos, falling back to the legacy single photo_url. */
+function cardPhotos(item: FeedItem): string[] {
+  if (item.photos && item.photos.length > 0) return item.photos;
+  return item.photo_url ? [item.photo_url] : [];
+}
+
+function PhotoCarousel({ photos }: { photos: string[] }) {
+  const [idx, setIdx] = useState(0);
+  if (photos.length === 0) return null;
+  const go = (d: number) => setIdx((i) => (i + d + photos.length) % photos.length);
+  return (
+    <div className="mt-3 rounded-2xl overflow-hidden bg-pine-deep/10 relative">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={photos[idx]}
+        alt=""
+        className="w-full max-h-96 object-cover"
+        loading="lazy"
+      />
+      {photos.length > 1 && (
+        <>
+          <button
+            onClick={() => go(-1)}
+            aria-label="Previous photo"
+            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 text-white text-sm font-bold"
+          >
+            ‹
+          </button>
+          <button
+            onClick={() => go(1)}
+            aria-label="Next photo"
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 text-white text-sm font-bold"
+          >
+            ›
+          </button>
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+            {photos.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setIdx(i)}
+                aria-label={`Photo ${i + 1}`}
+                className={`w-2 h-2 rounded-full transition-colors ${
+                  i === idx ? "bg-white" : "bg-white/50"
+                }`}
+              />
+            ))}
+          </div>
+          <span className="absolute top-2 right-2 text-[11px] font-bold text-white bg-black/50 rounded-full px-2 py-0.5">
+            {idx + 1}/{photos.length}
+          </span>
+        </>
+      )}
+    </div>
+  );
+}
+
+function Reactions({
+  item,
+  onReacted,
+}: {
+  item: FeedItem;
+  onReacted: (id: string, r: { like_count: number; dislike_count: number; viewer_reaction: 1 | -1 | null }) => void;
+}) {
+  const { user, openLogin } = useFishAuth();
+  const [busy, setBusy] = useState(false);
+
+  const react = async (value: 1 | -1) => {
+    if (!user) {
+      openLogin();
+      return;
+    }
+    if (busy) return;
+    setBusy(true);
+    // Tapping the active reaction again removes it.
+    const next = item.viewer_reaction === value ? null : value;
+    try {
+      const d = await fishFetch(`/api/fishmb/feed/${item.id}/react`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ value: next }),
+      });
+      onReacted(item.id, d);
+    } catch {
+      // non-fatal
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const btn = (value: 1 | -1, icon: string, count: number, label: string) => {
+    const active = item.viewer_reaction === value;
+    return (
+      <button
+        onClick={() => react(value)}
+        disabled={busy}
+        aria-label={label}
+        className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full transition-colors ${
+          active ? "bg-signal/15 text-signal-dark" : "text-pine/50 hover:bg-pine/5"
+        }`}
+      >
+        <span className={active ? "" : "grayscale opacity-60"}>{icon}</span>
+        {count}
+      </button>
+    );
+  };
+
+  return (
+    <div className="flex items-center gap-1">
+      {btn(1, "👍", item.like_count, "Like")}
+      {btn(-1, "👎", item.dislike_count, "Dislike")}
+    </div>
   );
 }
 
@@ -124,9 +243,12 @@ export default function FeedPage() {
   const [items, setItems] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"all" | "catch" | "post">("all");
+  const [q, setQ] = useState("");
+  const [activeQ, setActiveQ] = useState("");
   const [mode, setMode] = useState<"post" | "catch">("post");
   const [draft, setDraft] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
+  const [postPhotos, setPostPhotos] = useState<File[]>([]);
   const [posting, setPosting] = useState(false);
   const [visibility, setVisibility] = useState<"public" | "friends" | "private">("public");
   const [catchSpecies, setCatchSpecies] = useState("");
@@ -136,9 +258,11 @@ export default function FeedPage() {
   const [catchNote, setCatchNote] = useState<string | null>(null);
   const [openComments, setOpenComments] = useState<Set<string>>(new Set());
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (query?: string) => {
+    setLoading(true);
     try {
-      const d = await fishFetch("/api/fishmb/feed?limit=40");
+      const qs = query && query.trim() ? `?limit=40&q=${encodeURIComponent(query.trim())}` : "?limit=40";
+      const d = await fishFetch(`/api/fishmb/feed${qs}`);
       setItems(d.items);
     } catch {
       // non-fatal
@@ -150,6 +274,25 @@ export default function FeedPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  const runSearch = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    setActiveQ(q.trim());
+    load(q.trim());
+  };
+
+  const clearSearch = () => {
+    setQ("");
+    setActiveQ("");
+    load();
+  };
+
+  const handleReacted = (
+    id: string,
+    r: { like_count: number; dislike_count: number; viewer_reaction: 1 | -1 | null }
+  ) => {
+    setItems((prev) => prev.map((it) => (it.id === id ? { ...it, ...r } : it)));
+  };
 
   // My tournaments for the "also enter in tournament" picker.
   useEffect(() => {
@@ -182,20 +325,23 @@ export default function FeedPage() {
     setPosting(true);
     setCatchNote(null);
     try {
-      let photoUrl: string | null = null;
-      if (photo) photoUrl = await uploadPhoto(photo);
+      const urls: string[] = [];
+      for (const f of postPhotos.slice(0, 4)) {
+        urls.push(await uploadPhoto(f));
+      }
       const d = await fishFetch("/api/fishmb/feed", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           body: draft.trim(),
-          photo_url: photoUrl,
+          photo_url: urls[0] ?? null,
+          photos: urls,
           visibility: visibility === "private" ? "public" : visibility,
         }),
       });
       setItems([d.item, ...items]);
       setDraft("");
-      setPhoto(null);
+      setPostPhotos([]);
     } catch (e) {
       setCatchNote(e instanceof Error ? e.message : "Could not post.");
     } finally {
@@ -321,14 +467,40 @@ export default function FeedPage() {
                   placeholder="How's the bite? Share a report…"
                   className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal resize-none"
                 />
+                {postPhotos.length > 0 && (
+                  <div className="flex gap-2 mt-3 flex-wrap">
+                    {postPhotos.map((f, i) => (
+                      <span
+                        key={i}
+                        className="relative text-xs font-bold text-pine/70 bg-pine/5 rounded-full pl-3 pr-2 py-1.5"
+                      >
+                        📷 {f.name.slice(0, 20)}
+                        <button
+                          onClick={() => setPostPhotos(postPhotos.filter((_, j) => j !== i))}
+                          aria-label={`Remove ${f.name}`}
+                          className="ml-1.5 text-pine/50 hover:text-signal-dark font-bold"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
                 <div className="flex items-center justify-between mt-3 gap-2 flex-wrap">
                   <label className="text-sm font-bold text-signal-dark cursor-pointer">
-                    {photo ? `📷 ${photo.name.slice(0, 24)}` : "📷 Add photo"}
+                    {postPhotos.length > 0
+                      ? `📷 ${postPhotos.length}/4 photos`
+                      : "📷 Add photos (up to 4)"}
                     <input
                       type="file"
                       accept="image/jpeg,image/png,image/webp"
+                      multiple
                       className="hidden"
-                      onChange={(e) => setPhoto(e.target.files?.[0] || null)}
+                      onChange={(e) => {
+                        const picked = Array.from(e.target.files ?? []).slice(0, 4 - postPhotos.length);
+                        if (picked.length) setPostPhotos([...postPhotos, ...picked].slice(0, 4));
+                        e.target.value = "";
+                      }}
                     />
                   </label>
                   <div className="flex items-center gap-2">
@@ -449,6 +621,33 @@ export default function FeedPage() {
       </p>
 
       {/* Tabs */}
+      <form onSubmit={runSearch} className="flex gap-2 mb-4">
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Search the feed…"
+          className="flex-1 bg-white border border-pine/15 rounded-full px-4 py-2.5 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal"
+        />
+        <button
+          type="submit"
+          className="bg-pine text-white text-xs font-bold uppercase tracking-wider px-5 rounded-full"
+        >
+          Search
+        </button>
+      </form>
+      {activeQ && (
+        <div className="flex items-center gap-2 mb-4">
+          <p className="text-sm text-pine/60">
+            Results for <span className="font-bold text-pine">“{activeQ}”</span>
+          </p>
+          <button
+            onClick={clearSearch}
+            className="text-xs font-bold text-signal-dark hover:underline"
+          >
+            Clear ✕
+          </button>
+        </div>
+      )}
       <div className="flex gap-2 mb-6">
         {(
           [
@@ -477,7 +676,9 @@ export default function FeedPage() {
           ))}
         </div>
       ) : visible.length === 0 ? (
-        <p className="text-pine/55 text-center py-10">Nothing here yet — be the first to post.</p>
+        <p className="text-pine/55 text-center py-10">
+          {activeQ ? `No posts match “${activeQ}”.` : "Nothing here yet — be the first to post."}
+        </p>
       ) : (
         <div className="space-y-4">
           {visible.map((item) => (
@@ -485,7 +686,9 @@ export default function FeedPage() {
               <div className="flex items-center gap-3 mb-3">
                 <Avatar name={item.user_name} url={item.avatar_url} />
                 <div>
-                  <p className="font-bold text-pine text-sm">{item.user_name}</p>
+                  <Link href={`/fishmb/anglers/${item.user_id}`} className="font-bold text-pine text-sm hover:text-signal-dark">
+                    {item.user_name}
+                  </Link>
                   <p className="text-xs text-pine/45">
                     {timeAgo(item.created_at)} · {item.kind === "catch" ? "logged a catch" : "posted"}
                     {item.visibility === "friends" && " · 👥 friends only"}
@@ -504,18 +707,16 @@ export default function FeedPage() {
                 </p>
               )}
               {item.body && <p className="text-pine/80 text-sm whitespace-pre-line">{item.body}</p>}
-              {item.photo_url && (
-                <div className="mt-3 rounded-2xl overflow-hidden bg-pine-deep/10">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={item.photo_url} alt="" className="w-full max-h-96 object-cover" loading="lazy" />
-                </div>
-              )}
-              <button
-                onClick={() => toggleComments(item.id)}
-                className="mt-3 text-xs font-bold uppercase tracking-wider text-pine/50 hover:text-signal-dark"
-              >
-                💬 {item.comment_count} {item.comment_count === 1 ? "comment" : "comments"}
-              </button>
+              <PhotoCarousel photos={cardPhotos(item)} />
+              <div className="mt-3 flex items-center justify-between">
+                <Reactions item={item} onReacted={handleReacted} />
+                <button
+                  onClick={() => toggleComments(item.id)}
+                  className="text-xs font-bold uppercase tracking-wider text-pine/50 hover:text-signal-dark"
+                >
+                  💬 {item.comment_count} {item.comment_count === 1 ? "comment" : "comments"}
+                </button>
+              </div>
               {openComments.has(item.id) && <Comments postId={item.id} />}
             </article>
           ))}
