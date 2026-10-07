@@ -2,6 +2,10 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { LodgeMap, type MapLodge } from "./LodgeMap";
+import coordsJson from "@/public/fishmb/lodge-coords.json";
+
+const COORDS = coordsJson as Record<string, { lat: number; lng: number }>;
 
 export interface SlimLodge {
   id: string;
@@ -34,8 +38,26 @@ export default function LodgeDirectory({ lodges }: { lodges: SlimLodge[] }) {
     });
   }, [q, kind, lodges]);
 
+  const mapLodges: MapLodge[] = useMemo(
+    () =>
+      filtered
+        .filter((l) => COORDS[l.id])
+        .map((l) => ({
+          id: l.id,
+          name: l.name,
+          location: l.location,
+          lat: COORDS[l.id].lat,
+          lng: COORDS[l.id].lng,
+        })),
+    [filtered]
+  );
+
   return (
     <>
+      <div className="mb-8">
+        <LodgeMap lodges={mapLodges} />
+      </div>
+
       <div className="bg-white rounded-2xl border border-pine/10 p-4 md:p-5 shadow-sm mb-8">
         <input
           value={q}

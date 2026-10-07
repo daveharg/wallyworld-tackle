@@ -61,9 +61,17 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
       )}
 
       {/* Leaderboard */}
-      <h2 className="font-display font-bold uppercase text-pine text-2xl md:text-3xl tracking-wide mt-12 mb-4">
-        Leaderboard
-      </h2>
+      <div className="flex items-center justify-between mt-12 mb-4">
+        <h2 className="font-display font-bold uppercase text-pine text-2xl md:text-3xl tracking-wide">
+          Leaderboard
+        </h2>
+        <Link
+          href={`/fishmb/tournaments/${t.id}/leaderboard`}
+          className="bg-pine-deep text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full hover:bg-pine transition-colors"
+        >
+          ⛶ Full-screen board
+        </Link>
+      </div>
       {leaderboard.length === 0 ? (
         <p className="text-pine/55">No approved catches yet — the board lights up once the organizer approves entries.</p>
       ) : (

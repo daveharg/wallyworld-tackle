@@ -122,7 +122,15 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
         ← View tournament
       </Link>
       <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide mt-4 mb-2">{t.name}</h1>
-      <p className="text-pine/60 mb-8">Organizer dashboard</p>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
+        <p className="text-pine/60">Organizer dashboard</p>
+        <Link
+          href={`/fishmb/tournaments/${t.id}/leaderboard`}
+          className="bg-pine-deep text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full hover:bg-pine transition-colors"
+        >
+          ⛶ Full-screen board
+        </Link>
+      </div>
 
       {/* Catch map — every GPS-stamped catch plotted, for boundary checks */}
       <section className="mb-8">

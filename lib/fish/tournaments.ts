@@ -159,6 +159,14 @@ export async function listTournaments(): Promise<Tournament[]> {
   return query<Tournament>(`${TOURNAMENT_SELECT} ORDER BY t.starts_at ASC`);
 }
 
+/** Published tournaments (upcoming or running) for the homepage list. */
+export async function listPublicTournaments(): Promise<Tournament[]> {
+  await ensureTournamentTables();
+  return query<Tournament>(
+    `${TOURNAMENT_SELECT} WHERE t.status IN ('upcoming', 'active') ORDER BY t.starts_at ASC LIMIT 12`
+  );
+}
+
 export async function isParticipant(tournamentId: string, userId: string): Promise<boolean> {
   const row = await queryOne(
     `SELECT 1 FROM fm_tournament_participants WHERE tournament_id = $1 AND user_id = $2`,

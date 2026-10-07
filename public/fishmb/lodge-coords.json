@@ -1,0 +1,549 @@
+{
+ "ace-wilderness-guiding": {
+  "lat": 50.2066,
+  "lng": -97.6578
+ },
+ "agassiz-outfitters": {
+  "lat": 51.0032,
+  "lng": -98.7793,
+  "via": "lake-manitoba"
+ },
+ "aikens-lake-wilderness-lodge": {
+  "lat": 51.2135,
+  "lng": -95.3296,
+  "via": "aikens-lake"
+ },
+ "bakers-narrows-lodge": {
+  "lat": 54.6049,
+  "lng": -101.673,
+  "via": "lake-athapapuskow"
+ },
+ "barrier-bay-resort": {
+  "lat": 50.1691,
+  "lng": -95.7442
+ },
+ "bennett-lake-lodge": {
+  "lat": 50.996,
+  "lng": -95.4047
+ },
+ "betula-lake-resort": {
+  "lat": 50.052,
+  "lng": -95.5882,
+  "via": "betula-lake"
+ },
+ "big-grass-outfitters": {
+  "lat": 50.7805,
+  "lng": -101.2879
+ },
+ "big-sand-lake-lodge": {
+  "lat": 57.6975,
+  "lng": -99.7522,
+  "via": "big-sand-lake"
+ },
+ "big-whiteshell-lodge": {
+  "lat": 50.076,
+  "lng": -95.3478,
+  "via": "big-whiteshell-lake"
+ },
+ "birdtail-waterfowl": {
+  "lat": 49.8955,
+  "lng": -97.1385
+ },
+ "blackwater-cats-outfitter": {
+  "lat": 52.1117,
+  "lng": -97.9454,
+  "via": "lake-winnipeg"
+ },
+ "blue-lakes-resort": {
+  "lat": 51.574,
+  "lng": -100.9112,
+  "via": "east-blue-lake"
+ },
+ "bolton-lake-lodge": {
+  "lat": 54.2885,
+  "lng": -95.7075,
+  "via": "bolton-lake"
+ },
+ "breezy-creek-adventures": {
+  "lat": 50.3048,
+  "lng": -96.963
+ },
+ "brereton-lake-resort": {
+  "lat": 49.8927,
+  "lng": -95.5643,
+  "via": "brereton-lake"
+ },
+ "bruin-outfitting": {
+  "lat": 52.1343,
+  "lng": -97.9467,
+  "via": "lake-winnipeg"
+ },
+ "budds-gunisao-lake-lodge": {
+  "lat": 53.5609,
+  "lng": -96.3115,
+  "via": "gunisao-lake"
+ },
+ "burntwood-lake-lodge": {
+  "lat": 55.5103,
+  "lng": -100.6597,
+  "via": "burntwood-lake"
+ },
+ "caddy-lake-resort": {
+  "lat": 50.9686,
+  "lng": -98.7908,
+  "via": "lake-manitoba"
+ },
+ "carpenters-clearwater-lake-lodge": {
+  "lat": 54.086,
+  "lng": -101.0525,
+  "via": "clearwater-lake"
+ },
+ "cat-eye-outfitter": {
+  "lat": 52.1396,
+  "lng": -97.9796,
+  "via": "lake-winnipeg"
+ },
+ "catdaddy-fishing-guide-service": {
+  "lat": 52.1336,
+  "lng": -97.9548,
+  "via": "lake-winnipeg"
+ },
+ "chasing-giants": {
+  "lat": 50.1394,
+  "lng": -96.8389
+ },
+ "childs-lake-lodge": {
+  "lat": 51.6006,
+  "lng": -101.0971,
+  "via": "childs-lake"
+ },
+ "city-cats-guiding-service": {
+  "lat": 52.1264,
+  "lng": -97.9701,
+  "via": "lake-winnipeg"
+ },
+ "cobham-river-lodge": {
+  "lat": 53.1189,
+  "lng": -95.0214
+ },
+ "crescent-beach-cottages": {
+  "lat": 49.7798,
+  "lng": -95.1946,
+  "via": "west-hawk-lake"
+ },
+ "crunch-time-tackle-outfitting": {
+  "lat": 52.1115,
+  "lng": -97.9807,
+  "via": "lake-winnipeg"
+ },
+ "dogskin-lake-lodge": {
+  "lat": 50.6444,
+  "lng": -95.3811,
+  "via": "black-lake-nopiming"
+ },
+ "dunlops-fishing-lodge": {
+  "lat": 52.1294,
+  "lng": -97.9944,
+  "via": "lake-winnipeg"
+ },
+ "dunlops-fly-in-lodge": {
+  "lat": 52.5544,
+  "lng": -101.2189,
+  "via": "bell-lake"
+ },
+ "einarssons-guide-service": {
+  "lat": 51.9768,
+  "lng": -98.2629
+ },
+ "elk-island-lodge": {
+  "lat": 54.7062,
+  "lng": -93.3693,
+  "via": "edmund-lake"
+ },
+ "evergreen-lodge-resort": {
+  "lat": 54.0855,
+  "lng": -101.0756,
+  "via": "clearwater-lake"
+ },
+ "fairy-rock-wilderness-camp": {
+  "lat": 49.8081,
+  "lng": -95.4923,
+  "via": "rock-lake"
+ },
+ "falcon-trails-resort": {
+  "lat": 49.7189,
+  "lng": -95.2457,
+  "via": "falcon-lake"
+ },
+ "fishing-friends-manitoba": {
+  "lat": 51.0681,
+  "lng": -101.4213,
+  "via": "lake-of-the-prairies"
+ },
+ "fly-fishing-manitoba": {
+  "lat": 49.8955,
+  "lng": -97.1385
+ },
+ "for-your-walleyes-only": {
+  "lat": 51.0288,
+  "lng": -101.3875,
+  "via": "lake-of-the-prairies"
+ },
+ "fortwhyte-alive": {
+  "lat": 49.8955,
+  "lng": -97.1385
+ },
+ "gaune-fishin": {
+  "lat": 52.1065,
+  "lng": -97.9429,
+  "via": "lake-winnipeg"
+ },
+ "george-lake-outfitters": {
+  "lat": 52.1045,
+  "lng": -97.9815,
+  "via": "lake-winnipeg"
+ },
+ "gods-lake-haven": {
+  "lat": 54.5916,
+  "lng": -94.4244,
+  "via": "gods-lake"
+ },
+ "gods-river-lodge": {
+  "lat": 54.6385,
+  "lng": -94.4476,
+  "via": "gods-lake"
+ },
+ "greenback-guiding-and-outfitting": {
+  "lat": 52.1071,
+  "lng": -97.9413,
+  "via": "lake-winnipeg"
+ },
+ "gull-harbour-marina": {
+  "lat": 52.1471,
+  "lng": -97.9411,
+  "via": "lake-winnipeg"
+ },
+ "harrop-lake-wilderness-lodge": {
+  "lat": 52.6256,
+  "lng": -96.0131
+ },
+ "harvest-lodge": {
+  "lat": 51.8703,
+  "lng": -99.6655
+ },
+ "hastings-bros-outfitters": {
+  "lat": 52.1117,
+  "lng": -97.9628,
+  "via": "lake-winnipeg"
+ },
+ "healeys-gods-lake-narrows-lodge": {
+  "lat": 54.6011,
+  "lng": -94.4014,
+  "via": "gods-lake"
+ },
+ "ice-hole-fishing-adventures": {
+  "lat": 49.3232,
+  "lng": -99.539,
+  "via": "pelican-lake"
+ },
+ "icebound-excursions": {
+  "lat": 52.1214,
+  "lng": -97.9566,
+  "via": "lake-winnipeg"
+ },
+ "inverness-falls-resort": {
+  "lat": 50.0245,
+  "lng": -95.4195
+ },
+ "jacksons-lodge-outposts": {
+  "lat": 50.2783,
+  "lng": -96.0892,
+  "via": "lac-du-bonnet"
+ },
+ "jessica-lake-lodge": {
+  "lat": 50.0269,
+  "lng": -95.4732,
+  "via": "jessica-lake"
+ },
+ "kannuk-outfitters": {
+  "lat": 52.1316,
+  "lng": -97.9741,
+  "via": "lake-winnipeg"
+ },
+ "keystone-resort": {
+  "lat": 49.7643,
+  "lng": -95.1887,
+  "via": "west-hawk-lake"
+ },
+ "kickerfish": {
+  "lat": 50.0891,
+  "lng": -100.2013,
+  "via": "wahtopanah-lake"
+ },
+ "kilman-resort": {
+  "lat": 51.037,
+  "lng": -101.4034,
+  "via": "lake-of-the-prairies"
+ },
+ "kingsland-outfitting": {
+  "lat": 52.1068,
+  "lng": -97.9732,
+  "via": "lake-winnipeg"
+ },
+ "kississing-lake-lodge": {
+  "lat": 55.1643,
+  "lng": -101.5497,
+  "via": "kississing-lake"
+ },
+ "kitchi-island-outposts": {
+  "lat": 52.0897,
+  "lng": -97.9797,
+  "via": "lake-winnipeg"
+ },
+ "lake-winnipeg-ice-fishing-shack-rentals": {
+  "lat": 52.1302,
+  "lng": -97.9483,
+  "via": "lake-winnipeg"
+ },
+ "lake-winnipeg-outfitters": {
+  "lat": 52.0945,
+  "lng": -97.9815,
+  "via": "lake-winnipeg"
+ },
+ "lakeview-hecla-resort": {
+  "lat": 52.0985,
+  "lng": -97.9785,
+  "via": "lake-winnipeg"
+ },
+ "laurie-river-lodge": {
+  "lat": 56.5452,
+  "lng": -101.5102,
+  "via": "mcgavock-lake"
+ },
+ "little-grand-rapids-lodge": {
+  "lat": 51.9692,
+  "lng": -95.461,
+  "via": "family-lake"
+ },
+ "lynn-lake-fly-in-outpost-camps": {
+  "lat": 51.0108,
+  "lng": -98.819,
+  "via": "lake-manitoba"
+ },
+ "mac-mulligan-guide-service": {
+  "lat": 53.7398,
+  "lng": -101.4325
+ },
+ "medicine-creek-adventures": {
+  "lat": 52.1066,
+  "lng": -97.9468,
+  "via": "lake-winnipeg"
+ },
+ "moak-lodge": {
+  "lat": 53.3285,
+  "lng": -100.3844,
+  "via": "cedar-lake"
+ },
+ "molson-lake-lodge": {
+  "lat": 54.3091,
+  "lng": -95.694,
+  "via": "bolton-lake"
+ },
+ "munroe-lake-lodge": {
+  "lat": 50.0201,
+  "lng": -95.2365,
+  "via": "one-lake"
+ },
+ "narrows-sunset-lodge": {
+  "lat": 50.9828,
+  "lng": -98.8194,
+  "via": "lake-manitoba"
+ },
+ "neso-lake-lodge": {
+  "lat": 54.6935,
+  "lng": -101.5681,
+  "via": "neso-lake"
+ },
+ "north-haven-resort": {
+  "lat": 55.2996,
+  "lng": -95.9646,
+  "via": "utik-lake"
+ },
+ "north-mountain-adventures": {
+  "lat": 51.2827,
+  "lng": -99.7699,
+  "via": "dauphin-lake"
+ },
+ "north-star-executive-outpost": {
+  "lat": 54.9996,
+  "lng": -94.7441,
+  "via": "knee-lake"
+ },
+ "north-star-resort": {
+  "lat": 55.0122,
+  "lng": -94.7288,
+  "via": "knee-lake"
+ },
+ "northern-life-outfitters": {
+  "lat": 52.1434,
+  "lng": -97.9878,
+  "via": "lake-winnipeg"
+ },
+ "northern-lights-lodge": {
+  "lat": 50.9682,
+  "lng": -98.7925,
+  "via": "lake-manitoba"
+ },
+ "nutimik-lodge": {
+  "lat": 52.1261,
+  "lng": -97.9789,
+  "via": "lake-winnipeg"
+ },
+ "otter-falls-resort": {
+  "lat": 50.1043,
+  "lng": -96.0258
+ },
+ "out-of-the-blue-aquatic-adventures": {
+  "lat": 49.5437,
+  "lng": -98.2772,
+  "via": "stephenfield-lake"
+ },
+ "pelican-river-outfitters": {
+  "lat": 52.6838,
+  "lng": -101.1103
+ },
+ "pinewood-lodge": {
+  "lat": 50.9791,
+  "lng": -98.801,
+  "via": "lake-manitoba"
+ },
+ "plum-lake-outfitters": {
+  "lat": 51.2891,
+  "lng": -98.4221
+ },
+ "prairie-gal-fishing": {
+  "lat": 52.1455,
+  "lng": -97.984,
+  "via": "lake-winnipeg"
+ },
+ "pro-am-tackle": {
+  "lat": 49.8955,
+  "lng": -97.1385
+ },
+ "red-river-cats": {
+  "lat": 50.0858,
+  "lng": -96.9425
+ },
+ "riverside-lodge": {
+  "lat": 51.3123,
+  "lng": -99.828,
+  "via": "dauphin-lake"
+ },
+ "riverview-lodge": {
+  "lat": 50.1043,
+  "lng": -96.0258
+ },
+ "sandy-river-outfitters": {
+  "lat": 50.4084,
+  "lng": -95.9942
+ },
+ "sasa-ginni-gak-lodge": {
+  "lat": 51.6228,
+  "lng": -95.661,
+  "via": "sasaginnigak-lake"
+ },
+ "sharrons-outfitting-service": {
+  "lat": 55.1167,
+  "lng": -101.0833
+ },
+ "shield-outfitters": {
+  "lat": 49.7194,
+  "lng": -95.2846,
+  "via": "falcon-lake"
+ },
+ "silsby-lake-lodge": {
+  "lat": 55.4929,
+  "lng": -95.7555
+ },
+ "snobear-expeditions": {
+  "lat": 50.999,
+  "lng": -98.8203,
+  "via": "lake-manitoba"
+ },
+ "south-shore-lodge": {
+  "lat": 52.3764,
+  "lng": -100.0642,
+  "via": "lake-winnipegosis"
+ },
+ "tall-timber-lodge": {
+  "lat": 50.2772,
+  "lng": -96.0711,
+  "via": "lac-du-bonnet"
+ },
+ "tallpine-lodges": {
+  "lat": 49.7946,
+  "lng": -95.1954,
+  "via": "west-hawk-lake"
+ },
+ "tawow-lodge": {
+  "lat": 50.9913,
+  "lng": -98.7759,
+  "via": "lake-manitoba"
+ },
+ "trapper-toms-outfitting": {
+  "lat": 51.7861,
+  "lng": -100.5297
+ },
+ "turtle-tours": {
+  "lat": 49.83,
+  "lng": -97.224
+ },
+ "turtle-village": {
+  "lat": 50.6578,
+  "lng": -99.9719
+ },
+ "viking-lodge": {
+  "lat": 54.5215,
+  "lng": -101.1901,
+  "via": "simonhouse-lake"
+ },
+ "webbers-lodges": {
+  "lat": 58.1003,
+  "lng": -97.07,
+  "via": "north-knife-lake"
+ },
+ "wekusko-falls-lodge": {
+  "lat": 50.9791,
+  "lng": -98.7719,
+  "via": "lake-manitoba"
+ },
+ "wellman-lake-lodge": {
+  "lat": 51.0242,
+  "lng": -98.7819,
+  "via": "lake-manitoba"
+ },
+ "west-hawk-lake-resort": {
+  "lat": 49.7819,
+  "lng": -95.1611,
+  "via": "west-hawk-lake"
+ },
+ "white-lake-resort": {
+  "lat": 54.706,
+  "lng": -101.7598,
+  "via": "white-lake-whiteshell"
+ },
+ "whiteshell-lake-resort": {
+  "lat": 50.07,
+  "lng": -95.3626,
+  "via": "big-whiteshell-lake"
+ },
+ "whiteshell-outfitters": {
+  "lat": 50.1196,
+  "lng": -95.2735,
+  "via": "crowduck-lake"
+ },
+ "wolverine-lodge": {
+  "lat": 56.9996,
+  "lng": -101.4502
+ }
+}

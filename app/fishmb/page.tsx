@@ -18,6 +18,7 @@ import {
 } from "@/lib/fishmb";
 import { getSpeciesAdvice } from "@/lib/fishmb-species";
 import { FISHMB_CTA_PHOTO } from "@/lib/fishmb-constants";
+import { listPublicTournaments } from "@/lib/fish/tournaments";
 
 export const revalidate = 3600;
 
@@ -36,7 +37,8 @@ function toCardLake(l: ReturnType<typeof getLakesForSpecies>[number]) {
   };
 }
 
-export default function FishMBHome() {
+export default async function FishMBHome() {
+  const liveTournaments = await listPublicTournaments().catch(() => []);
   const hot = getHotLakes();
   const stocked = getStockedLakes(12);
   const lodges = getLodges().slice(0, 12);
@@ -71,7 +73,41 @@ export default function FishMBHome() {
             event to specific waters. And every catch is verified before it
             touches the leaderboard:
           </p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+          <div className="flex flex-wrap gap-3 mb-8">
+            <Link
+              href="/fishmb/tournaments/create"
+              className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors"
+            >
+              Create a tournament
+            </Link>
+            <Link
+              href="/fishmb/tournaments"
+              className="border border-pine/25 text-pine hover:bg-pine/5 font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors"
+            >
+              Browse tournaments
+            </Link>
+          </div>
+
+          {/* Offline tournaments */}
+          <div className="bg-pine rounded-3xl p-6 md:p-8 mb-8">
+            <p className="text-gold font-bold uppercase tracking-[0.24em] text-xs mb-2">
+              No signal? No problem
+            </p>
+            <h3 className="font-display font-bold uppercase text-white text-2xl md:text-3xl tracking-wide mb-3">
+              Tournaments work fully offline
+            </h3>
+            <p className="text-white/75 max-w-3xl">
+              Most good fishing spots have zero bars. Anglers open the FishMB
+              app, snap the catch photo right in the app, and it&apos;s stamped
+              with the time and GPS on the spot — no service needed. Everything
+              queues on the phone and uploads automatically, oldest first, when
+              they&apos;re back in range. A catch made inside the tournament
+              window counts even if it uploads hours later.
+            </p>
+          </div>
+
+          {/* Feature boxes — one scrollable row */}
+          <HSlider>
             {[
               [
                 "📸",
@@ -99,31 +135,90 @@ export default function FishMBHome() {
                 "You approve every catch before it hits the leaderboard, and can disqualify with one tap.",
               ],
               [
-                "📶",
-                "Works with no signal",
-                "Catches are logged offline at the boat and upload automatically when anglers are back in range — stamped with the time the picture was taken.",
+                "📵",
+                "Log it at the boat",
+                "Photo, GPS and timestamp are captured offline — the camera roll can't be used, so every entry is the real moment.",
+              ],
+              [
+                "⏱️",
+                "Stamped when taken",
+                "The official catch time is the phone's timestamp at the shutter, not when it uploads.",
+              ],
+              [
+                "🔄",
+                "Syncs itself",
+                "Entries upload on their own when service returns. The leaderboard fills in as anglers come back online.",
+              ],
+              [
+                "📺",
+                "Full-screen leaderboard",
+                "Put the live board on a TV or projector at weigh-in — it refreshes itself, and anyone can open it on their phone.",
               ],
             ].map(([icon, title, body]) => (
-              <div key={title} className="bg-white rounded-2xl border border-pine/10 p-5">
+              <div
+                key={title}
+                className="snap-start shrink-0 w-[260px] md:w-[300px] bg-white rounded-2xl border border-pine/10 p-5 flex flex-col"
+              >
                 <p className="text-2xl mb-2">{icon}</p>
                 <h3 className="font-bold text-pine text-sm uppercase tracking-wide mb-1.5">{title}</h3>
                 <p className="text-pine/60 text-sm">{body}</p>
               </div>
             ))}
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/fishmb/tournaments/create"
-              className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors"
-            >
-              Create a tournament
-            </Link>
-            <Link
-              href="/fishmb/tournaments"
-              className="border border-pine/25 text-pine hover:bg-pine/5 font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors"
-            >
-              Browse tournaments
-            </Link>
+          </HSlider>
+
+          {/* Live tournaments on FishMB */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-display font-bold uppercase text-pine text-2xl tracking-wide">
+                Live on FishMB now
+              </h3>
+              <Link
+                href="/fishmb/tournaments"
+                className="text-signal-dark font-bold text-sm uppercase tracking-wider"
+              >
+                All tournaments →
+              </Link>
+            </div>
+            {liveTournaments.length === 0 ? (
+              <p className="text-pine/55 text-sm bg-white border border-pine/10 rounded-2xl p-6">
+                No tournaments posted yet —{" "}
+                <Link href="/fishmb/tournaments/create" className="text-signal-dark font-bold">
+                  be the first to run one
+                </Link>
+                .
+              </p>
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {liveTournaments.map((t) => (
+                  <Link
+                    key={t.id}
+                    href={`/fishmb/tournaments/${t.id}`}
+                    className="bg-white border border-pine/10 rounded-2xl p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                  >
+                    <p className="text-[11px] font-black uppercase tracking-[0.18em] text-signal mb-1.5">
+                      {t.status === "active" ? "● Happening now" : "Upcoming"}
+                    </p>
+                    <h4 className="font-display font-bold text-pine text-lg uppercase tracking-wide leading-tight mb-1">
+                      {t.name}
+                    </h4>
+                    <p className="text-pine/55 text-sm">
+                      {t.lake_ids?.length > 1
+                        ? `${t.lake_ids.length} lakes`
+                        : t.lake_ids?.length === 1
+                          ? "1 lake"
+                          : "Open waters"}{" "}
+                      · {t.species?.length ? t.species.join(", ") : "All species"}
+                    </p>
+                    <p className="text-pine/45 text-xs mt-2">
+                      {new Date(t.starts_at).toLocaleDateString("en-CA", { month: "short", day: "numeric" })}
+                      {" → "}
+                      {new Date(t.ends_at).toLocaleDateString("en-CA", { month: "short", day: "numeric", year: "numeric" })}
+                      {" · "}{t.entry_count} {t.entry_count === 1 ? "catch" : "catches"}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -144,7 +239,10 @@ export default function FishMBHome() {
       </section>
 
       {/* Species-tabbed lakes */}
-      <SpeciesLakes tabs={speciesTabs} />
+      <SpeciesLakes
+        tabs={speciesTabs}
+        allLakes={getLakes().map(toCardLake)}
+      />
 
       {/* Community */}
       <CommunityBox />
