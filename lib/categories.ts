@@ -49,7 +49,7 @@ export function categoryOf(product: ShopifyProduct): CategoryKey {
   const t = titleOf(product);
 
   // Ice fishing — FIRST, since "ice fishing rod" contains "rod".
-  if (/ice[ -]?fish/.test(t) || /ice (shelter|tent|shack|hut|auger)/.test(t)) return "iceFishing";
+  if (/ice[ -]?fish/.test(t) || /ice (shelter|tent|shack|hut|auger|rod|reel)/.test(t)) return "iceFishing";
 
   // Tackle storage — before rods, since rod-carrier bags contain "rod".
   if (
@@ -180,6 +180,36 @@ export function reelSubcategoryOf(product: ShopifyProduct): ReelSubcategory {
   return "other";
 }
 
+/**
+ * All reel series numbers (e.g. 1000, 2500) found in a product's title and
+ * variant titles. Only round-hundred numbers in a sane range count, so
+ * weights like "153 g" and gear ratios like "7.2:1" are ignored.
+ */
+export function reelSeriesNumbers(product: ShopifyProduct): number[] {
+  const text = `${product.title} ${product.variants.map((v) => v.title).join(" ")}`;
+  const out = new Set<number>();
+  const matches = Array.from(text.matchAll(/\b(\d*00)\b/g));
+  for (const m of matches) {
+    const n = parseInt(m[1], 10);
+    if (n >= 500 && n <= 20000) out.add(n);
+  }
+  return Array.from(out).sort((a, b) => a - b);
+}
+
+export function maxReelSeries(product: ShopifyProduct): number | null {
+  const s = reelSeriesNumbers(product);
+  return s.length ? s[s.length - 1] : null;
+}
+
+/**
+ * Small reels from the main Reels catalog whose largest series is under 3000.
+ * These also show up in the Ice Fishing page's Reels subsection.
+ */
+export function isIceEligibleReel(product: ShopifyProduct): boolean {
+  if (categoryOf(product) !== "reels") return false;
+  const max = maxReelSeries(product);
+  return max !== null && max < 3000;
+}
 /**
  * Check if a reel product has any variants over 5000 series (large species).
  * Parses series numbers like 6000, 7000, 8000, 10000, 14000 from variant titles.

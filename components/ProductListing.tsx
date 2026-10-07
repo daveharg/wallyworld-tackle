@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { ShopifyProduct } from "../lib/shopify";
-import { categoryOf, type CategoryKey } from "../lib/categories";
+import { categoryOf } from "../lib/categories";
 import ProductCarousel from "./ProductCarousel";
 import ProductRow, { CategoryJumpNav } from "./ProductRow";
 import Breadcrumbs from "./Breadcrumbs";
@@ -43,12 +43,17 @@ export default function ProductListing({
   breadcrumbs,
   // When set, group products into one horizontal row per category with jump nav.
   rowGroups,
+  // Optional custom grouping (overrides the default categoryOf match).
+  // Maps product id -> group keys, so a product can appear in a group even
+  // when its main category differs (e.g. small reels under Ice Fishing).
+  groupKeys,
 }: {
   title: string;
   subtitle?: string;
   products: ShopifyProduct[];
   breadcrumbs: { label: string; href?: string }[];
-  rowGroups?: { key: CategoryKey; id: string; label: string }[];
+  rowGroups?: { key: string; id: string; label: string }[];
+  groupKeys?: Record<string, string[]>;
 }) {
   const [sort, setSort] = useState<SortKey>("featured");
   const [inStockOnly, setInStockOnly] = useState(false);
@@ -164,7 +169,11 @@ export default function ProductListing({
     return rowGroups
       .map((g) => ({
         ...g,
-        products: applyFilters(products.filter((p) => categoryOf(p) === g.key)),
+        products: applyFilters(
+          products.filter((p) =>
+            groupKeys ? groupKeys[p.id]?.includes(g.key) : categoryOf(p) === g.key
+          )
+        ),
       }))
       .filter((g) => g.products.length > 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
