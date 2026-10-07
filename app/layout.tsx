@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { Barlow_Condensed, Source_Sans_3 } from "next/font/google";
 import { CartProvider } from "../components/CartContext";
 import AuthProviders from "../components/AuthProviders";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import CartDrawer from "../components/CartDrawer";
+import Chrome from "../components/Chrome";
 import ScrollToTop from "../components/ScrollToTop";
 import "./globals.css";
 
@@ -80,10 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProviders>
           <CartProvider>
             <ScrollToTop />
-            <Header />
-            <main className="min-h-[70vh]">{children}</main>
-            <Footer />
-            <CartDrawer />
+            <Chrome>{children}</Chrome>
           </CartProvider>
         </AuthProviders>
       </body>
