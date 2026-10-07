@@ -1,0 +1,1677 @@
+{
+ "updated": "2026-10-06",
+ "regulations": {
+  "zones": [
+   {
+    "id": "southern",
+    "name": "Southern Division",
+    "description": "Southern Manitoba, including Lake Winnipeg and waters south of it. Exact boundaries are map-based (Anglers' Guide p.16); text references include Areas A (eastern Manitoba, south of the Gammon/Bloodvein rivers) and B (southwestern Manitoba). Lake Winnipeg south basin, Red River, Assiniboine River, Winnipeg River system, Whiteshell, Duck Mountain, Turtle Mountain areas fall in this division.",
+    "limits": [
+     {
+      "species": "Walleye (Pickerel) & Sauger (either or combined)",
+      "limit": "4",
+      "size": "None may exceed 55 cm",
+      "season": "Southern Division: closed April 6, 2026 to May 8, 2026; open May 9, 2026 to April 4, 2027. Northwest Division: closed May 1 to May 15, 2026; open May 16, 2026 to April 30, 2027. North Central Division: closed May 1 to May 15, 2026; open May 16, 2026 to April 30, 2027. Northeast Division: generally open all year (waterbody-specific closures apply). Lake Winnipeg: walleye/sauger closed April 6 to May 15, 2026."
+     },
+     {
+      "species": "Northern Pike (Jackfish)",
+      "limit": "4",
+      "size": "None may exceed 75 cm",
+      "season": "Open year-round (all divisions; waterbody-specific closures apply)"
+     },
+     {
+      "species": "Lake Trout",
+      "limit": "1",
+      "size": "None may exceed 65 cm",
+      "season": "Southern Division: closed September 15 to October 31, 2026; open November 1, 2026 to September 14, 2027. New 2026 rule: Area A (eastern Manitoba) \u2014 all lake trout over 55 cm must be released. Northwest/North Central: generally open year-round per general limits (check waterbody-specific closures)."
+     },
+     {
+      "species": "Channel Catfish",
+      "limit": "4",
+      "size": "None may exceed 60 cm",
+      "season": "Open year-round (all divisions; waterbody-specific closures apply)"
+     },
+     {
+      "species": "Smallmouth Bass",
+      "limit": "4",
+      "size": "None may exceed 45 cm",
+      "season": "Open year-round (all divisions; waterbody-specific closures apply)"
+     },
+     {
+      "species": "Yellow Perch",
+      "limit": "25",
+      "size": "No size restriction (provincially)",
+      "season": "Open year-round (all divisions; waterbody-specific closures apply)"
+     },
+     {
+      "species": "Lake Sturgeon",
+      "limit": "0",
+      "size": "N/A (zero limit)",
+      "season": "Southern Division: closed May 1 to June 15; open June 16 to April 30. Northwest and North Central Divisions: closed May 1 to June 30; open July 1 to April 30. Conservation closures on the Winnipeg River and Nelson River systems remain in place."
+     },
+     {
+      "species": "Largemouth Bass",
+      "limit": "4 (province-wide, excluding Mary Jane Reservoir)",
+      "size": "None may exceed 45 cm (province-wide)",
+      "season": "Open year-round (all divisions; waterbody-specific closures apply)"
+     }
+    ]
+   },
+   {
+    "id": "northwest",
+    "name": "Northwest Division",
+    "description": "West-central Manitoba (Flin Flon, The Pas, Grand Rapids area). Exact boundaries are map-based (Anglers' Guide p.16). No live bait fish may be used or possessed in this division. Waters include Athapapuskow Lake, Clearwater Lake, Kississing Lake, Reed Lake, Wekusko Lake, Saskatchewan River.",
+    "limits": [
+     {
+      "species": "Walleye (Pickerel) & Sauger (either or combined)",
+      "limit": "4",
+      "size": "None may exceed 55 cm",
+      "season": "Southern Division: closed April 6, 2026 to May 8, 2026; open May 9, 2026 to April 4, 2027. Northwest Division: closed May 1 to May 15, 2026; open May 16, 2026 to April 30, 2027. North Central Division: closed May 1 to May 15, 2026; open May 16, 2026 to April 30, 2027. Northeast Division: generally open all year (waterbody-specific closures apply). Lake Winnipeg: walleye/sauger closed April 6 to May 15, 2026."
+     },
+     {
+      "species": "Northern Pike (Jackfish)",
+      "limit": "4",
+      "size": "None may exceed 75 cm",
+      "season": "Open year-round (all divisions; waterbody-specific closures apply)"
+     },
+     {
+      "species": "Lake Trout",
+      "limit": "1",
+      "size": "None may exceed 65 cm",
+      "season": "Southern Division: closed September 15 to October 31, 2026; open November 1, 2026 to September 14, 2027. New 2026 rule: Area A (eastern Manitoba) \u2014 all lake trout over 55 cm must be released. Northwest/North Central: generally open year-round per general limits (check waterbody-specific closures)."
+     },
+     {
+      "species": "Channel Catfish",
+      "limit": "4",
+      "size": "None may exceed 60 cm",
+      "season": "Open year-round (all divisions; waterbody-specific closures apply)"
+     },
+     {
+      "species": "Smallmouth Bass",
+      "limit": "4",
+      "size": "None may exceed 45 cm",
+      "season": "Open year-round (all divisions; waterbody-specific closures apply)"
+     },
+     {
+      "species": "Yellow Perch",
+      "limit": "25",
+      "size": "No size restriction (provincially)",
+      "season": "Open year-round (all divisions; waterbody-specific closures apply)"
+     },
+     {
+      "species": "Lake Sturgeon",
+      "limit": "0",
+      "size": "N/A (zero limit)",
+      "season": "Southern Division: closed May 1 to June 15; open June 16 to April 30. Northwest and North Central Divisions: closed May 1 to June 30; open July 1 to April 30. Conservation closures on the Winnipeg River and Nelson River systems remain in place."
+     },
+     {
+      "species": "Largemouth Bass",
+      "limit": "4 (province-wide, excluding Mary Jane Reservoir)",
+      "size": "None may exceed 45 cm (province-wide)",
+      "season": "Open year-round (all divisions; waterbody-specific closures apply)"
+     }
+    ]
+   },
+   {
+    "id": "north-central",
+    "name": "North Central Division",
+    "description": "Central/northern Manitoba (The Pas to Thompson corridor, Nelson River system). Exact boundaries are map-based (Anglers' Guide p.16). No live bait fish may be used or possessed in this division. Waters include Nelson River, Setting Lake, Kiski Lake, Thompson-area lakes.",
+    "limits": [
+     {
+      "species": "Walleye (Pickerel) & Sauger (either or combined)",
+      "limit": "4",
+      "size": "None may exceed 55 cm",
+      "season": "Southern Division: closed April 6, 2026 to May 8, 2026; open May 9, 2026 to April 4, 2027. Northwest Division: closed May 1 to May 15, 2026; open May 16, 2026 to April 30, 2027. North Central Division: closed May 1 to May 15, 2026; open May 16, 2026 to April 30, 2027. Northeast Division: generally open all year (waterbody-specific closures apply). Lake Winnipeg: walleye/sauger closed April 6 to May 15, 2026."
+     },
+     {
+      "species": "Northern Pike (Jackfish)",
+      "limit": "4",
+      "size": "None may exceed 75 cm",
+      "season": "Open year-round (all divisions; waterbody-specific closures apply)"
+     },
+     {
+      "species": "Lake Trout",
+      "limit": "1",
+      "size": "None may exceed 65 cm",
+      "season": "Southern Division: closed September 15 to October 31, 2026; open November 1, 2026 to September 14, 2027. New 2026 rule: Area A (eastern Manitoba) \u2014 all lake trout over 55 cm must be released. Northwest/North Central: generally open year-round per general limits (check waterbody-specific closures)."
+     },
+     {
+      "species": "Channel Catfish",
+      "limit": "4",
+      "size": "None may exceed 60 cm",
+      "season": "Open year-round (all divisions; waterbody-specific closures apply)"
+     },
+     {
+      "species": "Smallmouth Bass",
+      "limit": "4",
+      "size": "None may exceed 45 cm",
+      "season": "Open year-round (all divisions; waterbody-specific closures apply)"
+     },
+     {
+      "species": "Yellow Perch",
+      "limit": "25",
+      "size": "No size restriction (provincially)",
+      "season": "Open year-round (all divisions; waterbody-specific closures apply)"
+     },
+     {
+      "species": "Lake Sturgeon",
+      "limit": "0",
+      "size": "N/A (zero limit)",
+      "season": "Southern Division: closed May 1 to June 15; open June 16 to April 30. Northwest and North Central Divisions: closed May 1 to June 30; open July 1 to April 30. Conservation closures on the Winnipeg River and Nelson River systems remain in place."
+     },
+     {
+      "species": "Largemouth Bass",
+      "limit": "4 (province-wide, excluding Mary Jane Reservoir)",
+      "size": "None may exceed 45 cm (province-wide)",
+      "season": "Open year-round (all divisions; waterbody-specific closures apply)"
+     }
+    ]
+   },
+   {
+    "id": "northeast",
+    "name": "Northeast Division",
+    "description": "Northeastern Manitoba, generally east/north of the Nelson River toward Hudson Bay (Gods Lake, Nueltin Lake, Berens/Bloodvein/Pigeon rivers, east shore Hudson Bay watersheds). Exact boundaries are map-based (Anglers' Guide p.16). No live bait fish may be used or possessed. Generally open to angling all year.",
+    "limits": [
+     {
+      "species": "Walleye (Pickerel) & Sauger (either or combined)",
+      "limit": "4",
+      "size": "None may exceed 55 cm",
+      "season": "Southern Division: closed April 6, 2026 to May 8, 2026; open May 9, 2026 to April 4, 2027. Northwest Division: closed May 1 to May 15, 2026; open May 16, 2026 to April 30, 2027. North Central Division: closed May 1 to May 15, 2026; open May 16, 2026 to April 30, 2027. Northeast Division: generally open all year (waterbody-specific closures apply). Lake Winnipeg: walleye/sauger closed April 6 to May 15, 2026."
+     },
+     {
+      "species": "Northern Pike (Jackfish)",
+      "limit": "4",
+      "size": "None may exceed 75 cm",
+      "season": "Open year-round (all divisions; waterbody-specific closures apply)"
+     },
+     {
+      "species": "Lake Trout",
+      "limit": "1",
+      "size": "None may exceed 65 cm",
+      "season": "Southern Division: closed September 15 to October 31, 2026; open November 1, 2026 to September 14, 2027. New 2026 rule: Area A (eastern Manitoba) \u2014 all lake trout over 55 cm must be released. Northwest/North Central: generally open year-round per general limits (check waterbody-specific closures)."
+     },
+     {
+      "species": "Channel Catfish",
+      "limit": "4",
+      "size": "None may exceed 60 cm",
+      "season": "Open year-round (all divisions; waterbody-specific closures apply)"
+     },
+     {
+      "species": "Smallmouth Bass",
+      "limit": "4",
+      "size": "None may exceed 45 cm",
+      "season": "Open year-round (all divisions; waterbody-specific closures apply)"
+     },
+     {
+      "species": "Yellow Perch",
+      "limit": "25",
+      "size": "No size restriction (provincially)",
+      "season": "Open year-round (all divisions; waterbody-specific closures apply)"
+     },
+     {
+      "species": "Lake Sturgeon",
+      "limit": "0",
+      "size": "N/A (zero limit)",
+      "season": "Southern Division: closed May 1 to June 15; open June 16 to April 30. Northwest and North Central Divisions: closed May 1 to June 30; open July 1 to April 30. Conservation closures on the Winnipeg River and Nelson River systems remain in place."
+     },
+     {
+      "species": "Largemouth Bass",
+      "limit": "4 (province-wide, excluding Mary Jane Reservoir)",
+      "size": "None may exceed 45 cm (province-wide)",
+      "season": "Open year-round (all divisions; waterbody-specific closures apply)"
+     }
+    ]
+   }
+  ],
+  "licensing": [
+   "Who Needs A Licence: All persons, except those exempt, who engage in angling, dip netting, cast netting, seining, minnow trapping, spear fishing, and bow fishing must have a Manitoba Angling Licence on their person (printed or on an electronic device; must be shown to an officer on request). Licences are not transferable or refundable.",
+   "Fees 2026: GST added at time of purchase. Manitoba Resident (age 16-64): one-day $13.00, annual $28.00. Senior (age 65+): no licence required. Active military member or veteran (Manitoba resident): no licence required. Canadian Resident (age 16+): one-day $18.00, annual $43.00. Non-Canadian Resident (age 16+): one-day $26.00, annual $69.00.",
+   "Exemptions: Manitoba resident seniors 65+ (must show proof of age and Manitoba residency). Manitoba resident active military members and veterans (must show proof of Manitoba residency plus a Canadian Forces ID, Record of Service Card, or Veterans' Service Card). Manitoba resident youth under 16 with six months' permanent residence (own licence privileges and own limit). Status Indians do not require an angling licence. Canadian/non-Canadian resident youth under 16 must fish with a licence holder (or exempt person) and their catch counts toward that person's limit; they may buy their own licence to have their own limit.",
+   "Family Fishing Weekends: June 12-14, 2026 (summer) and February 20-22, 2027 (winter). During these weekends people may fish without an angling licence anywhere in Manitoba except federal (national) parks; all other rules still apply.",
+   "Border Waters: On waters crossing the Manitoba border, anglers may have only a Manitoba limit. On specified border lakes with Ontario (Davidson, Frances, Garner, High, Mantario, Moar, Ryerson lakes) either a Manitoba or Ontario licence suffices. On Lake of the Prairies upstream of Shellmouth Dam, either a Manitoba or Saskatchewan licence suffices.",
+   "National Parks: A Manitoba Angling Licence is not valid in national parks; a federal licence is required (Parks Canada)."
+  ],
+  "general_rules": [
+   "Barbless hooks are mandatory in Manitoba (hooks on all lines, in use or not, must be barbless).",
+   "Anglers may use only one rod and line, except during ice fishing when two may be used; only two hooks or lures per line.",
+   "Total fish length is measured from the most anterior part of the head to the most posterior part of the tail laid flat (not pinched); 2.54 cm = 1 inch.",
+   "Harvest, possession and use of live bait fish and leeches will be prohibited as of April 1, 2027.",
+   "Live bait fish currently may not be imported into Manitoba, and may not be used or possessed in the Northwest, North Central and Northeast Divisions (including the Bloodvein and Gammon rivers); in the Southern Division live bait is allowed in some areas with exceptions (stocked trout waters, Duck Mountain, Turtle Mountain, Porcupine Provincial Forest, Whiteshell, Winnipeg River from Seven Sisters Dam to the Ontario border, Atikaki/South Atikaki parks).",
+   "Ice fishing shelters must be removed by March 14, 2027 on the Red River, March 15 in Area B of the Southern Division, March 31 in the rest of the Southern Division, and April 15 in the Northwest/North Central/Northeast Divisions.",
+   "Catching and keeping fish during a species' closed season is prohibited (must not fish for the species during its closed season)."
+  ],
+  "guide_url": "https://gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf"
+ },
+ "lakes": [
+  {
+   "id": "lake-winnipeg",
+   "name": "Lake Winnipeg",
+   "region": "Interlake / Eastern Manitoba",
+   "photo": "https://picsum.photos/seed/mb-lake-winnipeg/1200/800",
+   "species": [
+    "Walleye",
+    "Sauger",
+    "Northern Pike",
+    "Yellow Perch",
+    "Burbot",
+    "Lake Whitefish",
+    "Cisco (Tullibee)",
+    "Freshwater Drum",
+    "Goldeye",
+    "Channel Catfish",
+    "Lake Sturgeon"
+   ],
+   "size_text": "24,387 km2",
+   "max_depth_text": "36 m",
+   "description": "The 10th largest freshwater lake in the world, Lake Winnipeg is a shallow prairie lake (mean depth only 12 m) split into distinct north and south basins. It supports Manitoba's most famous walleye fishery - the iridescent greenback walleye - plus a major commercial fishery where walleye is the most important species. More than 50 fish species live in the lake.",
+   "depth_map_url": null,
+   "lodging": [
+    {
+     "name": "Lakeview Hecla Resort",
+     "detail": "https://www.travelmanitoba.com/directory/lakeview-hecla-resort/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "Seagull's Restaurant (Lakeview Hecla Resort)",
+     "detail": "Hecla Island"
+    }
+   ],
+   "boat_rentals": []
+  },
+  {
+   "id": "lake-manitoba",
+   "name": "Lake Manitoba",
+   "region": "Interlake",
+   "photo": "https://picsum.photos/seed/mb-lake-manitoba/1200/800",
+   "species": [
+    "Walleye",
+    "Sauger",
+    "Northern Pike",
+    "Yellow Perch",
+    "Burbot",
+    "Lake Whitefish",
+    "Lake Cisco",
+    "Freshwater Drum",
+    "Goldeye",
+    "Brown Bullhead",
+    "Bigmouth Buffalo"
+   ],
+   "size_text": "4,624 km2",
+   "max_depth_text": "7 m",
+   "description": "Canada's 14th largest lake, Lake Manitoba is a very shallow prairie lake about 75 km northwest of Winnipeg. It has supported a commercial fishery since 1895 and a long-standing recreational fishery for walleye, northern pike and yellow perch. Delta Marsh at its south end is one of North America's premier waterfowl staging areas.",
+   "depth_map_url": null,
+   "lodging": [
+    {
+     "name": "Lake Manitoba Narrows Lodge"
+    }
+   ],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "lake-winnipegosis",
+   "name": "Lake Winnipegosis",
+   "region": "Parkland / Western Manitoba",
+   "photo": "https://picsum.photos/seed/mb-lake-winnipegosis/1200/800",
+   "species": [
+    "Walleye",
+    "Northern Pike",
+    "Lake Whitefish",
+    "Yellow Perch",
+    "Sauger",
+    "White Sucker",
+    "Shorthead Redhorse",
+    "Cisco (Tullibee)",
+    "Common Carp"
+   ],
+   "size_text": "5,374 km2",
+   "max_depth_text": "18.3 m",
+   "description": "Manitoba's second-largest lake, Lake Winnipegosis is a shallow, turbid prairie lake west of Lake Winnipeg and north of Lake Manitoba. Its commercial fishery targets walleye, northern pike, lake whitefish and mullet species, while anglers pursue walleye and pike. Birch Island, at 806 km2, sits within the lake.",
+   "depth_map_url": null,
+   "lodging": [],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "lake-of-the-woods",
+   "name": "Lake of the Woods (Manitoba portion)",
+   "region": "Eastern Manitoba (Whiteshell / Kenora corridor)",
+   "photo": "https://picsum.photos/seed/mb-lake-of-the-woods/1200/800",
+   "species": [
+    "Walleye",
+    "Smallmouth Bass",
+    "Northern Pike",
+    "Muskellunge",
+    "Lake Trout",
+    "Yellow Perch",
+    "Black Crappie",
+    "Lake Sturgeon"
+   ],
+   "size_text": "",
+   "max_depth_text": "",
+   "description": "A vast multi-jurisdictional lake spanning Ontario, Manitoba and Minnesota, Lake of the Woods is one of North America's top multi-species fisheries. Manitoba's share lies in the lake's northwest reaches, reached via the Whiteshell-Kenora corridor. Anglers target walleye, smallmouth bass, northern pike and muskie, with lake trout in deep areas like Clearwater Bay.",
+   "depth_map_url": null,
+   "lodging": [],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "lake-athapapuskow",
+   "name": "Lake Athapapuskow",
+   "region": "Northwest Manitoba (Flin Flon area)",
+   "photo": "https://picsum.photos/seed/mb-lake-athapapuskow/1200/800",
+   "species": [
+    "Walleye",
+    "Yellow Perch",
+    "Northern Pike",
+    "Lake Trout",
+    "Lake Whitefish",
+    "Burbot",
+    "Rainbow Trout",
+    "White Sucker",
+    "Cisco (Tullibee)",
+    "Splake",
+    "Smallmouth Bass"
+   ],
+   "size_text": "267 km2 (Manitoba portion)",
+   "max_depth_text": "",
+   "description": "A Canadian Shield lake near Flin Flon made of three connected basins - Big Athapap, Little Athapap and the North Arm - with depths ranging from shallow flats to basins over 200 feet. It is a trophy multi-species fishery famous for lake trout, with three historical world records including a 62 lb laker. Walleye, northern pike, rainbow trout, splake and smallmouth bass round out the fishery.",
+   "depth_map_url": null,
+   "lodging": [
+    {
+     "name": "Bakers Narrows Lodge",
+     "detail": "https://bakersnarrowslodge.com/ice-fishing-lake-athapapuskow/"
+    }
+   ],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "clear-lake",
+   "name": "Clear Lake (Riding Mountain)",
+   "region": "Parkland (Riding Mountain National Park)",
+   "photo": "https://picsum.photos/seed/mb-clear-lake/1200/800",
+   "species": [
+    "Northern Pike",
+    "Yellow Perch",
+    "Walleye",
+    "Lake Whitefish"
+   ],
+   "size_text": "29.37 km2",
+   "max_depth_text": "34.2 m",
+   "description": "The showpiece lake of Riding Mountain National Park, Clear Lake is a moderately large, deep, spring-fed lake with exceptionally clear water. Parks Canada lists northern pike, yellow perch, walleye and lake whitefish as its prominent recreational species. The townsite of Wasagaming on its south shore is the park's commercial hub.",
+   "depth_map_url": null,
+   "lodging": [
+    {
+     "name": "Elkhorn Resort Spa & Conference Centre",
+     "detail": "http://www.elkhornresort.mb.ca/"
+    }
+   ],
+   "restaurants": [
+    {
+     "name": "10 Restaurant & Buffalo Bar (Elkhorn Resort)",
+     "detail": "Wasagaming"
+    }
+   ],
+   "boat_rentals": []
+  },
+  {
+   "id": "falcon-lake",
+   "name": "Falcon Lake",
+   "region": "Eastern Manitoba (Whiteshell Provincial Park)",
+   "photo": "https://picsum.photos/seed/mb-falcon-lake/1200/800",
+   "species": [
+    "Walleye",
+    "Northern Pike",
+    "Yellow Perch",
+    "Smallmouth Bass",
+    "Largemouth Bass",
+    "Lake Whitefish",
+    "Burbot",
+    "Cisco",
+    "Rock Bass",
+    "Pumpkinseed",
+    "White Sucker",
+    "Black Crappie"
+   ],
+   "size_text": "",
+   "max_depth_text": "",
+   "description": "A popular Whiteshell Provincial Park lake about 152 km east of Winnipeg on the Trans-Canada Highway. Manitoba's 2022 fisheries assessment found walleye dominant at 79% of the survey catch, with northern pike, smallmouth and largemouth bass, yellow perch and lake whitefish also present. The lake is also famous for the 1967 Falcon Lake Incident UFO sighting.",
+   "depth_map_url": null,
+   "lodging": [],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "west-hawk-lake",
+   "name": "West Hawk Lake",
+   "region": "Eastern Manitoba (Whiteshell Provincial Park)",
+   "photo": "https://picsum.photos/seed/mb-west-hawk-lake/1200/800",
+   "species": [
+    "Walleye",
+    "Northern Pike",
+    "Yellow Perch",
+    "Smallmouth Bass",
+    "Lake Trout"
+   ],
+   "size_text": "14.6 km2",
+   "max_depth_text": "125 m",
+   "description": "Formed by an ancient meteorite impact, West Hawk Lake is Manitoba's deepest lake with exceptionally clear water popular for scuba diving. The crater lake in Whiteshell Provincial Park holds walleye, northern pike, yellow perch and smallmouth bass; all trout must be released and trout fishing is closed Nov 1 to Apr 15. A Manitoba government bathymetric map is linked below.",
+   "depth_map_url": "https://gov.mb.ca/sd/waterstewardship/fisheries/fish_stocking_gMap_MVC_V2/pdf/westhawk_map.pdf",
+   "lodging": [],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "dauphin-lake",
+   "name": "Dauphin Lake",
+   "region": "Parkland (near Dauphin)",
+   "photo": "https://picsum.photos/seed/mb-dauphin-lake/1200/800",
+   "species": [
+    "Walleye",
+    "Northern Pike",
+    "Yellow Perch",
+    "White Sucker",
+    "Shorthead Redhorse",
+    "Brown Bullhead"
+   ],
+   "size_text": "519 km2",
+   "max_depth_text": "3.66 m",
+   "description": "A shallow prairie lake east of the town of Dauphin, between Riding Mountain and Duck Mountain, with an average depth of only 2.35 m. Annual index netting shows walleye as the dominant species, with northern pike, yellow perch, suckers and bullheads. It drains via the Mossy River into Lake Winnipegosis.",
+   "depth_map_url": null,
+   "lodging": [],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "cedar-lake",
+   "name": "Cedar Lake",
+   "region": "North Central Manitoba",
+   "photo": "https://picsum.photos/seed/mb-cedar-lake/1200/800",
+   "species": [
+    "Walleye",
+    "Lake Whitefish"
+   ],
+   "size_text": "1,353 km2",
+   "max_depth_text": "10 m",
+   "description": "A large, shallow lake on the Saskatchewan River system in north-central Manitoba. It is an important commercial fishery for walleye and lake whitefish. The town of Grand Rapids sits at its north end, where the Saskatchewan River continues toward Lake Winnipeg.",
+   "depth_map_url": null,
+   "lodging": [],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "kississing-lake",
+   "name": "Kississing Lake",
+   "region": "Northwest Manitoba",
+   "photo": "https://picsum.photos/seed/mb-kississing-lake/1200/800",
+   "species": [
+    "Northern Pike",
+    "Walleye",
+    "Lake Trout",
+    "Lake Whitefish",
+    "Yellow Perch"
+   ],
+   "size_text": "",
+   "max_depth_text": "",
+   "description": "A northern Manitoba fly-in lake reached by floatplane from Flin Flon, home to the five-star Kississing Lake Lodge and the drive-to Kenanow Lodge. It offers trophy northern pike, walleye and lake trout, with anglers reporting up to 100-fish days. Whitefish and perch are also present year-round.",
+   "depth_map_url": null,
+   "lodging": [
+    {
+     "name": "Kenanow Lodge",
+     "detail": "http://www.kenanowlodge.com/"
+    }
+   ],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "reed-lake",
+   "name": "Reed Lake",
+   "region": "Northwest Manitoba (Grass River Provincial Park)",
+   "photo": "https://picsum.photos/seed/mb-reed-lake/1200/800",
+   "species": [
+    "Walleye",
+    "Lake Trout",
+    "Northern Pike",
+    "Burbot",
+    "Yellow Perch",
+    "Lake Whitefish",
+    "Cisco (Tullibee)"
+   ],
+   "size_text": "",
+   "max_depth_text": "",
+   "description": "The largest lake in Grass River Provincial Park, Reed Lake is known for intricate shoreline, islands and fish that grow to enormous size regardless of species. Anglers target walleye, lake trout, northern pike, burbot, perch, whitefish and tullibee. Special regulations limit walleye and pike harvest in the lake and its tributaries.",
+   "depth_map_url": null,
+   "lodging": [
+    {
+     "name": "Grass River Lodge"
+    }
+   ],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "gods-lake",
+   "name": "Gods Lake",
+   "region": "Northeast Manitoba",
+   "photo": "https://picsum.photos/seed/mb-gods-lake/1200/800",
+   "species": [
+    "Northern Pike",
+    "Walleye",
+    "Lake Trout",
+    "Brook Trout"
+   ],
+   "size_text": "1,151 km2",
+   "max_depth_text": "75.3 m",
+   "description": "Manitoba's seventh-largest lake, a deep, cold northern lake 344 miles north of Winnipeg. Elk Island Lodge operates fly-in trips for trophy northern pike, walleye, lake trout and brook trout. The lake is renowned for world-class catch-and-release trophy fishing.",
+   "depth_map_url": null,
+   "lodging": [
+    {
+     "name": "Elk Island Lodge",
+     "detail": "https://godslake.ca/"
+    }
+   ],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "nueltin-lake",
+   "name": "Nueltin Lake",
+   "region": "Far North Manitoba (Nunavut border)",
+   "photo": "https://picsum.photos/seed/mb-nueltin-lake/1200/800",
+   "species": [
+    "Lake Trout",
+    "Northern Pike",
+    "Arctic Grayling",
+    "Lake Whitefish"
+   ],
+   "size_text": "~2,849 km2 total (mostly in Nunavut)",
+   "max_depth_text": "",
+   "description": "A vast subarctic lake of about 2,849 km2 total area, roughly 80% of it in Nunavut, on the Manitoba-Nunavut border. Partly protected by Nueltin Lake Provincial Park, it is accessible only by air and fished by fly-in lodges for trophy lake trout, northern pike and arctic grayling. Lake whitefish are also common.",
+   "depth_map_url": null,
+   "lodging": [
+    {
+     "name": "Nueltin Fly-In Lodges"
+    }
+   ],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "big-sand-lake",
+   "name": "Big Sand Lake",
+   "region": "Far North Manitoba (Seal River system)",
+   "photo": "https://picsum.photos/seed/mb-big-sand-lake/1200/800",
+   "species": [
+    "Northern Pike",
+    "Lake Trout",
+    "Walleye",
+    "Arctic Grayling"
+   ],
+   "size_text": "~243 km2 (~60,000 acres)",
+   "max_depth_text": "",
+   "description": "A remote fly-in lake in the Seal River system of far northern Manitoba, 550 miles north of Winnipeg. Big Sand Lake Lodge - the only lodge on the lake's roughly 60,000 acres of water - offers the Canadian Grand Slam: northern pike, lake trout, walleye and arctic grayling, all strict catch-and-release.",
+   "depth_map_url": null,
+   "lodging": [
+    {
+     "name": "Big Sand Lake Lodge",
+     "detail": "https://www.bigsandlakelodge.com/canada-fishing-trips/fishing-trips-overview/"
+    }
+   ],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "wekusko-lake",
+   "name": "Wekusko Lake",
+   "region": "North Central Manitoba",
+   "photo": "https://picsum.photos/seed/mb-wekusko-lake/1200/800",
+   "species": [
+    "Walleye",
+    "Lake Trout",
+    "Northern Pike",
+    "Burbot",
+    "Yellow Perch",
+    "Lake Whitefish",
+    "Cisco (Tullibee)"
+   ],
+   "size_text": "",
+   "max_depth_text": "",
+   "description": "A star-shaped lake in north-central Manitoba at the outlet of scenic Wekusko Falls, fished from Wekusko Falls Lodge. It produces thick-bodied chunky walleyes plus lake trout, northern pike, burbot, perch, whitefish and tullibee. Anglers can fish both Wekusko and nearby Reed Lake from the lodge.",
+   "depth_map_url": null,
+   "lodging": [
+    {
+     "name": "Wekusko Falls Lodge",
+     "detail": "https://wekuskofallslodge.com/"
+    }
+   ],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "lake-st-martin",
+   "name": "Lake St. Martin",
+   "region": "Interlake",
+   "photo": "https://picsum.photos/seed/mb-lake-st-martin/1200/800",
+   "species": [
+    "Walleye",
+    "Northern Pike",
+    "Freshwater Drum"
+   ],
+   "size_text": "",
+   "max_depth_text": "",
+   "description": "A lake in Manitoba's Interlake region between Lake Manitoba and Lake Winnipeg, connected to both via the Fairford and Dauphin rivers. Anglers report walleye, northern pike and freshwater drum. New outlet channels now help regulate its historically flood-prone water levels.",
+   "depth_map_url": null,
+   "lodging": [],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "cross-lake",
+   "name": "Cross Lake",
+   "region": "North Central Manitoba (Nelson River)",
+   "photo": "https://picsum.photos/seed/mb-cross-lake/1200/800",
+   "species": [
+    "Walleye",
+    "Northern Pike",
+    "Lake Whitefish",
+    "Cisco"
+   ],
+   "size_text": "755 km2",
+   "max_depth_text": "12 m",
+   "description": "A 755 km2 lake on the Nelson River in north-central Manitoba, scientifically studied for the effects of hydroelectric regulation on its fishery. Research documented lake whitefish, walleye, northern pike and cisco populations. It sits downstream of Lake Winnipeg on the Nelson River system.",
+   "depth_map_url": null,
+   "lodging": [],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "setting-lake",
+   "name": "Setting Lake",
+   "region": "North Central Manitoba (near Thompson)",
+   "photo": "https://picsum.photos/seed/mb-setting-lake/1200/800",
+   "species": [
+    "Walleye"
+   ],
+   "size_text": "",
+   "max_depth_text": "",
+   "description": "A northern Manitoba lake near Thompson listed among the province's notable drive-to walleye waters. It lies in the nickel-belt lake country of the Thompson area. Walleye are the main draw for visiting anglers.",
+   "depth_map_url": null,
+   "lodging": [],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "paint-lake",
+   "name": "Paint Lake",
+   "region": "North Central Manitoba (near Thompson)",
+   "photo": "https://picsum.photos/seed/mb-paint-lake/1200/800",
+   "species": [
+    "Walleye",
+    "Northern Pike"
+   ],
+   "size_text": "",
+   "max_depth_text": "",
+   "description": "A large, clear Canadian Shield lake just south of Thompson in Paint Lake Provincial Park, renowned for dense populations of thick-bodied walleyes. Northern pike are also abundant. Paint Lake Lodge on its shore offers cabins, a full-service restaurant and boat rentals.",
+   "depth_map_url": null,
+   "lodging": [
+    {
+     "name": "Paint Lake Lodge"
+    }
+   ],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "laurie-lake",
+   "name": "Laurie Lake",
+   "region": "Northwest Manitoba (Lynn Lake area)",
+   "photo": "https://picsum.photos/seed/mb-laurie-lake/1200/800",
+   "species": [
+    "Northern Pike",
+    "Walleye",
+    "Lake Trout"
+   ],
+   "size_text": "",
+   "max_depth_text": "",
+   "description": "Part of the Laurie River system near Lynn Lake in northwest Manitoba, fished via Laurie River Lodge. The slow-flowing river system produces northern pike, walleye and lake trout, making it a true multi-species fly-in destination. It flows toward the Churchill River.",
+   "depth_map_url": null,
+   "lodging": [
+    {
+     "name": "Laurie River Lodge"
+    }
+   ],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "gunisao-lake",
+   "name": "Gunisao Lake",
+   "region": "Northeast Manitoba",
+   "photo": "https://picsum.photos/seed/mb-gunisao-lake/1200/800",
+   "species": [
+    "Walleye",
+    "Northern Pike",
+    "Lake Whitefish",
+    "White Sucker",
+    "Yellow Perch"
+   ],
+   "size_text": "",
+   "max_depth_text": "",
+   "description": "A trophy walleye factory in northeastern Manitoba fished by Budd's Gunisao Lake Lodge. In 2022, 65% of all Manitoba Master Angler walleyes (May-August) were caught at Gunisao, with 708 Master Angler walleyes recorded. Trophy northern pike, whitefish, suckers and perch are also caught.",
+   "depth_map_url": null,
+   "lodging": [
+    {
+     "name": "Budd's Gunisao Lake Lodge"
+    }
+   ],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "clearwater-lake",
+   "name": "Clearwater Lake",
+   "region": "Northwest Manitoba (near The Pas)",
+   "photo": "https://picsum.photos/seed/mb-clearwater-lake/1200/800",
+   "species": [
+    "Lake Trout"
+   ],
+   "size_text": "",
+   "max_depth_text": "39 m",
+   "description": "A deep, clear, cold spring-fed lake in Clearwater Lake Provincial Park near The Pas, renowned for its excellent water quality and large lake trout. The nearly circular lake is 16 km across with a maximum depth of 39 m. Cold year-round temperatures slow trout growth but are essential for their survival.",
+   "depth_map_url": null,
+   "lodging": [],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "lake-of-the-prairies",
+   "name": "Lake of the Prairies",
+   "region": "Parkland (near Roblin)",
+   "photo": "https://picsum.photos/seed/mb-lake-of-the-prairies/1200/800",
+   "species": [
+    "Walleye",
+    "Yellow Perch",
+    "Muskellunge",
+    "Smallmouth Bass",
+    "Common Carp",
+    "Silver Redhorse",
+    "Golden Redhorse",
+    "Mooneye",
+    "Rock Bass",
+    "Quillback"
+   ],
+   "size_text": "",
+   "max_depth_text": "",
+   "description": "A large reservoir on the Assiniboine River west of Roblin, with about 40 km of its length in Manitoba, developed with Asessippi Provincial Park, cottages and campgrounds. Index netting shows walleye dominant, with yellow perch, stocked muskellunge and smallmouth bass, plus carp, redhorse, mooneye, rock bass and quillback.",
+   "depth_map_url": null,
+   "lodging": [],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "schist-lake",
+   "name": "Schist Lake",
+   "region": "Northwest Manitoba (Flin Flon area)",
+   "photo": "https://picsum.photos/seed/mb-schist-lake/1200/800",
+   "species": [
+    "Northern Pike",
+    "Walleye",
+    "Lake Trout",
+    "Yellow Perch"
+   ],
+   "size_text": "",
+   "max_depth_text": "",
+   "description": "A lake at Flin Flon in northwest Manitoba, bordered by Bakers Narrows Provincial Park. Area anglers pursue northern pike, walleye, lake trout and perch in open water and through the ice. It is part of the Flin Flon area's network of Shield lakes.",
+   "depth_map_url": null,
+   "lodging": [],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "crowduck-lake",
+   "name": "Crowduck Lake",
+   "region": "Eastern Manitoba (Whiteshell Provincial Park)",
+   "photo": "https://picsum.photos/seed/mb-crowduck-lake/1200/800",
+   "species": [
+    "Walleye",
+    "Smallmouth Bass",
+    "Northern Pike",
+    "Yellow Perch",
+    "Cisco",
+    "White Sucker"
+   ],
+   "size_text": "",
+   "max_depth_text": "",
+   "description": "A Whiteshell Provincial Park lake assessed by Manitoba Fisheries in 2023, holding walleye, smallmouth bass, northern pike, yellow perch, cisco and white suckers. Surveyed walleye averaged 46.8 cm, with fish up to 21 years old. It falls under the eastern region's special walleye regulation protecting fish over 45 cm.",
+   "depth_map_url": null,
+   "lodging": [],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "high-lake",
+   "name": "High Lake",
+   "region": "Eastern Manitoba (Whiteshell Provincial Park)",
+   "photo": "https://picsum.photos/seed/mb-high-lake/1200/800",
+   "species": [
+    "Lake Trout",
+    "Lake Whitefish",
+    "Northern Pike",
+    "Burbot",
+    "White Sucker",
+    "Yellow Perch"
+   ],
+   "size_text": "8.0 km2",
+   "max_depth_text": "30 m",
+   "description": "A backcountry lake near Falcon Lake in Whiteshell Provincial Park, reachable by portage from High Lake Bay at Falcon Lake's east end. This 8.0 km2 lake (max depth 30 m) holds self-sustaining lake trout plus lake whitefish, northern pike, burbot, white suckers and yellow perch. Trophy-class lake trout and whitefish have been documented.",
+   "depth_map_url": null,
+   "lodging": [],
+   "restaurants": [],
+   "boat_rentals": []
+  },
+  {
+   "id": "big-whiteshell-lake",
+   "name": "Big Whiteshell Lake",
+   "region": "Eastern Manitoba (Whiteshell Provincial Park)",
+   "photo": "https://picsum.photos/seed/mb-big-whiteshell-lake/1200/800",
+   "species": [
+    "Northern Pike",
+    "Walleye",
+    "Yellow Perch"
+   ],
+   "size_text": "",
+   "max_depth_text": "",
+   "description": "A Whiteshell Provincial Park lake near the Ontario border in eastern Manitoba. Anglers most commonly report northern pike, walleye and yellow perch. It sits in the same Canadian Shield lake country as Falcon and West Hawk lakes.",
+   "depth_map_url": null,
+   "lodging": [],
+   "restaurants": [],
+   "boat_rentals": []
+  }
+ ],
+ "lodges": [
+  {
+   "id": "bakers-narrows-lodge",
+   "name": "Bakers Narrows Lodge",
+   "location": "Bakers Narrows, Lake Athapapuskow (near Flin Flon)",
+   "kind": "lodge",
+   "species": [
+    "Walleye",
+    "Lake Trout",
+    "Northern Pike"
+   ],
+   "description": "Family-run, drive-to lodge on the shore of Lake Athapapuskow, about half a mile from the Flin Flon airport, with modern log cottages and guided fishing packages. The lake is known for producing some of Manitoba's largest lake trout, plus golden walleye and northern pike.",
+   "website": "http://www.bakersnarrowslodge.com/",
+   "ice_fishing": true
+  },
+  {
+   "id": "kississing-lake-lodge",
+   "name": "Kississing Lake Lodge",
+   "location": "Kississing Lake (floatplane from Flin Flon)",
+   "kind": "lodge",
+   "species": [
+    "Walleye",
+    "Northern Pike",
+    "Lake Trout"
+   ],
+   "description": "Fly-in fishing lodge reached by a 25-minute floatplane ride from Flin Flon, open May through September with private cabins and guided fishing. The lake is managed for trophy-size walleye, northern pike, and lake trout.",
+   "website": "http://kississinglodge.com/",
+   "ice_fishing": false
+  },
+  {
+   "id": "blackwater-cats-outfitter",
+   "name": "Blackwater Cats Outfitter",
+   "location": "Selkirk / Lockport / Winnipeg (Red River and Lake Winnipeg)",
+   "kind": "guide",
+   "species": [
+    "Channel Catfish",
+    "Walleye"
+   ],
+   "description": "Fully licensed and insured four-season guide service based in Winnipeg and operating out of Lockport, Selkirk, and Hecla Island. Specializes in giant Red River channel catfish and trophy greenback walleye on the Winnipeg River, Red River, and south basin of Lake Winnipeg, including winter ice fishing.",
+   "website": "https://blackwatercats.com",
+   "ice_fishing": true
+  },
+  {
+   "id": "cat-eye-outfitter",
+   "name": "Cat Eye Outfitter",
+   "location": "Selkirk (Red River, Winnipeg River, Lake Winnipeg)",
+   "kind": "guide",
+   "species": [
+    "Channel Catfish",
+    "Walleye"
+   ],
+   "description": "Guided fishing service led by Dan Kiazyk, operating year-round on the Red River, Winnipeg River, and Lake Winnipeg. Specializes in trophy channel catfish and greenback walleye, with all bait and equipment supplied.",
+   "website": "https://www.cateyeoutfitter.com/aboutthebusiness.php",
+   "ice_fishing": true
+  },
+  {
+   "id": "catdaddy-fishing-guide-service",
+   "name": "CatDaddy Fishing Guide Service",
+   "location": "Selkirk / Lockport (Red River)",
+   "kind": "guide",
+   "species": [
+    "Channel Catfish",
+    "Walleye"
+   ],
+   "description": "Fully licensed fishing outfitter based in Selkirk, led by guide Paul Munroe. Specializes in trophy channel catfish on the Red River and also fishes walleye on Lake Winnipeg, Traverse Bay, and Lake of the Woods, with all boats, tackle, and bait supplied.",
+   "website": "https://catdaddy.ca/",
+   "ice_fishing": false
+  },
+  {
+   "id": "city-cats-guiding-service",
+   "name": "City Cats Guiding Service",
+   "location": "Selkirk (Red River and Lake Winnipeg)",
+   "kind": "guide",
+   "species": [
+    "Channel Catfish",
+    "Walleye"
+   ],
+   "description": "Guiding service operating since 1999, specializing in monster channel catfish trips on the Red River from May through September. Also runs fall greenback walleye tours on the Red River and winter ice fishing trips for walleye on Lake Winnipeg.",
+   "website": "https://www.travelmanitoba.com/directory/city-cats-guiding-service/",
+   "ice_fishing": true
+  },
+  {
+   "id": "big-sand-lake-lodge",
+   "name": "Big Sand Lake Lodge",
+   "location": "Big Sand Lake, northern Manitoba (fly-in)",
+   "kind": "lodge",
+   "species": [
+    "Lake Trout",
+    "Northern Pike",
+    "Walleye",
+    "Arctic Grayling"
+   ],
+   "description": "Fly-in lodge about 550 miles north of Winnipeg, the only lodge on a 60,000-acre lake in the Seal River system. Packages include the round-trip flight from Winnipeg and guided fishing for lake trout, northern pike, walleye, and arctic grayling, with four outpost camps on additional lakes.",
+   "website": "http://www.bigsandlakelodge.com/",
+   "ice_fishing": false
+  },
+  {
+   "id": "nueltin-fly-in-lodges",
+   "name": "Nueltin Fly-In Lodges",
+   "location": "Nueltin Lake (fly-in)",
+   "kind": "lodge",
+   "species": [
+    "Northern Pike",
+    "Lake Trout",
+    "Arctic Grayling"
+   ],
+   "description": "Fly-in lodge operation on Nueltin Lake in northern Manitoba, also serving Kasmere Lake and Shannon Lake, with a pioneer catch-and-release program. Targets trophy northern pike, lake trout, and arctic grayling in remote subarctic waters.",
+   "website": "http://www.nueltin.com",
+   "ice_fishing": false
+  },
+  {
+   "id": "elk-island-lodge",
+   "name": "Elk Island Lodge",
+   "location": "God's Lake (fly-in)",
+   "kind": "lodge",
+   "species": [
+    "Walleye",
+    "Northern Pike",
+    "Lake Trout",
+    "Brook Trout"
+   ],
+   "description": "Family-run fly-in fishing lodge on God's Lake in northeastern Manitoba, about 344 miles north of Winnipeg. Guests fish for walleye, northern pike, lake trout, and brook trout with modern boats and experienced guides, plus fly-out brook trout trips on the Gods River.",
+   "website": "https://godslake.ca/",
+   "ice_fishing": false
+  },
+  {
+   "id": "healeys-gods-lake-narrows-lodge",
+   "name": "Healey's God's Lake Narrows Lodge",
+   "location": "Gods Lake Narrows",
+   "kind": "lodge",
+   "species": [
+    "Lake Trout",
+    "Northern Pike"
+   ],
+   "description": "Working wilderness lodge at Gods Lake Narrows, known for world-class lake trout fishing; Manitoba's all-time record lake trout was certified here in 1998. Offers guided fishing in 18-foot Lund boats across 65 miles of clear water dotted with islands.",
+   "website": "https://godslake.com",
+   "ice_fishing": false
+  },
+  {
+   "id": "trail-end-camp",
+   "name": "Trail End Camp & Outfitters",
+   "location": "Pointe du Bois (Winnipeg River, north end of Whiteshell Provincial Park)",
+   "kind": "guide",
+   "species": [
+    "Walleye",
+    "Northern Pike",
+    "Smallmouth Bass",
+    "Yellow Perch",
+    "Sturgeon"
+   ],
+   "description": "Drive-to, four-season lodge on the Winnipeg River run by Vance and Maureen Hrechkosy, with full-service waterfront cabins, rental boats, guides, and a charter boat service. The river holds walleye, northern pike, perch, sturgeon, and smallmouth bass, and the camp offers ice fishing packages in winter.",
+   "website": "https://trailendcamp.com/",
+   "ice_fishing": true
+  },
+  {
+   "id": "webbers-lodges",
+   "name": "Webber's Lodges",
+   "location": "North Knife Lake and Dymond Lake (fly-in)",
+   "kind": "lodge",
+   "species": [
+    "Lake Trout",
+    "Northern Pike",
+    "Arctic Grayling"
+   ],
+   "description": "Fly-in fishing operator with North Knife Lake Lodge and Dymond Lake Lodge in northern Manitoba, run on a strict catch-and-release policy. Targets lake trout, northern pike, and arctic grayling in remote subarctic lakes.",
+   "website": "https://webberslodges.com",
+   "ice_fishing": false
+  },
+  {
+   "id": "kannuk-outfitters",
+   "name": "Kannuk Outfitters",
+   "location": "Lake Winnipeg (based in Winnipeg)",
+   "kind": "guide",
+   "species": [
+    "Walleye",
+    "Sauger",
+    "Northern Pike",
+    "Yellow Perch"
+   ],
+   "description": "Professional guide service offering all-inclusive guided ice fishing trips on Lake Winnipeg, chasing the schools of greenback walleye in the south basin. Trips include a professional guide, pop-up ice shacks, bait, propane heaters, lunch, rods, tackle, and flashers; luxury Ice Castle fish house rentals are also offered.",
+   "website": "http://www.kannukoutdoors.com/",
+   "ice_fishing": true
+  },
+  {
+   "id": "lake-winnipeg-ice-fishing-shack-rentals",
+   "name": "Lake Winnipeg Ice Fishing Shack Rentals",
+   "location": "Balsam Harbour, east side of Lake Winnipeg",
+   "kind": "lodge",
+   "species": [
+    "Walleye"
+   ],
+   "description": "Ice shack rental operator on the east side of Lake Winnipeg at Balsam Harbour. Shacks sleep 4-6 people, are fully insulated and heated, and holes are drilled for guests each day; walleye is the primary target.",
+   "website": "http://www.lakewinnipegicefishingshackrentals.ca/",
+   "ice_fishing": true
+  },
+  {
+   "id": "laurie-river-lodge",
+   "name": "Laurie River Lodge",
+   "location": "McGavock Lake, near Lynn Lake (fly-in)",
+   "kind": "lodge",
+   "species": [
+    "Walleye",
+    "Northern Pike",
+    "Lake Trout"
+   ],
+   "description": "Fly-in lodge on McGavock Lake near Lynn Lake, reached via charter flights from Winnipeg and floatplane from Lynn Lake. Offers both guided all-inclusive packages and do-it-yourself outpost trips across about 1,600 square miles of wilderness, targeting trophy walleye, northern pike, and lake trout.",
+   "website": "https://laurieriverlodge.com",
+   "ice_fishing": false
+  },
+  {
+   "id": "north-haven-resort",
+   "name": "North Haven Resort",
+   "location": "Utik Lake (fly-in)",
+   "kind": "lodge",
+   "species": [
+    "Northern Pike",
+    "Walleye",
+    "Lake Trout"
+   ],
+   "description": "Fly-in fishing resort on Utik Lake in north-central Manitoba, the only lodge on the lake. Offers guided fishing for trophy northern pike, walleye, and lake trout with private lakefront cabins, fine dining, and spa facilities.",
+   "website": "https://www.northhavenresort.com/",
+   "ice_fishing": false
+  },
+  {
+   "id": "aikens-lake-wilderness-lodge",
+   "name": "Aikens Lake Wilderness Lodge",
+   "location": "Aikens Lake, Atikaki Provincial Park (fly-in)",
+   "kind": "lodge",
+   "species": [
+    "Walleye",
+    "Northern Pike",
+    "Lake Trout"
+   ],
+   "description": "Fly-in fishing lodge established in 1949 inside Atikaki Provincial Park in Manitoba's Eastern Region, reached only by floatplane. Set on a sandy beach near the Gammon River inlet, it targets trophy walleye, northern pike, and lake trout with a main lodge, mini-lodge, and outpost options.",
+   "website": "http://www.aikenslake.com/",
+   "ice_fishing": false
+  },
+  {
+   "id": "moak-lodge",
+   "name": "Moak Lodge and Campground",
+   "location": "Cross Bay, Cedar Lake (near Grand Rapids, drive-to)",
+   "kind": "lodge",
+   "species": [
+    "Walleye",
+    "Northern Pike",
+    "Burbot",
+    "Rainbow Trout"
+   ],
+   "description": "Drive-to lodge on Cross Bay of Cedar Lake, 450 km north of Winnipeg near Grand Rapids, with cabin rentals, rental boats, and tent/RV camping. Targets trophy northern pike, walleye, burbot, and stocked rainbow trout, and takes ice fishing reservations through March and April.",
+   "website": "http://moaklodge.ca/Site/Welcome.html",
+   "ice_fishing": true
+  },
+  {
+   "id": "icebound-excursions",
+   "name": "Icebound Excursions",
+   "location": "Lake Winnipeg (based in Winnipeg)",
+   "kind": "guide",
+   "species": [
+    "Walleye",
+    "Northern Pike",
+    "Black Crappie"
+   ],
+   "description": "SnoBear ice fishing outfitter on Lake Winnipeg, offering self-drive SnoBear rentals and guided SnoBear excursions since 2017. Primary target is the lake's famous greenback walleye, with northern pike and black crappie also possible.",
+   "website": "https://www.snobearrental.ca/about-us/",
+   "ice_fishing": true
+  },
+  {
+   "id": "bruin-outfitting",
+   "name": "Bruin Outfitting",
+   "location": "Lake Winnipeg (SnoBear ice fishing); Lake of the Woods (open-water musky)",
+   "kind": "guide",
+   "species": [
+    "Walleye",
+    "Muskellunge"
+   ],
+   "description": "Guided fishing charter founded in 2004 by Matt Cornell, offering SnoBear and run-and-gun ice fishing trips for greenback walleye on Lake Winnipeg. In open water the operation also runs musky fishing trips on Lake of the Woods.",
+   "website": "https://bruinoutfitting.com",
+   "ice_fishing": true
+  },
+  {
+   "id": "evergreen-lodge-resort",
+   "name": "Evergreen Lodge and Resort",
+   "location": "Clearwater Lake, near The Pas (drive-in)",
+   "kind": "lodge",
+   "species": [
+    "Lake Trout",
+    "Northern Pike",
+    "Burbot"
+   ],
+   "description": "Drive-in resort near The Pas with a main lodge, lakefront cabins, and an outpost camp, run by hosts Ken and Faye Kobelka. Offers guided ice fishing trips on Clearwater Lake in winter, where ice fishing for lake trout, northern pike, whitefish, and burbot is popular.",
+   "website": "https://evergreenlodgeandresort.com/",
+   "ice_fishing": true
+  }
+ ],
+ "ice_fishing": {
+  "best_spots": [
+   {
+    "name": "South basin (Balsam Harbour / Balsam Bay)",
+    "lake": "Lake Winnipeg",
+    "description": "The province's marquee ice fishery; guides and hut operators work out of access points on both the east and west sides to follow roaming walleye schools."
+   },
+   {
+    "name": "Mouth of the Red River",
+    "lake": "Lake Winnipeg",
+    "description": "Greenback walleye gather where the Red River enters the south basin; SnoBear outfitters run east across the lake to this area."
+   },
+   {
+    "name": "St. Andrews Lock and Dam",
+    "lake": "Red River",
+    "description": "The Lockport Ice Fishing Village offers easy river access, icehouse rentals (including the 'Cat House' and 'Taj Mahal'), and winter walleye fishing; summer brings catfish."
+   },
+   {
+    "name": "Pine Falls to Traverse Bay",
+    "lake": "Winnipeg River",
+    "description": "Blackwater Cats guides ice fishing on the Winnipeg River as well as the Red River and Lake Winnipeg, targeting greenback walleye."
+   },
+   {
+    "name": "Cross Bay",
+    "lake": "Cedar Lake",
+    "description": "Drive-to fishery near Grand Rapids with trophy walleye, pike, burbot, and stocked rainbow trout; Moak Lodge takes ice fishing reservations March through April."
+   },
+   {
+    "name": "Bakers Narrows",
+    "lake": "Lake Athapapuskow",
+    "description": "Short snowmobile rides from Bakers Narrows Lodge reach waters known for some of Manitoba's largest lake trout, plus golden walleye and northern pike."
+   },
+   {
+    "name": "Near Flin Flon",
+    "lake": "Foot Print Lake",
+    "description": "Stocked trout lake close to Moak Lodge; winter fishing for rainbow, tiger, brown, and brook trout."
+   },
+   {
+    "name": "Near Roblin",
+    "lake": "Twin Lake",
+    "description": "DIY-friendly stocked lake off Highway 83, close to shore access, known for energetic tiger trout."
+   },
+   {
+    "name": "The Pas area",
+    "lake": "Clearwater Lake",
+    "description": "Provincial park waters where winter ice fishing for lake trout, northern pike, whitefish, and burbot is popular; Evergreen Lodge and Resort offers guided trips and cabins."
+   },
+   {
+    "name": "Interlake region",
+    "lake": "Lake Manitoba",
+    "description": "Year-round drive-to fishing in the Interlake region between Lakes Winnipeg and Manitoba; signature species include greenback walleye and yellow perch."
+   }
+  ],
+  "hut_rentals": [
+   {
+    "name": "Lake Winnipeg Ice Fishing Shack Rentals",
+    "lake": "Balsam Harbour, east side of Lake Winnipeg",
+    "detail": "http://www.lakewinnipegicefishingshackrentals.ca/ | +1 (204) 406-5586",
+    "website": "http://www.lakewinnipegicefishingshackrentals.ca/"
+   },
+   {
+    "name": "Kannuk Outfitters",
+    "lake": "Lake Winnipeg",
+    "detail": "http://www.kannukoutdoors.com/ | +1 (204) 226-5478",
+    "website": "http://www.kannukoutdoors.com/"
+   },
+   {
+    "name": "Icebound Excursions",
+    "lake": "Lake Winnipeg",
+    "detail": "https://www.snobearrental.ca/about-us/ | (204) 960-7830",
+    "website": "https://www.snobearrental.ca/about-us/"
+   },
+   {
+    "name": "Bruin Outfitting",
+    "lake": "Lake Winnipeg",
+    "detail": "https://bruinoutfitting.com | 1 (204) 291-5375",
+    "website": "https://bruinoutfitting.com"
+   }
+  ],
+  "safety": [
+   "Manitoba is one of Canada's top ice fishing destinations, with a long winter season and thousands of lakes offering hardwater fishing from December through March. The signature target is the greenback walleye of Lake Winnipeg's south basin \u2014 a uniquely colored strain of walleye that draws trophy hunters from across North America \u2014 but the province's ice fisheries are far more diverse than one lake. Stocked trout lakes such as Foot Print Lake and Twin Lake produce rainbow, tiger, brown, and brook trout, while northern drive-to lakes like Cedar Lake and Lake Athapapuskow give up walleye, northern pike, lake trout, and burbot.\n\nAccess ranges from fully guided day trips to remote lodge stays. SnoBear outfitters on Lake Winnipeg rent heated, self-drive mobile ice shacks or run guided excursions that chase roaming walleye schools, and guides on the Red River put anglers on winter walleye at Lockport and trophy channel catfish through the ice. Lodges such as Bakers Narrows Lodge on Lake Athapapuskow, Moak Lodge on Cedar Lake, and Evergreen Lodge and Resort near The Pas host multi-day ice fishing stays, while experienced anglers can drive to DIY-friendly waters like Twin Lake near Roblin. Outfitters generally supply heated shelters, augers, rods, tackle, and local knowledge, making the sport accessible to first-timers as well as seasoned hardwater anglers.\n\nSafety comes first: Manitoba ice conditions change fast, and checking local ice reports is essential before heading out. Provincial fishing regulations \u2014 including seasons, slot limits, and licence requirements \u2014 apply on the ice exactly as they do in open water, so review the current Manitoba Angler's Guide before you fish.",
+   "Only go on ice at least 10 cm (4 in) thick for ice fishing on foot, 14 cm (5.5 in) for a snowmobile or ATV, and 32 cm (12.5 in) or more for a car or small truck. These minimums assume new, clear, solid ice \u2014 double the thickness for white or snow ice.",
+   "Ice seldom freezes uniformly; it can be 30 cm thick in one spot and 10 cm a few metres away. Test thickness repeatedly with a spud bar or auger as you move, especially after traveling across cracks or pressure ridges.",
+   "Stay away from river inlets and outlets, streams, culverts, and bridge pilings \u2014 moving water is the last to freeze and the first to thaw, and ice there is often dangerously thin.",
+   "Never venture onto the ice alone; a slip, fall, or breakthrough can be fatal without help nearby.",
+   "Before every trip, check local ice thickness reports and follow Manitoba provincial fishing regulations, including season dates and limits.",
+   "Tell someone where you are going and when you expect to return, and carry ice picks, a rope, and a charged phone in a waterproof bag."
+  ]
+ },
+ "species_advice": [
+  {
+   "species": "Walleye",
+   "overview": "Manitoba's signature sport fish. Lake Winnipeg's famous green-backed walleye draw ice anglers from around the world, while the Red River offers a strong fall run near Lockport.",
+   "techniques": [
+    "Jigging live minnows near bottom on structure",
+    "Trolling crankbaits along contours in open water",
+    "Drifting with bottom bouncers and nightcrawlers",
+    "Ice fishing with rattle baits and jigging spoons",
+    "Deadstick rod with live bait next to an active jigging rod"
+   ],
+   "baits": [
+    "Live minnows on jigs",
+    "Crankbaits",
+    "Jigging spoons",
+    "Rattle baits",
+    "Bottom bouncers with nightcrawlers"
+   ],
+   "best_seasons": "Spring and fall open water; September-October fall run on the Red River; prime ice fishing December through March."
+  },
+  {
+   "species": "Northern Pike",
+   "overview": "Manitoba's aggressive ambush predator, found in everything from Lake Winnipeg's bays to remote northern fly-in lakes, with true trophy potential.",
+   "techniques": [
+    "Casting spoons, spinnerbaits and jerkbaits along weed edges and rocky points",
+    "Fly fishing with large streamers and poppers on an 8-weight rod",
+    "Ice fishing with tip-ups baited with large shiners or sucker minnows",
+    "Trolling to cover water and locate active fish"
+   ],
+   "baits": [
+    "Large spoons",
+    "Spinnerbaits",
+    "Jerkbaits",
+    "Large streamers (fly)",
+    "Large shiners or sucker minnows on tip-ups"
+   ],
+   "best_seasons": "Spring, when pike pack into warming bays and river mouths; steady summer action on weedlines; fall for trophy fish on points and windblown shorelines; winter ice season with tip-ups."
+  },
+  {
+   "species": "Lake Trout",
+   "overview": "Deep, cold shield lakes in northern Manitoba \u2014 Lake Athapapuskow, Clearwater, the Cranberry Chain, Wekusko and Kississing \u2014 hold some of the biggest lake trout anywhere, and they're very catchable through the ice.",
+   "techniques": [
+    "Jigging heavy tubes, jigs and spoons on deep structure",
+    "Dead sticking with ciscos on points or saddles",
+    "Trolling deep with downriggers or lead-core line in summer",
+    "Casting bucktail jigs in shallow water during spring and fall"
+   ],
+   "baits": [
+    "Tubes and jigging plastics",
+    "Heavy spoons",
+    "Jigging Rap-style baits",
+    "Ciscos (dead bait)",
+    "Deep-diving crankbaits",
+    "Bucktail jigs"
+   ],
+   "best_seasons": "Winter through the ice; late August to early September when big females move onto shallow rocky reefs for the fall spawn; early spring when trout ride higher in the water column."
+  },
+  {
+   "species": "Channel Catfish",
+   "overview": "The Red River below the Lockport Dam is one of North America's premier trophy channel cat fisheries, with 20-plus-pound fish common and 30-pounders attainable.",
+   "techniques": [
+    "Slip-sinker bottom rigging behind an anchored boat",
+    "Slip-bobber float fishing along current edges",
+    "Anchoring at the head or edge of holes and casting rigs downriver"
+   ],
+   "baits": [
+    "Cut goldeye",
+    "Cut suckers or ciscos",
+    "Frozen shrimp",
+    "Chicken livers",
+    "Nightcrawlers",
+    "Leopard frogs",
+    "Stink baits"
+   ],
+   "best_seasons": "Late May-June prespawn bite in tailwaters is the peak; fishing stays strong through summer and into October."
+  },
+  {
+   "species": "Smallmouth Bass",
+   "overview": "Clear Canadian Shield lakes in Nopiming and Whiteshell Provincial Parks grow aggressive smallmouth that feed heavily on crayfish around rocks and boulders.",
+   "techniques": [
+    "Casting tube jigs along rocky points and boulders",
+    "Drop shotting near deeper structure",
+    "Jerkbait retrieves along shorelines",
+    "Topwater walking baits early in the day",
+    "Finesse presentations on subtle points and corners"
+   ],
+   "baits": [
+    "Tube jigs (brown, pumpkinseed)",
+    "Soft-plastic craws",
+    "Jerkbaits",
+    "Crankbaits",
+    "Topwater walkers",
+    "Live crayfish or minnows"
+   ],
+   "best_seasons": "Late spring through early fall; late fall can produce when fish school up."
+  },
+  {
+   "species": "Yellow Perch",
+   "overview": "Manitoba's Interlake shoal lakes produce jumbo perch, and Lake Winnipeg perch keep ice anglers busy all winter with fast, tasty action.",
+   "techniques": [
+    "Jigging small tungsten jigs and spoons tipped with bait",
+    "Dead sticking with live minnows on ultra-light rods",
+    "Rattle baits when perch are aggressive"
+   ],
+   "baits": [
+    "Tungsten jigs",
+    "Small spoons",
+    "Wax worms",
+    "Live or salted minnows",
+    "Small soft plastics"
+   ],
+   "best_seasons": "Winter ice season, especially late ice in March when perch move shallow; summer jigging in deeper water."
+  },
+  {
+   "species": "Burbot",
+   "overview": "Manitoba's freshwater cod is a winter specialty \u2014 Cedar Lake is famous for its burbot spawn under the ice, and the Red River's deeper stretches hold them too.",
+   "techniques": [
+    "Night jigging with heavy glow spoons",
+    "Dead sticking with scented bait near bottom",
+    "Tip-ups rigged just off bottom overnight"
+   ],
+   "baits": [
+    "Glow jigging spoons",
+    "Heavy jigs",
+    "Large minnows",
+    "Cut bait (smelt, herring)",
+    "Nightcrawlers"
+   ],
+   "best_seasons": "Winter, peaking around the March spawn under the ice."
+  },
+  {
+   "species": "Lake Whitefish",
+   "overview": "An underrated ice-fishing target in Manitoba \u2014 Lake Winnipeg and Cedar Lake both hold trophy-class whitefish that reward a finesse approach.",
+   "techniques": [
+    "Finesse jigging with compact spoons and jigs",
+    "Staying mobile to locate roaming schools",
+    "Light presentations that keep the lure above the fish"
+   ],
+   "baits": [
+    "Compact spoons",
+    "Small jigs",
+    "Pieces of minnow"
+   ],
+   "best_seasons": "Winter through the ice."
+  },
+  {
+   "species": "Goldeye",
+   "overview": "A Manitoba river classic \u2014 bright silver, eager biters in the Red, Assiniboine and Winnipeg Rivers, and the province's famous smoked fish delicacy.",
+   "techniques": [
+    "Slip-bobber fishing with worms close to shore",
+    "Casting small spinners, spoons and jigs"
+   ],
+   "baits": [
+    "Worms on small hooks",
+    "Small spinners",
+    "Spoons",
+    "Crankbaits",
+    "Small jigs"
+   ],
+   "best_seasons": "Spring and early summer as river water warms; active through the summer months."
+  },
+  {
+   "species": "Rainbow Trout",
+   "overview": "Manitoba stocks rainbows in lakes like Footprint Lake and throughout the Whiteshell, giving shore and ice anglers fun, hard-fighting trout close to home.",
+   "techniques": [
+    "Still fishing with a small jig and nightcrawler a foot or two off bottom",
+    "Casting small spoons and spinners",
+    "Fly fishing with streamers and leech patterns in fall"
+   ],
+   "baits": [
+    "Small jigs",
+    "Nightcrawlers",
+    "Deli shrimp",
+    "Small spoons and spinners",
+    "Woolly buggers"
+   ],
+   "best_seasons": "Fall, when stocked trout feed aggressively on shallow weed flats; winter through the ice; spring after ice-out."
+  }
+ ],
+ "master_angler": {
+  "about": "The Manitoba Master Angler Program is a trophy-fish recognition program run by Travel Manitoba (with the Manitoba Wildlife Federation historically involved). Any angler who catches a fish in Manitoba meeting or exceeding the program's minimum length for one of 30 eligible species can register it. Awards are given per qualifying fish, with bronze/silver/gold/platinum/diamond milestone badges for number of different species caught, plus specialist badges per species, and special recognition for catch-and-release. Program website: anglers.travelmanitoba.com.",
+  "how_it_works": [
+   "Catch a fish in Manitoba (in accordance with provincial angling regulations, using hook and line) that meets or exceeds the minimum length for its species.",
+   "Take a horizontal measurement photo of the entire length of the fish against a ruler, measuring tape or bump board (photo must meet rule #3; action photo optional but encouraged).",
+   "Submissions with images showing vertical gill/eye holds, weigh-scale or fish-stringer holds, frozen fish declared as released, thumbnails/screen captures, or blood in photos are not accepted.",
+   "Submit digitally through the Master Angler Awards website (anglers.travelmanitoba.com) or the Master Angler mobile app within one year of the catch.",
+   "Travel Manitoba is the sole and final judge of entries.",
+   "Every qualifying fish receives a certificate (digital certificate by email for non-level-achieving catches; mailed hard copy for the first Master Angler award and when a new level or specialist badge is achieved); catch-and-release catches earn a special release recognition/crest."
+  ],
+  "qualifying_sizes": [
+   {
+    "species": "Arctic Char",
+    "min_length_in": "51 cm (20 in)"
+   },
+   {
+    "species": "Arctic Grayling",
+    "min_length_in": "46 cm (18 in)"
+   },
+   {
+    "species": "Black Crappie",
+    "min_length_in": "33 cm (13 in)"
+   },
+   {
+    "species": "Brook Trout",
+    "min_length_in": "51 cm (20 in)"
+   },
+   {
+    "species": "Brown Trout",
+    "min_length_in": "51 cm (20 in)"
+   },
+   {
+    "species": "Bullhead",
+    "min_length_in": "33 cm (13 in)"
+   },
+   {
+    "species": "Burbot",
+    "min_length_in": "76 cm (30 in)"
+   },
+   {
+    "species": "Common Carp",
+    "min_length_in": "76 cm (30 in)"
+   },
+   {
+    "species": "Channel Catfish",
+    "min_length_in": "89 cm (35 in)"
+   },
+   {
+    "species": "Freshwater Drum",
+    "min_length_in": "61 cm (24 in)"
+   },
+   {
+    "species": "Goldeye",
+    "min_length_in": "35.5 cm (14 in)"
+   },
+   {
+    "species": "Lake Sturgeon",
+    "min_length_in": "109 cm (43 in)"
+   },
+   {
+    "species": "Lake Trout",
+    "min_length_in": "89 cm (35 in)"
+   },
+   {
+    "species": "Lake Whitefish",
+    "min_length_in": "56 cm (22 in)"
+   },
+   {
+    "species": "Largemouth Bass",
+    "min_length_in": "46 cm (18 in)"
+   },
+   {
+    "species": "Mooneye",
+    "min_length_in": "35.5 cm (14 in)"
+   },
+   {
+    "species": "Muskellunge",
+    "min_length_in": "79 cm (31 in)"
+   },
+   {
+    "species": "Northern Pike",
+    "min_length_in": "104 cm (41 in)"
+   },
+   {
+    "species": "Rainbow Trout",
+    "min_length_in": "51 cm (20 in)"
+   },
+   {
+    "species": "Rock Bass",
+    "min_length_in": "25.5 cm (10 in)"
+   },
+   {
+    "species": "Sauger",
+    "min_length_in": "46 cm (18 in)"
+   },
+   {
+    "species": "Smallmouth Bass",
+    "min_length_in": "46 cm (18 in)"
+   },
+   {
+    "species": "Splake",
+    "min_length_in": "51 cm (20 in)"
+   },
+   {
+    "species": "Sucker",
+    "min_length_in": "46 cm (18 in)"
+   },
+   {
+    "species": "Sunfish",
+    "min_length_in": "18 cm (7 in)"
+   },
+   {
+    "species": "Tiger Trout",
+    "min_length_in": "51 cm (20 in)"
+   },
+   {
+    "species": "Tullibee (Cisco)",
+    "min_length_in": "40.5 cm (16 in)"
+   },
+   {
+    "species": "Walleye",
+    "min_length_in": "71 cm (28 in)"
+   },
+   {
+    "species": "White Bass",
+    "min_length_in": "38 cm (15 in)"
+   },
+   {
+    "species": "Yellow Perch",
+    "min_length_in": "33 cm (13 in)"
+   }
+  ],
+  "top_lakes": []
+ },
+ "youtube_shows": [
+  {
+   "name": "LittleReelRebel",
+   "description": "Fishing channel run by Dave's nephew \u2014 a young Manitoba angler posting fishing moments and episodes.",
+   "url": "https://www.youtube.com/results?search_query=LittleReelRebel"
+  },
+  {
+   "name": "Uncut Angling",
+   "description": "Legendary Manitoba fishing channel by Aaron Wiebe \u2014 uncut, unscripted episodes chasing walleye, catfish, pike and smallmouth across the province.",
+   "url": "https://www.youtube.com/user/uncutangling"
+  },
+  {
+   "name": "Jay Siemens",
+   "description": "High-production fishing filmmaker and former Uncut Angling cameraman; Manitoba trophy fishing, tips and cinematic adventure videos.",
+   "url": "https://www.youtube.com/c/jaysiemens/"
+  },
+  {
+   "name": "Clayton Schick Outdoors",
+   "description": "Manitoba fishing guide turned YouTuber; open-water and ice fishing for giant lake trout, greenback walleye and monster pike across the province.",
+   "url": "https://www.youtube.com/@UC2a2x4_Vi-LbSBzKKJy7-7w"
+  },
+  {
+   "name": "Nicole Stone Outdoors",
+   "description": "North Dakota-based angler and media entrepreneur who partners with Hunt Fish Manitoba \u2014 including a Manitoba girls' trip jigging lake trout at Bakers Narrows.",
+   "url": "https://www.youtube.com/channel/UCguFClYXRte1XA1d7gw0d7A"
+  },
+  {
+   "name": "Jessie Belot Angling",
+   "description": "Manitoba angler posting ice-fishing adventures \u2014 Lake Winnipeg greenbacks, burbot and whitefish at Moak Lodge, and burbot-underwater footage.",
+   "url": "https://www.youtube.com/channel/UCQNNjBPOiz4f2R02tlqEg3w"
+  },
+  {
+   "name": "Finally Fishing",
+   "description": "Winnipeg bank angler documenting Red River, Lockport and Lake Winnipeg fishing \u2014 walleye, catfish, sturgeon and ice-fishing village trips.",
+   "url": "https://www.youtube.com/results?search_query=Finally+Fishing"
+  }
+ ],
+ "hot_lakes": [
+  {
+   "lake": "Lake Winnipeg (Hecla Island / Gull Harbour area)",
+   "date": "2026-10-06",
+   "species": "Walleye (greenbacks)",
+   "report": "Anglers posting on YouTube and social media in late September and early October 2026 report a strong fall greenback walleye bite off Hecla Island, with guided boats landing 40+ walleye in a day, multiple fish over 27 inches, and one guide boat reporting a 100-fish day with two Manitoba Master Angler walleye. Simple jigs with plastic or live bait near the Gull Harbour lighthouse are the pattern being shared."
+  },
+  {
+   "lake": "Red River (near Lockport)",
+   "date": "2026-10-06",
+   "species": "Channel catfish, Walleye, Northern pike, Freshwater drum",
+   "report": "Posts from October 2026 describe productive fall fishing on the Red River near Lockport: a guided pontoon trip on Oct 6 landed multiple large channel catfish with the top fish earning a Manitoba Master Angler mention, and an Oct 1 trip report shows a mixed bag of northern pike, greenback walleye, bullhead catfish, and freshwater drum."
+  },
+  {
+   "lake": "Waterhen River",
+   "date": "2026-10-06",
+   "species": "Walleye, Freshwater drum",
+   "report": "Cat Eye Outfitter posted a fall trip report from Manitoba's Waterhen River in mid-September 2026 showing several large walleye and a freshwater drum, presented as promotion for guided fall walleye trips. This is a guide marketing post, so treat it as a signal of fish being caught rather than an independent catch report."
+  },
+  {
+   "lake": "Whitemud River",
+   "date": "2026-10-06",
+   "species": "Walleye",
+   "report": "Cat Eye Outfitter's head guide posted on Oct 2, 2026 describing the Whitemud River as a productive trophy fall walleye fishery while advertising October guided trips. This is a guide marketing post, so treat it as a signal of fish being caught rather than an independent catch report."
+  },
+  {
+   "lake": "Lake Manitoba (Narrows)",
+   "date": "2026-10-06",
+   "species": "Walleye",
+   "report": "Cat Eye Outfitter posted a fall walleye catch at the Lake Manitoba Narrows on Sept 30, 2026, after wind forced the guide off Hecla. A separate Oct 4 community notice says the Narrows filleting station and porta-potty/garbage services close after the Oct 16-18 weekend, suggesting the fall season there is winding down."
+  },
+  {
+   "lake": "Lake Winnipegosis (Toba region)",
+   "date": "2026-10-06",
+   "species": "Walleye, Largemouth bass",
+   "report": "An angler posted a Sept 30, 2026 carousel of trophy catches from the Lake Winnipegosis/Toba region in Manitoba, including a walleye and a largemouth bass. The exact water body is not named in the post, so this is a regional signal rather than a lake-specific report."
+  },
+  {
+   "lake": "Northern Manitoba lakes (water body not named)",
+   "date": "2026-10-06",
+   "species": "Northern pike, Walleye, Lake trout",
+   "report": "An angler's Oct 5, 2026 carousel documents a multi-day fall trip in Northern Manitoba with large northern pike, walleye, and lake trout caught from a small aluminum boat across changing weather. The specific lake is not named, so this is a regional signal only."
+  },
+  {
+   "lake": "Hillside Beach area, Manitoba (lake not specified in post)",
+   "date": "2026-10-06",
+   "species": "Walleye (greenbacks)",
+   "report": "An Oct 4, 2026 post advertising fall fishing at Hillside Beach, Manitoba mentions 'biting greenbacks' (walleye) alongside fall colors and crisp air. The post is promotional, so treat it as a signal of walleye being caught in the area rather than a detailed catch report."
+  }
+ ]
+}
