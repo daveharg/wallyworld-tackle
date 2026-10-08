@@ -1,4 +1,6 @@
-// /api/fishmb/rentals/[id]/bookings — POST a booking request (auth; renter ≠ owner).
+// /api/fishmb/rentals/[id]/bookings —
+// GET: owner-only list of booking requests (includes renter contact info).
+// POST: a booking request (auth; renter ≠ owner).
 
 import { NextRequest, NextResponse } from "next/server";
 import {
@@ -13,8 +15,26 @@ import {
   getRental,
   createBooking,
   datesInRange,
+  getRentalBookingsForOwner,
 } from "@/lib/fish/rentals";
 import { validDate } from "../slots/route";
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  await ensureRentalsTables();
+  const me = await fishUserFromRequest(req);
+  if (!me) return unauthorized();
+  const { id } = await params;
+  const rental = await getRental(id);
+  if (!rental) return notFound("Rental not found.");
+  if (rental.owner_user_id !== me.id) {
+    return forbidden("Only the rental owner can see booking requests.");
+  }
+  const bookings = await getRentalBookingsForOwner(id, me.id);
+  return NextResponse.json({ bookings });
+}
 
 export async function POST(
   req: NextRequest,

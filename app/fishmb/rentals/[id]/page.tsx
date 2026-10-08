@@ -32,11 +32,17 @@ interface Booking {
   rental_title: string;
   renter_user_id: string;
   renter_name: string;
+  renter_avatar_url: string | null;
   start_date: string;
   end_date: string;
   renter_contact: string;
   status: "pending" | "confirmed" | "cancelled";
   created_at: string;
+}
+
+function fmtDate(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
 type DayStatus = "open" | "booked" | "none";
@@ -121,9 +127,8 @@ export default function RentalDetailPage() {
   const loadOwnerBookings = useCallback(async () => {
     if (!isOwner) return;
     try {
-      const d = await fishFetch("/api/fishmb/bookings");
-      const all = d.as_owner as Booking[];
-      setBookings(all.filter((b) => b.rental_id === id));
+      const d = await fishFetch(`/api/fishmb/rentals/${id}/bookings`);
+      setBookings((d.bookings as Booking[]) ?? []);
     } catch {
       /* ignore */
     }
@@ -310,6 +315,7 @@ export default function RentalDetailPage() {
 
   const meta = catMeta(rental.category);
   const photos = rental.photos.length > 0 ? rental.photos : [];
+  const pendingCount = bookings.filter((b) => b.status === "pending").length;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 md:py-12">
@@ -333,6 +339,108 @@ export default function RentalDetailPage() {
           <span>by {rental.owner_name}</span>
         </div>
       </div>
+
+      {/* Owner: booking requests — front and center, above the public details */}
+      {isOwner && (
+        <div className="mt-6 bg-gold/10 border-2 border-gold/40 rounded-3xl p-6">
+          <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-1 flex items-center gap-2 flex-wrap">
+            📥 Booking requests
+            {pendingCount > 0 && (
+              <span className="bg-signal text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+                {pendingCount} new
+              </span>
+            )}
+          </h2>
+          <p className="text-pine/60 text-sm mb-4">
+            Call the renter to close the deal — confirming holds the days, declining reopens them.
+          </p>
+          {bookings.length === 0 ? (
+            <p className="text-pine/50 text-sm">No booking requests yet. Share your listing to get the word out.</p>
+          ) : (
+            <div className="space-y-3">
+              {bookings.map((b) => (
+                <div
+                  key={b.id}
+                  className="bg-white border border-pine/10 rounded-2xl p-4 flex flex-wrap items-start justify-between gap-3"
+                >
+                  <div className="flex items-start gap-3 min-w-0">
+                    {b.renter_avatar_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={b.renter_avatar_url}
+                        alt={b.renter_name}
+                        className="w-11 h-11 rounded-full object-cover border-2 border-gold shrink-0"
+                      />
+                    ) : (
+                      <span className="w-11 h-11 rounded-full bg-pine/10 flex items-center justify-center font-bold text-pine text-lg shrink-0">
+                        {b.renter_name.charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                    <div className="min-w-0">
+                      <p className="font-bold text-pine truncate">{b.renter_name}</p>
+                      <a
+                        href={`tel:${b.renter_contact}`}
+                        className="text-signal-dark font-bold text-sm"
+                      >
+                        📞 {b.renter_contact}
+                      </a>
+                      <p className="text-sm text-pine/60 mt-0.5">
+                        {b.start_date} → {b.end_date} · requested {fmtDate(b.created_at)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full ${
+                        b.status === "confirmed"
+                          ? "bg-pine text-white"
+                          : b.status === "cancelled"
+                          ? "bg-pine/10 text-pine/40"
+                          : "bg-gold/25 text-signal-dark"
+                      }`}
+                    >
+                      {b.status}
+                    </span>
+                    {b.status === "pending" && (
+                      <>
+                        <button
+                          onClick={() => transition(b.id, "confirmed")}
+                          disabled={bookingsBusy === b.id}
+                          className="bg-pine hover:bg-pine-deep text-white text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-full disabled:opacity-40 transition-colors"
+                        >
+                          {bookingsBusy === b.id ? "…" : "Confirm"}
+                        </button>
+                        <button
+                          onClick={() => transition(b.id, "cancelled")}
+                          disabled={bookingsBusy === b.id}
+                          className="bg-white border border-pine/15 text-pine/70 text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-full disabled:opacity-40"
+                        >
+                          Decline
+                        </button>
+                      </>
+                    )}
+                    {b.status === "confirmed" && (
+                      <button
+                        onClick={() => transition(b.id, "cancelled")}
+                        disabled={bookingsBusy === b.id}
+                        className="bg-white border border-pine/15 text-pine/70 text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-full disabled:opacity-40"
+                      >
+                        Cancel booking
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          <button
+            onClick={deleteListing}
+            className="mt-6 text-xs font-bold uppercase tracking-wider text-signal-dark/70 hover:text-signal-dark"
+          >
+            Delete this listing
+          </button>
+        </div>
+      )}
 
       {photos.length > 0 && (
         <div className="mt-6">
@@ -501,80 +609,6 @@ export default function RentalDetailPage() {
           Prefer to talk first? Reach out directly — deals are made with the owner, not through this site.
         </p>
       </div>
-
-      {/* Owner: booking requests */}
-      {isOwner && (
-        <div className="mt-6 bg-white border border-pine/10 rounded-3xl p-6">
-          <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
-            Booking requests
-          </h2>
-          {bookings.length === 0 ? (
-            <p className="text-pine/50 text-sm">No booking requests yet. Share your listing to get the word out.</p>
-          ) : (
-            <div className="space-y-3">
-              {bookings.map((b) => (
-                <div
-                  key={b.id}
-                  className="bg-paper-deep border border-pine/10 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3"
-                >
-                  <div>
-                    <p className="font-bold text-pine">
-                      {b.renter_name} <span className="font-normal text-pine/60">· {b.renter_contact}</span>
-                    </p>
-                    <p className="text-sm text-pine/60">
-                      {b.start_date} → {b.end_date} ·{" "}
-                      <span
-                        className={
-                          b.status === "confirmed"
-                            ? "text-pine font-bold"
-                            : b.status === "cancelled"
-                            ? "text-pine/40 line-through"
-                            : "text-gold font-bold"
-                        }
-                      >
-                        {b.status}
-                      </span>
-                    </p>
-                  </div>
-                  {b.status === "pending" && (
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => transition(b.id, "confirmed")}
-                        disabled={bookingsBusy === b.id}
-                        className="bg-pine text-white text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-full disabled:opacity-40"
-                      >
-                        {bookingsBusy === b.id ? "…" : "Confirm"}
-                      </button>
-                      <button
-                        onClick={() => transition(b.id, "cancelled")}
-                        disabled={bookingsBusy === b.id}
-                        className="bg-paper-deep border border-pine/15 text-pine/70 text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-full disabled:opacity-40"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  )}
-                  {b.status === "confirmed" && (
-                    <button
-                      onClick={() => transition(b.id, "cancelled")}
-                      disabled={bookingsBusy === b.id}
-                      className="bg-paper-deep border border-pine/15 text-pine/70 text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-full disabled:opacity-40"
-                    >
-                      Cancel
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-          <button
-            onClick={deleteListing}
-            className="mt-6 text-xs font-bold uppercase tracking-wider text-signal-dark/70 hover:text-signal-dark"
-          >
-            Delete this listing
-          </button>
-        </div>
-      )}
     </div>
   );
 }

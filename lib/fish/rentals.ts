@@ -40,6 +40,7 @@ export interface RentalBooking {
   owner_name: string;
   renter_user_id: string;
   renter_name: string;
+  renter_avatar_url: string | null;
   start_date: string; // YYYY-MM-DD
   end_date: string; // YYYY-MM-DD
   renter_name_note: string | null;
@@ -246,7 +247,7 @@ export function todayPlus(offset: number): string {
 const BOOKING_SELECT = `
   SELECT b.id, b.rental_id, r.title AS rental_title, r.category AS rental_category,
          r.owner_user_id, ou.name AS owner_name,
-         b.renter_user_id, u.name AS renter_name,
+         b.renter_user_id, u.name AS renter_name, u.avatar_url AS renter_avatar_url,
          to_char(b.start_date, 'YYYY-MM-DD') AS start_date,
          to_char(b.end_date, 'YYYY-MM-DD') AS end_date,
          b.renter_name AS renter_name_note, b.renter_contact, b.status, b.created_at
@@ -276,6 +277,19 @@ export async function getBookingsForRental(rentalId: string): Promise<RentalBook
   return query<RentalBooking>(
     `${BOOKING_SELECT} WHERE b.rental_id = $1 ORDER BY b.start_date ASC`,
     [rentalId]
+  );
+}
+
+/** Owner-only: every booking for one rental, newest first. Ownership is
+ *  enforced in SQL as well as by the route, so contact info never leaks. */
+export async function getRentalBookingsForOwner(
+  rentalId: string,
+  ownerId: string
+): Promise<RentalBooking[]> {
+  await ensureRentalsTables();
+  return query<RentalBooking>(
+    `${BOOKING_SELECT} WHERE b.rental_id = $1 AND r.owner_user_id = $2 ORDER BY b.created_at DESC`,
+    [rentalId, ownerId]
   );
 }
 

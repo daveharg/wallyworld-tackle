@@ -9,6 +9,7 @@ import {
 import {
   ensureRentalsTables,
   listRentals,
+  getMyRentals,
   createRental,
   RENTAL_CATEGORIES,
   type RentalCategory,
@@ -22,6 +23,12 @@ export async function GET(req: NextRequest) {
   const category = searchParams.get("category");
   if (category !== null && !RENTAL_CATEGORIES.includes(category as RentalCategory)) {
     return badRequest("category must be shack, tent, equipment, or guide.");
+  }
+  if (searchParams.get("mine") === "1") {
+    const me = await fishUserFromRequest(req);
+    if (!me) return unauthorized();
+    const items = await getMyRentals(me.id);
+    return NextResponse.json({ items });
   }
   const items = await listRentals((category as RentalCategory) || undefined);
   return NextResponse.json({ items });
