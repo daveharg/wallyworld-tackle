@@ -407,7 +407,10 @@ export default function FeedPage() {
     const trimmed = q.trim();
     setActiveQ(trimmed);
     activeQRef.current = trimmed;
-    load(trimmed || undefined, tabRef.current);
+    // Bottom-bar search always spans every post type, not just the current tab.
+    setTab("all");
+    tabRef.current = "all";
+    load(trimmed || undefined, "all");
   };
 
   const clearSearch = () => {
