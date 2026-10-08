@@ -94,6 +94,14 @@ const FEATURE_PROMOS = [
     cta: "Start chatting",
     href: "/fishmb/messages",
   },
+  {
+    img: "/fishmb/promos/weather.jpg",
+    badge: "🌦️ Bite weather",
+    title: "Is the weather in your favour?",
+    body: "Barometric pressure gauge with the ideal bite range, wind, cloud cover and storm-front tracking — plus a live wind map. Know before you go.",
+    cta: "Check the bite",
+    href: "/fishmb/weather",
+  },
 ];
 
 function FeaturePromoCard({ promo }: { promo: (typeof FEATURE_PROMOS)[number] }) {
@@ -871,8 +879,8 @@ function FeedPageInner() {
             {feedAds.length > 0 && (idx + 1) % 8 === 0 && (
               <FeedAdCard ad={feedAds[Math.floor((idx + 1) / 8 - 1) % feedAds.length]} />
             )}
-            {/* Feature promos for new visitors — after the 3rd, 6th and 9th posts */}
-            {!user && (idx === 2 || idx === 5 || idx === 8) && (
+            {/* Feature promos for new visitors — after the 3rd, 6th, 9th and 12th posts */}
+            {!user && (idx === 2 || idx === 5 || idx === 8 || idx === 11) && (
               <FeaturePromoCard promo={FEATURE_PROMOS[(idx - 2) / 3]} />
             )}
             </Fragment>
