@@ -1,6 +1,8 @@
 // /api/fishmb/bookings — auth; the signed-in user's bookings
 // as owner ("as_owner") and as renter ("as_renter").
 
+export const dynamic = "force-dynamic";
+
 import { NextRequest, NextResponse } from "next/server";
 import { fishUserFromRequest, unauthorized } from "@/lib/fish/auth";
 import {
