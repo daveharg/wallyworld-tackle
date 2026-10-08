@@ -552,7 +552,7 @@ export default function FeedPage() {
       setCatchSpecies("");
       setCatchLength("");
       setDraft("");
-      setPhoto(null);
+      setCatchPhotos([]);
       setTournamentId("");
       setComposerOpen(false);
       load();
@@ -705,14 +705,40 @@ export default function FeedPage() {
                   placeholder="Notes — where, how, on what…"
                   className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal resize-none mt-3"
                 />
+                {catchPhotos.length > 0 && (
+                  <div className="flex gap-2 mt-3 flex-wrap">
+                    {catchPhotos.map((f, i) => (
+                      <span
+                        key={i}
+                        className="relative text-xs font-bold text-pine/70 bg-pine/5 rounded-full pl-3 pr-2 py-1.5"
+                      >
+                        📷 {f.name.slice(0, 20)}
+                        <button
+                          onClick={() => setCatchPhotos(catchPhotos.filter((_, j) => j !== i))}
+                          aria-label={`Remove ${f.name}`}
+                          className="ml-1.5 text-pine/50 hover:text-signal-dark font-bold"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
                 <div className="flex items-center justify-between mt-3 gap-2 flex-wrap">
                   <label className="text-sm font-bold text-signal-dark cursor-pointer">
-                    {photo ? `📷 ${photo.name.slice(0, 24)}` : "📷 Add photo *"}
+                    {catchPhotos.length > 0
+                      ? `📷 ${catchPhotos.length}/4 photos *`
+                      : "📷 Add photos (up to 4) *"}
                     <input
                       type="file"
-                      accept="image/jpeg,image/png,image/webp"
+                      accept="image/*"
+                      multiple
                       className="hidden"
-                      onChange={(e) => setPhoto(e.target.files?.[0] || null)}
+                      onChange={(e) => {
+                        const picked = Array.from(e.target.files ?? []).slice(0, 4 - catchPhotos.length);
+                        if (picked.length) setCatchPhotos([...catchPhotos, ...picked].slice(0, 4));
+                        e.target.value = "";
+                      }}
                     />
                   </label>
                   <select

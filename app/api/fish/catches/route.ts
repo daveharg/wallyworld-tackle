@@ -22,6 +22,7 @@ export interface CatchRow {
   weight_lb: string | null;
   photo_measure_url: string;
   photo_hold_url: string;
+  photos: string[] | null;
   visibility: "public" | "friends" | "private";
   note: string | null;
   caught_at: string;
@@ -38,6 +39,7 @@ function toItem(c: CatchRow) {
     weight_lb: c.weight_lb === null ? null : Number(c.weight_lb),
     photo_measure_url: c.photo_measure_url,
     photo_hold_url: c.photo_hold_url,
+    photos: Array.isArray(c.photos) ? c.photos : [],
     visibility: c.visibility,
     note: c.note,
     caught_at: c.caught_at,
@@ -126,6 +128,14 @@ export async function POST(req: NextRequest) {
       return badRequest(`${label} is required and must be an http(s) URL.`);
     }
   }
+  // Optional multi-photo array (up to 4). First photo stays primary via photo_measure_url/photo_hold_url.
+  let photos: string[] = [];
+  if (Array.isArray(body.photos)) {
+    photos = body.photos
+      .filter((u): u is string => typeof u === "string" && /^https?:\/\//.test(u) && u.length <= 2048)
+      .slice(0, 4);
+  }
+  if (photos.length === 0) photos = [photoMeasure];
   const note = typeof body.note === "string" ? body.note.trim().slice(0, 500) || null : null;
   let caughtAt: string | null = null;
   if (body.caught_at !== undefined && body.caught_at !== null) {
@@ -134,13 +144,15 @@ export async function POST(req: NextRequest) {
     caughtAt = d.toISOString();
   }
 
+  // Multi-photo storage (idempotent — same column the feed query already reads).
+  await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS photos jsonb`);
   const rows = await query<CatchRow>(
     `INSERT INTO fm_catches
-       (user_id, species, length_in, weight_lb, photo_measure_url, photo_hold_url, visibility, note, caught_at)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,COALESCE($9::timestamptz, now()))
+       (user_id, species, length_in, weight_lb, photo_measure_url, photo_hold_url, photos, visibility, note, caught_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9,COALESCE($10::timestamptz, now()))
      RETURNING *, (SELECT name FROM fm_users WHERE id = $1) AS name,
                    (SELECT avatar_url FROM fm_users WHERE id = $1) AS avatar_url`,
-    [me.id, species, lengthIn, weightLb, photoMeasure, photoHold, visibility, note, caughtAt]
+    [me.id, species, lengthIn, weightLb, photoMeasure, photoHold, JSON.stringify(photos), visibility, note, caughtAt]
   );
   return NextResponse.json({ catch: toItem(rows[0]) }, { status: 201 });
 }
