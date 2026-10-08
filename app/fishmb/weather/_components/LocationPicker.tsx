@@ -48,9 +48,17 @@ export default function LocationPicker({
     fetch("/fishmb/lake-coords.json")
       .then((r) => (r.ok ? r.json() : {}))
       .then((d: Record<string, { lat: number; lng: number; name: string }>) => {
-        setLakes(
-          Object.values(d).map((l) => ({ name: shortLakeName(l.name), lat: l.lat, lon: l.lng }))
-        );
+        // Defensive: one malformed record must never wipe out the whole list
+        // (that was silently breaking search entirely).
+        const list: WxLoc[] = [];
+        for (const l of Object.values(d ?? {})) {
+          if (!l || typeof l.name !== "string" || !Number.isFinite(l.lat) || !Number.isFinite(l.lng))
+            continue;
+          const short = shortLakeName(l.name);
+          if (!short) continue;
+          list.push({ name: short, lat: l.lat, lon: l.lng });
+        }
+        setLakes(list);
       })
       .catch(() => {});
   }, []);
