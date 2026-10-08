@@ -464,21 +464,26 @@ function AdSection({ ads, onSubmitted }: { ads: AdRow[]; onSubmitted: (ad: AdRow
   const [note, setNote] = useState<string | null>(null);
 
   const submit = async () => {
-    if (!title.trim() || !file || busy) return;
+    if (!title.trim() || busy) return;
     setBusy(true);
     setNote(null);
     try {
-      const token = localStorage.getItem(FISHMB_TOKEN_KEY);
-      const fd = new FormData();
-      fd.append("file", await compressImage(file));
-      const upRes = await fetch("/api/fish/photos/upload", {
-        method: "POST",
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-        body: fd,
-      });
-      const up = await upRes.json();
-      if (!upRes.ok) throw new Error(up.error || "Upload failed.");
-      const isVideo = file.type.startsWith("video/");
+      let imageUrl: string | null = null;
+      let videoUrl: string | null = null;
+      if (file) {
+        const token = localStorage.getItem(FISHMB_TOKEN_KEY);
+        const fd = new FormData();
+        fd.append("file", await compressImage(file));
+        const upRes = await fetch("/api/fish/photos/upload", {
+          method: "POST",
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          body: fd,
+        });
+        const up = await upRes.json();
+        if (!upRes.ok) throw new Error(up.error || "Upload failed.");
+        if (file.type.startsWith("video/")) videoUrl = up.url as string;
+        else imageUrl = up.url as string;
+      }
       const d = await fishFetch("/api/fishmb/ads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -486,8 +491,8 @@ function AdSection({ ads, onSubmitted }: { ads: AdRow[]; onSubmitted: (ad: AdRow
           slot,
           title: title.trim(),
           body: body.trim(),
-          image_url: isVideo ? null : (up.url as string),
-          video_url: isVideo ? (up.url as string) : null,
+          image_url: imageUrl,
+          video_url: videoUrl,
           link_url: link.trim() || null,
         }),
       });
@@ -515,6 +520,10 @@ function AdSection({ ads, onSubmitted }: { ads: AdRow[]; onSubmitted: (ad: AdRow
         <h2 className="font-bold text-pine uppercase tracking-wide">Request an ad</h2>
         <p className="text-sm text-pine/60">
           Ads run 7 days and go live after a quick review — we&apos;ll be in touch about payment.
+        </p>
+        <p className="text-sm text-pine/75 bg-gold/15 border border-gold/40 rounded-2xl px-4 py-3">
+          🎨 No design? No problem — <strong>we can create your ad banner or feed ad for you.</strong>{" "}
+          Just fill in the details below and we&apos;ll handle the creative.
         </p>
         <div className="grid grid-cols-2 gap-3">
           {AD_SLOTS.map((s) => (
@@ -556,7 +565,7 @@ function AdSection({ ads, onSubmitted }: { ads: AdRow[]; onSubmitted: (ad: AdRow
           className={inputCls}
         />
         <label className="block bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-sm text-pine/70 cursor-pointer">
-          {file ? `📎 ${file.name.slice(0, 30)}` : "📎 Ad image or video *"}
+          {file ? `📎 ${file.name.slice(0, 30)}` : "📎 Ad image or video (optional — we can make one for you)"}
           <input
             type="file"
             accept="image/*,video/mp4,video/webm"
@@ -566,7 +575,7 @@ function AdSection({ ads, onSubmitted }: { ads: AdRow[]; onSubmitted: (ad: AdRow
         </label>
         <button
           onClick={submit}
-          disabled={busy || !title.trim() || !file}
+          disabled={busy || !title.trim()}
           className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-8 py-3 rounded-full disabled:opacity-40 transition-colors"
         >
           {busy ? "Submitting…" : "Submit ad request"}

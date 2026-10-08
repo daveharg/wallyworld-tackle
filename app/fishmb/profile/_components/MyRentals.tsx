@@ -53,25 +53,27 @@ export default function MyRentals() {
 
   if (rentals === null) {
     return (
-      <div className="mt-8">
-        <div className="h-6 bg-pine/10 rounded-full w-40 animate-pulse mb-3" />
-        <div className="h-20 bg-pine/10 rounded-2xl animate-pulse" />
-      </div>
+      <section className="mt-8 bg-white border border-pine/10 rounded-3xl p-4 sm:p-5">
+        <div className="h-6 bg-pine/10 rounded-full w-40 animate-pulse mb-4" />
+        <div className="h-16 bg-pine/10 rounded-2xl animate-pulse" />
+      </section>
     );
   }
 
   const totalPending = Object.values(pendingByRental).reduce((a, n) => a + n, 0);
 
   return (
-    <div className="mt-8">
-      <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-3 flex items-center gap-2 flex-wrap">
-        🏠 My rentals
+    <section className="mt-8 bg-white border border-pine/10 rounded-3xl p-4 sm:p-5">
+      <div className="flex items-center justify-between gap-2 flex-wrap mb-4 px-1">
+        <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide">
+          🏠 My rentals
+        </h2>
         {totalPending > 0 && (
-          <span className="bg-signal text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+          <span className="bg-signal text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full whitespace-nowrap">
             {totalPending} new request{totalPending > 1 ? "s" : ""}
           </span>
         )}
-      </h2>
+      </div>
       {rentals.length === 0 ? (
         <Link
           href="/fishmb/rentals"
@@ -82,46 +84,47 @@ export default function MyRentals() {
           <p className="text-signal-dark font-bold text-sm mt-1">List your first rental →</p>
         </Link>
       ) : (
-        <div className="space-y-2.5">
+        <ul className="space-y-1">
           {rentals.map((r) => {
             const meta = catMeta(r.category);
             const pending = pendingByRental[r.id] ?? 0;
             return (
-              <Link
-                key={r.id}
-                href={`/fishmb/rentals/${r.id}`}
-                className="flex items-center gap-3 bg-white border border-pine/10 rounded-2xl p-3 hover:shadow-md hover:border-gold/40 transition-all"
-              >
-                {r.photos[0] ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={r.photos[0]}
-                    alt=""
-                    className="w-14 h-14 rounded-xl object-cover shrink-0 bg-paper-deep"
-                  />
-                ) : (
-                  <span className="w-14 h-14 rounded-xl bg-paper-deep flex items-center justify-center text-2xl shrink-0">
-                    {meta.emoji}
+              <li key={r.id}>
+                <Link
+                  href={`/fishmb/rentals/${r.id}`}
+                  className="flex items-center gap-3 rounded-2xl p-2.5 hover:bg-paper-deep transition-colors"
+                >
+                  {r.photos[0] ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={r.photos[0]}
+                      alt=""
+                      className="w-14 h-14 rounded-xl object-cover shrink-0 bg-paper-deep"
+                    />
+                  ) : (
+                    <span className="w-14 h-14 rounded-xl bg-paper-deep flex items-center justify-center text-2xl shrink-0">
+                      {meta.emoji}
+                    </span>
+                  )}
+                  <span className="flex-1 min-w-0 block">
+                    <span className="block font-bold text-pine truncate">{r.title}</span>
+                    <span className="block text-xs text-pine/55 uppercase tracking-wider mt-0.5">
+                      {meta.emoji} {meta.singular}
+                    </span>
                   </span>
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className="font-bold text-pine truncate">{r.title}</p>
-                  <p className="text-xs text-pine/55 uppercase tracking-wider">
-                    {meta.emoji} {meta.singular}
-                  </p>
-                </div>
-                {pending > 0 ? (
-                  <span className="bg-signal text-white text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full shrink-0">
-                    {pending} new
-                  </span>
-                ) : (
-                  <span className="text-pine/30 text-sm font-bold shrink-0">→</span>
-                )}
-              </Link>
+                  {pending > 0 ? (
+                    <span className="bg-signal text-white text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full shrink-0 whitespace-nowrap">
+                      {pending} new
+                    </span>
+                  ) : (
+                    <span className="text-pine/30 text-lg font-bold shrink-0 pr-1">→</span>
+                  )}
+                </Link>
+              </li>
             );
           })}
-        </div>
+        </ul>
       )}
-    </div>
+    </section>
   );
 }

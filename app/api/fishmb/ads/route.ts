@@ -47,7 +47,8 @@ export async function POST(req: NextRequest) {
     typeof body.video_url === "string" && /^https?:\/\//.test(body.video_url.trim())
       ? body.video_url.trim()
       : null;
-  if (!imageUrl && !videoUrl) return badRequest("An image or video is required.");
+  // Media is optional — if the advertiser has no creative, we make the ad
+  // banner/feed ad for them before it goes live.
   const linkUrl =
     typeof body.link_url === "string" && body.link_url.trim()
       ? body.link_url.trim().slice(0, 500)
