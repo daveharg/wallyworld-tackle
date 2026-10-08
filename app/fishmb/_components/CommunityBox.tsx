@@ -89,25 +89,6 @@ export function CommunityBox() {
         </div>
       ) : (
         <div>
-          <div className="bg-pine rounded-[2rem] p-8 md:p-10 overflow-hidden relative">
-            <div className="relative">
-              <p className="text-gold font-bold uppercase tracking-[0.28em] text-sm mb-3">
-                Community
-              </p>
-              <div className="md:flex md:items-center md:justify-between gap-8">
-                <h2 className="font-display font-bold uppercase text-white text-3xl md:text-4xl tracking-wide">
-                  Latest from the community
-                </h2>
-                <Link
-                  href="/fishmb/feed"
-                  className="mt-4 md:mt-0 inline-block shrink-0 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-8 py-3.5 rounded-full transition-colors"
-                >
-                  Open the feed →
-                </Link>
-              </div>
-            </div>
-          </div>
-
           {(() => {
             const featured = items.find((it) => photoOf(it));
             const textPosts = items.filter((it) => !photoOf(it) && it.body).slice(0, 2);
@@ -116,7 +97,7 @@ export function CommunityBox() {
                 {featured && (
                   <Link
                     href="/fishmb/feed"
-                    className="block relative -mx-4 md:mx-0 md:rounded-3xl overflow-hidden mt-4 group"
+                    className="block relative -mx-4 md:mx-0 md:rounded-3xl overflow-hidden group"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
@@ -177,6 +158,17 @@ export function CommunityBox() {
                   <p className="text-pine/60 text-sm mt-4">
                     Nothing posted yet — be the first.
                   </p>
+                )}
+
+                {(featured || textPosts.length > 0) && (
+                  <div className="text-center mt-5">
+                    <Link
+                      href="/fishmb/feed"
+                      className="inline-block bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-8 py-3.5 rounded-full transition-colors"
+                    >
+                      Open the feed →
+                    </Link>
+                  </div>
                 )}
               </>
             );
