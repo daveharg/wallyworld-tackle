@@ -48,8 +48,8 @@ export function LakeSearch() {
 
   return (
     <div ref={boxRef} className="relative max-w-xl mb-10">
-      <div className="flex items-center bg-white border border-pine/15 rounded-full pl-5 pr-2 py-1.5 shadow-sm focus-within:border-signal">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="text-pine/40 shrink-0">
+      <div className="flex items-center bg-pine border border-pine-deep rounded-full pl-5 pr-2 py-1.5 shadow-sm focus-within:border-gold">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="text-white/70 shrink-0">
           <circle cx="11" cy="11" r="7" />
           <path d="m20 20-3.5-3.5" />
         </svg>
@@ -58,7 +58,7 @@ export function LakeSearch() {
           onChange={(e) => onChange(e.target.value)}
           onFocus={() => hits.length > 0 && setOpen(true)}
           placeholder="Search your lake for its regulations…"
-          className="flex-1 bg-transparent outline-none px-3 py-2 text-pine placeholder:text-pine/40"
+          className="flex-1 bg-transparent outline-none px-3 py-2 text-white placeholder:text-white/50"
           aria-label="Search lakes"
         />
       </div>
