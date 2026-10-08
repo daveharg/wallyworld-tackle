@@ -16,14 +16,6 @@ export function loadSavedLocs(): WxLoc[] {
   }
 }
 
-function persistLocs(locs: WxLoc[]) {
-  try {
-    localStorage.setItem(STORE_KEY, JSON.stringify(locs));
-  } catch {
-    // non-fatal
-  }
-}
-
 function shortLakeName(full: string): string {
   return full.split(",")[0].trim();
 }
@@ -101,10 +93,21 @@ export default function LocationPicker({
   const remember = (loc: WxLoc) => {
     setSaved((prev) => {
       if (prev.some((p) => p.name === loc.name)) return prev;
-      const next = [loc, ...prev].slice(0, 20);
-      persistLocs(next);
-      return next;
+      return [loc, ...prev].slice(0, 20);
     });
+    // Persist synchronously — choose() closes (unmounts) this picker right
+    // after, which can discard a queued setState updater and the localStorage
+    // write hidden inside it. That silently dropped every saved location.
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      const list: WxLoc[] = Array.isArray(arr) ? arr.filter((l) => l && typeof l.name === "string") : [];
+      if (!list.some((p) => p.name === loc.name)) {
+        localStorage.setItem(STORE_KEY, JSON.stringify([loc, ...list].slice(0, 20)));
+      }
+    } catch {
+      // non-fatal
+    }
   };
 
   const choose = (loc: WxLoc) => {
@@ -114,11 +117,15 @@ export default function LocationPicker({
   };
 
   const remove = (name: string) => {
-    setSaved((prev) => {
-      const next = prev.filter((l) => l.name !== name);
-      persistLocs(next);
-      return next;
-    });
+    const next = saved.filter((l) => l.name !== name);
+    setSaved(next);
+    // Same synchronous-write rule as remember(): never hide the
+    // localStorage write inside a state updater.
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(next));
+    } catch {
+      // non-fatal
+    }
   };
 
   const useGps = () => {
