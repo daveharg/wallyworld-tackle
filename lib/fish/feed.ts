@@ -90,15 +90,29 @@ function likePattern(q: string): string {
   return `%${q.replace(/\\/g, "\\\\").replace(/%/g, "\\%").replace(/_/g, "\\_")}%`;
 }
 
-export async function getFeed(
-  limit = 30,
-  offset = 0,
-  viewerId: string | null = null,
-  q: string | null = null
-): Promise<FeedItem[]> {
+export interface FeedCursor {
+  before: string; // ISO timestamp of the last item on the previous page
+  beforeId: string; // id of the last item (tiebreak for equal timestamps)
+}
+
+export interface GetFeedOptions {
+  limit?: number;
+  viewerId?: string | null;
+  q?: string | null;
+  kind?: "all" | "catch" | "post";
+  cursor?: FeedCursor | null;
+}
+
+export interface FeedPage {
+  items: FeedItem[];
+  hasMore: boolean;
+}
+
+export async function getFeed(opts: GetFeedOptions = {}): Promise<FeedPage> {
+  const { limit = 30, viewerId = null, q = null, kind = "all", cursor = null } = opts;
   await ensureFeedColumns();
   const search = q && q.trim() ? q.trim() : null;
-  const params: unknown[] = [viewerId, limit, offset];
+  const params: unknown[] = [viewerId];
   let where = "";
   if (search) {
     params.push(likePattern(search));
@@ -107,6 +121,16 @@ export async function getFeed(
                  OR feed.species ILIKE ${p} ESCAPE '\\'
                  OR feed.user_name ILIKE ${p} ESCAPE '\\')`;
   }
+  if (cursor) {
+    params.push(cursor.before, cursor.beforeId);
+    const t = `$${params.length - 1}`;
+    const i = `$${params.length}`;
+    const clause = `(feed.created_at < ${t}::timestamptz OR (feed.created_at = ${t}::timestamptz AND feed.id < ${i}))`;
+    where = where ? `${where} AND ${clause}` : `WHERE ${clause}`;
+  }
+  // Kind filter applies inside each UNION branch so cursor pages stay stable.
+  const catchWhere = kind === "post" ? "AND FALSE" : "";
+  const postWhere = kind === "catch" ? "AND FALSE" : "";
   const rows = await query<FeedItem>(
     `SELECT feed.*,
             (SELECT COUNT(*) FROM fm_post_reactions r
@@ -125,7 +149,7 @@ export async function getFeed(
               c.created_at
        FROM fm_catches c
        JOIN fm_users u ON u.id = c.user_id
-       WHERE ${VISIBLE_TO("c")}
+       WHERE ${VISIBLE_TO("c")} ${catchWhere}
        UNION ALL
        SELECT d.id, d.kind, d.user_id, u.name AS user_name, u.avatar_url,
               d.body, d.photo_url,
@@ -136,14 +160,15 @@ export async function getFeed(
               d.created_at
        FROM fm_discussions d
        JOIN fm_users u ON u.id = d.user_id
-       WHERE d.kind IN ('post', 'tip') AND ${VISIBLE_TO("d")}
+       WHERE d.kind IN ('post', 'tip') AND ${VISIBLE_TO("d")} ${postWhere}
      ) feed
      ${where}
-     ORDER BY feed.created_at DESC
-     LIMIT $2 OFFSET $3`,
-    params
+     ORDER BY feed.created_at DESC, feed.id DESC
+     LIMIT $${params.length + 1}`,
+    [...params, limit + 1]
   );
-  return rows.map(normalizeFeedItem);
+  const hasMore = rows.length > limit;
+  return { items: rows.slice(0, limit).map(normalizeFeedItem), hasMore };
 }
 
 export async function createPost(

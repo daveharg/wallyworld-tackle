@@ -282,6 +282,9 @@ export default function FeedPage() {
   const { user, openLogin } = useFishAuth();
   const [items, setItems] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
   const [tab, setTab] = useState<"all" | "catch" | "post">("all");
   const [composerOpen, setComposerOpen] = useState(false);
   const [q, setQ] = useState("");
@@ -299,22 +302,91 @@ export default function FeedPage() {
   const [catchNote, setCatchNote] = useState<string | null>(null);
   const [openComments, setOpenComments] = useState<Set<string>>(new Set());
 
-  const load = useCallback(async (query?: string) => {
+  const PAGE_SIZE = 20;
+  // Refs mirror state so the IntersectionObserver callback never goes stale.
+  const tabRef = useRef(tab);
+  const activeQRef = useRef(activeQ);
+  const itemsRef = useRef<FeedItem[]>([]);
+  const nextCursorRef = useRef<string | null>(null);
+  const hasMoreRef = useRef(false);
+  const loadingMoreRef = useRef(false);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => { tabRef.current = tab; }, [tab]);
+  useEffect(() => { activeQRef.current = activeQ; }, [activeQ]);
+  useEffect(() => { itemsRef.current = items; }, [items]);
+
+  const applyPage = useCallback((d: { items?: FeedItem[]; nextCursor?: string | null; hasMore?: boolean }) => {
+    setItems(d.items ?? []);
+    setNextCursor(d.nextCursor ?? null);
+    setHasMore(!!d.hasMore);
+    nextCursorRef.current = d.nextCursor ?? null;
+    hasMoreRef.current = !!d.hasMore;
+  }, []);
+
+  const load = useCallback(async (query?: string, tabValue: "all" | "catch" | "post" = "all") => {
     setLoading(true);
     try {
-      const qs = query && query.trim() ? `?limit=40&q=${encodeURIComponent(query.trim())}` : "?limit=40";
-      const d = await fishFetch(`/api/fishmb/feed${qs}`);
-      setItems(d.items);
+      const params = new URLSearchParams({ limit: String(PAGE_SIZE), kind: tabValue });
+      if (query && query.trim()) params.set("q", query.trim());
+      const d = await fishFetch(`/api/fishmb/feed?${params.toString()}`);
+      applyPage(d);
     } catch {
       // non-fatal
     } finally {
       setLoading(false);
+    }
+  }, [applyPage]);
+
+  const loadMore = useCallback(async () => {
+    if (loadingMoreRef.current || !hasMoreRef.current || !nextCursorRef.current) return;
+    loadingMoreRef.current = true;
+    setLoadingMore(true);
+    try {
+      const params = new URLSearchParams({
+        limit: String(PAGE_SIZE),
+        kind: tabRef.current,
+        cursor: nextCursorRef.current,
+      });
+      if (activeQRef.current) params.set("q", activeQRef.current);
+      const d = await fishFetch(`/api/fishmb/feed?${params.toString()}`);
+      const seen = new Set(itemsRef.current.map((i) => i.id));
+      const fresh = ((d.items ?? []) as FeedItem[]).filter((i) => !seen.has(i.id));
+      setItems((prev) => [...prev, ...fresh]);
+      setNextCursor(d.nextCursor ?? null);
+      setHasMore(!!d.hasMore);
+      nextCursorRef.current = d.nextCursor ?? null;
+      hasMoreRef.current = !!d.hasMore;
+    } catch {
+      // non-fatal; user can scroll again to retry
+    } finally {
+      loadingMoreRef.current = false;
+      setLoadingMore(false);
     }
   }, []);
 
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) loadMore();
+      },
+      { rootMargin: "600px" }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [loadMore]);
+
+  const selectTab = (v: "all" | "catch" | "post") => {
+    setTab(v);
+    tabRef.current = v;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    load(activeQRef.current || undefined, v);
+  };
 
   const [friends, setFriends] = useState<{ id: string; name: string; avatar_url: string | null }[]>([]);
   const [feedAds, setFeedAds] = useState<
@@ -344,14 +416,17 @@ export default function FeedPage() {
 
   const runSearch = (e?: React.FormEvent) => {
     e?.preventDefault();
-    setActiveQ(q.trim());
-    load(q.trim());
+    const trimmed = q.trim();
+    setActiveQ(trimmed);
+    activeQRef.current = trimmed;
+    load(trimmed || undefined, tabRef.current);
   };
 
   const clearSearch = () => {
     setQ("");
     setActiveQ("");
-    load();
+    activeQRef.current = "";
+    load(undefined, tabRef.current);
   };
 
   const handleReacted = (
@@ -489,7 +564,6 @@ export default function FeedPage() {
     setOpenComments(next);
   };
 
-  const visible = items.filter((i) => tab === "all" || i.kind === tab || (tab === "post" && i.kind === "tip"));
 
   return (
     <div className="max-w-2xl mx-auto px-4 pt-10 md:pt-14 pb-32">
@@ -786,13 +860,13 @@ export default function FeedPage() {
             <div key={i} className="bg-white border border-pine/10 rounded-3xl p-5 h-40 animate-pulse" />
           ))}
         </div>
-      ) : visible.length === 0 ? (
+      ) : items.length === 0 ? (
         <p className="text-pine/55 text-center py-10">
           {activeQ ? `No posts match “${activeQ}”.` : "Nothing here yet — be the first to post."}
         </p>
       ) : (
         <div className="space-y-4">
-          {visible.map((item, idx) => (
+          {items.map((item, idx) => (
             <Fragment key={item.id}>
             <article className="bg-white border border-pine/10 rounded-3xl p-5 max-sm:-mx-4 max-sm:rounded-none max-sm:border-x-0">
               <div className="flex items-center gap-3 mb-3">
@@ -845,6 +919,21 @@ export default function FeedPage() {
         </div>
       )}
 
+      {/* Infinite-scroll sentinel */}
+      {!loading && items.length > 0 && (
+        <div ref={sentinelRef} className="py-6 text-center min-h-[4rem]">
+          {loadingMore && (
+            <div className="flex items-center justify-center gap-2 text-pine/50 text-sm">
+              <span className="w-5 h-5 border-2 border-pine/20 border-t-pine rounded-full animate-spin" />
+              Loading more…
+            </div>
+          )}
+          {!loadingMore && !hasMore && (
+            <p className="text-pine/45 text-sm">You&apos;re all caught up 🎣</p>
+          )}
+        </div>
+      )}
+
       {/* Floating bottom bar — white pill, icons only */}
       <nav
         aria-label="Feed sections"
@@ -861,10 +950,7 @@ export default function FeedPage() {
           ).map(([v, label, d]) => (
             <button
               key={v}
-              onClick={() => {
-                setTab(v);
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
+              onClick={() => selectTab(v)}
               aria-label={label}
               className={`w-12 h-12 flex items-center justify-center rounded-full transition-colors ${
                 tab === v ? "bg-pine/10 text-pine" : "text-pine/45 hover:text-pine"

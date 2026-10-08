@@ -9,9 +9,12 @@ import { getFeed, createPost } from "@/lib/fish/feed";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const limit = Math.min(parseInt(searchParams.get("limit") || "30", 10) || 30, 50);
-  const offset = parseInt(searchParams.get("offset") || "0", 10) || 0;
+  const limit = Math.min(parseInt(searchParams.get("limit") || "20", 10) || 20, 50);
+  const kindParam = searchParams.get("kind");
+  const kind: "all" | "catch" | "post" =
+    kindParam === "catch" || kindParam === "post" ? kindParam : "all";
   const q = (searchParams.get("q") || "").trim().slice(0, 80) || null;
+  const cursor = decodeCursor(searchParams.get("cursor"));
   let viewerId: string | null = null;
   try {
     const me = await fishUserFromRequest(req);
@@ -19,8 +22,32 @@ export async function GET(req: NextRequest) {
   } catch {
     // guests see public items only
   }
-  const items = await getFeed(limit, offset, viewerId, q);
-  return NextResponse.json({ items });
+  const { items, hasMore } = await getFeed({ limit, viewerId, q, kind, cursor });
+  return NextResponse.json({
+    items,
+    hasMore,
+    nextCursor: items.length > 0 ? encodeCursor(items[items.length - 1]) : null,
+  });
+}
+
+function encodeCursor(item: { created_at: string; id: string }): string {
+  const iso = new Date(item.created_at).toISOString();
+  return Buffer.from(`${iso}|${item.id}`, "utf8").toString("base64url");
+}
+
+function decodeCursor(raw: string | null): { before: string; beforeId: string } | null {
+  if (!raw) return null;
+  try {
+    const decoded = Buffer.from(raw, "base64url").toString("utf8");
+    const sep = decoded.lastIndexOf("|");
+    if (sep < 0) return null;
+    const before = decoded.slice(0, sep);
+    const beforeId = decoded.slice(sep + 1);
+    if (!before || !beforeId || Number.isNaN(Date.parse(before))) return null;
+    return { before, beforeId };
+  } catch {
+    return null;
+  }
 }
 
 function cleanUrl(v: unknown): string | null {
