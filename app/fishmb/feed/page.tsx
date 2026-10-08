@@ -1016,6 +1016,24 @@ export default function FeedPage() {
           </Link>
         </div>
       </nav>
+
+      {/* Floating post button — opens the composer */}
+      {user && (
+        <button
+          onClick={() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            setComposerOpen(true);
+          }}
+          aria-label="Create a post"
+          title="Create a post"
+          className="fixed z-40 right-4 md:right-8 w-14 h-14 rounded-full bg-signal hover:bg-signal-dark text-white shadow-[0_8px_30px_rgba(0,0,0,0.25)] flex items-center justify-center transition-colors"
+          style={{ bottom: "calc(5.5rem + env(safe-area-inset-bottom))" }}
+        >
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }
