@@ -137,19 +137,6 @@ export default function ContactPage() {
           </button>
         </div>
       )}
-
-      <p className="text-sm text-pine/55 mt-6 text-center">
-        For order issues with tackle, use{" "}
-        <a
-          href="https://www.wallyworldtackle.ca"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-signal-dark font-bold underline"
-        >
-          the main store site
-        </a>{" "}
-        instead.
-      </p>
     </div>
   );
 }
