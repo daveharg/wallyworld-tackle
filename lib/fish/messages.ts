@@ -15,7 +15,7 @@
 // v1 scope: keys are per-user (not per-device). A new device generates a
 // new keypair and cannot read older messages.
 
-import { query, queryOne } from "./db";
+import { query, queryOne, withTransaction, txQuery, txQueryOne } from "./db";
 
 export interface ConversationMember {
   user_id: string;
@@ -180,19 +180,104 @@ export async function listConversations(userId: string): Promise<ConversationPre
   return previews;
 }
 
-/** Find the existing 1:1 conversation between two users, if any. */
-export async function findDirectConversation(a: string, b: string): Promise<string | null> {
+/** All 1:1 conversation ids between two users (healthy state: at most one). */
+export async function findDirectConversations(a: string, b: string): Promise<string[]> {
   await ensureMsgTables();
-  const row = await queryOne<{ id: string }>(
+  const rows = await query<{ id: string }>(
     `SELECT m1.conversation_id AS id
        FROM fm_conversation_members m1
        JOIN fm_conversation_members m2 ON m2.conversation_id = m1.conversation_id
       WHERE m1.user_id = $1 AND m2.user_id = $2
-        AND (SELECT COUNT(*) FROM fm_conversation_members mm WHERE mm.conversation_id = m1.conversation_id) = 2
-      LIMIT 1`,
+        AND (SELECT COUNT(*) FROM fm_conversation_members mm WHERE mm.conversation_id = m1.conversation_id) = 2`,
     [a, b]
   );
-  return row?.id ?? null;
+  return rows.map((r) => r.id);
+}
+
+/**
+ * One thread per pair, guaranteed. Serializes find-or-create on the pair with
+ * an advisory lock (so double-taps can't mint duplicate threads), and heals
+ * any pre-existing duplicate 1:1 threads by folding them into the most active
+ * one — messages moved over, read positions kept.
+ */
+export async function getOrCreateDirectConversation(a: string, b: string): Promise<string> {
+  await ensureMsgTables();
+  return withTransaction(async (client) => {
+    const pair = [a, b].sort();
+    await client.query(`SELECT pg_advisory_xact_lock(hashtext($1))`, [
+      `fishmb-dm:${pair[0]}:${pair[1]}`,
+    ]);
+    const ids = (
+      await txQuery<{ id: string }>(
+        client,
+        `SELECT m1.conversation_id AS id
+           FROM fm_conversation_members m1
+           JOIN fm_conversation_members m2 ON m2.conversation_id = m1.conversation_id
+          WHERE m1.user_id = $1 AND m2.user_id = $2
+            AND (SELECT COUNT(*) FROM fm_conversation_members mm WHERE mm.conversation_id = m1.conversation_id) = 2`,
+        [a, b]
+      )
+    ).map((r) => r.id);
+
+    if (ids.length === 0) {
+      const row = await txQueryOne<{ id: string }>(
+        client,
+        `INSERT INTO fm_conversations (name) VALUES (NULL) RETURNING id`
+      );
+      if (!row) throw new Error("Could not create conversation.");
+      for (const uid of [a, b]) {
+        await client.query(
+          `INSERT INTO fm_conversation_members (conversation_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+          [row.id, uid]
+        );
+      }
+      return row.id;
+    }
+    if (ids.length === 1) return ids[0];
+
+    // Heal duplicates: keep the most active thread, fold the rest into it.
+    const stats = await txQuery<{ id: string; msg_count: string; last_msg_at: string | null }>(
+      client,
+      `SELECT c.id,
+              (SELECT COUNT(*) FROM fm_messages m WHERE m.conversation_id = c.id) AS msg_count,
+              (SELECT MAX(created_at) FROM fm_messages m WHERE m.conversation_id = c.id) AS last_msg_at
+         FROM fm_conversations c
+        WHERE c.id = ANY($1)`,
+      [ids]
+    );
+    stats.sort((x, y) => {
+      const c = Number(y.msg_count) - Number(x.msg_count);
+      if (c !== 0) return c;
+      const ly = y.last_msg_at ? new Date(y.last_msg_at).getTime() : 0;
+      const lx = x.last_msg_at ? new Date(x.last_msg_at).getTime() : 0;
+      return ly - lx;
+    });
+    const canonical = stats[0].id;
+    for (const dupe of stats.slice(1).map((s) => s.id)) {
+      // Move the dupe's messages into the canonical thread.
+      await client.query(`UPDATE fm_messages SET conversation_id = $1 WHERE conversation_id = $2`, [
+        canonical,
+        dupe,
+      ]);
+      // Keep the furthest-read position per member.
+      await client.query(
+        `UPDATE fm_conversation_members cm
+            SET last_read_at = GREATEST(cm.last_read_at, dm.last_read_at)
+           FROM fm_conversation_members dm
+          WHERE cm.conversation_id = $1 AND dm.conversation_id = $2 AND cm.user_id = dm.user_id`,
+        [canonical, dupe]
+      );
+      // Cascades to the dupe's member rows and any leftover message rows.
+      await client.query(`DELETE FROM fm_conversations WHERE id = $1`, [dupe]);
+    }
+    return canonical;
+  });
+}
+
+/** Find the existing 1:1 conversation between two users, if any. */
+export async function findDirectConversation(a: string, b: string): Promise<string | null> {
+  const ids = await findDirectConversations(a, b);
+  return ids[0] ?? null;
 }
 
 export async function createConversation(

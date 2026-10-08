@@ -11,7 +11,7 @@ import {
 } from "@/lib/fish/auth";
 import {
   listConversations,
-  findDirectConversation,
+  getOrCreateDirectConversation,
   createConversation,
   getPublicKey,
 } from "@/lib/fish/messages";
@@ -20,7 +20,22 @@ import { query } from "@/lib/fish/db";
 export async function GET(req: NextRequest) {
   const me = await fishUserFromRequest(req);
   if (!me) return unauthorized();
-  const convos = await listConversations(me.id);
+  let convos = await listConversations(me.id);
+  // Heal: if two 1:1 threads ever exist with the same friend (e.g. from an
+  // old double-tap race), fold them into one so all history stays together.
+  const byPeer = new Map<string, number>();
+  for (const c of convos) {
+    if (c.is_group) continue;
+    const peer = (c.members ?? []).find((m) => m.user_id !== me.id)?.user_id;
+    if (peer) byPeer.set(peer, (byPeer.get(peer) ?? 0) + 1);
+  }
+  const dupes = Array.from(byPeer.entries())
+    .filter(([, n]) => n > 1)
+    .map(([peer]) => peer);
+  if (dupes.length > 0) {
+    for (const peer of dupes) await getOrCreateDirectConversation(me.id, peer);
+    convos = await listConversations(me.id);
+  }
   return NextResponse.json({ conversations: convos });
 }
 
@@ -67,8 +82,8 @@ export async function POST(req: NextRequest) {
   // Anyone can be messaged — a user without keys yet just can't read
   // messages until they enable encrypted messaging.
   if (!(await myKeyReady(me.id))) return badRequest("Set up your messaging keys first.");
-  const id =
-    (await findDirectConversation(me.id, otherId)) ??
-    (await createConversation([me.id, otherId], null));
+  // Exactly one thread per pair: atomic find-or-create (double-tap safe) that
+  // also heals any duplicate threads from before.
+  const id = await getOrCreateDirectConversation(me.id, otherId);
   return NextResponse.json({ id });
 }
