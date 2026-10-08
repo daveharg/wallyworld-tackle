@@ -58,7 +58,8 @@ export default function RegulationsPage() {
               {z.name}
             </h2>
             <p className="text-sm text-pine/60 mb-6 max-w-3xl">{z.description}</p>
-            <div className="overflow-x-auto -mx-2 px-2">
+            {/* Desktop: full table */}
+            <div className="overflow-x-auto -mx-2 px-2 hidden md:block">
               <table className="w-full text-sm min-w-[620px]">
                 <thead>
                   <tr className="text-left text-[11px] uppercase tracking-[0.16em] text-pine/45 border-b-2 border-pine/15">
@@ -81,6 +82,28 @@ export default function RegulationsPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+            {/* Mobile: stacked cards, no zooming or sideways scrolling */}
+            <div className="md:hidden space-y-3">
+              {z.limits.map((lim, i) => (
+                <div key={i} className="bg-paper-deep rounded-2xl p-4 border border-pine/10">
+                  <p className="font-display font-bold uppercase text-pine tracking-wide mb-2">{lim.species}</p>
+                  <dl className="text-sm space-y-1.5">
+                    <div className="flex justify-between gap-3">
+                      <dt className="text-pine/50 text-xs uppercase tracking-wider font-bold">Limit</dt>
+                      <dd className="text-pine font-bold text-right">{lim.limit}</dd>
+                    </div>
+                    <div className="flex justify-between gap-3">
+                      <dt className="text-pine/50 text-xs uppercase tracking-wider font-bold">Size</dt>
+                      <dd className="text-pine/75 text-right">{lim.size}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-pine/50 text-xs uppercase tracking-wider font-bold mb-0.5">Season</dt>
+                      <dd className="text-pine/75 text-[13px] leading-relaxed">{lim.season}</dd>
+                    </div>
+                  </dl>
+                </div>
+              ))}
             </div>
           </section>
         ))}

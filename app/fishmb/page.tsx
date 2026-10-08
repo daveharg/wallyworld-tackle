@@ -71,16 +71,16 @@ export default function FishMBHome() {
             event to specific waters. And every catch is verified before it
             touches the leaderboard:
           </p>
-          <div className="flex flex-wrap gap-3 mb-8">
+          <div className="flex gap-3 mb-8">
             <Link
               href="/fishmb/tournaments/create"
-              className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors"
+              className="flex-1 sm:flex-none text-center bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs sm:text-sm px-5 py-2.5 sm:px-7 sm:py-3.5 rounded-full transition-colors"
             >
               Create a tournament
             </Link>
             <Link
               href="/fishmb/tournaments"
-              className="border border-pine/25 text-pine hover:bg-pine/5 font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors"
+              className="flex-1 sm:flex-none text-center border border-pine/25 text-pine hover:bg-pine/5 font-bold uppercase tracking-wider text-xs sm:text-sm px-5 py-2.5 sm:px-7 sm:py-3.5 rounded-full transition-colors"
             >
               Browse tournaments
             </Link>

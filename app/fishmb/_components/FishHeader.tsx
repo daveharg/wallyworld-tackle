@@ -13,6 +13,7 @@ const NAV = [
   { href: "/fishmb/tournaments", label: "Tournaments" },
   { href: "/fishmb/tips", label: "Tips" },
   { href: "/fishmb/feed", label: "The Feed" },
+  { href: "/fishmb/rentals", label: "Rentals" },
   { href: "/fishmb/business", label: "Businesses" },
 ];
 
