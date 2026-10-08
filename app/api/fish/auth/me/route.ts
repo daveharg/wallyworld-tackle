@@ -9,6 +9,7 @@ import {
   unauthorized,
   badRequest,
   toApiUser,
+  ensureProfileColumns,
   type FishUser,
 } from "@/lib/fish/auth";
 
@@ -22,8 +23,7 @@ export async function PATCH(req: NextRequest) {
   const me = await fishUserFromRequest(req);
   if (!me) return unauthorized();
 
-  await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS bio text NOT NULL DEFAULT ''`);
-  await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS account_type text NOT NULL DEFAULT 'personal'`);
+  await ensureProfileColumns();
 
   let body: Record<string, unknown>;
   try {

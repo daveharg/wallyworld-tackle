@@ -5,7 +5,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { query, queryOne } from "@/lib/fish/db";
-import { fishUserFromRequest, notFound } from "@/lib/fish/auth";
+import { fishUserFromRequest, notFound, ensureProfileColumns } from "@/lib/fish/auth";
 
 interface ProfileUser {
   id: string;
@@ -30,6 +30,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  await ensureProfileColumns();
   const target = await queryOne<ProfileUser>(
     `SELECT id, name, avatar_url, bio FROM fm_users WHERE id = $1`,
     [params.id]

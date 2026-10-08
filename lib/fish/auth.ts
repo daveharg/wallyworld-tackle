@@ -32,6 +32,16 @@ export function publicUser(u: FishUser): PublicUser {
   return { id: u.id, name: u.name, avatar_url: u.avatar_url };
 }
 
+/** Columns added after fm_users was created — ensure they exist before
+ *  any query that selects them explicitly (lazy migration). */
+let profileColsEnsured = false;
+export async function ensureProfileColumns(): Promise<void> {
+  if (profileColsEnsured) return;
+  await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS bio text NOT NULL DEFAULT ''`);
+  await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS account_type text NOT NULL DEFAULT 'personal'`);
+  profileColsEnsured = true;
+}
+
 /** True when the user signed up anonymously (no Google account linked yet). */
 export function isAnonymousUser(u: { google_sub: string }): boolean {
   return u.google_sub.startsWith("anon:");
