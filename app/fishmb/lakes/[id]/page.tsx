@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getLake, getLakes, getZone, getGuideUrl } from "@/lib/fishmb";
+import { getLake, getLakes, getZone, getGuideUrl, getStockingHistory, type StockingEvent } from "@/lib/fishmb";
 import { slugifySpecies, getSpeciesAdvice } from "@/lib/fishmb-species";
 import { lakePhotoUrl, hasRealLakePhoto, lakePhotoCredit } from "@/lib/fishmb-constants";
 
@@ -81,9 +81,82 @@ function LakeTitle({ lake, light }: { lake: { name: string; region: string; stoc
   );
 }
 
+function formatStockDate(iso: string | null): string {
+  if (!iso) return "—";
+  const [y, m, d] = iso.split("-").map(Number);
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  if (!y || !m || !d) return iso;
+  return `${months[m - 1]} ${d}, ${y}`;
+}
+
+/** Provincial stocking records table for one lake (exact dates + quantities). */
+function StockingTable({ lakeId }: { lakeId: string }) {
+  const events: StockingEvent[] = getStockingHistory(lakeId);
+  if (events.length === 0) {
+    return (
+      <p className="text-sm text-pine/60">
+        Detailed stocking records for this lake aren&apos;t in the provincial
+        dataset yet.
+      </p>
+    );
+  }
+  return (
+    <div>
+      {/* Desktop: full table */}
+      <div className="overflow-x-auto rounded-2xl border border-pine/10 bg-white hidden md:block">
+        <table className="w-full text-sm min-w-[560px]">
+          <thead>
+            <tr className="bg-pine/5 text-left">
+              <th className="px-4 py-2.5 text-xs font-black uppercase tracking-wider text-pine/60">Date</th>
+              <th className="px-4 py-2.5 text-xs font-black uppercase tracking-wider text-pine/60">Species</th>
+              <th className="px-4 py-2.5 text-xs font-black uppercase tracking-wider text-pine/60">Size</th>
+              <th className="px-4 py-2.5 text-xs font-black uppercase tracking-wider text-pine/60 text-right">Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            {events.map((e, i) => (
+              <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-pine/[0.03]"}>
+                <td className="px-4 py-2.5 text-pine font-bold whitespace-nowrap">
+                  {formatStockDate(e.date)}
+                </td>
+                <td className="px-4 py-2.5 text-pine/80">{e.species}</td>
+                <td className="px-4 py-2.5 text-pine/80 whitespace-nowrap">{e.size || "—"}</td>
+                <td className="px-4 py-2.5 text-pine font-bold text-right tabular-nums whitespace-nowrap">
+                  {e.quantity != null ? e.quantity.toLocaleString("en-US") : "—"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {/* Mobile: compact stacked list, no sideways scrolling */}
+      <div className="md:hidden rounded-2xl border border-pine/10 bg-white divide-y divide-pine/8">
+        {events.map((e, i) => (
+          <div key={i} className="px-4 py-2.5 flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-pine">{formatStockDate(e.date)}</p>
+              <p className="text-xs text-pine/60 truncate">
+                {e.species}
+                {e.size ? ` · ${e.size}` : ""}
+              </p>
+            </div>
+            <p className="text-sm font-bold text-pine tabular-nums whitespace-nowrap">
+              {e.quantity != null ? e.quantity.toLocaleString("en-US") : "—"}
+            </p>
+          </div>
+        ))}
+      </div>
+      <p className="text-xs text-pine/40 mt-3">
+        {events.length} stocking event{events.length === 1 ? "" : "s"} · Source:
+        Manitoba Waterbody Stocking Records, Manitoba Wildlife and Fisheries
+        Branch (open.canada.ca)
+      </p>
+    </div>
+  );
+}
+
 export default function LakeDetailPage({ params }: { params: { id: string } }) {
-  const lake = getLake(params.id);
-  if (!lake) notFound();
+  const lake = getLake(params.id);  if (!lake) notFound();
 
   const zone = getZone(lake.limits_zone);
   const regs = lake.regulations;
@@ -290,11 +363,12 @@ export default function LakeDetailPage({ params }: { params: { id: string } }) {
               <h2 className="font-display font-bold uppercase text-2xl text-pine tracking-wide mb-3">
                 Stocking history
               </h2>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 mb-5">
                 {lake.stocked_species.map((s) => (
                   <Chip key={s}>{s}</Chip>
                 ))}
               </div>
+              <StockingTable lakeId={lake.id} />
             </section>
           )}
         </div>

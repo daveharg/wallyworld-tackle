@@ -127,6 +127,29 @@ export function getFishData(): FishData {
   return cache;
 }
 
+export interface StockingEvent {
+  date: string | null;
+  year: number | null;
+  species: string;
+  size: string;
+  quantity: number | null;
+}
+
+let stockingCache: Record<string, StockingEvent[]> | null = null;
+
+/**
+ * Real provincial stocking records (exact dates + quantities) from the
+ * Manitoba Waterbody Stocking Records dataset, matched to our lake ids.
+ * Sorted newest-first. Empty array when the lake has no matched records.
+ */
+export function getStockingHistory(lakeId: string): StockingEvent[] {
+  if (!stockingCache) {
+    const p = path.join(process.cwd(), "public", "fishmb", "stocking-history.json");
+    stockingCache = JSON.parse(fs.readFileSync(p, "utf8")) as Record<string, StockingEvent[]>;
+  }
+  return stockingCache[lakeId] ?? [];
+}
+
 export function getLakes(): Lake[] {
   return getFishData().lakes;
 }
