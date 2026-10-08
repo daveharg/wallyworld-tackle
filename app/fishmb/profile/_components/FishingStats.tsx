@@ -64,13 +64,13 @@ export default function FishingStats({ userId, hideTitle }: { userId: string; hi
     );
   }
 
-  const tiles: [string, number][] = [
-    ["Catches", stats.total_catches],
-    ["Tournament catches", stats.tournament_catches],
-    ["Species", stats.species_count],
-    ["Tournaments", stats.tournaments_joined],
-    ["Wins", stats.tournament_wins],
-    ["Posts", stats.posts_count],
+  const tiles: [string, number, string][] = [
+    ["Catches", stats.total_catches, "catches"],
+    ["Tournament catches", stats.tournament_catches, "tournament-catches"],
+    ["Species", stats.species_count, "species"],
+    ["Tournaments", stats.tournaments_joined, "tournaments"],
+    ["Wins", stats.tournament_wins, "wins"],
+    ["Posts", stats.posts_count, "posts"],
   ];
   const since = memberSince(stats.member_since);
 
@@ -82,16 +82,17 @@ export default function FishingStats({ userId, hideTitle }: { userId: string; hi
         </h2>
       )}
       <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5 mb-4">
-        {tiles.map(([label, value]) => (
-          <div
+        {tiles.map(([label, value, key]) => (
+          <Link
             key={label}
-            className="bg-white border border-pine/10 rounded-2xl p-3 text-center"
+            href={`/fishmb/anglers/${userId}/stats/${key}`}
+            className="bg-white border border-pine/10 rounded-2xl p-3 text-center hover:border-signal/50 hover:shadow-sm active:scale-[0.98] transition-all"
           >
             <p className="font-display font-bold text-pine text-2xl leading-none">{value}</p>
             <p className="text-[10px] font-bold uppercase tracking-wider text-pine/55 mt-1.5 leading-tight">
               {label}
             </p>
-          </div>
+          </Link>
         ))}
       </div>
       <div className="bg-white border border-pine/10 rounded-3xl p-5">
