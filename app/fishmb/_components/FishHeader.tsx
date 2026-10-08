@@ -34,8 +34,11 @@ export default function FishHeader() {
     <header className="sticky top-0 z-40 bg-paper/95 backdrop-blur border-b border-pine/10">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link href="/fishmb" aria-label="FishMB home">
+          <Link href="/fishmb" aria-label="FishMB home" className="flex items-center gap-2">
             <Wordmark />
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-signal border border-signal/40 rounded-full px-2 py-0.5 mt-0.5">
+              Beta
+            </span>
           </Link>
           <nav className="hidden md:flex items-center gap-7">
             {NAV.map((n) => (
@@ -147,6 +150,20 @@ export default function FishHeader() {
           >
             📱 Get the app
           </Link>
+          <div className="mt-3 mb-2 bg-gold/15 border border-gold/40 rounded-2xl p-4">
+            <p className="text-sm font-bold text-pine">🧪 FishMB is in beta</p>
+            <p className="text-xs text-pine/65 mt-1 leading-relaxed">
+              We&apos;re still building — things might break or look rough around the edges.
+              Got an idea for a feature or spotted a bug? Tell us and we&apos;ll take a look.
+            </p>
+            <Link
+              href="/fishmb/contact"
+              onClick={() => setOpen(false)}
+              className="inline-block mt-2.5 text-xs font-bold uppercase tracking-wider text-signal-dark"
+            >
+              Suggest a feature / report a bug →
+            </Link>
+          </div>
         </nav>
       )}
     </header>
