@@ -290,12 +290,34 @@ export default function SpotMap({ spots, picking, onPick, onLongPress, pendingPi
     };
   }, [expanded]);
 
-  // Leaflet needs to re-measure once the container resizes into/out of fullscreen.
+  // Leaflet needs to re-measure once the container resizes into/out of
+  // fullscreen — otherwise tiles can paint blank. A ResizeObserver catches
+  // the size settling; the delayed retries cover slow layout passes.
   useEffect(() => {
-    if (!map) return;
-    const t = setTimeout(() => map.invalidateSize(), 60);
-    return () => clearTimeout(t);
-  }, [expanded, map]);
+    if (!map || !containerRef.current) return;
+    const el = containerRef.current;
+    const fix = () => {
+      try {
+        map.invalidateSize();
+      } catch {
+        // non-fatal
+      }
+    };
+    const t1 = setTimeout(fix, 60);
+    const t2 = setTimeout(fix, 400);
+    const t3 = setTimeout(fix, 1200);
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(() => fix());
+      ro.observe(el);
+    }
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      ro?.disconnect();
+    };
+  }, [map]);
 
   // Fullscreen mode: lock the page behind the map, Escape exits.
   useEffect(() => {
