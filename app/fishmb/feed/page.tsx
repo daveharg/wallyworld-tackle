@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, Fragment } from "react";
+import { useCallback, useEffect, useRef, useState, Fragment, Suspense } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
 import { compressImage } from "../_components/compressImage";
@@ -43,13 +44,14 @@ function timeAgo(iso: string): string {
   return `${Math.floor(s / 86400)}d ago`;
 }
 
-function Avatar({ name, url }: { name: string; url: string | null }) {
+function Avatar({ name, url, small }: { name: string; url: string | null; small?: boolean }) {
+  const cls = small ? "w-9 h-9" : "w-10 h-10";
   if (url) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={url} alt="" className="w-10 h-10 rounded-full object-cover" />;
+    return <img src={url} alt="" className={`${cls} rounded-full object-cover ring-2 ring-white/70`} />;
   }
   return (
-    <span className="w-10 h-10 rounded-full bg-signal text-white flex items-center justify-center font-bold">
+    <span className={`${cls} rounded-full bg-signal text-white flex items-center justify-center font-bold ring-2 ring-white/70`}>
       {name.charAt(0).toUpperCase()}
     </span>
   );
@@ -99,12 +101,12 @@ function cardPhotos(item: FeedItem): string[] {
   return item.photo_url ? [item.photo_url] : [];
 }
 
-function PhotoCarousel({ photos }: { photos: string[] }) {
+function PhotoCarousel({ photos, bare }: { photos: string[]; bare?: boolean }) {
   const [idx, setIdx] = useState(0);
   if (photos.length === 0) return null;
   const go = (d: number) => setIdx((i) => (i + d + photos.length) % photos.length);
   return (
-    <div className="mt-3 rounded-2xl overflow-hidden bg-pine-deep/10 relative max-sm:-mx-5 max-sm:rounded-none">
+    <div className={bare ? "relative bg-pine-deep/10" : "mt-3 rounded-2xl overflow-hidden bg-pine-deep/10 relative max-sm:-mx-5 max-sm:rounded-none"}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={photos[idx]}
@@ -278,7 +280,9 @@ function Comments({ postId }: { postId: string }) {
   );
 }
 
-export default function FeedPage() {
+function FeedPageInner() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const { user, openLogin } = useFishAuth();
   const [items, setItems] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -377,35 +381,46 @@ export default function FeedPage() {
     load();
   }, [load]);
 
-  // Deep link: /fishmb/feed?log=catch opens the composer in catch-logging mode.
-  // /fishmb/feed?compose=1 opens the share-a-post composer (bottom-bar + button).
-  const logCatchOpened = useRef(false);
+  // Keep the feed section and composer in sync with the URL, so bottom-bar
+  // taps work every time (even tapping the same button twice in a row).
+  // ?log=catch → catch composer, ?compose=1 → post composer,
+  // ?kind=catch → Catches, ?friends=1 → Buddies.
+  const lastActionRef = useRef<string | null>(null);
   useEffect(() => {
-    if (logCatchOpened.current || !user) return;
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("log") === "catch") {
-      logCatchOpened.current = true;
-      setMode("catch");
+    const kind = searchParams.get("kind");
+    const friends = searchParams.get("friends") === "1";
+    const wantTab = kind === "catch" ? "catch" : "all";
+    if (wantTab !== tabRef.current || friends !== friendsOnlyRef.current) {
+      tabRef.current = wantTab;
+      setTab(wantTab);
+      friendsOnlyRef.current = friends;
+      setFriendsOnly(friends);
+      load(undefined, wantTab, friends);
+    }
+    const action =
+      searchParams.get("log") === "catch" ? "log"
+      : searchParams.get("compose") === "1" ? "compose"
+      : null;
+    const actionKey = action ? `${action}:${searchParams.toString()}` : null;
+    if (action && user && lastActionRef.current !== actionKey) {
+      lastActionRef.current = actionKey;
+      setMode(action === "log" ? "catch" : "post");
       setComposerOpen(true);
-    } else if (params.get("compose") === "1") {
-      logCatchOpened.current = true;
-      setMode("post");
-      setComposerOpen(true);
     }
-    // Deep links from the bottom bar: ?kind=catch (Catches), ?friends=1 (Buddies).
-    const kindParam = params.get("kind");
-    if (kindParam === "catch") {
-      tabRef.current = "catch";
-      setTab("catch");
+    if (!action) lastActionRef.current = null;
+  }, [searchParams, user, load]);
+
+  // Closing the composer clears the action params so the next tap re-fires.
+  const closeComposer = useCallback(() => {
+    setComposerOpen(false);
+    const sp = new URLSearchParams(searchParams.toString());
+    if (sp.has("compose") || sp.has("log")) {
+      sp.delete("compose");
+      sp.delete("log");
+      const qs = sp.toString();
+      router.replace(`/fishmb/feed${qs ? `?${qs}` : ""}`, { scroll: false });
     }
-    if (params.get("friends") === "1") {
-      friendsOnlyRef.current = true;
-      setFriendsOnly(true);
-    }
-    if (kindParam === "catch" || params.get("friends") === "1") {
-      load(undefined, kindParam === "catch" ? "catch" : "all", params.get("friends") === "1");
-    }
-  }, [user]);
+  }, [searchParams, router]);
 
   useEffect(() => {
     const el = sentinelRef.current;
@@ -523,7 +538,7 @@ export default function FeedPage() {
       setItems([d.item, ...items]);
       setDraft("");
       setPostPhotos([]);
-      setComposerOpen(false);
+      closeComposer();
     } catch (e) {
       setCatchNote(e instanceof Error ? e.message : "Could not post.");
     } finally {
@@ -618,7 +633,7 @@ export default function FeedPage() {
       setTournamentId("");
       setCatchLat(null);
       setCatchLng(null);
-      setComposerOpen(false);
+      closeComposer();
       load();
     } catch (e) {
       setCatchNote(e instanceof Error ? e.message : "Could not log the catch.");
@@ -689,47 +704,72 @@ export default function FeedPage() {
         <div className="space-y-4">
           {items.map((item, idx) => (
             <Fragment key={item.id}>
-            <article className="bg-white border border-pine/10 rounded-3xl p-5 max-sm:-mx-4 max-sm:rounded-none max-sm:border-x-0">
-              <div className="flex items-center gap-3 mb-3">
-                <Avatar name={item.user_name} url={item.avatar_url} />
-                <div>
-                  <Link href={`/fishmb/anglers/${item.user_id}`} className="font-bold text-pine text-sm hover:text-signal-dark">
-                    {item.user_name}
-                  </Link>
-                  <p className="text-xs text-pine/45">
-                    {timeAgo(item.created_at)} ·{" "}
-                    {item.kind === "catch"
-                      ? "logged a catch"
-                      : item.kind === "tip"
-                        ? `💡 added a tip${item.species_tag ? ` for ${item.species_tag}` : ""}`
-                        : "posted"}
-                    {item.visibility === "friends" && " · 👥 friends only"}
-                  </p>
+            <article className="bg-white border border-pine/10 rounded-3xl overflow-hidden max-sm:-mx-4 max-sm:rounded-none max-sm:border-x-0">
+              {cardPhotos(item).length > 0 ? (
+                <div className="relative">
+                  <PhotoCarousel photos={cardPhotos(item)} bare />
+                  {/* readability scrim + overlaid author */}
+                  <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/65 to-transparent pointer-events-none" />
+                  <div className="absolute top-3 left-3 flex items-center gap-2.5">
+                    <Avatar name={item.user_name} url={item.avatar_url} small />
+                    <div className="leading-tight">
+                      <Link href={`/fishmb/anglers/${item.user_id}`} className="block font-bold text-white text-sm drop-shadow-md">
+                        {item.user_name}
+                      </Link>
+                      <p className="text-[11px] text-white/85 drop-shadow">
+                        {timeAgo(item.created_at)}
+                        {item.visibility === "friends" && " · 👥 friends"}
+                      </p>
+                    </div>
+                  </div>
+                  {item.kind === "catch" && (
+                    <span className="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider bg-black/55 text-white px-3 py-1 rounded-full">
+                      🐟 Catch
+                    </span>
+                  )}
                 </div>
-                {item.kind === "catch" && (
-                  <span className="ml-auto text-[10px] font-bold uppercase tracking-wider bg-accentTeal/15 text-accentTeal px-3 py-1 rounded-full">
-                    Catch
-                  </span>
-                )}
-              </div>
-              {item.species && (
-                <p className="font-bold text-pine mb-1">
-                  {item.species}
-                  {item.length_in ? ` · ${Number(item.length_in).toFixed(1)}″` : ""}
-                </p>
+              ) : (
+                <div className="flex items-center gap-3 px-5 pt-4">
+                  <Avatar name={item.user_name} url={item.avatar_url} />
+                  <div>
+                    <Link href={`/fishmb/anglers/${item.user_id}`} className="font-bold text-pine text-sm hover:text-signal-dark">
+                      {item.user_name}
+                    </Link>
+                    <p className="text-xs text-pine/45">
+                      {timeAgo(item.created_at)}
+                      {item.visibility === "friends" && " · 👥 friends only"}
+                    </p>
+                  </div>
+                  {item.kind === "catch" && (
+                    <span className="ml-auto text-[10px] font-bold uppercase tracking-wider bg-accentTeal/15 text-accentTeal px-3 py-1 rounded-full">
+                      Catch
+                    </span>
+                  )}
+                </div>
               )}
-              {item.body && <p className="text-pine/80 text-sm whitespace-pre-line">{item.body}</p>}
-              <PhotoCarousel photos={cardPhotos(item)} />
-              <div className="mt-3 flex items-center justify-between">
-                <Reactions item={item} onReacted={handleReacted} />
-                <button
-                  onClick={() => toggleComments(item.id)}
-                  className="text-xs font-bold uppercase tracking-wider text-pine/50 hover:text-signal-dark"
-                >
-                  💬 {item.comment_count} {item.comment_count === 1 ? "comment" : "comments"}
-                </button>
+              <div className="px-5 py-4">
+                {item.species && (
+                  <p className="font-bold text-pine mb-1">
+                    {item.species}
+                    {item.length_in ? ` · ${Number(item.length_in).toFixed(1)}″` : ""}
+                  </p>
+                )}
+                {item.body && <p className="text-pine/80 text-sm whitespace-pre-line">{item.body}</p>}
+                <div className="mt-3 flex items-center justify-between">
+                  <Reactions item={item} onReacted={handleReacted} />
+                  <button
+                    onClick={() => toggleComments(item.id)}
+                    className="text-xs font-bold uppercase tracking-wider text-pine/50 hover:text-signal-dark"
+                  >
+                    💬 {item.comment_count} {item.comment_count === 1 ? "comment" : "comments"}
+                  </button>
+                </div>
               </div>
-              {openComments.has(item.id) && <Comments postId={item.id} />}
+              {openComments.has(item.id) && (
+                <div className="px-5 pb-4">
+                  <Comments postId={item.id} />
+                </div>
+              )}
             </article>
             {/* Interleave a sponsored ad after every 8th post */}
             {feedAds.length > 0 && (idx + 1) % 8 === 0 && (
@@ -796,7 +836,7 @@ export default function FeedPage() {
       {/* Composer modal */}
       {user && composerOpen && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-          <div className="absolute inset-0 bg-pine-deep/60" onClick={() => setComposerOpen(false)} />
+          <div className="absolute inset-0 bg-pine-deep/60" onClick={() => closeComposer()} />
           <div className="relative bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl p-5 max-h-[92vh] overflow-y-auto">
             <div className="flex gap-2 mb-4 items-center">
               {(
@@ -819,7 +859,7 @@ export default function FeedPage() {
                 </button>
               ))}
               <button
-                onClick={() => setComposerOpen(false)}
+                onClick={() => closeComposer()}
                 aria-label="Close composer"
                 className="ml-auto text-pine/40 hover:text-pine font-bold text-lg leading-none px-2"
               >
@@ -1027,5 +1067,21 @@ export default function FeedPage() {
 
 
     </div>
+  );
+}
+
+export default function FeedPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="max-w-2xl mx-auto px-4 pt-4 pb-32 space-y-4">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="bg-white border border-pine/10 rounded-3xl p-5 h-40 animate-pulse" />
+          ))}
+        </div>
+      }
+    >
+      <FeedPageInner />
+    </Suspense>
   );
 }
