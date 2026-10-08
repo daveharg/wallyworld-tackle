@@ -77,8 +77,16 @@ export function LakeMap({ lakes }: { lakes: MapLake[] }) {
     <div className="rounded-3xl overflow-hidden border border-pine/10 shadow-sm">
       <div ref={containerRef} className="h-[320px] md:h-[420px] w-full z-0" />
       <p className="text-xs text-pine/50 px-4 py-2.5 bg-white">
-        Showing {Math.min(lakes.length, 200)} of {lakes.length} lakes on the map.{" "}
-        {lakes.length === 0 && "Search above to find lakes."}
+        {lakes.length === 1 ? (
+          <>
+            📍 {lakes[0].name} · {lakes[0].region}
+          </>
+        ) : (
+          <>
+            Showing {Math.min(lakes.length, 200)} of {lakes.length} lakes on the map.{" "}
+            {lakes.length === 0 && "Search above to find lakes."}
+          </>
+        )}
       </p>
     </div>
   );

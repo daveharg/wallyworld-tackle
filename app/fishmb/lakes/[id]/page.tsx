@@ -4,6 +4,10 @@ import { notFound } from "next/navigation";
 import { getLake, getLakes, getZone, getGuideUrl, getStockingHistory, type StockingEvent } from "@/lib/fishmb";
 import { slugifySpecies, getSpeciesAdvice } from "@/lib/fishmb-species";
 import { lakePhotoUrl, hasRealLakePhoto, lakePhotoCredit } from "@/lib/fishmb-constants";
+import { LakeMap } from "../_components/LakeMap";
+import coordsJson from "@/public/fishmb/lake-coords.json";
+
+const COORDS = coordsJson as Record<string, { lat: number; lng: number }>;
 
 export const revalidate = 3600;
 
@@ -160,6 +164,7 @@ export default function LakeDetailPage({ params }: { params: { id: string } }) {
 
   const zone = getZone(lake.limits_zone);
   const regs = lake.regulations;
+  const coords = COORDS[lake.id];
   const towns: string[] = Array.isArray(lake.towns)
     ? lake.towns.map((t) => (typeof t === "string" ? t : t.name))
     : [];
@@ -218,6 +223,26 @@ export default function LakeDetailPage({ params }: { params: { id: string } }) {
                   </p>
                 )}
               </div>
+            </section>
+          )}
+
+          {/* Location map */}
+          {coords && (
+            <section>
+              <h2 className="font-display font-bold uppercase text-2xl text-pine tracking-wide mb-3">
+                Where it is
+              </h2>
+              <LakeMap
+                lakes={[
+                  {
+                    id: lake.id,
+                    name: lake.name,
+                    region: lake.region,
+                    lat: coords.lat,
+                    lng: coords.lng,
+                  },
+                ]}
+              />
             </section>
           )}
 
