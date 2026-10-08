@@ -372,6 +372,17 @@ export default function FeedPage() {
     load();
   }, [load]);
 
+  // Deep link: /fishmb/feed?log=catch opens the composer in catch-logging mode.
+  const logCatchOpened = useRef(false);
+  useEffect(() => {
+    if (logCatchOpened.current || !user) return;
+    if (new URLSearchParams(window.location.search).get("log") === "catch") {
+      logCatchOpened.current = true;
+      setMode("catch");
+      setComposerOpen(true);
+    }
+  }, [user]);
+
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el) return;

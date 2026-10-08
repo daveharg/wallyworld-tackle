@@ -179,6 +179,17 @@ export default function ProfileView({
 
       <FishingStats userId={userId} />
 
+      {data.is_self && (
+        <div className="mb-8 -mt-4">
+          <Link
+            href="/fishmb/feed?log=catch"
+            className="inline-flex items-center gap-2 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-8 py-3.5 rounded-full transition-colors"
+          >
+            🐟 Log a catch
+          </Link>
+        </div>
+      )}
+
       {data.is_self && <MyRentals />}
 
       {/* Tabs */}
