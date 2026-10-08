@@ -176,7 +176,7 @@ export default function LocationPicker({
           <>
             <div className="mt-4 space-y-2">
               {saved.length === 0 && (
-                <p className="text-sm text-white/50">No saved spots yet — add your lakes below.</p>
+                <p className="text-sm text-white/50">No saved spots yet — add your places below.</p>
               )}
               {saved.map((l) => (
                 <div
@@ -216,7 +216,7 @@ export default function LocationPicker({
                 onClick={() => setMode("add")}
                 className="rounded-2xl bg-emerald-400/90 text-[#0b1a15] px-4 py-3 text-sm font-black"
               >
-                ＋ Add a lake
+                ＋ Add a location
               </button>
             </div>
           </>
@@ -232,21 +232,24 @@ export default function LocationPicker({
               autoFocus
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search Manitoba lakes…"
+              placeholder="Search lakes & towns…"
               className="mt-2 w-full bg-white/10 border border-white/15 rounded-2xl px-4 py-3 text-sm placeholder:text-white/35 focus:outline-none focus:border-emerald-300/60"
             />
             <div className="mt-2 space-y-1.5">
               {results.map((l) => (
                 <button
-                  key={l.name}
+                  key={`${l.kind}-${l.name}`}
                   onClick={() => choose(l)}
-                  className="w-full text-left rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-sm font-bold hover:bg-white/10"
+                  className="w-full text-left rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-2.5 hover:bg-white/10 flex items-center justify-between gap-2"
                 >
-                  {l.name}
+                  <span className="text-sm font-bold">{l.name}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/40 shrink-0">
+                    {l.kind === "town" ? "🏠 Town" : "🌊 Lake"}
+                  </span>
                 </button>
               ))}
               {q.trim().length >= 2 && results.length === 0 && (
-                <p className="text-sm text-white/50 px-1">No lakes match “{q.trim()}”.</p>
+                <p className="text-sm text-white/50 px-1">No places match “{q.trim()}”.</p>
               )}
             </div>
           </>
