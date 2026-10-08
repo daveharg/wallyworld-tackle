@@ -9,6 +9,7 @@ import { fishFetch } from "../_components/fishFetch";
 import { compressImage } from "../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 import ProfileView from "./_components/ProfileView";
+import FishingSpots from "./_components/FishingSpots";
 
 function EditPanel() {
   const { user, refresh } = useFishAuth();
@@ -195,6 +196,7 @@ export default function ProfilePage() {
         </div>
       )}
       <ProfileView userId={user.id} editor={<EditPanel />} />
+      <FishingSpots />
     </>
   );
 }

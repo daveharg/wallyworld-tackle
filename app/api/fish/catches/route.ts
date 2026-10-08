@@ -144,15 +144,49 @@ export async function POST(req: NextRequest) {
     caughtAt = d.toISOString();
   }
 
+  // Optional GPS coords saved from the catch composer.
+  const rawLat = body.lat === undefined || body.lat === null ? null : Number(body.lat);
+  const rawLng = body.lng === undefined || body.lng === null ? null : Number(body.lng);
+  const lat =
+    rawLat === null ? null : Number.isFinite(rawLat) && rawLat >= -90 && rawLat <= 90 ? rawLat : null;
+  const lng =
+    rawLng === null
+      ? null
+      : Number.isFinite(rawLng) && rawLng >= -180 && rawLng <= 180
+        ? rawLng
+        : null;
+  if ((body.lat !== undefined && body.lat !== null && lat === null) || (body.lng !== undefined && body.lng !== null && lng === null)) {
+    return badRequest("lat must be between -90 and 90, lng between -180 and 180.");
+  }
+
   // Multi-photo storage (idempotent — same column the feed query already reads).
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS photos jsonb`);
+  await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS lat double precision`);
+  await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS lng double precision`);
   const rows = await query<CatchRow>(
     `INSERT INTO fm_catches
-       (user_id, species, length_in, weight_lb, photo_measure_url, photo_hold_url, photos, visibility, note, caught_at)
-     VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9,COALESCE($10::timestamptz, now()))
+       (user_id, species, length_in, weight_lb, photo_measure_url, photo_hold_url, photos, visibility, note, caught_at, lat, lng)
+     VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9,COALESCE($10::timestamptz, now()),$11,$12)
      RETURNING *, (SELECT name FROM fm_users WHERE id = $1) AS name,
                    (SELECT avatar_url FROM fm_users WHERE id = $1) AS avatar_url`,
-    [me.id, species, lengthIn, weightLb, photoMeasure, photoHold, JSON.stringify(photos), visibility, note, caughtAt]
+    [me.id, species, lengthIn, weightLb, photoMeasure, photoHold, JSON.stringify(photos), visibility, note, caughtAt, lat, lng]
   );
-  return NextResponse.json({ catch: toItem(rows[0]) }, { status: 201 });
+  const newCatch = rows[0];
+
+  // A catch with GPS coords becomes a personal fishing spot.
+  if (lat !== null && lng !== null) {
+    try {
+      const { ensureSpotsTable, createSpot } = await import("@/lib/fish/spots");
+      await ensureSpotsTable();
+      await createSpot(me.id, {
+        name: `${species} spot`,
+        lat,
+        lng,
+        catchId: newCatch.id,
+      });
+    } catch {
+      // Spot creation is best-effort — the catch itself is already saved.
+    }
+  }
+  return NextResponse.json({ catch: toItem(newCatch) }, { status: 201 });
 }

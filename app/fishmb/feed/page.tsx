@@ -298,6 +298,9 @@ export default function FeedPage() {
   const [visibility, setVisibility] = useState<"public" | "friends" | "private">("public");
   const [catchSpecies, setCatchSpecies] = useState("");
   const [catchLength, setCatchLength] = useState("");
+  const [catchLat, setCatchLat] = useState<number | null>(null);
+  const [catchLng, setCatchLng] = useState<number | null>(null);
+  const [locating, setLocating] = useState(false);
   const [myTournaments, setMyTournaments] = useState<{ id: string; name: string }[]>([]);
   const [tournamentId, setTournamentId] = useState("");
   const [catchNote, setCatchNote] = useState<string | null>(null);
@@ -477,6 +480,27 @@ export default function FeedPage() {
     }
   };
 
+  const saveCatchLocation = () => {
+    if (!("geolocation" in navigator)) {
+      setCatchNote("Your device doesn't support location.");
+      return;
+    }
+    setLocating(true);
+    setCatchNote(null);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setCatchLat(pos.coords.latitude);
+        setCatchLng(pos.coords.longitude);
+        setLocating(false);
+      },
+      () => {
+        setLocating(false);
+        setCatchNote("Couldn't get your location — check permission.");
+      },
+      { timeout: 10000 }
+    );
+  };
+
   const logCatch = async () => {
     if (!user) {
       openLogin();
@@ -515,6 +539,8 @@ export default function FeedPage() {
           photos: urls,
           visibility,
           note: draft.trim() || null,
+          lat: catchLat,
+          lng: catchLng,
         }),
       });
       if (tournamentId) {
@@ -539,6 +565,8 @@ export default function FeedPage() {
       setDraft("");
       setCatchPhotos([]);
       setTournamentId("");
+      setCatchLat(null);
+      setCatchLng(null);
       setComposerOpen(false);
       load();
     } catch (e) {
@@ -858,6 +886,14 @@ export default function FeedPage() {
                       }}
                     />
                   </label>
+                  <button
+                    type="button"
+                    onClick={saveCatchLocation}
+                    disabled={locating}
+                    className="text-sm font-bold text-signal-dark disabled:opacity-50"
+                  >
+                    {locating ? "📍 Getting location…" : "📍 Save location"}
+                  </button>
                   <select
                     value={visibility}
                     onChange={(e) => setVisibility(e.target.value as "public" | "friends" | "private")}
@@ -869,6 +905,26 @@ export default function FeedPage() {
                     <option value="private">🔒 Only me</option>
                   </select>
                 </div>
+                {catchLat !== null && catchLng !== null && (
+                  <div className="flex items-center justify-between mt-2 bg-pine/5 border border-pine/10 rounded-2xl px-4 py-2.5">
+                    <p className="text-sm text-pine font-bold">
+                      📍 Location saved
+                      <span className="font-normal text-pine/50 text-xs ml-2">
+                        {catchLat.toFixed(5)}, {catchLng.toFixed(5)}
+                      </span>
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCatchLat(null);
+                        setCatchLng(null);
+                      }}
+                      className="text-xs font-bold text-pine/50 hover:text-signal-dark"
+                    >
+                      remove
+                    </button>
+                  </div>
+                )}
                 {myTournaments.length > 0 && (
                   <div className="mt-3">
                     <label className="text-xs font-bold uppercase tracking-wider text-pine/55">
