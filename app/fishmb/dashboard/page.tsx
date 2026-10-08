@@ -5,16 +5,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useFishAuth } from "../_components/FishAuth";
-import FishingSpots from "../profile/_components/FishingSpots";
 import DashboardStats from "./_components/DashboardStats";
 import DashboardSettings from "./_components/DashboardSettings";
 import DashboardLicence from "./_components/DashboardLicence";
-import LakeNotes from "./_components/LakeNotes";
 
 const TABS = [
   { id: "stats", label: "📊 Stats" },
-  { id: "spots", label: "📍 My Spots" },
-  { id: "notes", label: "📓 Lake Notes" },
   { id: "settings", label: "⚙️ Settings" },
 ] as const;
 
@@ -31,7 +27,7 @@ export default function DashboardPage() {
           Dashboard
         </h1>
         <p className="text-pine/60 mb-6">
-          Log in to see your stats, spots, lake notes and settings.
+          Log in to see your stats and settings.
         </p>
         <button
           onClick={openLogin}
@@ -70,22 +66,6 @@ export default function DashboardPage() {
       </div>
 
       {tab === "stats" && <DashboardStats />}
-      {tab === "spots" && (
-        <div>
-          <p className="text-pine/60 text-sm mb-4">
-            Your private fishing spots, saved lakes and the map — only you can
-            see these.{" "}
-            <Link
-              href="/fishmb/profile"
-              className="text-signal-dark font-bold hover:underline"
-            >
-              View public profile →
-            </Link>
-          </p>
-          <FishingSpots />
-        </div>
-      )}
-      {tab === "notes" && <LakeNotes />}
       {tab === "settings" && <DashboardSettings />}
 
       <DashboardLicence />
