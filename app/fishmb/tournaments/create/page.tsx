@@ -17,10 +17,10 @@ export default function CreateTournamentPage() {
         shareable link — anglers log in (or create a free account) to join, and
         you review every catch before it hits the leaderboard.
       </p>
-      <TournamentBuilder lakes={lakes} />
-      <div className="mt-6">
+      <div className="mb-8">
         <LicenceNotice participantCount={0} maxParticipants={null} />
       </div>
+      <TournamentBuilder lakes={lakes} />
     </div>
   );
 }

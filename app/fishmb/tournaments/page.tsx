@@ -33,6 +33,12 @@ export default async function TournamentsPage() {
         >
           Create a tournament
         </Link>
+        <Link
+          href="/fishmb/tournaments/how-it-works"
+          className="border-2 border-pine/20 hover:border-pine/40 text-pine font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors"
+        >
+          Learn more
+        </Link>
         <JoinByCode />
       </div>
 
