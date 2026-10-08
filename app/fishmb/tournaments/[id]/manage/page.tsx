@@ -6,6 +6,8 @@ import { useFishAuth } from "../../../_components/FishAuth";
 import { fishFetch, formatDateTime } from "../../../_components/fishFetch";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 import { CatchMap } from "../../_components/CatchMap";
+import { PayoutEditor } from "../../_components/PayoutEditor";
+import type { PayoutTier } from "@/lib/fish/tournaments";
 
 interface Entry {
   id: string;
@@ -35,6 +37,13 @@ interface Detail {
     ends_at: string;
     invite_code: string;
     status: string;
+    scoring: string;
+    rules: string;
+    species: string[];
+    lake_ids: string[];
+    entry_fee_cents: number;
+    payouts: PayoutTier[];
+    auto_approve_entries: boolean;
     cover_photo_url: string | null;
     venue_name: string | null;
     venue_address: string | null;
@@ -43,14 +52,132 @@ interface Detail {
   is_organizer: boolean;
 }
 
-/** Organizer-editable rich details: cover photo, venue name, venue address. */
-function EditDetails({ tournament, onSaved }: { tournament: Detail["tournament"]; onSaved: () => void }) {
+/** ISO timestamp → value for <input type="datetime-local">. */
+function toLocalInput(iso: string) {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+/** Search-as-you-type lake picker; selected lakes show as removable chips. */
+function LakePicker({
+  selected,
+  onChange,
+}: {
+  selected: { id: string; name: string }[];
+  onChange: (v: { id: string; name: string }[]) => void;
+}) {
+  const [q, setQ] = useState("");
+  const [hits, setHits] = useState<{ id: string; name: string; region: string }[]>([]);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (q.trim().length < 2) {
+      setHits([]);
+      setOpen(false);
+      return;
+    }
+    const t = setTimeout(() => {
+      fishFetch(`/api/fishmb/search?q=${encodeURIComponent(q.trim())}`)
+        .then((d) => {
+          setHits((d.lakes ?? []) as { id: string; name: string; region: string }[]);
+          setOpen(true);
+        })
+        .catch(() => setHits([]));
+    }, 250);
+    return () => clearTimeout(t);
+  }, [q]);
+
+  const add = (lake: { id: string; name: string }) => {
+    if (!selected.some((s) => s.id === lake.id)) onChange([...selected, lake]);
+    setQ("");
+    setOpen(false);
+  };
+
+  return (
+    <div className="relative">
+      <div className="flex flex-wrap gap-2 mb-2">
+        {selected.length === 0 && <span className="text-pine/40 text-sm">Any Manitoba water</span>}
+        {selected.map((l) => (
+          <button
+            key={l.id}
+            type="button"
+            onClick={() => onChange(selected.filter((s) => s.id !== l.id))}
+            className="bg-pine/10 text-pine text-xs font-bold px-3 py-1.5 rounded-full hover:bg-signal/10 hover:text-signal-dark"
+            title="Remove"
+          >
+            {l.name} ✕
+          </button>
+        ))}
+      </div>
+      <input
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        placeholder="Type a lake name to add…"
+        className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal"
+      />
+      {open && hits.length > 0 && (
+        <div className="absolute z-20 inset-x-0 mt-1 bg-white border border-pine/15 rounded-2xl shadow-xl overflow-hidden max-h-56 overflow-y-auto">
+          {hits.map((h) => (
+            <button
+              key={h.id}
+              type="button"
+              onClick={() => add(h)}
+              className="w-full text-left px-4 py-2.5 hover:bg-paper-deep text-sm text-pine"
+            >
+              <span className="font-bold">{h.name}</span>
+              {h.region && <span className="text-pine/50"> · {h.region}</span>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const inputCls =
+  "w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal";
+const labelCls =
+  "block text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-1.5";
+
+/** Full tournament editor — the organizer can fix any mistake made at creation. */
+function EditTournament({ tournament, onSaved }: { tournament: Detail["tournament"]; onSaved: () => void }) {
+  const [name, setName] = useState(tournament.name);
+  const [description, setDescription] = useState(tournament.description ?? "");
+  const [startsAt, setStartsAt] = useState(toLocalInput(tournament.starts_at));
+  const [endsAt, setEndsAt] = useState(toLocalInput(tournament.ends_at));
+  const [status, setStatus] = useState(tournament.status);
+  const [scoring, setScoring] = useState(tournament.scoring);
+  const [rules, setRules] = useState(tournament.rules ?? "");
+  const [speciesText, setSpeciesText] = useState((tournament.species ?? []).join(", "));
+  const [lakes, setLakes] = useState<{ id: string; name: string }[]>(
+    (tournament.lake_ids ?? []).map((id) => ({ id, name: id }))
+  );
+  const [entryFee, setEntryFee] = useState(
+    tournament.entry_fee_cents ? (tournament.entry_fee_cents / 100).toFixed(2).replace(/\.00$/, "") : ""
+  );
+  const [payouts, setPayouts] = useState<PayoutTier[]>(tournament.payouts ?? []);
+  const [autoApprove, setAutoApprove] = useState(!!tournament.auto_approve_entries);
   const [cover, setCover] = useState<string | null>(tournament.cover_photo_url ?? null);
   const [venueName, setVenueName] = useState(tournament.venue_name ?? "");
   const [venueAddress, setVenueAddress] = useState(tournament.venue_address ?? "");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [note, setNote] = useState<string | null>(null);
+
+  // Resolve names for the lakes already attached to this tournament.
+  useEffect(() => {
+    const ids = (tournament.lake_ids ?? []).filter(Boolean);
+    if (ids.length === 0) return;
+    fishFetch(`/api/fishmb/search?ids=${encodeURIComponent(ids.join(","))}`)
+      .then((d) => {
+        const rows = (d.lakes ?? []) as { id: string; name: string }[];
+        if (rows.length) setLakes(rows.map((r) => ({ id: r.id, name: r.name })));
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const uploadCover = async (file: File) => {
     setUploading(true);
@@ -78,16 +205,34 @@ function EditDetails({ tournament, onSaved }: { tournament: Detail["tournament"]
     setSaving(true);
     setNote(null);
     try {
+      const startIso = startsAt ? new Date(startsAt).toISOString() : "";
+      const endIso = endsAt ? new Date(endsAt).toISOString() : "";
+      if (!name.trim()) throw new Error("Give the tournament a name.");
+      if (!startIso || !endIso) throw new Error("Set a start and end date/time.");
+      if (new Date(endIso) <= new Date(startIso))
+        throw new Error("The end must be after the start.");
       await fishFetch(`/api/fishmb/tournaments/${tournament.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          name: name.trim(),
+          description,
+          starts_at: startIso,
+          ends_at: endIso,
+          status,
+          scoring,
+          rules,
+          species: speciesText.split(",").map((s) => s.trim()).filter(Boolean),
+          lake_ids: lakes.map((l) => l.id),
+          entry_fee_cents: Math.max(0, Math.round((parseFloat(entryFee) || 0) * 100)),
+          payouts,
+          auto_approve_entries: autoApprove,
           cover_photo_url: cover ?? "",
           venue_name: venueName,
           venue_address: venueAddress,
         }),
       });
-      setNote("Tournament details updated!");
+      setNote("Tournament updated!");
       onSaved();
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not save.");
@@ -99,19 +244,108 @@ function EditDetails({ tournament, onSaved }: { tournament: Detail["tournament"]
   return (
     <section className="bg-white border border-pine/10 rounded-3xl p-6 md:p-8 mb-8">
       <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-1">
-        Tournament page details
+        Edit tournament
       </h2>
-      <p className="text-pine/55 text-sm mb-5">
-        Cover photo, venue name and address show on the public tournament page.
+      <p className="text-pine/55 text-sm mb-6">
+        Fix anything — details, dates, waters, fees, payouts. One save updates the whole tournament.
       </p>
       {note && (
         <p className="text-sm text-pine bg-gold/20 border border-gold/50 rounded-2xl px-4 py-3 mb-5">{note}</p>
       )}
       <div className="grid md:grid-cols-2 gap-5">
         <div>
-          <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-1.5">
-            Cover photo
+          <label className={labelCls}>Tournament name</label>
+          <input value={name} onChange={(e) => setName(e.target.value)} maxLength={80} className={inputCls} />
+        </div>
+        <div>
+          <label className={labelCls}>Status</label>
+          <select value={status} onChange={(e) => setStatus(e.target.value)} className={inputCls}>
+            <option value="upcoming">Upcoming</option>
+            <option value="live">Live</option>
+            <option value="ended">Ended</option>
+          </select>
+        </div>
+        <div>
+          <label className={labelCls}>Starts</label>
+          <input type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} className={inputCls} />
+        </div>
+        <div>
+          <label className={labelCls}>Ends</label>
+          <input type="datetime-local" value={endsAt} onChange={(e) => setEndsAt(e.target.value)} className={inputCls} />
+        </div>
+        <div>
+          <label className={labelCls}>Scoring</label>
+          <select value={scoring} onChange={(e) => setScoring(e.target.value)} className={inputCls}>
+            <option value="longest">Longest fish</option>
+            <option value="total">Total length</option>
+            <option value="count">Most fish</option>
+          </select>
+        </div>
+        <div>
+          <label className={labelCls}>Entry fee (dollars, blank = free)</label>
+          <input
+            value={entryFee}
+            onChange={(e) => setEntryFee(e.target.value.replace(/[^0-9.]/g, ""))}
+            placeholder="0"
+            inputMode="decimal"
+            className={inputCls}
+          />
+        </div>
+        <div className="md:col-span-2">
+          <label className={labelCls}>Description</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            maxLength={2000}
+            rows={3}
+            className={inputCls}
+          />
+        </div>
+        <div className="md:col-span-2">
+          <label className={labelCls}>Waters (search Manitoba lakes)</label>
+          <LakePicker selected={lakes} onChange={setLakes} />
+        </div>
+        <div className="md:col-span-2">
+          <label className={labelCls}>Species (comma-separated, blank = all)</label>
+          <input
+            value={speciesText}
+            onChange={(e) => setSpeciesText(e.target.value)}
+            placeholder="Walleye, Northern pike"
+            className={inputCls}
+          />
+        </div>
+        <div className="md:col-span-2">
+          <label className={labelCls}>Rules</label>
+          <textarea
+            value={rules}
+            onChange={(e) => setRules(e.target.value)}
+            maxLength={5000}
+            rows={4}
+            className={inputCls}
+          />
+        </div>
+        <div className="md:col-span-2">
+          <label className={labelCls}>Payouts</label>
+          <PayoutEditor value={payouts} onChange={setPayouts} />
+        </div>
+        <div className="md:col-span-2">
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={autoApprove}
+              onChange={(e) => setAutoApprove(e.target.checked)}
+              className="w-5 h-5 accent-[#1d4d2b]"
+            />
+            <span className="text-pine text-sm font-bold">
+              Auto-approve catches{" "}
+              <span className="font-normal text-pine/55">
+                (entries hit the leaderboard instantly, no review)
+              </span>
+            </span>
           </label>
+        </div>
+        <div>
+          <label className={labelCls}>Cover photo</label>
           {cover ? (
             <div className="relative rounded-2xl overflow-hidden border border-pine/20">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -141,43 +375,40 @@ function EditDetails({ tournament, onSaved }: { tournament: Detail["tournament"]
         </div>
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-1.5">
-              Venue name
-            </label>
+            <label className={labelCls}>Venue name</label>
             <input
               value={venueName}
               onChange={(e) => setVenueName(e.target.value)}
               maxLength={120}
               placeholder="e.g. Selkirk Park"
-              className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal"
+              className={inputCls}
             />
           </div>
           <div>
-            <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-1.5">
-              Venue address
-            </label>
+            <label className={labelCls}>Venue address</label>
             <input
               value={venueAddress}
               onChange={(e) => setVenueAddress(e.target.value)}
               maxLength={200}
               placeholder="e.g. 112 Main St, Selkirk MB"
-              className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal"
+              className={inputCls}
             />
           </div>
         </div>
       </div>
-      <div className="flex justify-end mt-5">
+      <div className="flex justify-end mt-6">
         <button
           onClick={save}
           disabled={saving}
-          className="bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-xs px-6 py-2.5 rounded-full disabled:opacity-50 transition-colors"
+          className="bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-xs px-8 py-3 rounded-full disabled:opacity-50 transition-colors"
         >
-          {saving ? "Saving…" : "Save details"}
+          {saving ? "Saving…" : "Save changes"}
         </button>
       </div>
     </section>
   );
 }
+
 
 export default function ManageTournamentPage({ params }: { params: { id: string } }) {  const { user, openLogin } = useFishAuth();
   const [detail, setDetail] = useState<Detail | null>(null);
@@ -305,8 +536,8 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
         </div>
       </section>
 
-      {/* Tournament page details */}
-      <EditDetails tournament={t} onSaved={load} />
+      {/* Full tournament editor */}
+      <EditTournament tournament={t} onSaved={load} />
 
       {/* Pending review */}
       <h2 className="font-display font-bold uppercase text-pine text-2xl tracking-wide mb-4">
@@ -324,9 +555,39 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
               </div>
               <div className="p-5">
                 <p className="font-bold text-pine">{e.species}{e.length_inches ? ` · ${Number(e.length_inches).toFixed(1)}"` : ""}</p>
-                <p className="text-pine/55 text-xs mt-1">
-                  {e.user_name} · server time {formatDateTime(e.created_at)}
+                <p className="text-pine/55 text-xs mt-1">{e.user_name}</p>
+                <p className="text-pine/70 text-xs mt-1">
+                  📸 Caught:{" "}
+                  {e.captured_at ? (
+                    <span className="font-bold text-pine">{formatDateTime(e.captured_at)}</span>
+                  ) : (
+                    <span className="text-pine/50">No capture time recorded</span>
+                  )}{" "}
+                  <span className="text-pine/45">(official time)</span>
                 </p>
+                <p className="text-pine/45 text-xs">Uploaded: {formatDateTime(e.created_at)}</p>
+                {e.captured_at ? (
+                  (() => {
+                    const c = new Date(e.captured_at as string).getTime();
+                    const inside =
+                      !isNaN(c) &&
+                      c >= new Date(t.starts_at).getTime() &&
+                      c <= new Date(t.ends_at).getTime();
+                    return inside ? (
+                      <p className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 mt-2">
+                        ✓ Inside tournament window
+                      </p>
+                    ) : (
+                      <p className="text-xs font-bold text-signal-dark bg-signal/10 rounded-xl px-3 py-2 mt-2">
+                        ⚠ Outside tournament window — verify before approving.
+                      </p>
+                    );
+                  })()
+                ) : (
+                  <p className="text-xs font-bold text-pine/50 bg-pine/5 rounded-xl px-3 py-2 mt-2">
+                    Time not recorded
+                  </p>
+                )}
                 {e.latitude !== null && e.longitude !== null ? (
                   <a
                     href={`https://www.google.com/maps?q=${e.latitude},${e.longitude}`}

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { listTournaments } from "@/lib/fish/tournaments";
 import { getLakes, getTournaments as getTraditionalTournaments } from "@/lib/fishmb";
 import { JoinByCode } from "./_components/JoinByCode";
+import { SuggestTournament } from "./_components/SuggestTournament";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 60;
@@ -76,16 +77,16 @@ export default async function TournamentsPage() {
       )}
 
       {/* Traditional (non-digital) Manitoba tournaments */}
-      {traditional.length > 0 && (
-        <div className="mt-16">
-          <h2 className="font-display font-bold uppercase text-pine text-3xl tracking-wide mb-2">
-            Traditional tournaments
-          </h2>
-          <p className="text-pine/60 text-sm mb-6 max-w-2xl">
-            Classic Manitoba derbies and ice-fishing tournaments run by local
-            organizers — weigh-ins, prizes and all. Always confirm dates and
-            entry details with the organizer.
-          </p>
+      <div className="mt-16">
+        <h2 className="font-display font-bold uppercase text-pine text-3xl tracking-wide mb-2">
+          Traditional tournaments
+        </h2>
+        <p className="text-pine/60 text-sm mb-6 max-w-2xl">
+          Classic Manitoba derbies and ice-fishing tournaments run by local
+          organizers — weigh-ins, prizes and all. Always confirm dates and
+          entry details with the organizer.
+        </p>
+        {traditional.length > 0 && (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {traditional.map((t) => (
               <a
@@ -110,8 +111,9 @@ export default async function TournamentsPage() {
               </a>
             ))}
           </div>
-        </div>
-      )}
+        )}
+        <SuggestTournament />
+      </div>
 
       <p className="text-center text-sm text-pine/50 mt-12 max-w-2xl mx-auto">
         📱 The full FishMB app is coming soon — with tournaments that work

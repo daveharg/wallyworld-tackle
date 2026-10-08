@@ -4,6 +4,7 @@ import { getTournament, getLeaderboard } from "@/lib/fish/tournaments";
 import { getLakes } from "@/lib/fishmb";
 import { TournamentActions } from "../_components/TournamentActions";
 import { CatchesGrid } from "../_components/CatchesGrid";
+import { InviteCodeReveal } from "../_components/InviteCodeReveal";
 import { PrizePot, LicenceNotice } from "../_components/PrizePot";
 import { formatDateTime } from "../../_components/formatDate";
 
@@ -91,10 +92,7 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
           <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-2">Species</h3>
           <p className="text-pine text-sm">{t.species.join(", ") || "All species"}</p>
         </div>
-        <div className="bg-white border border-pine/10 rounded-2xl p-5">
-          <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-2">Invite code</h3>
-          <p className="text-pine font-bold tracking-[0.3em] text-lg">{t.invite_code}</p>
-        </div>
+        <InviteCodeReveal tournamentId={t.id} />
       </div>
 
       {/* Rules — dedicated section */}

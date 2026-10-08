@@ -78,6 +78,28 @@ export async function PATCH(
   if (typeof body.scoring === "string" && SCORING.includes(body.scoring)) set("scoring", body.scoring);
   if (typeof body.status === "string" && ["upcoming", "live", "ended"].includes(body.status))
     set("status", body.status);
+  let newStart: string | null = null;
+  let newEnd: string | null = null;
+  if (typeof body.starts_at === "string") {
+    const d = new Date(body.starts_at);
+    if (isNaN(d.getTime())) return badRequest("Invalid start date.");
+    newStart = d.toISOString();
+    set("starts_at", newStart);
+  }
+  if (typeof body.ends_at === "string") {
+    const d = new Date(body.ends_at);
+    if (isNaN(d.getTime())) return badRequest("Invalid end date.");
+    newEnd = d.toISOString();
+    set("ends_at", newEnd);
+  }
+  const effStart = newStart ?? t.starts_at;
+  const effEnd = newEnd ?? t.ends_at;
+  if (newStart || newEnd) {
+    if (isNaN(new Date(effStart).getTime()) || isNaN(new Date(effEnd).getTime()))
+      return badRequest("Invalid tournament dates.");
+    if (new Date(effEnd) <= new Date(effStart))
+      return badRequest("The tournament end must be after its start.");
+  }
   if (body.max_participants === null || (typeof body.max_participants === "number" && body.max_participants > 0))
     set("max_participants", body.max_participants === null ? null : Math.min(Math.floor(body.max_participants as number), 10000));
   if (typeof body.entry_fee_cents === "number" && body.entry_fee_cents >= 0)
