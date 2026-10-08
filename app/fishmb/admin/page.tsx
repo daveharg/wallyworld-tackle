@@ -306,7 +306,7 @@ export default function AdminPage() {
       </div>
 
       {/* Review tabs */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex flex-wrap gap-2 mb-6">
         {(
           [
             ["claims", `📨 Business claims (${claims.length})`],
