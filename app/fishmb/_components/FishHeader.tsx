@@ -34,11 +34,8 @@ export default function FishHeader() {
     <header className="sticky top-0 z-40 bg-paper/95 backdrop-blur border-b border-pine/10">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link href="/fishmb" aria-label="FishMB home" className="flex items-center gap-2">
+          <Link href="/fishmb" aria-label="FishMB home">
             <Wordmark />
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-signal border border-signal/40 rounded-full px-2 py-0.5 mt-0.5">
-              Beta
-            </span>
           </Link>
           <nav className="hidden md:flex items-center gap-7">
             {NAV.map((n) => (
