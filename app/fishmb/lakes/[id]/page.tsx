@@ -85,8 +85,15 @@ function LakeTitle({ lake, light }: { lake: { name: string; region: string; stoc
   );
 }
 
-function formatStockDate(iso: string | null): string {
-  if (!iso) return "—";
+/** Does a division limit row apply to this lake? Matches if any of the lake's
+ *  species appears in the limit row's species label (e.g. "Walleye" matches
+ *  "Walleye (Pickerel) & Sauger (either or combined)"). */
+function limitAppliesToLake(limitSpecies: string, lakeSpecies: string[]): boolean {
+  const label = limitSpecies.toLowerCase();
+  return lakeSpecies.some((s) => label.includes(s.toLowerCase()));
+}
+
+function formatStockDate(iso: string | null): string {  if (!iso) return "—";
   const [y, m, d] = iso.split("-").map(Number);
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   if (!y || !m || !d) return iso;
@@ -165,6 +172,13 @@ export default function LakeDetailPage({ params }: { params: { id: string } }) {
   const zone = getZone(lake.limits_zone);
   const regs = lake.regulations;
   const coords = COORDS[lake.id];
+  // Only show limit rows for species this lake actually has. If none of the
+  // lake's species match a division row (e.g. stocked-trout-only waters),
+  // fall back to the full division table rather than showing nothing.
+  const matchedLimits = zone
+    ? zone.limits.filter((lim) => limitAppliesToLake(lim.species, lake.species))
+    : [];
+  const shownLimits = matchedLimits.length > 0 ? matchedLimits : (zone?.limits ?? []);
   const towns: string[] = Array.isArray(lake.towns)
     ? lake.towns.map((t) => (typeof t === "string" ? t : t.name))
     : [];
@@ -314,6 +328,12 @@ export default function LakeDetailPage({ params }: { params: { id: string } }) {
 
             {zone ? (
               <>
+                {matchedLimits.length === 0 && (
+                  <p className="text-sm text-pine/60 mb-4">
+                    None of this lake&apos;s species have their own row below, so
+                    here are the division&apos;s general limits instead.
+                  </p>
+                )}
                 {/* Desktop: full table */}
                 <div className="overflow-x-auto -mx-2 px-2 hidden md:block">
                   <table className="w-full text-sm min-w-[560px]">
@@ -326,7 +346,7 @@ export default function LakeDetailPage({ params }: { params: { id: string } }) {
                       </tr>
                     </thead>
                     <tbody>
-                      {zone.limits.map((lim, i) => (
+                      {shownLimits.map((lim, i) => (
                         <tr key={i} className="border-b border-pine/8 align-top">
                           <td className="py-3 pr-4 font-bold text-pine">{lim.species}</td>
                           <td className="py-3 pr-4 text-pine/75">{lim.limit}</td>
@@ -341,7 +361,7 @@ export default function LakeDetailPage({ params }: { params: { id: string } }) {
                 </div>
                 {/* Mobile: stacked cards, no sideways scrolling */}
                 <div className="md:hidden space-y-3">
-                  {zone.limits.map((lim, i) => (
+                  {shownLimits.map((lim, i) => (
                     <div key={i} className="bg-paper-deep rounded-2xl p-4 border border-pine/10">
                       <p className="font-display font-bold uppercase text-pine tracking-wide mb-2">{lim.species}</p>
                       <dl className="text-sm space-y-1.5">
