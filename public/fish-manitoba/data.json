@@ -258,8 +258,11 @@
       "max_depth_text": "",
       "description": "A remote fly-in lake in the Seal River system of far northern Manitoba, 550 miles north of Winnipeg. Big Sand Lake Lodge - the only lodge on the lake's roughly 60,000 acres of water - offers the Canadian Grand Slam: northern pike, lake trout, walleye and arctic grayling, all strict catch-and-release.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Lake Trout",
+        "Rainbow Trout"
+      ],
       "towns": [],
       "regulations": {
         "division": "Northeast Division",
@@ -293,8 +296,11 @@
       "max_depth_text": "",
       "description": "A Whiteshell Provincial Park lake near the Ontario border in eastern Manitoba. Anglers most commonly report northern pike, walleye and yellow perch. It sits in the same Canadian Shield lake country as Falcon and West Hawk lakes.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Kokanee",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Rennie",
@@ -333,8 +339,11 @@
       "max_depth_text": "",
       "description": "A small lake just west of Sandy Lake in western Manitoba with walleye and northern pike. Travel Manitoba Master Angler records include walleye over 29 inches from Beaufort Lake.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Northern Pike",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Sandy Lake",
@@ -368,8 +377,12 @@
       "max_depth_text": "10 m",
       "description": "A large, shallow lake on the Saskatchewan River system in north-central Manitoba. It is an important commercial fishery for walleye and lake whitefish. The town of Grand Rapids sits at its north end, where the Saskatchewan River continues toward Lake Winnipeg.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Lake Trout",
+        "Lake Whitefish",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Grand Rapids",
@@ -459,8 +472,15 @@
       "max_depth_text": "39 m",
       "description": "A deep, clear, cold spring-fed lake in Clearwater Lake Provincial Park near The Pas, renowned for its excellent water quality and large lake trout. The nearly circular lake is 16 km across with a maximum depth of 39 m. Cold year-round temperatures slow trout growth but are essential for their survival.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brook Trout",
+        "Brown Trout",
+        "Kokanee",
+        "Lake Trout",
+        "Rainbow Trout",
+        "Splake"
+      ],
       "towns": [
         {
           "name": "The Pas",
@@ -496,8 +516,12 @@
       "max_depth_text": "12 m",
       "description": "A 755 km2 lake on the Nelson River in north-central Manitoba, scientifically studied for the effects of hydroelectric regulation on its fishery. Research documented lake whitefish, walleye, northern pike and cisco populations. It sits downstream of Lake Winnipeg on the Nelson River system.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Lake Trout",
+        "Lake Whitefish",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Cross Lake",
@@ -544,8 +568,15 @@
       "max_depth_text": "",
       "description": "A Whiteshell Provincial Park lake assessed by Manitoba Fisheries in 2023, holding walleye, smallmouth bass, northern pike, yellow perch, cisco and white suckers. Surveyed walleye averaged 46.8 cm, with fish up to 21 years old. It falls under the eastern region's special walleye regulation protecting fish over 45 cm.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brook Trout",
+        "Brown Trout",
+        "Lake Trout",
+        "Rainbow Trout",
+        "Smallmouth Bass",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Rennie",
@@ -588,8 +619,11 @@
       "max_depth_text": "3.66 m",
       "description": "A shallow prairie lake east of the town of Dauphin, between Riding Mountain and Duck Mountain, with an average depth of only 2.35 m. Annual index netting shows walleye as the dominant species, with northern pike, yellow perch, suckers and bullheads. It drains via the Mossy River into Lake Winnipegosis.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Lake Whitefish",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Dauphin",
@@ -648,8 +682,19 @@
       "max_depth_text": "",
       "description": "A popular Whiteshell Provincial Park lake about 152 km east of Winnipeg on the Trans-Canada Highway. Manitoba's 2022 fisheries assessment found walleye dominant at 79% of the survey catch, with northern pike, smallmouth and largemouth bass, yellow perch and lake whitefish also present. The lake is also famous for the 1967 Falcon Lake Incident UFO sighting.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brown Trout",
+        "Kokanee",
+        "Lake Trout",
+        "Largemouth Bass",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Smallmouth Bass",
+        "Splake",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Falcon Lake",
@@ -754,8 +799,10 @@
       "max_depth_text": "",
       "description": "A trophy walleye factory in northeastern Manitoba fished by Budd's Gunisao Lake Lodge. In 2022, 65% of all Manitoba Master Angler walleyes (May-August) were caught at Gunisao, with 708 Master Angler walleyes recorded. Trophy northern pike, whitefish, suckers and perch are also caught.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Lake Trout"
+      ],
       "towns": [],
       "regulations": {
         "division": "Northeast Division",
@@ -791,8 +838,13 @@
       "max_depth_text": "30 m",
       "description": "A backcountry lake near Falcon Lake in Whiteshell Provincial Park, reachable by portage from High Lake Bay at Falcon Lake's east end. This 8.0 km2 lake (max depth 30 m) holds self-sustaining lake trout plus lake whitefish, northern pike, burbot, white suckers and yellow perch. Trophy-class lake trout and whitefish have been documented.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brown Trout",
+        "Lake Trout",
+        "Rainbow Trout",
+        "Splake"
+      ],
       "towns": [
         {
           "name": "Falcon Lake",
@@ -834,8 +886,10 @@
       "max_depth_text": "",
       "description": "A northern Manitoba fly-in lake reached by floatplane from Flin Flon, home to the five-star Kississing Lake Lodge and the drive-to Kenanow Lodge. It offers trophy northern pike, walleye and lake trout, with anglers reporting up to 100-fish days. Whitefish and perch are also present year-round.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Lake Trout"
+      ],
       "towns": [
         {
           "name": "Sherridon",
@@ -888,8 +942,13 @@
       "max_depth_text": "",
       "description": "A Canadian Shield lake near Flin Flon made of three connected basins - Big Athapap, Little Athapap and the North Arm - with depths ranging from shallow flats to basins over 200 feet. It is a trophy multi-species fishery famous for lake trout, with three historical world records including a 62 lb laker. Walleye, northern pike, rainbow trout, splake and smallmouth bass round out the fishery.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Lake Trout",
+        "Rainbow Trout",
+        "Smallmouth Bass",
+        "Splake"
+      ],
       "towns": [
         {
           "name": "Flin Flon",
@@ -942,8 +1001,12 @@
       "max_depth_text": "7 m",
       "description": "Canada's 14th largest lake, Lake Manitoba is a very shallow prairie lake about 75 km northwest of Winnipeg. It has supported a commercial fishery since 1895 and a long-standing recreational fishery for walleye, northern pike and yellow perch. Delta Marsh at its south end is one of North America's premier waterfowl staging areas.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Lake Whitefish",
+        "Sauger",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Steep Rock",
@@ -1006,8 +1069,11 @@
       "max_depth_text": "",
       "description": "A lake in Manitoba's Interlake region between Lake Manitoba and Lake Winnipeg, connected to both via the Fairford and Dauphin rivers. Anglers report walleye, northern pike and freshwater drum. New outlet channels now help regulate its historically flood-prone water levels.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Lake Whitefish",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Gypsumville",
@@ -1068,8 +1134,13 @@
       "max_depth_text": "36 m",
       "description": "The 10th largest freshwater lake in the world, Lake Winnipeg is a shallow prairie lake (mean depth only 12 m) split into distinct north and south basins. It supports Manitoba's most famous walleye fishery - the iridescent greenback walleye - plus a major commercial fishery where walleye is the most important species. More than 50 fish species live in the lake.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Kokanee",
+        "Lake Trout",
+        "Lake Whitefish",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Gimli",
@@ -1130,8 +1201,11 @@
       "max_depth_text": "18.3 m",
       "description": "Manitoba's second-largest lake, Lake Winnipegosis is a shallow, turbid prairie lake west of Lake Winnipeg and north of Lake Manitoba. Its commercial fishery targets walleye, northern pike, lake whitefish and mullet species, while anglers pursue walleye and pike. Birch Island, at 806 km2, sits within the lake.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Lake Whitefish",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Winnipegosis",
@@ -1190,8 +1264,13 @@
       "max_depth_text": "",
       "description": "A large reservoir on the Assiniboine River west of Roblin, with about 40 km of its length in Manitoba, developed with Asessippi Provincial Park, cottages and campgrounds. Index netting shows walleye dominant, with yellow perch, stocked muskellunge and smallmouth bass, plus carp, redhorse, mooneye, rock bass and quillback.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Roblin",
@@ -1277,8 +1356,15 @@
       "max_depth_text": "",
       "description": "Part of the Laurie River system near Lynn Lake in northwest Manitoba, fished via Laurie River Lodge. The slow-flowing river system produces northern pike, walleye and lake trout, making it a true multi-species fly-in destination. It flows toward the Churchill River.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brook Trout",
+        "Brown Trout",
+        "Kokanee",
+        "Lake Trout",
+        "Rainbow Trout",
+        "Splake"
+      ],
       "towns": [
         {
           "name": "Swan River",
@@ -1398,8 +1484,10 @@
       "max_depth_text": "",
       "description": "A large, clear Canadian Shield lake just south of Thompson in Paint Lake Provincial Park, renowned for dense populations of thick-bodied walleyes. Northern pike are also abundant. Paint Lake Lodge on its shore offers cabins, a full-service restaurant and boat rentals.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Thompson",
@@ -1483,8 +1571,10 @@
       "max_depth_text": "",
       "description": "A lake at Flin Flon in northwest Manitoba, bordered by Bakers Narrows Provincial Park. Area anglers pursue northern pike, walleye, lake trout and perch in open water and through the ice. It is part of the Flin Flon area's network of Shield lakes.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Lake Trout"
+      ],
       "towns": [
         {
           "name": "Flin Flon",
@@ -1600,8 +1690,20 @@
       "max_depth_text": "125 m",
       "description": "Formed by an ancient meteorite impact, West Hawk Lake is Manitoba's deepest lake with exceptionally clear water popular for scuba diving. The crater lake in Whiteshell Provincial Park holds walleye, northern pike, yellow perch and smallmouth bass; all trout must be released and trout fishing is closed Nov 1 to Apr 15. A Manitoba government bathymetric map is linked below.",
       "depth_map_url": "https://gov.mb.ca/sd/waterstewardship/fisheries/fish_stocking_gMap_MVC_V2/pdf/westhawk_map.pdf",
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Arctic Char",
+        "Brook Trout",
+        "Brown Trout",
+        "Kokanee",
+        "Lake Trout",
+        "Lake Whitefish",
+        "Largemouth Bass",
+        "Rainbow Trout",
+        "Smallmouth Bass",
+        "Splake",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "West Hawk Lake",
@@ -1641,8 +1743,13 @@
       "max_depth_text": "",
       "description": "Aikens Lake in Atikaki Provincial Park is a fly-in-only trophy water run by Aikens Lake Wilderness Lodge, operating since 1948 inside the UNESCO Pimachiowin Aki World Heritage site. The lodge bills it as a walleye factory with world-class trophy walleye, northern pike and lake trout, all fully guided from a floatplane base at Lac du Bonnet. The 2026 season runs late May to mid-September.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brook Trout",
+        "Brown Trout",
+        "Lake Trout",
+        "Splake"
+      ],
       "towns": [
         {
           "name": "Lac du Bonnet",
@@ -1681,8 +1788,18 @@
       "max_depth_text": "20.3 m",
       "description": "A stocked rainbow and brown trout water that doubles as the Ducks' walleye nursery. Each spring, walleye fry are stocked here and moved out as advanced fingerlings each fall for other lakes in the transfer program. The lake occasionally winterkills, which has produced exceptional growth on freshly stocked rainbows. Work the main island and the bulrushes on the south shore.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brown Trout",
+        "Fathead Minnow",
+        "Finescale Dace",
+        "Kokanee",
+        "Muskellunge",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Swan River",
@@ -1804,8 +1921,10 @@
       "max_depth_text": "",
       "description": "Beresford Lake is a Nopiming campground lake once home to the 1937 Gunnar gold mine, and the 2022 fisheries assessment found walleye, northern pike, yellow perch, burbot and white sucker with walleye fry stocked in 2011. The provincial campground has 28 sites with a boat launch, and cottage development rings parts of the shore. The lake record walleye stands at 78.7 cm from 1992.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Bissett",
@@ -1844,8 +1963,10 @@
       "max_depth_text": "",
       "description": "Betula Lake is a Whiteshell River lake known for year-round walleye fishing, and Betula Lake Resort on its shore rents boats and sells bait and tackle. The province's 2022 fisheries assessment recorded walleye, northern pike, sauger, smallmouth bass, black crappie, rock bass and yellow perch, with walleye fry stocked in most years since 2010. Nearby Pine Point Rapids and the Bannock Point petroforms make it a popular all-around destination.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Rennie",
@@ -1907,8 +2028,10 @@
       "max_depth_text": "6.4 m",
       "description": "A shallow backcountry lake on the north edge of Duck Mountain Provincial Park managed for walleye and perch. Access is strictly by ATV or snowmobile along an unmaintained designated route, and launch areas are restricted to small watercraft. Check with the nearest government office for road conditions before heading in.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Swan River",
@@ -1957,8 +2080,10 @@
       "max_depth_text": "",
       "description": "Bird Lake is the southern gateway lake of Nopiming Provincial Park, with a provincial campground, boat launch, fish-cleaning facility and Nopiming Lodge within walking distance. The 2022 fisheries assessment found walleye, northern pike, smallmouth bass, yellow perch, rock bass, burbot, cisco and lake whitefish, with half a million walleye fry stocked in 2021. The Area A rule applies: all walleye over 45 cm must be released.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Lac du Bonnet",
@@ -2011,8 +2136,10 @@
       "max_depth_text": "",
       "description": "Black Lake in Nopiming Provincial Park has been stocked with hundreds of thousands of walleye fry in most years since 2000, and the 2022 assessment turned up walleye, northern pike, smallmouth bass, yellow perch, burbot and cisco. The lake record walleye measured 83.8 cm in 2001, and the record smallmouth hit 52.1 cm in 2022. A campground and the 5.1-mile Black Lake hiking trail make it a full-service wilderness stop.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Bissett",
@@ -2058,8 +2185,14 @@
       "max_depth_text": "",
       "description": "A reservoir near the town of Boissevain in the Turtle Mountain foothills, holding walleye and yellow perch according to angler catch reports. It has a main dock and boat access, and contour mapping exists for anglers who want to study its structure. A handy local option when passing through Boissevain.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brook Trout",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Boissevain",
@@ -2148,8 +2281,10 @@
       "max_depth_text": "",
       "description": "Booster Lake in Nopiming Provincial Park earned a provincial size-and-abundance profile for walleye, smallmouth bass and yellow perch based on 2011 and 2022 assessments. Anglers rate it for smallmouth, walleye and trophy northern pike without the crowds of the Whiteshell. It is a drive-to lake in the park's southern half.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Lac du Bonnet",
@@ -2196,8 +2331,15 @@
       "max_depth_text": "",
       "description": "A stocked trout lake in the Turtle Mountains south of Boissevain, Bower Lake is planted with rainbow trout and also holds brown trout. As a designated stocked trout water it is open to fishing year-round. It is a popular family outing lake where a simple bait or spinner setup can produce trout close to shore.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brown Trout",
+        "Largemouth Bass",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Boissevain",
@@ -2269,8 +2411,11 @@
       "max_depth_text": "",
       "description": "Brereton Lake covers 531 hectares with three boat launches, making it one of the Whiteshell's most accessible fishing lakes for northern pike, walleye, smallmouth bass and perch. Angler reports also mention lake trout, and a Master Angler black crappie has been recorded here. The provincial campground offers electrical sites, showers and a beach, suiting family trips.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Kokanee",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Rennie",
@@ -2399,8 +2544,12 @@
       "max_depth_text": "5.7 m",
       "description": "Caddy Lake sits on the Whiteshell River near the Ontario border and is famous for the rock tunnels under the rail lines that connect it to South Cross and North Cross lakes - paddling through them is a classic Whiteshell outing. The lake covers about 300 hectares with a maximum depth of 5.7 metres, and fishing yields master angler catches of walleye, northern pike, smallmouth bass, black crappie, rock bass and yellow perch. The province runs a seasonal campground on the west shore, and Green Bay Resort sits on the east shore.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brown Trout",
+        "Kokanee",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "West Hawk Lake",
@@ -2497,8 +2646,16 @@
       "max_depth_text": "57.7 m",
       "description": "The largest waterbody in Duck Mountain Provincial Park and its most developed fishing hub, with two boat launches, a filleting station, campground, yurts, and a lodge. It is one of the few lakes in the Ducks with a lake trout fishery, and anglers hit it hard in early spring and late fall for lakers. Walleye and pike fill the rest of the season, and burbot bite through the ice. Local cottagers are the best source of day-to-day intel.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brook Trout",
+        "Brown Trout",
+        "Kokanee",
+        "Lake Trout",
+        "Rainbow Trout",
+        "Splake",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Swan River",
@@ -2574,8 +2731,10 @@
       "max_depth_text": "",
       "description": "Cormorant Lake lies along Highway 10 between The Pas and Flin Flon. A Discover The Pas ice-fishing feature lists Nootin Resort on the lake, with northern pike, walleye, whitefish, and lake trout as the most common fish. It is a convenient drive-to northern fishery.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Lake Trout"
+      ],
       "towns": [
         {
           "name": "Cormorant",
@@ -2660,8 +2819,12 @@
       "max_depth_text": "12.8 m",
       "description": "A semi-remote Porcupine Forest lake popular with north-mountain anglers as an alternative to North Steeprock. It has an undeveloped launch and dock, and its abundant underwater structure makes a fish finder a big advantage for finding walleye and whitefish. Reached along the National Mills logging road, usually by 4x4 in summer.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Rainbow Trout",
+        "Splake",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Swan River",
@@ -2703,8 +2866,15 @@
       "max_depth_text": "",
       "description": "A small reservoir east of Deloraine in Manitoba's far southwest, this water is known for outsized smallmouth bass, with 21-inch fish caught through both open water and ice. Unlike typical shield bass lakes, its smallies relate to shoreline vegetation and rip rap. Walleye are also present from provincial stocking, making it a legitimate two-species stop.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brook Trout",
+        "Largemouth Bass",
+        "Northern Pike",
+        "Smallmouth Bass",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Deloraine",
@@ -2757,8 +2927,15 @@
       "max_depth_text": "63.8 m",
       "description": "One of Manitoba's clearest and deepest park lakes, East Blue sits at the heart of Duck Mountain Provincial Park and draws anglers year-round. The spring-fed water is so clear the bottom stays visible 9-12 m down, and the deep basin holds lake trout while stocked rainbows and splake cruise shallower water. Gang trolling the deeps and bottom-bouncing for walleye are the proven tactics here. The Blue Lakes campground and resort offer full amenities right on the shore.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brook Trout",
+        "Brown Trout",
+        "Lake Trout",
+        "Rainbow Trout",
+        "Splake",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Swan River",
@@ -2842,8 +3019,11 @@
       "max_depth_text": "9.4 m",
       "description": "One of Roblin's signature 'Parkland Paradise' fisheries: a small, aerated, electric-motor-only lake with trophy trout, including the famous Markosky-strain rainbows. Rainbow and brown trout share the water with stocked walleye and perch. It has an undeveloped launch, angling docks, modern washrooms, and great access right off Hwy 83. Trout limit is one.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brown Trout",
+        "Rainbow Trout"
+      ],
       "towns": [
         {
           "name": "Roblin",
@@ -2978,8 +3158,15 @@
       "max_depth_text": "",
       "description": "A stocked trout reservoir southwest of Brandon, Elgin Reservoir appears in the province's official stocked trout waters list. Angler reports show brown trout and tiger trout as the catches. It is a small, accessible stillwater trout option for Westman anglers who want trout without driving to the mountains or the Whiteshell.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brown Trout",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Tiger Trout",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Elgin",
@@ -3096,8 +3283,12 @@
       "max_depth_text": "23.3 m",
       "description": "A backcountry Porcupine Forest lake known for trophy walleye and northern pike over tons of underwater structure. Despite the long haul-trail access, the lake itself is family-friendly with great shoreline access and quality angling. Launch areas are restricted to small watercraft. Most commonly reached by snowmobile in winter; the summer trail is long and rough.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Lake Trout",
+        "Northern Pike",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Swan River",
@@ -3130,8 +3321,14 @@
       "max_depth_text": "",
       "description": "A Porcupine Hills brook trout water west of North Steeprock Lake, listed as a stocked trout water in the Angler's Guide. The province has stocked brook trout fingerlings here. It is remote forest country, so pair it with a North Steeprock trip for a full day.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brook Trout",
+        "Kokanee",
+        "Rainbow Trout",
+        "Sparr",
+        "Tiger Trout"
+      ],
       "towns": [
         {
           "name": "Swan River",
@@ -3192,8 +3389,16 @@
       "max_depth_text": "39.9 m",
       "description": "A deep, clear lake near the Wellman campground that holds one of Manitoba's rare arctic char fisheries. Char were re-introduced in 2017 and an ongoing pike-transfer program helps protect them, alongside lake trout and pike. Trophy trout have been taken here over the years. Special regulations apply: all arctic char must be released. The Wellman Lake campground amenities are minutes away.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Arctic Char",
+        "Brook Trout",
+        "Cutthroat Trout",
+        "Lake Trout",
+        "Rainbow Trout",
+        "Sparr",
+        "Splake"
+      ],
       "towns": [
         {
           "name": "Swan River",
@@ -3262,8 +3467,17 @@
       "max_depth_text": "",
       "description": "A small reservoir west of Pilot Mound on PR 253, Goudney Reservoir is a stocked walleye water covered by the province's southwestern walleye regulations. It is a low-key prairie reservoir for anglers working the smaller waters of the Pembina Valley. Expect modest walleye with little fishing pressure.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Black Crappie",
+        "Brook Trout",
+        "Brown Trout",
+        "Largemouth Bass",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Pilot Mound",
@@ -3356,8 +3570,23 @@
       "max_depth_text": "21.1 m",
       "description": "A multi-trout lake in the Childs Lake area of the Ducks, offering splake, rainbows, and brookies to fly and spin anglers alike. Perch numbers have been climbing, so expect bonus catches. An undeveloped launch, dock, filleting station, and day-use area make it an easy day trip. Big rainbows to 30 inches have come out of here.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Black Crappie",
+        "Brook Trout",
+        "Brown Trout",
+        "Fathead Minnow",
+        "Kokanee",
+        "Lake Whitefish",
+        "Largemouth Bass",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Rock Bass",
+        "Sparr",
+        "Splake",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Swan River",
@@ -3462,8 +3691,23 @@
       "max_depth_text": "",
       "description": "Gull Lake is a small, clear lake near Beaconia on the east shore of Lake Winnipeg's south basin, ringed by cottages. Anglers fish it for northern pike and small perch, and regulations require all pike over 60 cm to be released. Its calm, shallow water also makes it popular for kayaking and swimming.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Black Crappie",
+        "Brook Trout",
+        "Brown Trout",
+        "Fathead Minnow",
+        "Kokanee",
+        "Lake Whitefish",
+        "Largemouth Bass",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Rock Bass",
+        "Sparr",
+        "Splake",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Beaconia",
@@ -3566,8 +3810,12 @@
       "max_depth_text": "",
       "description": "Happy Lake is the third lake in the Quesnel chain inside Nopiming Provincial Park, sharing the system's trophy walleye, smallmouth bass, northern pike, perch and whitefish. The three-lake chain is drive-to accessible yet fishes like a northern fly-in lake. Q Lake Lodge at Caribou Landing is the only lodge on the chain.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Rainbow Trout",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Manigotagan",
@@ -3607,8 +3855,19 @@
       "max_depth_text": "13.1 m",
       "description": "Hunt Lake near West Hawk Lake is one of the Whiteshell's most reliable stocked trout fisheries, regularly stocked since the 1950s with brook trout the mainstay in recent decades plus periodic adult brook and brown trout for trophy potential. The 2024 provincial assessment describes a small lake (0.18 sq km, 13.1 m max depth) with a public dock and boat launch for electric or self-propelled craft. Special trout rules apply, including a limit of one and artificial lures and flies only. The lake is also the trailhead for the popular Hunt Lake hiking trail.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Arctic Char",
+        "Arctic Grayling",
+        "Brook Trout",
+        "Brown Trout",
+        "Lake Trout",
+        "Lake Whitefish",
+        "Rainbow Trout",
+        "Smallmouth Bass",
+        "Splake",
+        "Tiger Trout"
+      ],
       "towns": [
         {
           "name": "West Hawk Lake",
@@ -3694,8 +3953,12 @@
       "max_depth_text": "",
       "description": "One of the Whiteshell's premier walleye lakes, Jessica Lake has received hundreds of thousands of stocked walleye fry nearly every year since 2010, and the province's 2022 fisheries assessment found walleye, smallmouth bass, black crappie, northern pike and yellow perch in its survey nets. The lake is also noted as an important traditional fishing area for Manitoba First Nations. Like most eastern Manitoba waters, it falls under the Area A rule that all walleye over 45 cm must be released.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Kokanee",
+        "Largemouth Bass",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Rennie",
@@ -3748,8 +4011,14 @@
       "max_depth_text": "",
       "description": "A small reservoir just south of the community of Kenton, stocked with walleye fry and covered by southwestern Manitoba walleye rules. It is a simple local water rather than a destination, useful for a quick evening trip. Small boat or shore fishing is the practical approach.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brown Trout",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Kenton",
@@ -3803,8 +4072,13 @@
       "max_depth_text": "5.5 m",
       "description": "A small, shallow lake right on the edge of the town of Killarney, Killarney Lake is an easy-access family fishery. Provincial depth charts list northern pike, walleye, black bullhead, yellow perch, white sucker and even largemouth bass as common species. It is stocked with walleye fry and fishes well for pike and panfish close to town amenities.",
       "depth_map_url": "https://www.gov.mb.ca/nrnd/fish-wildlife/pubs/lifa/pdf/killarny_map.pdf",
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Largemouth Bass",
+        "Northern Pike",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Killarney",
@@ -3965,8 +4239,15 @@
       "max_depth_text": "",
       "description": "A small lake just southeast of Neepawa, Lake Irwin is a stocked pike-and-perch water the province has supplemented with adult northern pike and perch. It is a simple, close-to-town option for a quick outing rather than a destination fishery. Expect modest-sized pike and perch with easy access from Neepawa.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brown Trout",
+        "Largemouth Bass",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Neepawa",
@@ -3999,8 +4280,11 @@
       "max_depth_text": "",
       "description": "A Riding Mountain National Park lake listed by Parks Canada for road-accessible northern pike fishing, with non-motorized boats only. A national park fishing licence is required. Note this is the national park's Lake Katherine, not to be confused with the smaller Duck Mountain lake of the same name.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brook Trout",
+        "Rainbow Trout"
+      ],
       "towns": [
         {
           "name": "Wasagaming",
@@ -4035,8 +4319,11 @@
       "max_depth_text": "",
       "description": "A clear, spring-fed lake straddling the Canada-US border in the Turtle Mountains, Lake Metigoshe offers walleye, northern pike and perch in a scenic wooded setting. The Manitoba portion is quieter than the developed North Dakota side, with a public beach and the year-round Turtle Mountain Resort on the Canadian shore. It is a good multi-species lake for families who want fishing plus swimming and trails.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Rainbow Trout",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Boissevain",
@@ -4084,8 +4371,12 @@
       "max_depth_text": "",
       "description": "A reservoir on Morden's west side and the centrepiece of the Lake Minnewasta Recreation Area, this lake offers walleye under a special size rule plus a notable black crappie population. It pairs fishing with a sandy beach, campground, and trail system, making it a strong family day-trip lake. Recent angler reports show steady crappie action.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Largemouth Bass",
+        "Northern Pike",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Morden",
@@ -4207,8 +4498,16 @@
       "max_depth_text": "17.8 m",
       "description": "Also known as the Rivers Reservoir, Lake Wahtopanah is a reservoir on the Little Saskatchewan River just east of Rivers. Provincial surveys list walleye, northern pike, rock bass and perch as the common species, and index netting found walleye the dominant catch. It has produced Master Angler walleye and pike, hosts an annual summer fishing derby, and offers boat launches plus camping at Rivers Provincial Park.",
       "depth_map_url": "https://www.gov.mb.ca/sd/waterstewardship/fisheries/fish_stocking_gMap_MVC_V2/pdf/wahtopanah_final.pdf",
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Largemouth Bass",
+        "Muskellunge",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Smallmouth Bass",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Rivers",
@@ -4408,8 +4707,17 @@
       "max_depth_text": "20.5 m",
       "description": "Lyons Lake sits right off the Trans-Canada Highway near the Ontario border and is a go-to roadside rainbow trout spot, well stocked with rainbows in the 8-15 inch range plus big brood-stock brown trout from the hatchery. The government's depth map lists rainbow and brown trout as the common species and shows a maximum depth of 20.5 metres in just 0.23 square kilometres. Yellow perch, tiger trout and black bullheads also show up in angler catches.",
       "depth_map_url": "https://www.gov.mb.ca/nrnd/fish-wildlife/pubs/lifa/pdf/lyons_map.pdf",
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Arctic Char",
+        "Arctic Grayling",
+        "Brook Trout",
+        "Brown Trout",
+        "Lake Whitefish",
+        "Rainbow Trout",
+        "Splake",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "West Hawk Lake",
@@ -4520,8 +4828,13 @@
       "max_depth_text": "",
       "description": "Mantagao Lake is a north-Interlake lake set between Lake Manitoba and Lake Winnipeg, fished mainly by local anglers. Catch reports point to northern pike as the main target, with rock bass also present. It is a quiet, low-pressure alternative to the busier Shoal Lakes to the south.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brown Trout",
+        "Northern Pike",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Hodgson",
@@ -4569,8 +4882,11 @@
       "max_depth_text": "",
       "description": "A Swan Valley-area walleye lake that the province and Swan Valley Sport Fishing have monitored for walleye recruitment in multiple years. It carries special regulations: walleye limit is 2 and all walleye shorter than 35 cm must be released. A quieter option for anglers exploring the Duck Mountain region's walleye waters.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Splake",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Swan River",
@@ -4604,8 +4920,16 @@
       "max_depth_text": "",
       "description": "A small reservoir west of Manitou on the edge of the Pembina Valley, Mary Jane Reservoir is one of the few southern Manitoba waters managed specifically for black crappie, with a dedicated limit of four. Walleye are also present under the southwestern size rule. It is a niche panfish stop for anglers exploring the valley's smaller reservoirs.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Black Crappie",
+        "Brook Trout",
+        "Brown Trout",
+        "Largemouth Bass",
+        "Rainbow Trout",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Manitou",
@@ -4652,8 +4976,15 @@
       "max_depth_text": "",
       "description": "A Turtle Mountain lake at the south end of Highway 466, Max Lake is managed as a stocked walleye water with regular fry plants. It sits in the same forested Turtle Mountain country as the area's better-known bass and trout lakes. A quiet, small-boat lake best combined with a trip to nearby William or Bower lakes.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brown Trout",
+        "Largemouth Bass",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Boissevain",
@@ -4744,8 +5075,16 @@
       "max_depth_text": "",
       "description": "A small reservoir on the Little Saskatchewan River at the town of Minnedosa, part of the same managed system as Lake Wahtopanah. Angler reports show northern pike, rock bass and walleye as the main catches, and the province stocks walleye fry here. Its special walleye regulation (all walleye over 45 cm released) reflects a quality-minded fishery close to town.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Catfish",
+        "Largemouth Bass",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Smallmouth Bass",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Minnedosa",
@@ -4878,8 +5217,16 @@
       "max_depth_text": "",
       "description": "Moose Lake near The Pas is a drive-to provincial park lake with a 59-site campground and boat launch. A Manitoba government fisheries assessment records northern pike, walleye, smallmouth bass, and yellow perch, with regular walleye stocking. The lake has produced Master Angler pike over 49 inches and walleye over 31 inches.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Black Crappie",
+        "Lake Whitefish",
+        "Largemouth Bass",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "The Pas",
@@ -5030,8 +5377,13 @@
       "max_depth_text": "",
       "description": "Norris Lake is a small, shallow Interlake lake between Teulon and Inwood that forms the headwaters of Netley Creek. Because the lake does not reliably hold fish through winter, the Teulon Fish and Game Association operates an aeration system to help populations survive. Anglers fish it for northern pike and yellow perch, and the provincial park campground on its northeast shore offers 15 basic sites.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brook Trout",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Teulon",
@@ -5076,8 +5428,10 @@
       "max_depth_text": "",
       "description": "North Cross Lake connects to South Cross Lake through a second rock tunnel under the CN line, making the Caddy-Cross chain a unique paddle-and-fish route. Angler reports list black crappie, northern pike and walleye. Like the rest of the Whiteshell, all walleye over 45 cm must be released.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "West Hawk Lake",
@@ -5161,8 +5515,11 @@
       "max_depth_text": "",
       "description": "North Shoal Lake is the northernmost of the Interlake's Shoal Lakes, sharing the group's famous yellow perch and northern pike fishing. Like West Shoal Lake, it has received stocked walleye. It is the least accessible of the three, fished mainly by boat in summer and by snowmobile in winter.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Northern Pike",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Ashern",
@@ -5199,8 +5556,11 @@
       "max_depth_text": "12.7 m",
       "description": "Called Steeprock by locals, this big Porcupine Forest lake is a stunner with rocky shorelines and islands. Try the river portion for spring walleye, weedlines for summer pike, and steep contours for whitefish in early August. Two launches with docks, a filleting shack, and a basic campground serve anglers. Special regulations: walleye limit is 2 and all over 45 cm must be released. It can get rough on windy days.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Lake Trout",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Swan River",
@@ -5250,8 +5610,15 @@
       "max_depth_text": "",
       "description": "Nutimik Lake on the Winnipeg River is one of the few Manitoba lakes where anglers can realistically target lake sturgeon - locals call them dinosaurs - alongside walleye, northern pike, smallmouth bass, perch and goldeye. Nutimik Lodge sits on the lake, and the provincial campground offers 98 sites near the Pine Point Rapids trail and Bannock Point petroforms. Remember sturgeon are catch-and-release.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brook Trout",
+        "Brown Trout",
+        "Lake Sturgeon",
+        "Muskellunge",
+        "Rainbow Trout",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Rennie",
@@ -5291,8 +5658,13 @@
       "max_depth_text": "",
       "description": "A classic prairie pothole lake west of Brandon, Oak Lake is one of southwestern Manitoba's most productive walleye fisheries. The province stocks around 800,000 walleye fry here each spring since natural reproduction is minimal, while northern pike and yellow perch reproduce on their own. It is famous for jumbo yellow perch alongside strong numbers of eater-sized walleye, and a full-service marina makes launching easy.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Northern Pike",
+        "Smallmouth Bass",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Oak Lake",
@@ -5394,8 +5766,12 @@
       "max_depth_text": "8.8 m",
       "description": "A FLIPPR stillwater trout factory on the south side of Riding Mountain, known worldwide for giant rainbows and browns. The aerated, electric-motor-only lake fishes best right after ice-out and again in late September and October, when all-day bites of trophy browns in the 20-25 inch range are not uncommon. Overnight camping is available on the lake.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brown Trout",
+        "Rainbow Trout",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Oakburn",
@@ -5469,8 +5845,15 @@
       "max_depth_text": "",
       "description": "The largest navigable lake in southwestern Manitoba, Pelican Lake is a long, narrow prairie lake known first and foremost for walleye. The province stocks it heavily with walleye fry each year, and index netting shows walleye dominating the catch ahead of yellow perch and northern pike. It fishes well in both open water and winter, and the town of Ninette on the north shore hosts an annual walleye tournament.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Lake Whitefish",
+        "Northern Pike",
+        "Sauger",
+        "Smallmouth Bass",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Ninette",
@@ -5527,8 +5910,19 @@
       "max_depth_text": "",
       "description": "A small Duck Mountain lake about 6.5 km north of East Blue Lake that has produced large brown trout up to 30 inches, plus smallmouth bass to 24 inches. Browns have been stocked here for years. Special regulations apply: all trout and bass must be released. Weighted nymphs and small leeches fished slow and deep are the fly-fishing ticket.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brook Trout",
+        "Brown Trout",
+        "Fathead Minnow",
+        "Muskellunge",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Smallmouth Bass",
+        "Splake",
+        "Tiger Trout",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Swan River",
@@ -5596,8 +5990,15 @@
       "max_depth_text": "11.2 m",
       "description": "A 58-hectare stocked trout lake 37 km west-northwest of Roblin that has produced browns, rainbows, tigers, and stocked brookies. It is a listed stocked trout water with a trout limit of two and artificial lures/flies only. A solid Parkland stillwater option within easy reach of Roblin.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Black Crappie",
+        "Brook Trout",
+        "Brown Trout",
+        "Rainbow Trout",
+        "Splake",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Roblin",
@@ -5700,8 +6101,10 @@
       "max_depth_text": "18 m",
       "description": "Playgreen Lake is a large, island-dotted widening of the Nelson River at the top of Lake Winnipeg, on the historic Norway House fur-trade corridor. It supports a commercial fishery run through the Norway House Fishermen's Co-op, with walleye, sauger and lake whitefish under quota. Anglers reach it by boat from Norway House or Grand Rapids and find classic shield-country structure with strong walleye and pike fishing.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Norway House",
@@ -5791,8 +6194,12 @@
       "max_depth_text": "",
       "description": "Red Rock Lake is a cottage lake of just over 500 acres along PR 307, about a dozen miles north of Rennie, with a Whiteshell River tributary flowing through it. Walleye have been stocked there for many years, joining northern pike, smallmouth bass, yellow perch, crappie and the occasional lake sturgeon. There are no park campgrounds - access is by car-top boat from Crown land - so it stays quieter than the busier Whiteshell lakes.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Kokanee",
+        "Rainbow Trout",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Rennie",
@@ -5878,8 +6285,13 @@
       "max_depth_text": "",
       "description": "A prairie lake in the Pembina Valley west of Pilot Mound, Rock Lake is a stocked walleye water that also holds northern pike and carp. Angler catch reports consistently show walleye and pike as the top species. It is a quieter alternative to the bigger name lakes nearby, with decent shore and small-boat access.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Largemouth Bass",
+        "Northern Pike",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Pilot Mound",
@@ -5935,8 +6347,11 @@
       "max_depth_text": "",
       "description": "Rocky Lake is a 26,000-acre drive-to lake about 30 minutes north of The Pas. The Travel Manitoba listing for Rocky Lake Cabins names northern pike, walleye, smallmouth bass, tullibee, whitefish, and perch in the lake. The resort offers cabins, camping, and boat and motor rentals, with nearby Clearwater Lake for lake trout.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Smallmouth Bass",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "The Pas",
@@ -5978,8 +6393,12 @@
       "max_depth_text": "",
       "description": "A small lake north of Rossburn on PR 577, Rossman Lake is a stocked walleye water under the southwestern walleye regulations. It is a quiet prairie lake for local anglers rather than a destination fishery. Fish it as part of a swing through the smaller walleye waters west of Riding Mountain.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brown Trout",
+        "Northern Pike",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Rossburn",
@@ -6031,8 +6450,16 @@
       "max_depth_text": "",
       "description": "A stocked walleye lake near the town of Sandy Lake on the edge of Riding Mountain country. Angler reports show consistent catches of both walleye and northern pike, and the province's stocked-walleye assessments include it. The town of Sandy Lake offers basic services and puts you close to the national park and Vermilion Reservoir.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brown Trout",
+        "Lake Whitefish",
+        "Largemouth Bass",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Sandy Lake",
@@ -6149,8 +6576,15 @@
       "max_depth_text": "",
       "description": "A 9-km-long Parkland lake with a stocked walleye and pike fishery, popular for boating and fishing. The community of Shoal Lake sits at the lake's north side, in the Rural Municipality of Yellowhead. It is an easy-access walleye option in western Manitoba's farm country, not far from Patterson and Tokaryk lakes.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brown Trout",
+        "Largemouth Bass",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Shoal Lake",
@@ -6243,8 +6677,11 @@
       "max_depth_text": "",
       "description": "Shoe Lake is Nopiming's smallmouth bass numbers lake - anglers report catching smallies all day long, mostly 12-15 inches with a 19-inch fish a realistic bonus. Walleye are present but scarce these days, and the drive in is rough. Backcountry campsites and nearby Nopiming Lodge cabins serve visiting anglers.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Smallmouth Bass",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Bissett",
@@ -6361,8 +6798,13 @@
       "max_depth_text": "12.2 m",
       "description": "Singush is a shallower, walleye-stocked lake on the park's southeast side with a solid smallmouth bass population as well. The province has poured millions of walleye fry into it over the years, and the provincial bathymetric map lists walleye, pike, smallmouth, and perch. An established launch, filleting shack, and basic campground serve anglers, and the lake is quieter than Wellman or Childs.",
       "depth_map_url": "https://www.gov.mb.ca/sd/waterstewardship/fisheries/fish_stocking_gMap_MVC_V2/pdf/singush_final.pdf",
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Lake Trout",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Swan River",
@@ -6456,8 +6898,11 @@
       "max_depth_text": "12.5 m",
       "description": "A remote Porcupine Forest lake fished for arctic char, with fish that have made the Manitoba Master Angler record book. There is no summer land trail: reach it by canoe (a strenuous route, not for novices) or by snowmobile in winter, and launch areas are restricted to small watercraft. A true backcountry char trip for anglers willing to earn it.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Arctic Char",
+        "Sparr"
+      ],
       "towns": [
         {
           "name": "Swan River",
@@ -6500,8 +6945,10 @@
       "max_depth_text": "",
       "description": "South Cross Lake is reached from Caddy Lake by paddling through the historic CPR rail tunnel, a trip that draws sightseers as well as anglers. The government's 2022 assessment highlighted walleye, black crappie and yellow perch, with trophy-potential ratings for each. It shares the Area A rule requiring release of all walleye over 45 cm.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "West Hawk Lake",
@@ -6550,8 +6997,10 @@
       "max_depth_text": "",
       "description": "Southern Indian Lake is one of Manitoba's biggest northern lakes, known for walleye and northern pike action. The Opaskwayak Cree Nation tourism site highlights its world-class walleye and pike fishing plus trophy lake trout potential. Anglers typically access it through First Nations outfitters and remote camps.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Walleye"
+      ],
       "towns": [],
       "regulations": {
         "division": "North Central Division",
@@ -6609,8 +7058,11 @@
       "max_depth_text": "11.4 m",
       "description": "A small, crystal-clear Duck Mountain lake with walleye and pike that rewards sight-fishing in spring. The little red-and-white Five of Diamonds spoon is a local legend here. Walleye are periodically boosted with fry from the Beautiful Lake transfer program. It has a canoe/small-boat launch, angling dock, and hiking trail, and it is ideal for a quiet half-day trip.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Northern Pike",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Swan River",
@@ -6657,8 +7109,13 @@
       "max_depth_text": "9.2 m",
       "description": "A stocked walleye lake beside the community of St. Malo in southeastern Manitoba, just east of PTH 59, provincially stocked with walleye fry. St. Malo Provincial Park on the lake offers campgrounds, new mini cabins and beaches with seasonal food service.",
       "depth_map_url": "https://gov.mb.ca/nrnd/fish-wildlife/pubs/lifa/pdf/stmalo_map.pdf",
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brook Trout",
+        "Largemouth Bass",
+        "Rainbow Trout",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "St. Malo",
@@ -6711,8 +7168,13 @@
       "max_depth_text": "",
       "description": "Star Lake is a smallmouth bass favourite in the Whiteshell - a Hunt Fish Manitoba day trip there produced endless medium-sized smallies plus a 23-inch walleye and a Master Angler black crappie in a single outing. The 2022 fisheries assessment found walleye, smallmouth bass, black crappie, northern pike, rock bass and yellow perch, with walleye fry stocked most years since 2011. The Nite Hawk Cafe sits just around the bend from the boat launch for a post-fishing meal.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Largemouth Bass",
+        "Northern Pike",
+        "Smallmouth Bass",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "West Hawk Lake",
@@ -6771,8 +7233,14 @@
       "max_depth_text": "",
       "description": "A reservoir on the Boyne River inside Stephenfield Provincial Park, Stephenfield Lake is described by the province as a productive fishery with northern pike, perch and some walleye. It has a special walleye size rule (all walleye under 35 cm released). With a big family campground, sandy beach, boat launch and hiking trails, it is more of a camping-first lake where fishing is a strong bonus.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brook Trout",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Walleye",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Carman",
@@ -6818,8 +7286,12 @@
       "max_depth_text": "",
       "description": "A small lake at the International Peace Gardens in Manitoba's extreme southwest corner, Stormon Lake has been stocked with adult northern pike. It is more of a curiosity stop for visitors to the Gardens than a serious fishery. Combine it with a trip to nearby Lake Metigoshe or the Turtle Mountains.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brown Trout",
+        "Northern Pike",
+        "Yellow Perch"
+      ],
       "towns": [
         {
           "name": "Boissevain",
@@ -6893,8 +7365,10 @@
       "max_depth_text": "",
       "description": "A small lake in south-central Manitoba's Pembina Valley country, this Swan Lake (not the northern one) shows walleye and northern pike in angler catch reports. It is a low-pressure water without major development, suited to anglers exploring the smaller lakes of the region. Access is informal, so a small boat or shore setup is the practical approach.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Walleye"
+      ],
       "towns": [],
       "regulations": {
         "division": "Southern Division",
@@ -6954,8 +7428,12 @@
       "max_depth_text": "",
       "description": "A Parkland fly-fishing favourite that has earned a reputation as one of Canada's best stillwater trout fisheries, with brown trout and big rainbows. It sits 6.4 km north of Oakburn off PR 577, minutes from Patterson Lake. Perch and pike are also in the mix. Listed as a stocked trout water with a boat launch.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brown Trout",
+        "Rainbow Trout",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Oakburn",
@@ -7027,8 +7505,13 @@
       "max_depth_text": "",
       "description": "Manitoba's tiger trout destination, straight north of Roblin on Hwy 83 near the west side of Duck Mountain. The brook-brown hybrid tigers here are aggressive, gorgeous, and strictly catch-and-release, with artificial lures and flies only (no natural bait). It is an angler's dream setting that draws trophy-trout chasers from across the country.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brown Trout",
+        "Muskellunge",
+        "Tiger Trout",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Roblin",
@@ -7075,8 +7558,14 @@
       "max_depth_text": "",
       "description": "One of Manitoba's original stocked trout lakes, first stocked with brook trout in 1963 on the west side of PR 366, 4 km south of Wellman Lake. Early studies found brook trout stocking extremely successful here, with significant growth rates. It remains a listed stocked trout water in Duck Mountain Provincial Park, popular with stillwater anglers looking for classic brookie water.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brook Trout",
+        "Cutthroat Trout",
+        "Fathead Minnow",
+        "Rainbow Trout",
+        "Splake"
+      ],
       "towns": [
         {
           "name": "Swan River",
@@ -7210,8 +7699,15 @@
       "max_depth_text": "8.9 m",
       "description": "A small flood-control reservoir on the upper Vermilion River just north of Riding Mountain National Park, known for trophy smallmouth with very little angling pressure. Walleye and browns have also been stocked here historically. It is electric-motor only, has an undeveloped launch, and water levels can change quickly. Directions start at Sticky's Bait and Tackle in Dauphin.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Black Crappie",
+        "Brook Trout",
+        "Brown Trout",
+        "Rainbow Trout",
+        "Smallmouth Bass",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Dauphin",
@@ -7268,8 +7764,13 @@
       "max_depth_text": "33.7 m",
       "description": "A deep backcountry lake in the Porcupine Provincial Forest that was once a trophy rainbow destination until pike encroachment ended the rainbow stocking. Today it is a lake trout and arctic char fishery with pike. It is small-watercraft only and usually reached by 4x4 in summer or snowmobile in winter along an old haul trail; the trail crosses First Nation land, so check permission before crossing.",
       "depth_map_url": "https://www.gov.mb.ca/nrnd/fish-wildlife/pubs/lifa/pdf/vini_map.pdf",
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Arctic Char",
+        "Lake Trout",
+        "Rainbow Trout",
+        "Splake"
+      ],
       "towns": [
         {
           "name": "Swan River",
@@ -7323,8 +7824,11 @@
       "max_depth_text": "",
       "description": "Wallace Lake sits 19 km east of Bissett at the last drive-to entry into the Atikaki wilderness, with the lake itself in South Atikaki Provincial Park and a provincial park plus lodge on its southwestern shore. The lodge advertises abundant walleye and northern pike with perch, while the province notes yellow perch, northern pike and tullibee as regular catches. Wallace Lake Lodge runs the main lodge plus fly-in outposts to Obukowin, Carroll and Craven lakes and the Gammon River.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Rainbow Trout",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Bissett",
@@ -7379,8 +7883,10 @@
       "max_depth_text": "",
       "description": "War Eagle Lake is a remote Whiteshell lake about four miles long by three miles wide, reached by ATV from Inverness Falls Resort, which runs the only cabin on the lake with a boat and motor included. The lake's structure-heavy rock and mud bottom keeps smallmouth bass and northern pike happy, with perch also present and Master Angler bass recorded. It is a true getaway - no public launch, no crowds.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Smallmouth Bass"
+      ],
       "towns": [],
       "regulations": {
         "division": "Southern Division",
@@ -7456,8 +7962,11 @@
       "max_depth_text": "",
       "description": "Waterhen Lake lies just east of Lake Winnipegosis in Manitoba's western Interlake, draining to Lake Manitoba through the Waterhen River. Its Indigenous-owned commercial fishery was the first freshwater fishery in the Western Hemisphere to earn Marine Stewardship Council certification, built on walleye and northern pike. Recreational anglers work the lake and the fast, fertile Waterhen River, which is renowned for trophy walleye and freshwater drum.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Lake Whitefish",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Waterhen",
@@ -7498,8 +8007,12 @@
       "max_depth_text": "17.6 m",
       "description": "Wellman is the Ducks' multi-species hotspot and one of the park's busiest angling destinations. Walleye, hard-fighting smallmouth, big northerns, and perch all share this 425-hectare lake, so it is hard to get bored here. Three launches with docks, two filleting shacks, and a full-service campground make access easy. Cast floating raps along weedlines for smallies in June and jig walleye late spring and late summer.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Northern Pike",
+        "Smallmouth Bass",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Swan River",
@@ -7560,8 +8073,14 @@
       "max_depth_text": "40.3 m",
       "description": "A deep, turquoise, spring-fed lake beside East Blue that is a favourite fall destination for brook trout anglers. The gin-clear water lets you watch trout staging on their spawning redds in autumn. Walleye were stocked here in past years and round out the fishery. Note it is electric-motor only, and fluctuating water levels can make the launch tricky.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brook Trout",
+        "Brown Trout",
+        "Lake Trout",
+        "Rainbow Trout",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Swan River",
@@ -7638,8 +8157,11 @@
       "max_depth_text": "8.5 m",
       "description": "A small stocked-trout lake right in the town of Roblin that grows big rainbows and browns, including Markosky-strain fish. It has hosted competitive fly-fishing events. Special rules apply: trout limit is one and no natural bait. A convenient urban trout option with a boat launch.",
       "depth_map_url": "http://gov.mb.ca/nrnd/fish-wildlife/pubs/lifa/pdf/westgoose_map.pdf",
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brown Trout",
+        "Rainbow Trout"
+      ],
       "towns": [
         {
           "name": "Roblin",
@@ -7786,8 +8308,15 @@
       "max_depth_text": "7.3 m",
       "description": "White Lake sits along PR 307 in Whiteshell Provincial Park with Rainbow Falls just upstream, and the government's bathymetric map lists walleye, yellow perch, white sucker, northern pike and rock bass as its common species. It has been stocked with walleye fry regularly since 2008, and the 2022 fisheries assessment also turned up black crappie and smallmouth bass. The lake covers about 8.09 square kilometres with a maximum depth of 7.3 metres.",
       "depth_map_url": "https://gov.mb.ca/nrnd/fish-wildlife/pubs/lifa/pdf/white_map.pdf",
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brook Trout",
+        "Brown Trout",
+        "Kokanee",
+        "Rainbow Trout",
+        "Splake",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Rennie",
@@ -7837,8 +8366,11 @@
       "max_depth_text": "18.9 m",
       "description": "One of the top walleye fisheries for Swan Valley locals, Whitefish is a self-sustaining lake in the Porcupine Provincial Forest with serious trophy pike to go with it. June is prime walleye time; target trophy pike right after ice-out. A full-service provincial campground, marina, wheelchair-accessible fishing pier, and filleting shack make it one of the most developed lakes in the region.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Lake Trout",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Swan River",
@@ -7873,8 +8405,15 @@
       "max_depth_text": "",
       "description": "One of southern Manitoba's few smallmouth bass lakes, William Lake sits in Turtle Mountain Provincial Park south of Boissevain. The province's angling guide gives it a special smallmouth limit, and it is also listed as a stocked trout water with brown trout present. It is a scenic, small-boat lake where bass are the main draw and perch and trout round out the day.",
       "depth_map_url": null,
-      "stocked": false,
-      "stocked_species": [],
+      "stocked": true,
+      "stocked_species": [
+        "Brook Trout",
+        "Brown Trout",
+        "Lake Whitefish",
+        "Rainbow Trout",
+        "Smallmouth Bass",
+        "Walleye"
+      ],
       "towns": [
         {
           "name": "Boissevain",
@@ -7992,7 +8531,9 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
-        "Northern Pike"
+        "Northern Pike",
+        "Walleye",
+        "Yellow Perch"
       ],
       "towns": [
         {
@@ -8053,6 +8594,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brook Trout",
         "Rainbow Trout"
       ],
       "towns": [
@@ -8234,6 +8776,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Lake Whitefish",
         "Walleye"
       ],
       "towns": [
@@ -8293,6 +8836,8 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brown Trout",
+        "Rainbow Trout",
         "Walleye",
         "Yellow Perch"
       ],
@@ -8371,6 +8916,8 @@
       "stocked": true,
       "stocked_species": [
         "Brook Trout",
+        "Brown Trout",
+        "Cutthroat Trout",
         "Rainbow Trout"
       ],
       "towns": [
@@ -8545,6 +9092,10 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Largemouth Bass",
+        "Muskellunge",
+        "Rainbow Trout",
+        "Smallmouth Bass",
         "Walleye"
       ],
       "towns": [
@@ -8611,7 +9162,9 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
-        "Brown Trout"
+        "Brown Trout",
+        "Cutthroat Trout",
+        "Rainbow Trout"
       ],
       "towns": [
         {
@@ -8860,7 +9413,9 @@
       "stocked_species": [
         "Brook Trout",
         "Brown Trout",
-        "Rainbow Trout"
+        "Rainbow Trout",
+        "Walleye",
+        "Yellow Perch"
       ],
       "towns": [
         {
@@ -8977,6 +9532,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brook Trout",
         "Brown Trout",
         "Rainbow Trout",
         "Tiger Trout"
@@ -9158,6 +9714,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Rainbow Trout",
         "Walleye"
       ],
       "towns": [],
@@ -9192,9 +9749,12 @@
       "stocked": true,
       "stocked_species": [
         "Arctic Char",
+        "Brook Trout",
         "Brown Trout",
         "Rainbow Trout",
-        "Splake"
+        "Sparr",
+        "Splake",
+        "Tiger Trout"
       ],
       "towns": [
         {
@@ -9318,6 +9878,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brook Trout",
         "Rainbow Trout"
       ],
       "towns": [],
@@ -9527,7 +10088,8 @@
       "stocked": true,
       "stocked_species": [
         "Brown Trout",
-        "Rainbow Trout"
+        "Rainbow Trout",
+        "Tiger Trout"
       ],
       "towns": [
         {
@@ -9833,7 +10395,12 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Arctic Char",
+        "Brown Trout",
         "Lake Trout",
+        "Rainbow Trout",
+        "Sparr",
+        "Splake",
         "Walleye"
       ],
       "towns": [
@@ -9908,6 +10475,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brook Trout",
         "Rainbow Trout"
       ],
       "towns": [],
@@ -9959,7 +10527,10 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
-        "Walleye"
+        "Brook Trout",
+        "Northern Pike",
+        "Walleye",
+        "Yellow Perch"
       ],
       "towns": [
         {
@@ -10054,6 +10625,8 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brook Trout",
+        "Brown Trout",
         "Rainbow Trout"
       ],
       "towns": [
@@ -10125,6 +10698,9 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brook Trout",
+        "Rainbow Trout",
+        "Splake",
         "Walleye"
       ],
       "towns": [
@@ -10334,7 +10910,8 @@
         "Brook Trout",
         "Brown Trout",
         "Rainbow Trout",
-        "Tiger Trout"
+        "Tiger Trout",
+        "Walleye"
       ],
       "towns": [
         {
@@ -10445,7 +11022,8 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
-        "Lake Trout"
+        "Lake Trout",
+        "Splake"
       ],
       "towns": [
         {
@@ -10582,6 +11160,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brown Trout",
         "Rainbow Trout"
       ],
       "towns": [
@@ -10653,6 +11232,8 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brook Trout",
+        "Rainbow Trout",
         "Walleye"
       ],
       "towns": [
@@ -10727,6 +11308,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brook Trout",
         "Rainbow Trout",
         "Tiger Trout"
       ],
@@ -10833,7 +11415,11 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
-        "Rainbow Trout"
+        "Brook Trout",
+        "Brown Trout",
+        "Muskellunge",
+        "Rainbow Trout",
+        "Walleye"
       ],
       "towns": [
         {
@@ -10901,6 +11487,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brook Trout",
         "Rainbow Trout"
       ],
       "towns": [
@@ -10970,7 +11557,10 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
-        "Northern Pike"
+        "Northern Brook Lamprey",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Walleye"
       ],
       "towns": [
         {
@@ -11131,6 +11721,8 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Lake Whitefish",
+        "Smallmouth Bass",
         "Walleye"
       ],
       "towns": [
@@ -11177,7 +11769,12 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
-        "Northern Pike"
+        "Brown Trout",
+        "Largemouth Bass",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Walleye",
+        "Yellow Perch"
       ],
       "towns": [
         {
@@ -11259,7 +11856,12 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
-        "Walleye"
+        "Black Crappie",
+        "Brook Trout",
+        "Largemouth Bass",
+        "Northern Pike",
+        "Walleye",
+        "Yellow Perch"
       ],
       "towns": [
         {
@@ -11313,7 +11915,10 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brown Trout",
         "Northern Pike",
+        "Rainbow Trout",
+        "Walleye",
         "Yellow Perch"
       ],
       "towns": [
@@ -11398,9 +12003,14 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Black Crappie",
+        "Brook Trout",
         "Brown Trout",
+        "Muskellunge",
+        "Northern Pike",
         "Rainbow Trout",
-        "Tiger Trout"
+        "Tiger Trout",
+        "Yellow Perch"
       ],
       "towns": [
         {
@@ -11633,9 +12243,13 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brook Trout",
         "Brown Trout",
+        "Largemouth Bass",
+        "Muskellunge",
         "Rainbow Trout",
-        "Tiger Trout"
+        "Tiger Trout",
+        "Walleye"
       ],
       "towns": [
         {
@@ -11866,7 +12480,8 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
-        "Rainbow Trout"
+        "Rainbow Trout",
+        "Walleye"
       ],
       "towns": [
         {
@@ -11949,6 +12564,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Rainbow Trout",
         "Walleye"
       ],
       "towns": [
@@ -12095,6 +12711,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brook Trout",
         "Rainbow Trout",
         "Tiger Trout"
       ],
@@ -12184,6 +12801,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Muskellunge",
         "Walleye"
       ],
       "towns": [
@@ -12259,7 +12877,10 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
-        "Walleye"
+        "Brook Trout",
+        "Rainbow Trout",
+        "Walleye",
+        "Yellow Perch"
       ],
       "towns": [
         {
@@ -12343,6 +12964,7 @@
       "stocked": true,
       "stocked_species": [
         "Brook Trout",
+        "Brown Trout",
         "Rainbow Trout"
       ],
       "towns": [
@@ -12427,7 +13049,8 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
-        "Northern Pike"
+        "Northern Pike",
+        "Yellow Perch"
       ],
       "towns": [
         {
@@ -12477,6 +13100,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brown Trout",
         "Walleye"
       ],
       "towns": [],
@@ -12536,8 +13160,10 @@
       "stocked": true,
       "stocked_species": [
         "Arctic Char",
+        "Brook Trout",
         "Brown Trout",
         "Rainbow Trout",
+        "Sparr",
         "Tiger Trout"
       ],
       "towns": [
@@ -12836,6 +13462,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Cutthroat Trout",
         "Rainbow Trout"
       ],
       "towns": [
@@ -13006,6 +13633,8 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Largemouth Bass",
+        "Northern Pike",
         "Walleye"
       ],
       "towns": [
@@ -13154,6 +13783,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Arctic Char",
         "Brook Trout",
         "Rainbow Trout"
       ],
@@ -13241,6 +13871,10 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brook Trout",
+        "Lake Trout",
+        "Muskellunge",
+        "Rainbow Trout",
         "Walleye"
       ],
       "towns": [
@@ -13456,6 +14090,8 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brook Trout",
+        "Brown Trout",
         "Rainbow Trout"
       ],
       "towns": [
@@ -13526,7 +14162,10 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
-        "Brook Trout"
+        "Brook Trout",
+        "Rainbow Trout",
+        "Splake",
+        "Walleye"
       ],
       "towns": [
         {
@@ -13603,6 +14242,7 @@
       "stocked": true,
       "stocked_species": [
         "Arctic Char",
+        "Brook Trout",
         "Rainbow Trout",
         "Tiger Trout"
       ],
@@ -13701,6 +14341,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brook Trout",
         "Rainbow Trout"
       ],
       "towns": [
@@ -13839,6 +14480,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brook Trout",
         "Rainbow Trout"
       ],
       "towns": [
@@ -14073,6 +14715,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Smallmouth Bass",
         "Walleye"
       ],
       "towns": [
@@ -14186,6 +14829,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Northern Pike",
         "Walleye"
       ],
       "towns": [
@@ -14251,6 +14895,8 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brook Trout",
+        "Brown Trout",
         "Rainbow Trout",
         "Walleye"
       ],
@@ -14352,7 +14998,8 @@
       "stocked_species": [
         "Brook Trout",
         "Rainbow Trout",
-        "Tiger Trout"
+        "Tiger Trout",
+        "Yellow Perch"
       ],
       "towns": [
         {
@@ -14456,7 +15103,15 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
-        "Walleye"
+        "Brook Trout",
+        "Brown Trout",
+        "Lake Trout",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Smallmouth Bass",
+        "Sparr",
+        "Walleye",
+        "Yellow Perch"
       ],
       "towns": [
         {
@@ -14526,7 +15181,9 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
-        "Brook Trout"
+        "Brook Trout",
+        "Fathead Minnow",
+        "Rainbow Trout"
       ],
       "towns": [],
       "regulations": {
@@ -14564,6 +15221,8 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brook Trout",
+        "Brown Trout",
         "Rainbow Trout"
       ],
       "towns": [
@@ -14642,7 +15301,13 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
-        "Walleye"
+        "Brown Trout",
+        "Largemouth Bass",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Smallmouth Bass",
+        "Walleye",
+        "Yellow Perch"
       ],
       "towns": [
         {
@@ -14717,6 +15382,7 @@
         "Brook Trout",
         "Brown Trout",
         "Rainbow Trout",
+        "Tiger Trout",
         "Walleye"
       ],
       "towns": [
@@ -14914,7 +15580,9 @@
       "stocked": true,
       "stocked_species": [
         "Brown Trout",
-        "Rainbow Trout"
+        "Northern Pike",
+        "Rainbow Trout",
+        "Yellow Perch"
       ],
       "towns": [
         {
@@ -14992,6 +15660,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brook Trout",
         "Rainbow Trout"
       ],
       "towns": [],
@@ -15031,6 +15700,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Smallmouth Bass",
         "Walleye"
       ],
       "towns": [
@@ -15177,7 +15847,8 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
-        "Brook Trout"
+        "Brook Trout",
+        "Yellow Perch"
       ],
       "towns": [
         {
@@ -15269,6 +15940,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brook Trout",
         "Brown Trout",
         "Rainbow Trout"
       ],
@@ -15366,7 +16038,10 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
-        "Walleye"
+        "Northern Pike",
+        "Rainbow Trout",
+        "Walleye",
+        "Yellow Perch"
       ],
       "towns": [
         {
@@ -15439,8 +16114,10 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Black Crappie",
         "Brook Trout",
         "Brown Trout",
+        "Muskellunge",
         "Rainbow Trout"
       ],
       "towns": [
@@ -15688,6 +16365,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brook Trout",
         "Walleye"
       ],
       "towns": [
@@ -15761,7 +16439,8 @@
       "stocked": true,
       "stocked_species": [
         "Arctic Char",
-        "Brook Trout"
+        "Brook Trout",
+        "Brown Trout"
       ],
       "towns": [
         {
@@ -15847,6 +16526,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Lake Trout",
         "Tiger Trout"
       ],
       "towns": [],
@@ -15886,7 +16566,9 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
-        "Brown Trout"
+        "Brook Trout",
+        "Brown Trout",
+        "Rainbow Trout"
       ],
       "towns": [
         {
@@ -16033,6 +16715,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Splake",
         "Walleye"
       ],
       "towns": [
@@ -16165,7 +16848,13 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
-        "Walleye"
+        "Largemouth Bass",
+        "Muskellunge",
+        "Northern Pike",
+        "Rainbow Trout",
+        "Smallmouth Bass",
+        "Walleye",
+        "Yellow Perch"
       ],
       "towns": [
         {
@@ -16334,6 +17023,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brown Trout",
         "Tiger Trout"
       ],
       "towns": [
@@ -16409,7 +17099,6 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
-        "Brown Trout",
         "Rainbow Trout"
       ],
       "towns": [
@@ -16629,6 +17318,7 @@
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
+        "Brook Trout",
         "Walleye"
       ],
       "towns": [

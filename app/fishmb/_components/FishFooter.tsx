@@ -1,7 +1,12 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Wordmark } from "./FishHeader";
 
 export default function FishFooter() {
+  const pathname = usePathname();
+  const hideStoreLink = pathname === "/fishmb/contact";
   return (
     <footer className="bg-pine-deep text-white mt-16">
       <div className="max-w-7xl mx-auto px-4 py-12 grid gap-10 md:grid-cols-4">
@@ -47,12 +52,14 @@ export default function FishFooter() {
       <div className="border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/40">
           <span>© 2026 FishMB. Fish hard, release harder.</span>
-          <span>
-            Tackle up at{" "}
-            <a href="https://www.wallyworldtackle.ca" className="text-gold hover:text-white">
-              wallyworldtackle.ca
-            </a>
-          </span>
+          {!hideStoreLink && (
+            <span>
+              Tackle up at{" "}
+              <a href="https://www.wallyworldtackle.ca" className="text-gold hover:text-white">
+                wallyworldtackle.ca
+              </a>
+            </span>
+          )}
         </div>
       </div>
     </footer>
