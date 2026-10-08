@@ -61,7 +61,7 @@ export default function RentalsPage() {
             you to make the deal.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {user && (
             <Link
               href="/fishmb/rentals/bookings"

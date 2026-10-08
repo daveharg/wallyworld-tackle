@@ -291,7 +291,7 @@ export default function FeedPage() {
   const [activeQ, setActiveQ] = useState("");
   const [mode, setMode] = useState<"post" | "catch">("post");
   const [draft, setDraft] = useState("");
-  const [photo, setPhoto] = useState<File | null>(null);
+  const [catchPhotos, setCatchPhotos] = useState<File[]>([]);
   const [postPhotos, setPostPhotos] = useState<File[]>([]);
   const [posting, setPosting] = useState(false);
   const [visibility, setVisibility] = useState<"public" | "friends" | "private">("public");
@@ -507,14 +507,18 @@ export default function FeedPage() {
       setCatchNote("Enter the length in inches.");
       return;
     }
-    if (!photo) {
+    if (catchPhotos.length === 0) {
       setCatchNote("Add a photo of your catch.");
       return;
     }
     setPosting(true);
     setCatchNote(null);
     try {
-      const photoUrl = await uploadPhoto(photo);
+      const urls: string[] = [];
+      for (const f of catchPhotos.slice(0, 4)) {
+        urls.push(await uploadPhoto(f));
+      }
+      const photoUrl = urls[0];
       await fishFetch("/api/fish/catches", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -523,6 +527,7 @@ export default function FeedPage() {
           length_in: lengthIn,
           photo_measure_url: photoUrl,
           photo_hold_url: photoUrl,
+          photos: urls,
           visibility,
           note: draft.trim() || null,
         }),
@@ -533,6 +538,7 @@ export default function FeedPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             photo_url: photoUrl,
+            photo_urls: urls,
             species: catchSpecies.trim(),
             length_inches: lengthIn,
             notes: draft.trim(),
