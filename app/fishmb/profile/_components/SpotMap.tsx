@@ -608,15 +608,15 @@ export default function SpotMap({
         </div>
       )}
 
-      {/* Live speed readout */}
+      {/* Live speed readout — sits above the map attribution */}
       {speedKmh !== null && (
-        <div className="absolute bottom-3 right-3 z-[600] bg-pine-deep/90 text-white text-xs font-bold rounded-full px-3.5 py-2 shadow-lg tabular-nums">
+        <div className="absolute bottom-9 right-3 z-[600] bg-pine-deep/90 text-white text-xs font-bold rounded-full px-3.5 py-2 shadow-lg tabular-nums">
           🚤 {speedKmh.toFixed(0)} km/h
         </div>
       )}
 
-      {/* Map toolbar: record trail + measure */}
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-[600] flex gap-2">
+      {/* Map toolbar: record trail + measure — lifted above the attribution */}
+      <div className="absolute bottom-9 left-1/2 -translate-x-1/2 z-[600] flex gap-2">
         <button
           type="button"
           onClick={() => (recording ? stopRecording() : startRecording())}
