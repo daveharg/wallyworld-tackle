@@ -316,11 +316,12 @@ export async function createBooking(
     }
     const row = await txQueryOne<RentalBooking>(
       client,
-      `${BOOKING_SELECT} WHERE b.id = (
+      `WITH new_booking AS (
          INSERT INTO fm_rental_bookings (rental_id, renter_user_id, start_date, end_date, renter_contact)
          VALUES ($1, $2, $3::date, $4::date, $5)
          RETURNING id
-       )`,
+       )
+       ${BOOKING_SELECT} WHERE b.id = (SELECT id FROM new_booking)`,
       [rentalId, renterId, startDate, endDate, renterContact]
     );
     await txQuery(

@@ -54,6 +54,17 @@ export async function POST(
     const booking = await createBooking(id, me.id, start, end, contact);
     return NextResponse.json({ booking }, { status: 201 });
   } catch (e) {
-    return badRequest(e instanceof Error ? e.message : "Could not create the booking.");
+    // Friendly validation errors (thrown by createBooking) are safe to show.
+    // Raw database errors must never reach the screen.
+    const code = (e as { code?: string })?.code;
+    const msg = e instanceof Error ? e.message : "";
+    if (!code && !/syntax error|at or near|violates |duplicate key|relation .* does not exist/i.test(msg)) {
+      return badRequest(msg || "Could not create the booking.");
+    }
+    console.error("createBooking failed:", e);
+    return NextResponse.json(
+      { error: "Something went wrong saving your booking. Please try again." },
+      { status: 500 }
+    );
   }
 }
