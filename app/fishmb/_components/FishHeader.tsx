@@ -73,7 +73,10 @@ export default function FishHeader() {
         </div>
       </div>
       {open && (
-        <nav className="md:hidden border-t border-pine/10 bg-paper px-4 py-3 flex flex-col gap-1">
+        <nav
+          className="md:hidden border-t border-pine/10 bg-paper px-4 py-3 flex flex-col gap-1"
+          onClick={() => setOpen(false)}
+        >
           {NAV.map((n) => (
             <Link
               key={n.href}

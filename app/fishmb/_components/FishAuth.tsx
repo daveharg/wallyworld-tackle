@@ -277,6 +277,26 @@ function AccountTypeChooser({ user, onDone }: { user: FishAuthUser; onDone: (u: 
 export function FishLoginButton() {
   const { user, loading, openLogin, logout } = useFishAuth();
   const [menu, setMenu] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Close the menu on any outside tap. (A fixed overlay div can't do this job:
+  // the header's backdrop-blur makes it a containing block, clipping the overlay
+  // to the header strip.)
+  useEffect(() => {
+    if (!menu) return;
+    const close = (e: Event) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setMenu(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenu(false);
+    };
+    document.addEventListener("pointerdown", close);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", close);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [menu ]);
 
   if (loading) {
     return <span className="inline-flex w-24 h-10 rounded-full bg-pine/10 animate-pulse" />;
@@ -294,7 +314,7 @@ export function FishLoginButton() {
   }
 
   return (
-    <div className="relative block">
+    <div className="relative block" ref={ref}>
       <button
         onClick={() => setMenu((m) => !m)}
         className="inline-flex items-center gap-2 bg-pine/5 hover:bg-pine/10 rounded-full pl-1 pr-4 py-1 transition-colors"
@@ -310,9 +330,10 @@ export function FishLoginButton() {
         <span className="text-sm font-bold text-pine max-w-[120px] truncate">{user.name}</span>
       </button>
       {menu && (
-        <>
-          <div className="fixed inset-0 z-10" onClick={() => setMenu(false)} />
-          <div className="absolute right-0 mt-2 z-20 bg-paper border border-pine/10 rounded-2xl shadow-xl py-2 w-44">
+        <div
+          className="absolute right-0 mt-2 z-20 bg-paper border border-pine/10 rounded-2xl shadow-xl py-2 w-44"
+          onClick={() => setMenu(false)}
+        >
             <Link
               href="/fishmb/profile"
               onClick={() => setMenu(false)}
@@ -336,8 +357,7 @@ export function FishLoginButton() {
             >
               Log out
             </button>
-          </div>
-        </>
+        </div>
       )}
     </div>
   );
