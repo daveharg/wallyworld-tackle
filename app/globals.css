@@ -92,3 +92,12 @@ body {
 .animate-fade-in {
   animation: fadeIn 0.2s ease both;
 }
+
+/* Prevent iOS Safari auto-zoom when tapping a text field: any input under 16px triggers it. */
+@media (max-width: 768px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
