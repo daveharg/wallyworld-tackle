@@ -41,6 +41,10 @@ const cheat = [
     body: "The official catch time comes from the phone's camera capture — not when the entry is uploaded. Late uploads of in-window catches still count; backdated ones get flagged.",
   },
   {
+    title: "Tournament-waters check",
+    body: "When your tournament names specific lakes, every entry's GPS is measured against those waters. Catches logged far from the chosen lakes are flagged for your review — along with how far away they were caught.",
+  },
+  {
     title: "Manitoba GPS check",
     body: "Every entry's location is verified against Manitoba waters. Catches logged outside Manitoba are rejected automatically.",
   },
@@ -64,8 +68,12 @@ const dashboard = [
     body: "Your invite code, a copy-link button and native phone sharing, all in one place.",
   },
   {
+    title: "Entry fees",
+    body: "For paid tournaments: see every angler and tap to confirm who's paid. Anglers see their payment confirmation on the tournament page. (You collect the money directly — FishMB never touches it.)",
+  },
+  {
     title: "Review queue",
-    body: "Every submitted catch with its photos, species, length, GPS stamp and capture time. Approve or reject each one, and see everything you've already reviewed.",
+    body: "Every submitted catch with its photos, species, length, GPS stamp and capture time. Catches outside your tournament waters are flagged with how far away they were caught. Approve or reject each one, and see everything you've already reviewed.",
   },
   {
     title: "Entry keys",
@@ -173,11 +181,16 @@ export default function HowTournamentsWorkPage() {
       <h2 className="font-display font-bold uppercase text-pine text-2xl tracking-wide mb-6">
         Money
       </h2>
-      <p className="text-pine/65 text-sm leading-relaxed mb-14 max-w-2xl">
+      <p className="text-pine/65 text-sm leading-relaxed mb-4 max-w-2xl">
         Entry fees are collected by you, directly from your anglers — cash,
         e-transfer, whatever you agree on. FishMB never handles tournament
         money and takes no cut of the prize pot. The prize breakdown you set
         when creating the tournament is shown to every angler up front.
+      </p>
+      <p className="text-pine/65 text-sm leading-relaxed mb-14 max-w-2xl">
+        For paid tournaments, your manage dashboard tracks who&apos;s paid:
+        tap to confirm each angler once their money is in, and they&apos;ll see
+        the confirmation on the tournament page.
       </p>
 
       <div className="flex flex-wrap gap-3">

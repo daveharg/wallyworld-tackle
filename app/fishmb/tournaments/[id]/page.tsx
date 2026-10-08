@@ -6,6 +6,7 @@ import { TournamentActions } from "../_components/TournamentActions";
 import { CatchesGrid } from "../_components/CatchesGrid";
 import { InviteCodeReveal } from "../_components/InviteCodeReveal";
 import { PrizePot, LicenceNotice } from "../_components/PrizePot";
+import { MyPaymentStatus } from "../_components/MyPaymentStatus";
 import { formatDateTime } from "../../_components/formatDate";
 
 export const dynamic = "force-dynamic";
@@ -114,6 +115,7 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
           payouts={t.payouts ?? []}
         />
       </div>
+      <MyPaymentStatus tournamentId={t.id} entryFeeCents={t.entry_fee_cents ?? 0} />
       <LicenceNotice participantCount={t.participant_count} maxParticipants={t.max_participants} />
 
       {/* Leaderboard */}

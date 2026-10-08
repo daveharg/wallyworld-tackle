@@ -273,6 +273,9 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
         <div className="space-y-5">
           <div>
             <label className={labelCls}>Waters (search Manitoba lakes)</label>
+            <p className="text-pine/55 text-xs mb-2">
+              Catches logged outside your chosen waters are flagged for your review.
+            </p>
             <input value={lakeQuery} onChange={(e) => setLakeQuery(e.target.value)} placeholder="Type a lake name…" className={inputCls} />
             {lakeMatches.length > 0 && (
               <div className="mt-2 bg-white border border-pine/15 rounded-2xl overflow-hidden">

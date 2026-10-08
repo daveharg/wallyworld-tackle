@@ -22,7 +22,7 @@ export default async function TournamentsPage() {
       </h1>
       <p className="text-pine/65 max-w-2xl mb-6">
         Run your own catch-photo tournament with real anti-cheat — phone-timestamped
-        catches, GPS stamps, duplicate-photo detection and
+        catches, GPS stamps, tournament-waters checks, duplicate-photo detection and
         organizer review — or join one below. No entry caps, no platform cut.
       </p>
 

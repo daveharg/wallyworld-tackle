@@ -13,6 +13,7 @@ import {
   getEntries,
   getLeaderboard,
   isParticipant,
+  getMyPaymentStatus,
 } from "@/lib/fish/tournaments";
 import { query } from "@/lib/fish/db";
 
@@ -27,6 +28,7 @@ export async function GET(
   const entries = await getEntries(t.id, ["approved"]);
   const mine = me ? await isParticipant(t.id, me.id) : false;
   const participantCount = t.participant_count;
+  const myPayment = me && mine ? await getMyPaymentStatus(t.id, me.id) : null;
   return NextResponse.json({
     tournament: t,
     leaderboard,
@@ -34,6 +36,7 @@ export async function GET(
     joined: mine,
     is_organizer: !!me && me.id === t.organizer_id,
     participant_count: participantCount,
+    my_payment: myPayment,
   });
 }
 

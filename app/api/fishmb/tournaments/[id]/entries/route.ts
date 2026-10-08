@@ -25,6 +25,8 @@ import {
   getEntriesForViewer,
   isParticipant,
   gpsInManitoba,
+  nearestTournamentLake,
+  LAKE_BOUNDARY_KM,
 } from "@/lib/fish/tournaments";
 import { query, queryOne } from "@/lib/fish/db";
 
@@ -134,12 +136,32 @@ export async function POST(
     photoHash = null;
   }
 
+  // Lake-boundary check: tournaments run on specific water. Measure the entry
+  // GPS against the tournament's chosen lake(s); flag (never auto-reject) when
+  // it's outside lake waters so the organizer can review it.
+  let lakeDistanceKm: number | null = null;
+  let locationFlag: string | null = null;
+  const lakeIds = Array.isArray(t.lake_ids) ? t.lake_ids : [];
+  if (lakeIds.length > 0) {
+    if (lat !== null && lng !== null) {
+      const near = nearestTournamentLake(lat, lng, lakeIds);
+      if (near) {
+        lakeDistanceKm = Math.round(near.km * 10) / 10;
+        if (near.km > LAKE_BOUNDARY_KM) locationFlag = "outside-lake";
+      } else {
+        locationFlag = "no-gps";
+      }
+    } else {
+      locationFlag = "no-gps";
+    }
+  }
+
   const entry = await queryOne(
     `INSERT INTO fm_tournament_entries
-       (tournament_id, user_id, photo_url, photo_urls, species, length_inches, latitude, longitude, gps_accuracy, notes, photo_hash, captured_at, time_flag, status)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
+       (tournament_id, user_id, photo_url, photo_urls, species, length_inches, latitude, longitude, gps_accuracy, notes, photo_hash, captured_at, time_flag, lake_distance_km, location_flag, status)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
      RETURNING *`,
-    [t.id, me.id, photoUrl, JSON.stringify(photoUrls), species, lengthIn, lat, lng, acc, notes, photoHash, capturedAt.toISOString(), timeFlag, t.auto_approve_entries ? "approved" : "pending"]
+    [t.id, me.id, photoUrl, JSON.stringify(photoUrls), species, lengthIn, lat, lng, acc, notes, photoHash, capturedAt.toISOString(), timeFlag, lakeDistanceKm, locationFlag, t.auto_approve_entries ? "approved" : "pending"]
   );
   return NextResponse.json({ entry }, { status: 201 });
 }

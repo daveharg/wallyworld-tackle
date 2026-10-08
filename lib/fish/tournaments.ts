@@ -72,6 +72,8 @@ export interface TournamentEntry {
   created_at: string;
   captured_at: string | null;
   time_flag: string | null;
+  lake_distance_km: number | null;
+  location_flag: string | null;
 }
 
 let ensured = false;
@@ -156,6 +158,15 @@ export async function ensureTournamentTables(): Promise<void> {
   // Offline app support: the phone's capture timestamp + any clock-tamper flag.
   await query(`ALTER TABLE fm_tournament_entries ADD COLUMN IF NOT EXISTS captured_at timestamptz`);
   await query(`ALTER TABLE fm_tournament_entries ADD COLUMN IF NOT EXISTS time_flag text`);
+  // Lake-boundary enforcement: distance from the entry GPS to the nearest
+  // tournament lake center + a review flag when it's outside lake waters.
+  await query(`ALTER TABLE fm_tournament_entries ADD COLUMN IF NOT EXISTS lake_distance_km numeric`);
+  await query(`ALTER TABLE fm_tournament_entries ADD COLUMN IF NOT EXISTS location_flag text`);
+  // Entry-fee tracking: the organizer marks each participant paid (payment
+  // itself stays manual/off-platform — FishMB never touches the money).
+  await query(`ALTER TABLE fm_tournament_participants ADD COLUMN IF NOT EXISTS paid boolean NOT NULL DEFAULT false`);
+  await query(`ALTER TABLE fm_tournament_participants ADD COLUMN IF NOT EXISTS paid_at timestamptz`);
+  await query(`ALTER TABLE fm_tournament_participants ADD COLUMN IF NOT EXISTS paid_marked_by uuid REFERENCES fm_users(id)`);
   // Multi-photo catches: primary photo stays in photo_url; all photos (1-4) in photo_urls.
   await query(`ALTER TABLE fm_tournament_entries ADD COLUMN IF NOT EXISTS photo_urls jsonb NOT NULL DEFAULT '[]'`);
   await query(`UPDATE fm_tournament_entries SET photo_urls = jsonb_build_array(photo_url) WHERE photo_urls = '[]' OR jsonb_array_length(photo_urls) = 0`);
@@ -211,6 +222,114 @@ export async function generateInviteCode(): Promise<string> {
 /** Manitoba bounding box sanity check for a GPS fix. */
 export function gpsInManitoba(lat: number, lng: number): boolean {
   return lat >= 48.9 && lat <= 60.1 && lng >= -102.1 && lng <= -88.9;
+}
+
+// Lake-boundary enforcement. Tournaments run on specific water: each entry's
+// GPS is measured against the tournament's chosen lake(s) using the verified
+// lake center points (public/fishmb/lake-coords.json). There are no lake
+// boundary polygons in the data, so this is a center-distance check — entries
+// beyond LAKE_BOUNDARY_KM are FLAGGED for organizer review, never
+// auto-rejected (giant lakes like Winnipeg span far beyond any radius).
+export const LAKE_BOUNDARY_KM = 30;
+
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+let lakeCentersCache: Record<string, { lat: number; lng: number; name?: string }> | null = null;
+function lakeCenters(): Record<string, { lat: number; lng: number; name?: string }> {
+  if (!lakeCentersCache) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      lakeCentersCache = require("@/public/fishmb/lake-coords.json");
+    } catch {
+      lakeCentersCache = {};
+    }
+  }
+  return lakeCentersCache!;
+}
+
+/** Nearest tournament lake to a GPS point, or null when none have coordinates. */
+export function nearestTournamentLake(
+  lat: number,
+  lng: number,
+  lakeIds: string[]
+): { lakeId: string; lakeName: string; km: number } | null {
+  const centers = lakeCenters();
+  let best: { lakeId: string; lakeName: string; km: number } | null = null;
+  for (const id of lakeIds) {
+    const c = centers[id];
+    if (!c || typeof c.lat !== "number" || typeof c.lng !== "number") continue;
+    const km = haversineKm(lat, lng, c.lat, c.lng);
+    if (!best || km < best.km) {
+      best = { lakeId: id, lakeName: c.name ?? id, km };
+    }
+  }
+  return best;
+}
+
+export interface TournamentParticipant {
+  user_id: string;
+  name: string;
+  avatar_url: string | null;
+  joined_at: string;
+  paid: boolean;
+  paid_at: string | null;
+}
+
+/** Organizer-only participant list with entry-fee payment status. */
+export async function listParticipants(tournamentId: string): Promise<TournamentParticipant[]> {
+  await ensureTournamentTables();
+  return query<TournamentParticipant>(
+    `SELECT p.user_id, u.name, u.avatar_url, p.joined_at, p.paid, p.paid_at
+       FROM fm_tournament_participants p
+       JOIN fm_users u ON u.id = p.user_id
+      WHERE p.tournament_id = $1
+      ORDER BY p.joined_at ASC`,
+    [tournamentId]
+  );
+}
+
+/** Organizer marks a participant's entry fee paid/unpaid (money stays manual/off-platform). */
+export async function setParticipantPaid(
+  tournamentId: string,
+  userId: string,
+  paid: boolean,
+  markedBy: string
+): Promise<TournamentParticipant | null> {
+  await ensureTournamentTables();
+  const rows = await query<TournamentParticipant>(
+    `UPDATE fm_tournament_participants
+        SET paid = $3,
+            paid_at = CASE WHEN $3 THEN now() ELSE NULL END,
+            paid_marked_by = $4
+      WHERE tournament_id = $1 AND user_id = $2
+      RETURNING user_id, joined_at, paid, paid_at,
+        (SELECT name FROM fm_users WHERE id = fm_tournament_participants.user_id) AS name,
+        (SELECT avatar_url FROM fm_users WHERE id = fm_tournament_participants.user_id) AS avatar_url`,
+    [tournamentId, userId, paid, markedBy]
+  );
+  return rows[0] ?? null;
+}
+
+/** What a participant sees about their own entry-fee payment. */
+export async function getMyPaymentStatus(
+  tournamentId: string,
+  userId: string
+): Promise<{ paid: boolean; paid_at: string | null } | null> {
+  await ensureTournamentTables();
+  return queryOne<{ paid: boolean; paid_at: string | null }>(
+    `SELECT paid, paid_at FROM fm_tournament_participants WHERE tournament_id = $1 AND user_id = $2`,
+    [tournamentId, userId]
+  );
 }
 
 const TOURNAMENT_SELECT = `

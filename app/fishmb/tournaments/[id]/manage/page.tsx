@@ -8,6 +8,7 @@ import { compressImage } from "../../../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 import { CatchMap } from "../../_components/CatchMap";
 import { EntryKeys } from "../../_components/EntryKeys";
+import { EntryFees } from "../../_components/EntryFees";
 import { PayoutEditor } from "../../_components/PayoutEditor";
 import type { PayoutTier } from "@/lib/fish/tournaments";
 
@@ -28,6 +29,8 @@ interface Entry {
   created_at: string;
   captured_at: string | null;
   time_flag: string | null;
+  lake_distance_km: number | null;
+  location_flag: string | null;
 }
 
 interface Detail {
@@ -561,6 +564,9 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
         </div>
       </section>
 
+      {/* Entry fees — organizer tracks who has paid */}
+      <EntryFees tournamentId={t.id} entryFeeCents={t.entry_fee_cents} />
+
       {/* Full tournament editor */}
       <EditTournament tournament={t} onSaved={load} />
 
@@ -651,6 +657,24 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
                 {e.time_flag === "future_timestamp" && (
                   <p className="text-xs font-bold text-signal-dark bg-signal/10 rounded-xl px-3 py-2 mt-2">
                     ⚠ Clock flag — the phone claimed a capture time in the future. Verify before approving.
+                  </p>
+                )}
+                {e.location_flag === "outside-lake" && (
+                  <p className="text-xs font-bold text-signal-dark bg-signal/10 rounded-xl px-3 py-2 mt-2">
+                    ⚠ Outside tournament waters — caught{" "}
+                    {e.lake_distance_km !== null ? `${Number(e.lake_distance_km).toFixed(0)} km ` : ""}from the
+                    nearest chosen lake. Verify before approving.
+                  </p>
+                )}
+                {e.location_flag === "no-gps" && (
+                  <p className="text-xs font-bold text-gold-dark bg-gold/15 border border-gold/40 rounded-xl px-3 py-2 mt-2">
+                    📍 No location to verify — this catch has no GPS, so it couldn&apos;t be checked
+                    against the tournament waters.
+                  </p>
+                )}
+                {e.lake_distance_km !== null && e.location_flag !== "outside-lake" && (
+                  <p className="text-xs text-pine/55 mt-2">
+                    ✓ {Number(e.lake_distance_km).toFixed(1)} km from tournament waters
                   </p>
                 )}
                 {e.notes && <p className="text-xs text-pine/60 mt-2">“{e.notes}”</p>}
