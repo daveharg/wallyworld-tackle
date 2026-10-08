@@ -13,6 +13,7 @@ export interface Classified {
   price_text: string | null;
   contact: string;
   location: string | null;
+  offers: string;
   user_id: string;
   user_name: string;
   avatar_url: string | null;
@@ -34,6 +35,7 @@ export async function ensureClassifiedsTable(): Promise<void> {
     location text,
     created_at timestamptz NOT NULL DEFAULT now()
   )`);
+  await query(`ALTER TABLE fm_classifieds ADD COLUMN IF NOT EXISTS offers text NOT NULL DEFAULT 'fishing'`);
   await query(
     `CREATE INDEX IF NOT EXISTS fm_classifieds_category_idx ON fm_classifieds(category, created_at DESC)`
   );
@@ -46,7 +48,7 @@ export async function listClassifieds(
 ): Promise<Classified[]> {
   await ensureClassifiedsTable();
   return query<Classified>(
-    `SELECT c.id, c.category, c.title, c.body, c.price_text, c.contact, c.location,
+    `SELECT c.id, c.category, c.title, c.body, c.price_text, c.contact, c.location, c.offers,
             c.user_id, u.name AS user_name, u.avatar_url, c.created_at
        FROM fm_classifieds c
        JOIN fm_users u ON u.id = c.user_id
@@ -66,17 +68,22 @@ export async function createClassified(
     price_text: string | null;
     contact: string;
     location: string | null;
+    offers?: string;
   }
 ): Promise<Classified> {
   await ensureClassifiedsTable();
+  const offers =
+    input.category === "guide" && ["fishing", "hunting", "both"].includes(input.offers ?? "")
+      ? input.offers!
+      : "fishing";
   const rows = await query<Classified>(
-    `INSERT INTO fm_classifieds (user_id, category, title, body, price_text, contact, location)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)
-     RETURNING id, category, title, body, price_text, contact, location, user_id,
+    `INSERT INTO fm_classifieds (user_id, category, title, body, price_text, contact, location, offers)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+     RETURNING id, category, title, body, price_text, contact, location, offers, user_id,
        (SELECT name FROM fm_users WHERE id = $1) AS user_name,
        (SELECT avatar_url FROM fm_users WHERE id = $1) AS avatar_url,
        created_at`,
-    [userId, input.category, input.title, input.body, input.price_text, input.contact, input.location]
+    [userId, input.category, input.title, input.body, input.price_text, input.contact, input.location, offers]
   );
   return rows[0];
 }

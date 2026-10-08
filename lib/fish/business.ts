@@ -125,7 +125,13 @@ export const AD_PRICES: Record<string, { label: string; price_cents: number }> =
   homepage_banner: { label: "Homepage banner — 7 days", price_cents: 7500 },
 };
 
+/** Master switch for PUBLIC ad display. Off until Dave's first ad sale —
+ *  businesses can still submit ads (they queue as pending), but nothing
+ *  renders in the feed or homepage until this is true. */
+export const ADS_ENABLED = false;
+
 export async function getActiveAds(slot: "feed" | "homepage_banner", limit = 10): Promise<Ad[]> {
+  if (!ADS_ENABLED) return [];
   await ensureBusinessTables();
   return query<Ad>(
     `SELECT a.*, b.name AS business_name FROM fm_ads a

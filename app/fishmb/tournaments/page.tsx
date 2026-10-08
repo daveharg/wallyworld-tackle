@@ -25,13 +25,45 @@ export default async function TournamentsPage() {
         organizer review — or join one below. No entry caps, no platform cut.
       </p>
 
-      <div className="bg-pine rounded-2xl px-5 py-4 mb-10 flex items-center gap-4">
-        <span className="text-2xl">📱</span>
-        <p className="text-white/90 text-sm">
-          <strong className="text-white">FishMB app launching soon.</strong>{" "}
-          Everything here already works in your browser — the app adds offline
-          catch logging for when you&apos;re out of service.
+      <div className="bg-pine rounded-3xl p-6 md:p-8 mb-10">
+        <p className="text-gold font-bold uppercase tracking-[0.24em] text-xs mb-2">
+          📱 Full FishMB app coming soon
         </p>
+        <h2 className="font-display font-bold uppercase text-white text-2xl md:text-3xl tracking-wide mb-3">
+          Offline catch logging is on its way
+        </h2>
+        <p className="text-white/75 max-w-3xl mb-5">
+          Most good fishing spots have zero bars. The full FishMB app will let
+          anglers snap the catch photo right in the app with no service — stamped
+          with the time and GPS on the spot, then synced automatically when
+          they&apos;re back in range. A catch made inside the tournament window
+          counts even if it uploads hours later.
+        </p>
+        <p className="text-white/75 max-w-3xl mb-5">
+          Until then, everything here already works in your browser — and you can
+          install FishMB as a web app on your Home Screen today:{" "}
+          <Link href="/fishmb/app" className="font-bold text-gold underline">
+            get the FishMB web app →
+          </Link>
+        </p>
+        <div className="grid sm:grid-cols-2 gap-3 max-w-3xl">
+          <div className="bg-white/10 rounded-2xl p-4">
+            <p className="font-bold text-white text-sm mb-2">🍎 iPhone (Safari)</p>
+            <ol className="text-white/70 text-sm list-decimal list-inside space-y-1">
+              <li>Open <Link href="/fishmb/app" className="underline text-gold">fishmb/app</Link> in Safari</li>
+              <li>Tap the Share button ⬆️</li>
+              <li>Tap &ldquo;Add to Home Screen&rdquo; → Add</li>
+            </ol>
+          </div>
+          <div className="bg-white/10 rounded-2xl p-4">
+            <p className="font-bold text-white text-sm mb-2">🤖 Android (Chrome)</p>
+            <ol className="text-white/70 text-sm list-decimal list-inside space-y-1">
+              <li>Open <Link href="/fishmb/app" className="underline text-gold">fishmb/app</Link> in Chrome</li>
+              <li>Tap Menu ⋮ → &ldquo;Install app&rdquo;</li>
+              <li>Tap Install — it&apos;s on your Home Screen</li>
+            </ol>
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-3 mb-10">

@@ -282,6 +282,7 @@ export default function FeedPage() {
   const [items, setItems] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<"all" | "catch" | "post">("all");
+  const [composerOpen, setComposerOpen] = useState(false);
   const [q, setQ] = useState("");
   const [activeQ, setActiveQ] = useState("");
   const [mode, setMode] = useState<"post" | "catch">("post");
@@ -407,6 +408,7 @@ export default function FeedPage() {
       setItems([d.item, ...items]);
       setDraft("");
       setPostPhotos([]);
+      setComposerOpen(false);
     } catch (e) {
       setCatchNote(e instanceof Error ? e.message : "Could not post.");
     } finally {
@@ -470,6 +472,7 @@ export default function FeedPage() {
       setDraft("");
       setPhoto(null);
       setTournamentId("");
+      setComposerOpen(false);
       load();
     } catch (e) {
       setCatchNote(e instanceof Error ? e.message : "Could not log the catch.");
@@ -488,7 +491,7 @@ export default function FeedPage() {
   const visible = items.filter((i) => tab === "all" || i.kind === tab || (tab === "post" && i.kind === "tip"));
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-10 md:py-14">
+    <div className="max-w-2xl mx-auto px-4 pt-10 md:pt-14 pb-32">
       <p className="text-signal font-bold uppercase tracking-[0.28em] text-sm mb-3">Community</p>
       <h1 className="font-display font-bold uppercase text-pine text-4xl md:text-5xl tracking-wide mb-2">
         The feed
@@ -497,11 +500,12 @@ export default function FeedPage() {
         Catches and discussions from Manitoba anglers — the same feed as the FishMB app.
       </p>
 
-      {/* Composer */}
+      {/* Composer — collapsed until tapped */}
       <div className="bg-white border border-pine/10 rounded-3xl p-5 mb-6">
         {user ? (
+          composerOpen ? (
           <>
-            <div className="flex gap-2 mb-4">
+            <div className="flex gap-2 mb-4 items-center">
               {(
                 [
                   ["post", "Share a post"],
@@ -521,6 +525,13 @@ export default function FeedPage() {
                   {label}
                 </button>
               ))}
+              <button
+                onClick={() => setComposerOpen(false)}
+                aria-label="Close composer"
+                className="ml-auto text-pine/40 hover:text-pine font-bold text-lg leading-none px-2"
+              >
+                ✕
+              </button>
             </div>
 
             {mode === "post" ? (
@@ -664,6 +675,24 @@ export default function FeedPage() {
               </>
             )}
           </>
+          ) : (
+            <button
+              onClick={() => setComposerOpen(true)}
+              className="w-full flex items-center gap-3 text-left"
+            >
+              {user.avatar_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={user.avatar_url} alt={user.name} className="w-10 h-10 rounded-full object-cover" />
+              ) : (
+                <span className="w-10 h-10 rounded-full bg-pine/10 flex items-center justify-center font-bold text-pine">
+                  {user.name.charAt(0).toUpperCase()}
+                </span>
+              )}
+              <span className="flex-1 bg-paper-deep border border-pine/10 rounded-full px-4 py-3 text-sm text-pine/40">
+                Share a report or log a catch…
+              </span>
+            </button>
+          )
         ) : (
           <div className="text-center py-2">
             <p className="text-pine/60 text-sm mb-4">
@@ -747,25 +776,7 @@ export default function FeedPage() {
           </button>
         </div>
       )}
-      <div className="flex gap-2 mb-6">
-        {(
-          [
-            ["all", "All"],
-            ["catch", "Catches"],
-            ["post", "Discussions"],
-          ] as const
-        ).map(([v, label]) => (
-          <button
-            key={v}
-            onClick={() => setTab(v)}
-            className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors ${
-              tab === v ? "bg-pine text-white" : "bg-pine/5 text-pine/60 hover:bg-pine/10"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      {/* Bottom tab bar — fixed, like the FishMB app. Top filter row removed. */}
 
       {/* Items */}
       {loading ? (
@@ -832,6 +843,44 @@ export default function FeedPage() {
           ))}
         </div>
       )}
+
+      {/* Fixed bottom tab bar — always visible, like the FishMB app. */}
+      <nav
+        aria-label="Feed sections"
+        className="fixed bottom-0 inset-x-0 z-40 bg-pine-deep/95 backdrop-blur border-t border-white/10"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      >
+        <div className="max-w-2xl mx-auto px-2 grid grid-cols-4">
+          {(
+            [
+              ["all", "🎣", "Full reel"],
+              ["catch", "🐟", "Fish"],
+              ["post", "💬", "Posts"],
+            ] as const
+          ).map(([v, icon, label]) => (
+            <button
+              key={v}
+              onClick={() => {
+                setTab(v);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              className={`flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-bold uppercase tracking-wider transition-colors ${
+                tab === v ? "text-gold" : "text-white/55 hover:text-white"
+              }`}
+            >
+              <span className="text-xl leading-none">{icon}</span>
+              {label}
+            </button>
+          ))}
+          <Link
+            href="/fishmb/tournaments"
+            className="flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-bold uppercase tracking-wider text-white/55 hover:text-white transition-colors"
+          >
+            <span className="text-xl leading-none">🏆</span>
+            Tournaments
+          </Link>
+        </div>
+      </nav>
     </div>
   );
 }

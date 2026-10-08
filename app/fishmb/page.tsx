@@ -86,24 +86,6 @@ export default function FishMBHome() {
             </Link>
           </div>
 
-          {/* Offline tournaments */}
-          <div className="bg-pine rounded-3xl p-6 md:p-8 mb-8">
-            <p className="text-gold font-bold uppercase tracking-[0.24em] text-xs mb-2">
-              No signal? No problem
-            </p>
-            <h3 className="font-display font-bold uppercase text-white text-2xl md:text-3xl tracking-wide mb-3">
-              Tournaments work fully offline
-            </h3>
-            <p className="text-white/75 max-w-3xl">
-              Most good fishing spots have zero bars. Anglers open the FishMB
-              app, snap the catch photo right in the app, and it&apos;s stamped
-              with the time and GPS on the spot — no service needed. Everything
-              queues on the phone and uploads automatically, oldest first, when
-              they&apos;re back in range. A catch made inside the tournament
-              window counts even if it uploads hours later.
-            </p>
-          </div>
-
           {/* Feature boxes — one scrollable row */}
           <HSlider>
             {[

@@ -17,6 +17,7 @@ interface Listing {
   price_text: string | null;
   contact: string;
   location: string | null;
+  offers: string;
   user_id: string;
   user_name: string;
   avatar_url: string | null;
@@ -61,7 +62,14 @@ export default function Classifieds({ category }: { category: Category }) {
   const [location, setLocation] = useState("");
   const [posting, setPosting] = useState(false);
   const [note, setNote] = useState<string | null>(null);
+  const [offers, setOffers] = useState("fishing");
+  const [offersTab, setOffersTab] = useState<"fishing" | "hunting">("fishing");
   const copy = COPY[category];
+
+  const shown =
+    category === "guide"
+      ? items.filter((l) => l.offers === offersTab || l.offers === "both")
+      : items;
 
   const load = () =>
     fishFetch(`/api/fishmb/classifieds?category=${category}`)
@@ -92,6 +100,7 @@ export default function Classifieds({ category }: { category: Category }) {
           price_text: price.trim() || null,
           contact: contact.trim(),
           location: location.trim() || null,
+          offers: category === "guide" ? offers : undefined,
         }),
       });
       if ((d as { error?: string }).error) throw new Error((d as { error: string }).error);
@@ -101,6 +110,7 @@ export default function Classifieds({ category }: { category: Category }) {
       setPrice("");
       setContact("");
       setLocation("");
+      setOffers("fishing");
       setOpen(false);
       setNote("Your listing is live! 🎣");
     } catch (e) {
@@ -134,6 +144,27 @@ export default function Classifieds({ category }: { category: Category }) {
         </button>
       </div>
       <p className="text-pine/60 text-sm max-w-2xl mb-5">{copy.blurb}</p>
+
+      {category === "guide" && (
+        <div className="flex gap-2 mb-5">
+          {(
+            [
+              ["fishing", "🎣 Fishing guides"],
+              ["hunting", "🦌 Hunting guides"],
+            ] as const
+          ).map(([v, label]) => (
+            <button
+              key={v}
+              onClick={() => setOffersTab(v)}
+              className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors ${
+                offersTab === v ? "bg-pine text-white" : "bg-white border border-pine/15 text-pine/60 hover:border-pine/40"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {note && (
         <p className="text-sm text-pine bg-gold/20 border border-gold/50 rounded-2xl px-4 py-3 mb-5">{note}</p>
@@ -179,6 +210,33 @@ export default function Classifieds({ category }: { category: Category }) {
               className="bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal"
             />
           </div>
+          {category === "guide" && (
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-2">
+                What do you guide?
+              </p>
+              <div className="flex gap-2">
+                {(
+                  [
+                    ["fishing", "🎣 Fishing"],
+                    ["hunting", "🦌 Hunting"],
+                    ["both", "🎣🦌 Both"],
+                  ] as const
+                ).map(([v, label]) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => setOffers(v)}
+                    className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors ${
+                      offers === v ? "bg-pine text-white" : "bg-pine/5 text-pine/60 hover:bg-pine/10"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="flex justify-end">
             <button
               onClick={submit}
@@ -191,13 +249,13 @@ export default function Classifieds({ category }: { category: Category }) {
         </div>
       )}
 
-      {items.length === 0 ? (
+      {shown.length === 0 ? (
         <p className="text-pine/55 text-sm bg-white border border-pine/10 rounded-2xl p-6">
           Nothing listed yet — be the first.
         </p>
       ) : (
         <div className="grid md:grid-cols-2 gap-4">
-          {items.map((l) => (
+          {shown.map((l) => (
             <article key={l.id} className="bg-white border border-pine/10 rounded-3xl p-5 flex flex-col">
               <div className="flex items-start justify-between gap-3 mb-2">
                 <h3 className="font-bold text-pine leading-snug">{l.title}</h3>

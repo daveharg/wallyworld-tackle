@@ -49,6 +49,7 @@ export async function POST(req: NextRequest) {
     price_text: price,
     contact,
     location,
+    offers: typeof body.offers === "string" ? body.offers : undefined,
   });
   return NextResponse.json({ item }, { status: 201 });
 }
