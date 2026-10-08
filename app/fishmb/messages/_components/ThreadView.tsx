@@ -13,6 +13,7 @@ import {
 interface StoredMessage {
   id: string;
   sender_id: string;
+  recipient_id?: string;
   nonce: string;
   ciphertext: string;
   created_at: string;
@@ -75,6 +76,10 @@ export default function ThreadView({
   const bottomRef = useRef<HTMLDivElement>(null);
   const lastAtRef = useRef<string | null>(null);
   const secretsRef = useRef<{ user_id: string; shared: Uint8Array }[] | null>(null);
+  // Synchronous send guard — `sending` state updates async, so rapid taps
+  // (double-tap, tap + Enter) would all slip past it and send duplicates.
+  const sendingRef = useRef(false);
+  const uploadingRef = useRef(false);
 
   // Every member's public key -> per-member shared secret. Each message is
   // encrypted separately for each member that HAS a key (including yourself).
@@ -141,7 +146,12 @@ export default function ThreadView({
         if (!live) return;
         if (after) {
           if (rows.length > 0) {
-            setMsgs((prev) => [...prev, ...decryptAll(rows)]);
+            setMsgs((prev) => {
+              const ids = new Set(prev.map((m) => m.id));
+              const fresh = decryptAll(rows).filter((m) => !ids.has(m.id));
+              if (fresh.length === 0) return prev;
+              return [...prev, ...fresh];
+            });
             lastAtRef.current = rows[rows.length - 1].created_at;
             bottomRef.current?.scrollIntoView({ behavior: "smooth" });
           }
@@ -176,11 +186,12 @@ export default function ThreadView({
 
   const sendPayload = async (payload: string, optimisticText: string | null = null) => {
     const secs = secretsRef.current;
-    if (!payload || !secs || secs.length === 0 || sending) return;
+    if (!payload || !secs || secs.length === 0 || sendingRef.current) return;
     if (payload.length > 8000) {
       setNote("That message is too long.");
       return;
     }
+    sendingRef.current = true;
     setSending(true);
     setNote(null);
     try {
@@ -193,12 +204,20 @@ export default function ThreadView({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ parts }),
       });
-      const mine = (d.messages as StoredMessage[]).find((m) => m.sender_id === myId);
+      // The POST stores one row per recipient (all with sender_id = me) —
+      // the optimistic row must be MY copy, or the poll will re-add it as
+      // a duplicate seconds later.
+      const rows = d.messages as StoredMessage[];
+      const mine =
+        rows.find((m) => m.recipient_id === myId) ?? rows.find((m) => m.sender_id === myId);
       if (mine) {
-        setMsgs((prev) => [
-          ...prev,
-          { id: mine.id, mine: true, sender_id: myId, text: optimisticText ?? payload, created_at: mine.created_at },
-        ]);
+        setMsgs((prev) => {
+          if (prev.some((m) => m.id === mine.id)) return prev;
+          return [
+            ...prev,
+            { id: mine.id, mine: true, sender_id: myId, text: optimisticText ?? payload, created_at: mine.created_at },
+          ];
+        });
         lastAtRef.current = mine.created_at;
       }
       setTimeout(
@@ -210,6 +229,7 @@ export default function ThreadView({
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not send.");
     } finally {
+      sendingRef.current = false;
       setSending(false);
     }
   };
@@ -229,7 +249,8 @@ export default function ThreadView({
 
   const sendPhoto = async (file: File) => {
     const secs = secretsRef.current;
-    if (!secs || sending || uploading) return;
+    if (!secs || secs.length === 0 || sendingRef.current || uploadingRef.current) return;
+    uploadingRef.current = true;
     setUploading(true);
     setNote(null);
     try {
@@ -250,6 +271,7 @@ export default function ThreadView({
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not send photo.");
     } finally {
+      uploadingRef.current = false;
       setUploading(false);
     }
   };
@@ -260,8 +282,8 @@ export default function ThreadView({
   const others = peer.members.filter((m) => m.user_id !== myId);
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-220px)] min-h-[420px]">
-      <div className="flex items-center gap-3 pb-3 border-b border-pine/10">
+    <div className="flex flex-col h-full min-h-0">
+      <div className="flex items-center gap-3 pb-3 border-b border-pine/10 shrink-0">
         <button
           type="button"
           onClick={onBack}
@@ -333,7 +355,7 @@ export default function ThreadView({
         </p>
       )}
 
-      <div className="flex-1 overflow-y-auto py-4 space-y-2">
+      <div className="flex-1 min-h-0 overflow-y-auto py-4 space-y-2">
         {msgs.length === 0 && secrets && (
           <p className="text-center text-pine/45 text-sm mt-8">
             No messages yet — say hey. 🔒
@@ -376,7 +398,7 @@ export default function ThreadView({
         <div ref={bottomRef} />
       </div>
 
-      <div className="flex gap-2 pt-3 border-t border-pine/10">
+      <div className="flex gap-2 pt-3 border-t border-pine/10 shrink-0">
         <input
           ref={photoInputRef}
           type="file"
@@ -406,7 +428,8 @@ export default function ThreadView({
           maxLength={2000}
           placeholder="Message…"
           disabled={!secrets}
-          className="flex-1 bg-white border border-pine/15 rounded-full px-4 py-3 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal disabled:opacity-50"
+          enterKeyHint="send"
+          className="flex-1 min-w-0 bg-white border border-pine/15 rounded-full px-4 py-3 text-base md:text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal disabled:opacity-50"
         />
         <button
           type="button"

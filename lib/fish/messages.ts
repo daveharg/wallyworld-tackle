@@ -37,6 +37,7 @@ export interface ConversationPreview {
 export interface StoredMessage {
   id: string;
   sender_id: string;
+  recipient_id: string;
   nonce: string;
   ciphertext: string;
   created_at: string;
@@ -272,7 +273,7 @@ export async function storeMessage(
     const row = await queryOne<StoredMessage>(
       `INSERT INTO fm_messages (conversation_id, sender_id, recipient_id, nonce, ciphertext)
        VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, sender_id, nonce, ciphertext, created_at`,
+       RETURNING id, sender_id, recipient_id, nonce, ciphertext, created_at`,
       [conversationId, senderId, p.recipient_id, p.nonce, p.ciphertext]
     );
     if (row) stored.push(row);

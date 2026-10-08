@@ -351,10 +351,10 @@ export default function MessagesPage() {
           )}
         </div>
 
-        {/* Thread */}
-        <div className={peer ? "" : "hidden md:block"}>
+        {/* Thread — full-screen takeover on mobile so the message box stays put */}
+        <div className={peer ? "fixed inset-0 z-50 bg-paper md:static md:z-auto md:bg-transparent" : "hidden md:block"}>
           {peer ? (
-            <div className="bg-paper-deep/50 border border-pine/10 rounded-3xl p-4 md:p-6">
+            <div className="h-[100dvh] md:h-[calc(100dvh-260px)] md:min-h-[420px] bg-paper-deep/50 md:border md:border-pine/10 md:rounded-3xl p-4 md:p-6">
               <ThreadView
                 peer={peer}
                 myId={user.id}

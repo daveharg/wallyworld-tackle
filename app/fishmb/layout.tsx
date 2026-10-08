@@ -1,7 +1,15 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { FishAuthProvider } from "./_components/FishAuth";
 import { FishChrome } from "./_components/FishChrome";
 import SWRegister from "./_components/SWRegister";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  // When the iOS/Android keyboard opens, resize the layout instead of
+  // overlaying it — keeps the chat message box pinned above the keyboard.
+  interactiveWidget: "resizes-content",
+};
 
 export const metadata: Metadata = {
   title: {

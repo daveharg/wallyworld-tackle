@@ -50,13 +50,13 @@ export default function DashboardPage() {
         Dashboard
       </h1>
 
-      <div className="flex gap-2 overflow-x-auto pb-2 mb-8 sticky top-16 z-10 bg-paper/95 backdrop-blur py-2">
+      <div className="flex gap-2 pb-2 mb-8 sticky top-16 z-10 bg-paper/95 backdrop-blur py-2">
         {TABS.map((t) => (
           <button
             key={t.id}
             type="button"
             onClick={() => setTab(t.id)}
-            className={`shrink-0 font-bold uppercase tracking-wider text-sm px-5 py-2.5 rounded-full transition-colors ${
+            className={`flex-1 md:flex-none whitespace-nowrap font-bold uppercase tracking-wider text-xs md:text-sm px-2 py-2 md:px-5 md:py-2.5 rounded-full transition-colors ${
               tab === t.id
                 ? "bg-pine text-white"
                 : "bg-pine/10 text-pine hover:bg-pine/20"
