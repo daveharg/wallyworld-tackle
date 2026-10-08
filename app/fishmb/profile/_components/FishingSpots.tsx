@@ -59,6 +59,58 @@ export default function FishingSpots() {
   const [locating, setLocating] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  // Quick-add via map long-press
+  const [quickAdd, setQuickAdd] = useState<{ lat: number; lng: number } | null>(null);
+  const [quickName, setQuickName] = useState("");
+  const [quickNotes, setQuickNotes] = useState("");
+  const [quickSaving, setQuickSaving] = useState(false);
+
+  const onMapLongPress = (lat: number, lng: number) => {
+    setManualLat(lat);
+    setManualLng(lng);
+    setPicking(false);
+    setQuickName("");
+    setQuickNotes("");
+    setQuickAdd({ lat, lng });
+  };
+
+  const saveQuickAdd = async () => {
+    if (!quickAdd || quickSaving) return;
+    setQuickSaving(true);
+    setNote(null);
+    try {
+      const d = await fishFetch("/api/fishmb/spots", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: quickName.trim() || "Fishing spot",
+          notes: quickNotes.trim() || null,
+          lat: quickAdd.lat,
+          lng: quickAdd.lng,
+        }),
+      });
+      setSpots([(d.spot as Spot), ...spots]);
+      setQuickAdd(null);
+      setQuickName("");
+      setQuickNotes("");
+      setManualLat(null);
+      setManualLng(null);
+      setNote("Spot saved!");
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Could not save the spot.");
+    } finally {
+      setQuickSaving(false);
+    }
+  };
+
+  const cancelQuickAdd = () => {
+    setQuickAdd(null);
+    setQuickName("");
+    setQuickNotes("");
+    setManualLat(null);
+    setManualLng(null);
+  };
+
   // Inline rename state
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
@@ -248,30 +300,83 @@ export default function FishingSpots() {
 
       {loading ? (
         <div className="h-64 bg-pine/10 rounded-3xl animate-pulse" />
-      ) : spots.length === 0 && !picking && manualLat === null ? (
-        <div className="bg-white border border-pine/10 rounded-3xl p-8 text-center">
-          <p className="text-4xl mb-3">📍</p>
-          <p className="text-pine/70 font-bold">No spots yet</p>
-          <p className="text-pine/50 text-sm mt-1">
-            Save one from a catch or add one below.
-          </p>
-        </div>
       ) : (
-        <SpotMap
-          spots={spots}
-          picking={picking}
-          onPick={(lat, lng) => {
-            setManualLat(lat);
-            setManualLng(lng);
-            setPicking(false);
-          }}
-          pendingPin={
-            manualLat !== null && manualLng !== null
-              ? { lat: manualLat, lng: manualLng }
-              : null
-          }
-          focus={focus}
-        />
+        <>
+          {spots.length === 0 && !picking && manualLat === null && (
+            <p className="text-center text-pine/60 text-sm mb-3">
+              📍 No spots yet — <strong>hold your finger down</strong> on the
+              map to mark your first one.
+            </p>
+          )}
+          <SpotMap
+            spots={spots}
+            picking={picking}
+            onPick={(lat, lng) => {
+              setManualLat(lat);
+              setManualLng(lng);
+              setPicking(false);
+            }}
+            onLongPress={onMapLongPress}
+            pendingPin={
+              manualLat !== null && manualLng !== null
+                ? { lat: manualLat, lng: manualLng }
+                : null
+            }
+            focus={focus}
+          />
+        </>
+      )}
+
+      {/* Quick-add popup after a map long-press */}
+      {quickAdd && (
+        <div
+          className="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center p-4 bg-pine-deep/60 backdrop-blur-sm"
+          onClick={cancelQuickAdd}
+        >
+          <div
+            className="bg-paper rounded-3xl p-6 w-full max-w-sm shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-1">
+              📍 Mark this spot
+            </h3>
+            <p className="text-pine/50 text-xs mb-4 tabular-nums">
+              {quickAdd.lat.toFixed(5)}, {quickAdd.lng.toFixed(5)}
+            </p>
+            <input
+              value={quickName}
+              onChange={(e) => setQuickName(e.target.value)}
+              maxLength={80}
+              placeholder="Spot name (e.g. North point)"
+              className={inputCls}
+              autoFocus
+            />
+            <input
+              value={quickNotes}
+              onChange={(e) => setQuickNotes(e.target.value)}
+              maxLength={500}
+              placeholder="Notes (optional)"
+              className={`${inputCls} mt-2`}
+            />
+            <div className="flex gap-2 mt-4">
+              <button
+                type="button"
+                onClick={cancelQuickAdd}
+                className="flex-1 bg-pine/10 hover:bg-pine/20 text-pine font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={saveQuickAdd}
+                disabled={quickSaving}
+                className="flex-1 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full disabled:opacity-50 transition-colors"
+              >
+                {quickSaving ? "Saving…" : "Save spot"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Favorite lakes — quick map navigation */}

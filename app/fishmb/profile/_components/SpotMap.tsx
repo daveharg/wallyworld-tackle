@@ -17,6 +17,8 @@ interface SpotMapProps {
   /** When true, clicking the map drops a pin and calls onPick. */
   picking?: boolean;
   onPick?: (lat: number, lng: number) => void;
+  /** Long-press (hold) on the map also drops a pin via onLongPress. */
+  onLongPress?: (lat: number, lng: number) => void;
   /** The in-progress manual pin (rendered distinctly). */
   pendingPin?: { lat: number; lng: number } | null;
   /** Recenter request: when the key changes, fly the map to lat/lng. */
@@ -47,11 +49,13 @@ function escapeHtml(s: string): string {
  * Personal fishing-spots map (Leaflet, dynamically imported so it never runs
  * during SSR). Same pattern as the lake map: pins, popups, fit-to-bounds.
  */
-export default function SpotMap({ spots, picking, onPick, pendingPin, focus }: SpotMapProps) {
+export default function SpotMap({ spots, picking, onPick, onLongPress, pendingPin, focus }: SpotMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<any>(null);
   const onPickRef = useRef(onPick);
   onPickRef.current = onPick;
+  const onLongPressRef = useRef(onLongPress);
+  onLongPressRef.current = onLongPress;
   const pickingRef = useRef(picking);
   pickingRef.current = picking;
 
@@ -82,6 +86,92 @@ export default function SpotMap({ spots, picking, onPick, pendingPin, focus }: S
       cancelled = true;
     };
   }, []);
+
+  // Long-press (hold) on the map drops a pin via onLongPress.
+  // Works for touch (mobile) and mouse (desktop). Moving more than a few
+  // pixels cancels, so panning the map never triggers it.
+  useEffect(() => {
+    if (!map || !containerRef.current) return;
+    let L: any = null;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    let startX = 0;
+    let startY = 0;
+    const el = containerRef.current;
+
+    import("leaflet").then((mod) => {
+      L = mod.default;
+    });
+
+    const pointToLatLng = (clientX: number, clientY: number) => {
+      if (!L) return null;
+      const rect = el.getBoundingClientRect();
+      const pt = L.point(clientX - rect.left, clientY - rect.top);
+      return map.containerPointToLatLng(pt) as { lat: number; lng: number };
+    };
+
+    const fire = (clientX: number, clientY: number) => {
+      const ll = pointToLatLng(clientX, clientY);
+      if (ll) onLongPressRef.current?.(ll.lat, ll.lng);
+    };
+
+    const cancel = () => {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+    };
+
+    const onDown = (clientX: number, clientY: number) => {
+      cancel();
+      startX = clientX;
+      startY = clientY;
+      timer = setTimeout(() => {
+        timer = null;
+        fire(clientX, clientY);
+      }, 600);
+    };
+
+    const onMove = (clientX: number, clientY: number) => {
+      if (timer && Math.hypot(clientX - startX, clientY - startY) > 12) cancel();
+    };
+
+    const ts = (e: TouchEvent) => {
+      if (e.touches.length !== 1) {
+        cancel();
+        return;
+      }
+      onDown(e.touches[0].clientX, e.touches[0].clientY);
+    };
+    const tm = (e: TouchEvent) => {
+      if (e.touches.length !== 1) {
+        cancel();
+        return;
+      }
+      onMove(e.touches[0].clientX, e.touches[0].clientY);
+    };
+    const md = (e: MouseEvent) => onDown(e.clientX, e.clientY);
+    const mm = (e: MouseEvent) => onMove(e.clientX, e.clientY);
+
+    el.addEventListener("touchstart", ts, { passive: true });
+    el.addEventListener("touchmove", tm, { passive: true });
+    el.addEventListener("touchend", cancel);
+    el.addEventListener("touchcancel", cancel);
+    el.addEventListener("mousedown", md);
+    el.addEventListener("mousemove", mm);
+    el.addEventListener("mouseup", cancel);
+    el.addEventListener("mouseleave", cancel);
+    return () => {
+      cancel();
+      el.removeEventListener("touchstart", ts);
+      el.removeEventListener("touchmove", tm);
+      el.removeEventListener("touchend", cancel);
+      el.removeEventListener("touchcancel", cancel);
+      el.removeEventListener("mousedown", md);
+      el.removeEventListener("mousemove", mm);
+      el.removeEventListener("mouseup", cancel);
+      el.removeEventListener("mouseleave", cancel);
+    };
+  }, [map ]);
 
   // Render pins when the map exists or spots change.
   const layerRef = useRef<any>(null);
@@ -150,9 +240,9 @@ export default function SpotMap({ spots, picking, onPick, pendingPin, focus }: S
       <div ref={containerRef} className="h-[300px] md:h-[380px] w-full z-0" />
       <p className="text-xs text-pine/50 px-4 py-2.5 bg-white">
         {picking
-          ? "Tap the map to drop your pin."
+          ? "Tap the map to drop your pin — or hold your finger down on any spot to mark it."
           : spots.length === 0
-            ? "No spots on the map yet."
+            ? "No spots on the map yet — hold your finger down on the map to mark one."
             : `${spots.length} spot${spots.length === 1 ? "" : "s"} — only you can see them.`}
       </p>
     </div>
