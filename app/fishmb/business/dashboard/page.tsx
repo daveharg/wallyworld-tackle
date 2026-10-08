@@ -184,12 +184,12 @@ export default function BusinessDashboardPage() {
         Dashboard
       </h1>
 
-      <div className="flex gap-2 overflow-x-auto pb-2 mb-8 -mx-4 px-4">
+      <div className="grid grid-cols-2 sm:flex gap-2 mb-8">
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
-            className={`shrink-0 px-5 py-2.5 rounded-full text-sm font-bold uppercase tracking-wider transition-colors ${
+            className={`px-5 py-3 rounded-2xl sm:rounded-full text-sm font-bold uppercase tracking-wider transition-colors text-center ${
               tab === t.id
                 ? "bg-pine text-white"
                 : "bg-paper-deep border border-pine/15 text-pine/70 hover:border-signal"
