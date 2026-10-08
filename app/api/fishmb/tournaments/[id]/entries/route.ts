@@ -89,8 +89,23 @@ export async function POST(
   if (capturedAt.getTime() > new Date(t.ends_at).getTime())
     return badRequest("This catch was made after the tournament ended.");
 
-  const photoUrl = typeof body.photo_url === "string" ? body.photo_url.trim() : "";
-  if (!photoUrl || !/^https?:\/\//.test(photoUrl)) return badRequest("A photo is required for every catch.");
+  // Photos: 1–4 per catch. The web sends photo_urls (array); the Expo app
+  // sends a lone photo_url string (back-compat). photo_url = photo_urls[0].
+  let photoUrls: string[] = [];
+  if (Array.isArray(body.photo_urls)) {
+    photoUrls = body.photo_urls
+      .filter((u): u is string => typeof u === "string")
+      .map((u) => u.trim())
+      .filter((u) => /^https?:\/\//.test(u))
+      .slice(0, 4);
+  }
+  const photoUrl =
+    photoUrls[0] ??
+    (typeof body.photo_url === "string" && /^https?:\/\//.test(body.photo_url.trim())
+      ? body.photo_url.trim()
+      : "");
+  if (!photoUrl) return badRequest("A photo is required for every catch.");
+  if (photoUrls.length === 0) photoUrls = [photoUrl];
   const species = typeof body.species === "string" ? body.species.trim().slice(0, 60) : "";
   if (!species) return badRequest("Species is required.");
   const lengthIn =
@@ -121,10 +136,10 @@ export async function POST(
 
   const entry = await queryOne(
     `INSERT INTO fm_tournament_entries
-       (tournament_id, user_id, photo_url, species, length_inches, latitude, longitude, gps_accuracy, notes, photo_hash, captured_at, time_flag, status)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+       (tournament_id, user_id, photo_url, photo_urls, species, length_inches, latitude, longitude, gps_accuracy, notes, photo_hash, captured_at, time_flag, status)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
      RETURNING *`,
-    [t.id, me.id, photoUrl, species, lengthIn, lat, lng, acc, notes, photoHash, capturedAt.toISOString(), timeFlag, t.auto_approve_entries ? "approved" : "pending"]
+    [t.id, me.id, photoUrl, JSON.stringify(photoUrls), species, lengthIn, lat, lng, acc, notes, photoHash, capturedAt.toISOString(), timeFlag, t.auto_approve_entries ? "approved" : "pending"]
   );
   return NextResponse.json({ entry }, { status: 201 });
 }

@@ -2,14 +2,16 @@
 
 import { useState } from "react";
 import { fishFetch } from "../../_components/fishFetch";
+import { compressImage } from "../../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 
 const inputCls =
   "w-full bg-white border border-pine/20 rounded-2xl px-4 py-3 text-pine focus:outline-none focus:border-signal";
 
-/** Catch submission: photo + species + length + GPS. Server stamps the time. */
+/** Catch submission: up to 4 photos + species + length + GPS. Server stamps the time. */
 export function SubmitEntry({ tournamentId, species }: { tournamentId: string; species: string[] }) {
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
   const [fishSpecies, setFishSpecies] = useState(species[0] || "");
   const [length, setLength] = useState("");
   const [notes, setNotes] = useState("");
@@ -17,9 +19,28 @@ export function SubmitEntry({ tournamentId, species }: { tournamentId: string; s
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
+  const addFiles = (picked: FileList | null) => {
+    if (!picked) return;
+    const next = [...files, ...Array.from(picked)].slice(0, 4);
+    setFiles(next);
+    setPreviews((prev) => {
+      prev.forEach((u) => URL.revokeObjectURL(u));
+      return next.map((f) => URL.createObjectURL(f));
+    });
+  };
+
+  const removeFile = (i: number) => {
+    const next = files.filter((_, j) => j !== i);
+    setFiles(next);
+    setPreviews((prev) => {
+      URL.revokeObjectURL(prev[i]);
+      return next.map((f, j) => (j < i ? prev[j] : URL.createObjectURL(f)));
+    });
+  };
+
   const submit = async () => {
     setError(null);
-    if (!file) {
+    if (files.length === 0) {
       setError("A photo of your catch is required.");
       return;
     }
@@ -29,17 +50,21 @@ export function SubmitEntry({ tournamentId, species }: { tournamentId: string; s
     }
     setBusy(true);
     try {
-      // 1. Upload the photo.
+      // 1. Upload the photos (compressed), one at a time.
       const token = localStorage.getItem(FISHMB_TOKEN_KEY);
-      const form = new FormData();
-      form.append("file", file);
-      const upRes = await fetch("/api/fish/photos/upload", {
-        method: "POST",
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-        body: form,
-      });
-      const up = await upRes.json();
-      if (!upRes.ok) throw new Error(up.error || "Photo upload failed.");
+      const photoUrls: string[] = [];
+      for (const file of files) {
+        const form = new FormData();
+        form.append("file", await compressImage(file));
+        const upRes = await fetch("/api/fish/photos/upload", {
+          method: "POST",
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          body: form,
+        });
+        const up = await upRes.json();
+        if (!upRes.ok) throw new Error(up.error || "Photo upload failed.");
+        photoUrls.push(up.url as string);
+      }
 
       // 2. Grab a GPS fix (best effort — the organizer sees it).
       let lat: number | null = null;
@@ -61,7 +86,7 @@ export function SubmitEntry({ tournamentId, species }: { tournamentId: string; s
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          photo_url: up.url,
+          photo_urls: photoUrls,
           species: fishSpecies.trim(),
           length_inches: length ? parseFloat(length) : null,
           latitude: lat,
@@ -93,13 +118,42 @@ export function SubmitEntry({ tournamentId, species }: { tournamentId: string; s
     <div className="bg-white border border-pine/15 rounded-3xl p-6 space-y-4">
       <h3 className="font-display font-bold uppercase text-pine text-lg tracking-wide">Log a catch</h3>
       <div>
-        <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/60 mb-1.5">Photo *</label>
+        <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/60 mb-1.5">
+          Photos * <span className="normal-case font-normal">(up to 4)</span>
+        </label>
         <input
           type="file"
-          accept="image/jpeg,image/png,image/webp"
-          onChange={(e) => setFile(e.target.files?.[0] || null)}
+          accept="image/*"
+          multiple
+          onChange={(e) => {
+            addFiles(e.target.files);
+            e.target.value = "";
+          }}
           className="text-sm text-pine/70"
         />
+        {previews.length > 0 && (
+          <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
+            {previews.map((src, i) => (
+              <div key={i} className="relative shrink-0 w-20 h-20 rounded-xl overflow-hidden border border-pine/20">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={src} alt={`Catch photo ${i + 1}`} className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => removeFile(i)}
+                  aria-label={`Remove photo ${i + 1}`}
+                  className="absolute top-1 right-1 w-6 h-6 rounded-full bg-pine-deep/80 text-white text-xs font-bold leading-none"
+                >
+                  ✕
+                </button>
+                {i === 0 && (
+                  <span className="absolute bottom-1 left-1 bg-gold text-pine-deep text-[10px] font-bold px-1.5 py-0.5 rounded">
+                    Main
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       <div>
         <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/60 mb-1.5">Species *</label>

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useFishAuth } from "../../../_components/FishAuth";
 import { fishFetch, formatDateTime } from "../../../_components/fishFetch";
+import { compressImage } from "../../../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 import { CatchMap } from "../../_components/CatchMap";
 import { PayoutEditor } from "../../_components/PayoutEditor";
@@ -13,6 +14,7 @@ interface Entry {
   id: string;
   user_name: string;
   photo_url: string;
+  photo_urls: string[] | null;
   species: string;
   length_inches: number | null;
   latitude: number | null;
@@ -185,7 +187,7 @@ function EditTournament({ tournament, onSaved }: { tournament: Detail["tournamen
     try {
       const token = localStorage.getItem(FISHMB_TOKEN_KEY);
       const form = new FormData();
-      form.append("file", file);
+      form.append("file", await compressImage(file));
       const upRes = await fetch("/api/fish/photos/upload", {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -549,10 +551,25 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
         <div className="grid md:grid-cols-2 gap-4 mb-10">
           {pending.map((e) => (
             <div key={e.id} className="bg-white border border-gold/50 rounded-3xl overflow-hidden">
-              <div className="aspect-video bg-pine-deep/10">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={e.photo_url} alt={`${e.species} by ${e.user_name}`} className="w-full h-full object-cover" />
-              </div>
+              {(() => {
+                const photos = e.photo_urls && e.photo_urls.length > 0 ? e.photo_urls : [e.photo_url];
+                return (
+                  <div className="flex gap-2 overflow-x-auto bg-pine-deep/10 p-2 snap-x">
+                    {photos.map((src, i) => (
+                      <a
+                        key={i}
+                        href={src}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="snap-start shrink-0 w-40 aspect-video rounded-xl overflow-hidden bg-pine-deep/10"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={src} alt={`${e.species} by ${e.user_name} — photo ${i + 1}`} className="w-full h-full object-cover" />
+                      </a>
+                    ))}
+                  </div>
+                );
+              })()}
               <div className="p-5">
                 <p className="font-bold text-pine">{e.species}{e.length_inches ? ` · ${Number(e.length_inches).toFixed(1)}"` : ""}</p>
                 <p className="text-pine/55 text-xs mt-1">{e.user_name}</p>

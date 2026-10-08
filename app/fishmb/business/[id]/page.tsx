@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useFishAuth } from "../../_components/FishAuth";
 import { fishFetch } from "../../_components/fishFetch";
+import { compressImage } from "../../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 
 interface Biz {
@@ -58,7 +59,7 @@ export default function BusinessPage({ params }: { params: { id: string } }) {
     const urls: string[] = [];
     for (const f of newFiles) {
       const fd = new FormData();
-      fd.append("file", f);
+      fd.append("file", await compressImage(f));
       const res = await fetch("/api/fish/photos/upload", {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : {},

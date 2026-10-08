@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
+import { compressImage } from "../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 import { RENTAL_CATS, type RentalCatKey } from "./_meta";
 
@@ -178,7 +179,7 @@ function NewRentalForm({
     const urls: string[] = [];
     for (const f of files.slice(0, 8)) {
       const form = new FormData();
-      form.append("file", f);
+      form.append("file", await compressImage(f));
       const res = await fetch("/api/fish/photos/upload", {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : {},

@@ -7,6 +7,7 @@ import { formatDateTime } from "../../_components/formatDate";
 interface Entry {
   id: string;
   photo_url: string;
+  photo_urls: string[] | null;
   species: string;
   length_inches: number | null;
   user_name: string;
@@ -59,6 +60,11 @@ export function CatchesGrid({ tournamentId }: { tournamentId: string }) {
             {e.status === "pending" && (
               <span className="absolute top-2 left-2 bg-gold text-pine text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full">
                 Waiting for review
+              </span>
+            )}
+            {(e.photo_urls?.length ?? 0) > 1 && (
+              <span className="absolute bottom-2 right-2 bg-pine-deep/80 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
+                ＋{e.photo_urls!.length - 1} photo{e.photo_urls!.length - 1 > 1 ? "s" : ""}
               </span>
             )}
           </div>

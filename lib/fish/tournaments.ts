@@ -59,6 +59,7 @@ export interface TournamentEntry {
   user_name: string;
   avatar_url: string | null;
   photo_url: string;
+  photo_urls: string[];
   species: string;
   length_inches: number | null;
   latitude: number | null;
@@ -121,6 +122,9 @@ export async function ensureTournamentTables(): Promise<void> {
   // Offline app support: the phone's capture timestamp + any clock-tamper flag.
   await query(`ALTER TABLE fm_tournament_entries ADD COLUMN IF NOT EXISTS captured_at timestamptz`);
   await query(`ALTER TABLE fm_tournament_entries ADD COLUMN IF NOT EXISTS time_flag text`);
+  // Multi-photo catches: primary photo stays in photo_url; all photos (1-4) in photo_urls.
+  await query(`ALTER TABLE fm_tournament_entries ADD COLUMN IF NOT EXISTS photo_urls jsonb NOT NULL DEFAULT '[]'`);
+  await query(`UPDATE fm_tournament_entries SET photo_urls = jsonb_build_array(photo_url) WHERE photo_urls = '[]' OR jsonb_array_length(photo_urls) = 0`);
   // Money: entry fee in cents + payout structure (JSON array of {place,type:'percent'|'amount',value}).
   await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS entry_fee_cents int NOT NULL DEFAULT 0`);
   await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS payouts jsonb NOT NULL DEFAULT '[]'`);

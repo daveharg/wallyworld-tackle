@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFishAuth } from "../../_components/FishAuth";
 import { fishFetch } from "../../_components/fishFetch";
+import { compressImage } from "../../_components/compressImage";
 import { PayoutEditor } from "./PayoutEditor";
 import { RULE_TEMPLATES } from "./ruleTemplates";
 import type { PayoutTier } from "@/lib/fish/tournaments";
@@ -59,7 +60,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
     try {
       const token = localStorage.getItem(FISHMB_TOKEN_KEY);
       const form = new FormData();
-      form.append("file", file);
+      form.append("file", await compressImage(file));
       const upRes = await fetch("/api/fish/photos/upload", {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : {},

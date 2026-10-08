@@ -6,6 +6,7 @@
 import { useState } from "react";
 import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
+import { compressImage } from "../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 
 const SLOTS = [
@@ -45,7 +46,7 @@ export default function AdvertisePage() {
     try {
       const token = localStorage.getItem(FISHMB_TOKEN_KEY);
       const fd = new FormData();
-      fd.append("file", file);
+      fd.append("file", await compressImage(file));
       const upRes = await fetch("/api/fish/photos/upload", {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
