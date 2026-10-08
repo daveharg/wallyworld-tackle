@@ -103,6 +103,9 @@ export default function SpotMap({
 
   // Trail recording state.
   const [recording, setRecording] = useState(false);
+  // Follow mode: while recording, the map pans to keep your marker in view.
+  // Dragging the map manually pauses following (◎ button resumes it).
+  const [following, setFollowing] = useState(false);
   const [trailPts, setTrailPts] = useState<TrailPoint[]>([]);
   const [trailStart, setTrailStart] = useState<number | null>(null);
   const [trailElapsed, setTrailElapsed] = useState(0);
@@ -402,10 +405,18 @@ export default function SpotMap({
     setTrailStart(Date.now());
     setTrailNote(null);
     setRecording(true);
+    setFollowing(true);
+    // Jump the map to you so you can watch the trail draw as you move.
+    if (myLoc && map) {
+      map.flyTo([myLoc.lat, myLoc.lng], Math.max(map.getZoom(), 15), { duration: 0.8 });
+    } else {
+      setTrailNote("Waiting for GPS signal…");
+    }
   };
 
   const stopRecording = () => {
     setRecording(false);
+    setFollowing(false);
     setTrailPts((prev) => {
       if (prev.length >= 2) {
         setTrailName(defaultTrailName());
@@ -417,10 +428,34 @@ export default function SpotMap({
 
   const cancelRecording = () => {
     setRecording(false);
+    setFollowing(false);
     setTrailPts([]);
     setShowSave(false);
     setTrailNote(null);
   };
+
+  // Follow mode: keep your marker centered while recording.
+  useEffect(() => {
+    if (!map || !recording || !following || !myLoc) return;
+    map.panTo([myLoc.lat, myLoc.lng], { animate: true });
+  }, [map, recording, following, myLoc]);
+
+  // A manual drag pauses follow mode; the ◎ button resumes it.
+  useEffect(() => {
+    if (!map) return;
+    const onDrag = () => setFollowing(false);
+    map.on("dragstart", onDrag);
+    return () => {
+      map.off("dragstart", onDrag);
+    };
+  }, [map]);
+
+  // Clear the "waiting for GPS" note once the first fix arrives.
+  useEffect(() => {
+    if (recording && myLoc) {
+      setTrailNote((n) => (n === "Waiting for GPS signal…" ? null : n));
+    }
+  }, [recording, myLoc]);
 
   const saveTrail = async () => {
     if (trailPts.length < 2 || savingTrail) return;
@@ -613,6 +648,24 @@ export default function SpotMap({
         <div className="absolute bottom-9 right-3 z-[600] bg-pine-deep/90 text-white text-xs font-bold rounded-full px-3.5 py-2 shadow-lg tabular-nums">
           🚤 {speedKmh.toFixed(0)} km/h
         </div>
+      )}
+
+      {/* Recenter: resumes follow mode after a manual drag while recording */}
+      {recording && !following && (
+        <button
+          type="button"
+          onClick={() => {
+            setFollowing(true);
+            if (myLoc && map) {
+              map.flyTo([myLoc.lat, myLoc.lng], Math.max(map.getZoom(), 15), { duration: 0.8 });
+            }
+          }}
+          aria-label="Follow my location"
+          title="Follow my location"
+          className="absolute bottom-24 right-3 z-[600] w-11 h-11 rounded-full bg-white/95 border border-pine/15 shadow-lg text-pine text-xl flex items-center justify-center"
+        >
+          ◎
+        </button>
       )}
 
       {/* Map toolbar: record trail + measure — lifted above the attribution */}
