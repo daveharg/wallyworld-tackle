@@ -50,42 +50,38 @@ export default function RentalsPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
-      <div className="flex flex-wrap items-start justify-between gap-4 mb-2">
-        <div>
-          <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide">
-            Rentals
-          </h1>
-          <p className="text-pine/60 text-sm mt-1 max-w-xl">
-            Rent an ice shack, a tent, gear, or a personal guide — straight from
-            the people who own them. Booking requests are free; the owner calls
-            you to make the deal.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {user && (
-            <Link
-              href="/fishmb/rentals/bookings"
-              className="inline-flex items-center bg-paper-deep border border-pine/15 hover:border-signal text-pine text-sm font-bold uppercase tracking-wider px-5 py-3 rounded-full transition-colors"
-            >
-              📅 My bookings
-            </Link>
-          )}
-          <button
-            onClick={() => (user ? setShowForm(true) : openLogin())}
-            className="inline-flex items-center bg-signal hover:bg-signal-dark text-white text-sm font-bold uppercase tracking-wider px-5 py-3 rounded-full transition-colors"
+      <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide">
+        Rentals
+      </h1>
+      <p className="text-pine/60 text-sm mt-1 max-w-xl">
+        Rent an ice shack, a tent, gear, or a personal guide — straight from
+        the people who own them. Booking requests are free; the owner calls
+        you to make the deal.
+      </p>
+      <div className="flex flex-col sm:flex-row gap-2 mt-4 mb-2">
+        <button
+          onClick={() => (user ? setShowForm(true) : openLogin())}
+          className="inline-flex items-center justify-center bg-signal hover:bg-signal-dark text-white text-sm font-bold uppercase tracking-wider px-5 py-3.5 rounded-full transition-colors"
+        >
+          + List your rental
+        </button>
+        {user && (
+          <Link
+            href="/fishmb/rentals/bookings"
+            className="inline-flex items-center justify-center bg-paper-deep border border-pine/15 hover:border-signal text-pine text-sm font-bold uppercase tracking-wider px-5 py-3.5 rounded-full transition-colors"
           >
-            + List your rental
-          </button>
-        </div>
+            📅 My bookings
+          </Link>
+        )}
       </div>
 
-      {/* Category tabs */}
-      <div className="flex gap-2 overflow-x-auto py-4 -mx-4 px-4">
+      {/* Category tabs — 2x2 grid on mobile, row on desktop */}
+      <div className="grid grid-cols-2 md:flex gap-2 py-4">
         {RENTAL_CATS.map((c) => (
           <button
             key={c.key}
             onClick={() => setCat(c.key)}
-            className={`shrink-0 px-5 py-2.5 rounded-full text-sm font-bold uppercase tracking-wider transition-colors ${
+            className={`px-5 py-3 md:py-2.5 rounded-2xl md:rounded-full text-sm font-bold uppercase tracking-wider transition-colors text-center ${
               cat === c.key
                 ? "bg-pine text-white"
                 : "bg-paper-deep border border-pine/15 text-pine/70 hover:border-signal"
@@ -108,17 +104,23 @@ export default function RentalsPage() {
           <p className="text-pine/70 font-bold">
             No {RENTAL_CATS.find((c) => c.key === cat)?.label.toLowerCase()} listed yet.
           </p>
-          <p className="text-pine/50 text-sm mt-1">Be the first — list yours for free.</p>
+          <p className="text-pine/50 text-sm mt-1 mb-5">Be the first — list yours for free.</p>
+          <button
+            onClick={() => (user ? setShowForm(true) : openLogin())}
+            className="inline-flex items-center justify-center bg-signal hover:bg-signal-dark text-white text-sm font-bold uppercase tracking-wider px-8 py-3.5 rounded-full transition-colors"
+          >
+            + List your rental
+          </button>
         </div>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {items.map((r) => (
             <Link
               key={r.id}
               href={`/fishmb/rentals/${r.id}`}
-              className="bg-white border border-pine/10 rounded-3xl overflow-hidden hover:border-signal/50 transition-colors"
+              className="bg-white border border-pine/10 rounded-3xl overflow-hidden hover:border-signal/50 transition-colors flex sm:block"
             >
-              <div className="aspect-video bg-paper-deep relative">
+              <div className="w-32 sm:w-full shrink-0 aspect-square sm:aspect-video bg-paper-deep relative">
                 {r.photos[0] ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={r.photos[0]} alt={r.title} className="w-full h-full object-cover" />
@@ -128,14 +130,14 @@ export default function RentalsPage() {
                   </div>
                 )}
               </div>
-              <div className="p-5">
-                <p className="font-bold text-pine text-lg leading-snug line-clamp-1">{r.title}</p>
+              <div className="p-4 sm:p-5 flex-1 min-w-0">
+                <p className="font-bold text-pine leading-snug line-clamp-2">{r.title}</p>
                 {r.price_text && (
                   <p className="text-signal font-bold text-sm mt-1">{r.price_text}</p>
                 )}
-                <div className="flex items-center justify-between mt-3 text-xs text-pine/50">
+                <div className="flex items-center justify-between gap-2 mt-2 text-xs text-pine/50">
                   <span className="truncate">{r.location ?? "Manitoba"}</span>
-                  <span className="shrink-0 ml-2">by {r.owner_name}</span>
+                  <span className="shrink-0">by {r.owner_name}</span>
                 </div>
               </div>
             </Link>
