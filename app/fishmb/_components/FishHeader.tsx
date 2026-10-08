@@ -112,6 +112,13 @@ export default function FishHeader() {
               >
                 Friends
               </Link>
+              <Link
+                href="/fishmb/messages"
+                onClick={() => setOpen(false)}
+                className="py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70"
+              >
+                💬 Messages
+              </Link>
               <button
                 onClick={() => {
                   logout();

@@ -100,6 +100,7 @@ export interface GetFeedOptions {
   viewerId?: string | null;
   q?: string | null;
   kind?: "all" | "catch" | "post";
+  friendsOnly?: boolean;
   cursor?: FeedCursor | null;
 }
 
@@ -109,17 +110,25 @@ export interface FeedPage {
 }
 
 export async function getFeed(opts: GetFeedOptions = {}): Promise<FeedPage> {
-  const { limit = 30, viewerId = null, q = null, kind = "all", cursor = null } = opts;
+  const { limit = 30, viewerId = null, q = null, kind = "all", friendsOnly = false, cursor = null } = opts;
   await ensureFeedColumns();
   const search = q && q.trim() ? q.trim() : null;
   const params: unknown[] = [viewerId];
   let where = "";
+  if (friendsOnly) {
+    where = `WHERE ($1::uuid IS NOT NULL AND (feed.user_id = $1::uuid OR EXISTS (
+       SELECT 1 FROM fm_friendships f
+       WHERE f.status = 'accepted'
+         AND ((f.requester_id = $1::uuid AND f.addressee_id = feed.user_id)
+           OR (f.requester_id = feed.user_id AND f.addressee_id = $1::uuid)))))`;
+  }
   if (search) {
     params.push(likePattern(search));
     const p = `$${params.length}`;
-    where = `WHERE (feed.body ILIKE ${p} ESCAPE '\\'
+    const clause = `(feed.body ILIKE ${p} ESCAPE '\\'
                  OR feed.species ILIKE ${p} ESCAPE '\\'
                  OR feed.user_name ILIKE ${p} ESCAPE '\\')`;
+    where = where ? `${where} AND ${clause}` : `WHERE ${clause}`;
   }
   if (cursor) {
     params.push(cursor.before, cursor.beforeId);

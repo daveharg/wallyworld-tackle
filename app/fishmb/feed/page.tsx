@@ -286,6 +286,7 @@ export default function FeedPage() {
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [tab, setTab] = useState<"all" | "catch" | "post">("all");
+  const [friendsOnly, setFriendsOnly] = useState(false);
   const [composerOpen, setComposerOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [q, setQ] = useState("");
@@ -309,6 +310,7 @@ export default function FeedPage() {
   const PAGE_SIZE = 20;
   // Refs mirror state so the IntersectionObserver callback never goes stale.
   const tabRef = useRef(tab);
+  const friendsOnlyRef = useRef(friendsOnly);
   const activeQRef = useRef(activeQ);
   const itemsRef = useRef<FeedItem[]>([]);
   const nextCursorRef = useRef<string | null>(null);
@@ -316,6 +318,7 @@ export default function FeedPage() {
   const loadingMoreRef = useRef(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => { tabRef.current = tab; }, [tab]);
+  useEffect(() => { friendsOnlyRef.current = friendsOnly; }, [friendsOnly]);
   useEffect(() => { activeQRef.current = activeQ; }, [activeQ]);
   useEffect(() => { itemsRef.current = items; }, [items]);
 
@@ -327,11 +330,12 @@ export default function FeedPage() {
     hasMoreRef.current = !!d.hasMore;
   }, []);
 
-  const load = useCallback(async (query?: string, tabValue: "all" | "catch" | "post" = "all") => {
+  const load = useCallback(async (query?: string, tabValue: "all" | "catch" | "post" = "all", friends = friendsOnlyRef.current) => {
     setLoading(true);
     try {
       const params = new URLSearchParams({ limit: String(PAGE_SIZE), kind: tabValue });
       if (query && query.trim()) params.set("q", query.trim());
+      if (friends) params.set("friends", "1");
       const d = await fishFetch(`/api/fishmb/feed?${params.toString()}`);
       applyPage(d);
     } catch {
@@ -352,6 +356,7 @@ export default function FeedPage() {
         cursor: nextCursorRef.current,
       });
       if (activeQRef.current) params.set("q", activeQRef.current);
+      if (friendsOnlyRef.current) params.set("friends", "1");
       const d = await fishFetch(`/api/fishmb/feed?${params.toString()}`);
       const seen = new Set(itemsRef.current.map((i) => i.id));
       const fresh = ((d.items ?? []) as FeedItem[]).filter((i) => !seen.has(i.id));
@@ -387,6 +392,19 @@ export default function FeedPage() {
       setMode("post");
       setComposerOpen(true);
     }
+    // Deep links from the bottom bar: ?kind=catch (Catches), ?friends=1 (Buddies).
+    const kindParam = params.get("kind");
+    if (kindParam === "catch") {
+      tabRef.current = "catch";
+      setTab("catch");
+    }
+    if (params.get("friends") === "1") {
+      friendsOnlyRef.current = true;
+      setFriendsOnly(true);
+    }
+    if (kindParam === "catch" || params.get("friends") === "1") {
+      load(undefined, kindParam === "catch" ? "catch" : "all", params.get("friends") === "1");
+    }
   }, [user]);
 
   useEffect(() => {
@@ -405,8 +423,19 @@ export default function FeedPage() {
   const selectTab = (v: "all" | "catch" | "post") => {
     setTab(v);
     tabRef.current = v;
+    setFriendsOnly(false);
+    friendsOnlyRef.current = false;
     window.scrollTo({ top: 0, behavior: "smooth" });
-    load(activeQRef.current || undefined, v);
+    load(activeQRef.current || undefined, v, false);
+  };
+
+  const selectBuddies = () => {
+    setTab("all");
+    tabRef.current = "all";
+    setFriendsOnly(true);
+    friendsOnlyRef.current = true;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    load(activeQRef.current || undefined, "all", true);
   };
 
   const [feedAds, setFeedAds] = useState<
@@ -427,7 +456,9 @@ export default function FeedPage() {
     // Bottom-bar search always spans every post type, not just the current tab.
     setTab("all");
     tabRef.current = "all";
-    load(trimmed || undefined, "all");
+    setFriendsOnly(false);
+    friendsOnlyRef.current = false;
+    load(trimmed || undefined, "all", false);
   };
 
   const clearSearch = () => {
@@ -606,6 +637,22 @@ export default function FeedPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 pt-4 md:pt-6 pb-32">
+      {/* Feed section header — the bottom bar switches sections */}
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-xl font-black text-pine tracking-tight">
+          {friendsOnly ? "👥 Buddies" : tab === "catch" ? "🐟 Catches" : "🌊 Community"}
+        </h1>
+        <button
+          onClick={() => setSearchOpen(true)}
+          aria-label="Search the feed"
+          className="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-pine/10 text-pine/60 hover:text-pine shadow-sm"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <circle cx="11" cy="11" r="7" />
+            <path d="m20 20-3.5-3.5" />
+          </svg>
+        </button>
+      </div>
 
 
 
@@ -978,69 +1025,7 @@ export default function FeedPage() {
         </div>
       )}
 
-      {/* Floating bottom bar — white pill, icons only */}
-      <nav
-        aria-label="Feed sections"
-        className="fixed z-40 left-1/2 -translate-x-1/2"
-        style={{ bottom: "calc(0.9rem + env(safe-area-inset-bottom))" }}
-      >
-        <div className="flex items-center gap-1 bg-white/95 backdrop-blur rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.18)] border border-black/5 px-3 py-2">
-          {(
-            [
-              ["all", "Home", "M4 11.5 12 4l8 7.5M6.5 10v9.5h11V10"],
-              ["catch", "Fish", "M6.5 12c2.5-3.5 6-5.5 10-5.5 0 0-1.5 2.5-1.5 5.5S16.5 17.5 16.5 17.5c-4 0-7.5-2-10-5.5ZM6.5 12 3.5 9.5v5L6.5 12Zm13 0h.01"],
-              ["post", "Posts", "M4 6.5h16v10H9l-5 4v-4H4v-10Z"],
-            ] as const
-          ).map(([v, label, d]) => (
-            <button
-              key={v}
-              onClick={() => selectTab(v)}
-              aria-label={label}
-              className={`w-12 h-12 flex items-center justify-center rounded-full transition-colors ${
-                tab === v ? "bg-pine/10 text-pine" : "text-pine/45 hover:text-pine"
-              }`}
-            >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d={d} />
-              </svg>
-            </button>
-          ))}
-          <button
-            onClick={() => setSearchOpen(true)}
-            aria-label="Search the feed"
-            className="w-12 h-12 flex items-center justify-center rounded-full text-pine/45 hover:text-pine transition-colors"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <circle cx="11" cy="11" r="7" />
-              <path d="m20 20-3.5-3.5" />
-            </svg>
-          </button>
-          <Link
-            href="/fishmb/profile"
-            aria-label="Profile"
-            className="relative w-12 h-12 flex items-center justify-center rounded-full text-pine/45 hover:text-pine transition-colors"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <circle cx="12" cy="8" r="4" />
-              <path d="M4.5 20.5c1.5-3.5 4.5-5 7.5-5s6 1.5 7.5 5" />
-            </svg>
-            {!user && <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-signal rounded-full" />}
-          </Link>
-        </div>
-      </nav>
 
-      {/* Floating post button — opens the composer (or login when signed out) */}
-      <button
-        onClick={() => (user ? setComposerOpen(true) : openLogin())}
-        aria-label="Create a post"
-        title="Create a post"
-        className="fixed z-40 right-4 md:right-8 w-14 h-14 rounded-full bg-signal hover:bg-signal-dark text-white shadow-[0_8px_30px_rgba(0,0,0,0.25)] flex items-center justify-center transition-colors"
-        style={{ bottom: "calc(5.5rem + env(safe-area-inset-bottom))" }}
-      >
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-          <path d="M12 5v14M5 12h14" />
-        </svg>
-      </button>
     </div>
   );
 }

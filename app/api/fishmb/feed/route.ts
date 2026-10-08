@@ -14,6 +14,7 @@ export async function GET(req: NextRequest) {
   const kind: "all" | "catch" | "post" =
     kindParam === "catch" || kindParam === "post" ? kindParam : "all";
   const q = (searchParams.get("q") || "").trim().slice(0, 80) || null;
+  const friendsOnly = searchParams.get("friends") === "1";
   const cursor = decodeCursor(searchParams.get("cursor"));
   let viewerId: string | null = null;
   try {
@@ -22,7 +23,7 @@ export async function GET(req: NextRequest) {
   } catch {
     // guests see public items only
   }
-  const { items, hasMore } = await getFeed({ limit, viewerId, q, kind, cursor });
+  const { items, hasMore } = await getFeed({ limit, viewerId, q, kind, friendsOnly, cursor });
   return NextResponse.json({
     items,
     hasMore,
