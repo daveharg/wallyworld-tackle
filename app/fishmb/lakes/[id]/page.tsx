@@ -215,30 +215,55 @@ export default function LakeDetailPage({ params }: { params: { id: string } }) {
             )}
 
             {zone ? (
-              <div className="overflow-x-auto -mx-2 px-2">
-                <table className="w-full text-sm min-w-[560px]">
-                  <thead>
-                    <tr className="text-left text-[11px] uppercase tracking-[0.16em] text-pine/45 border-b-2 border-pine/15">
-                      <th className="py-2.5 pr-4 font-bold">Species</th>
-                      <th className="py-2.5 pr-4 font-bold">Possession limit</th>
-                      <th className="py-2.5 pr-4 font-bold">Size restriction</th>
-                      <th className="py-2.5 font-bold">Season</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {zone.limits.map((lim, i) => (
-                      <tr key={i} className="border-b border-pine/8 align-top">
-                        <td className="py-3 pr-4 font-bold text-pine">{lim.species}</td>
-                        <td className="py-3 pr-4 text-pine/75">{lim.limit}</td>
-                        <td className="py-3 pr-4 text-pine/75">{lim.size}</td>
-                        <td className="py-3 text-pine/75 text-[13px] leading-relaxed">
-                          {lim.season}
-                        </td>
+              <>
+                {/* Desktop: full table */}
+                <div className="overflow-x-auto -mx-2 px-2 hidden md:block">
+                  <table className="w-full text-sm min-w-[560px]">
+                    <thead>
+                      <tr className="text-left text-[11px] uppercase tracking-[0.16em] text-pine/45 border-b-2 border-pine/15">
+                        <th className="py-2.5 pr-4 font-bold">Species</th>
+                        <th className="py-2.5 pr-4 font-bold">Possession limit</th>
+                        <th className="py-2.5 pr-4 font-bold">Size restriction</th>
+                        <th className="py-2.5 font-bold">Season</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {zone.limits.map((lim, i) => (
+                        <tr key={i} className="border-b border-pine/8 align-top">
+                          <td className="py-3 pr-4 font-bold text-pine">{lim.species}</td>
+                          <td className="py-3 pr-4 text-pine/75">{lim.limit}</td>
+                          <td className="py-3 pr-4 text-pine/75">{lim.size}</td>
+                          <td className="py-3 text-pine/75 text-[13px] leading-relaxed">
+                            {lim.season}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {/* Mobile: stacked cards, no sideways scrolling */}
+                <div className="md:hidden space-y-3">
+                  {zone.limits.map((lim, i) => (
+                    <div key={i} className="bg-paper-deep rounded-2xl p-4 border border-pine/10">
+                      <p className="font-display font-bold uppercase text-pine tracking-wide mb-2">{lim.species}</p>
+                      <dl className="text-sm space-y-1.5">
+                        <div className="flex justify-between gap-3">
+                          <dt className="text-pine/50 text-xs uppercase tracking-wider font-bold">Limit</dt>
+                          <dd className="text-pine font-bold text-right">{lim.limit}</dd>
+                        </div>
+                        <div className="flex justify-between gap-3">
+                          <dt className="text-pine/50 text-xs uppercase tracking-wider font-bold">Size</dt>
+                          <dd className="text-pine/75 text-right">{lim.size}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-pine/50 text-xs uppercase tracking-wider font-bold mb-0.5">Season</dt>
+                          <dd className="text-pine/75 text-[13px] leading-relaxed">{lim.season}</dd>
+                        </div>
+                      </dl>
+                    </div>
+                  ))}
+                </div>
+              </>
             ) : (
               <p className="text-sm text-pine/60">
                 Division limits table not available for this lake — check the{" "}
