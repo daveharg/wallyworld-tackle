@@ -244,6 +244,15 @@ export async function listPublicTournaments(): Promise<Tournament[]> {
   );
 }
 
+/** Tournaments organized by one user, newest first. */
+export async function getMyTournaments(userId: string): Promise<Tournament[]> {
+  await ensureTournamentTables();
+  return query<Tournament>(
+    `${TOURNAMENT_SELECT} WHERE t.organizer_id = $1 ORDER BY t.starts_at DESC`,
+    [userId]
+  );
+}
+
 export async function isParticipant(tournamentId: string, userId: string): Promise<boolean> {
   const row = await queryOne(
     `SELECT 1 FROM fm_tournament_participants WHERE tournament_id = $1 AND user_id = $2`,

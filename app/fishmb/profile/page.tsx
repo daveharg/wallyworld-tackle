@@ -3,6 +3,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
 import { compressImage } from "../_components/compressImage";
@@ -173,5 +174,27 @@ export default function ProfilePage() {
     );
   }
 
-  return <ProfileView userId={user.id} editor={<EditPanel />} />;
+  const isBusiness = (user as { account_type?: string }).account_type === "business";
+
+  return (
+    <>
+      {isBusiness && (
+        <div className="max-w-3xl mx-auto px-4 pt-10">
+          <Link
+            href="/fishmb/business/dashboard"
+            className="flex items-center justify-between gap-4 bg-pine hover:bg-pine-deep text-white rounded-3xl p-5 transition-colors"
+          >
+            <div>
+              <p className="font-display font-bold uppercase text-xl tracking-wide">💼 Business dashboard</p>
+              <p className="text-white/70 text-sm mt-1">
+                Rentals, booking requests, tournaments, business page & ads — all in one place.
+              </p>
+            </div>
+            <span className="text-2xl shrink-0">→</span>
+          </Link>
+        </div>
+      )}
+      <ProfileView userId={user.id} editor={<EditPanel />} />
+    </>
+  );
 }

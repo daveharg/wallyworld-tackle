@@ -143,3 +143,15 @@ export async function getActiveAds(slot: "feed" | "homepage_banner", limit = 10)
     [slot, limit]
   );
 }
+
+/** Ads submitted by one user (any status), newest first. */
+export async function getMyAds(userId: string): Promise<Ad[]> {
+  await ensureBusinessTables();
+  return query<Ad>(
+    `SELECT a.*, b.name AS business_name FROM fm_ads a
+     LEFT JOIN fm_businesses b ON b.id = a.business_id
+     WHERE a.user_id = $1
+     ORDER BY a.created_at DESC LIMIT 50`,
+    [userId]
+  );
+}
