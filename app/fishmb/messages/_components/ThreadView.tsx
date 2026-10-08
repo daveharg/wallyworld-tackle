@@ -41,6 +41,17 @@ function timeAgo(iso: string): string {
   return `${Math.floor(s / 86400)}d`;
 }
 
+/** Photo payloads are JSON { t: "photo", url } inside the encrypted text. */
+function photoUrl(text: string | null): string | null {
+  if (!text || !text.startsWith("{")) return null;
+  try {
+    const o = JSON.parse(text);
+    return o && o.t === "photo" && typeof o.url === "string" ? o.url : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function ThreadView({
   peer,
   myId,
@@ -96,26 +107,27 @@ export default function ThreadView({
     };
   }, [peer.id, keypair]);
 
-  const myShared = (s: { user_id: string; shared: Uint8Array }[]): Uint8Array | null =>
-    s.find((x) => x.user_id === myId)?.shared ?? null;
-
-  const decryptAll = (rows: StoredMessage[], s: Uint8Array): Decrypted[] =>
-    rows.map((m) => ({
-      id: m.id,
-      mine: m.sender_id === myId,
-      sender_id: m.sender_id,
-      text: decryptText(m.nonce, m.ciphertext, s),
-      created_at: m.created_at,
-    }));
+  // Each message copy was encrypted by its sender for us, so it must be
+  // decrypted with the shared secret for THAT sender (their public key x
+  // our secret key) — not our own.
+  const decryptAll = (rows: StoredMessage[]): Decrypted[] =>
+    rows.map((m) => {
+      const sec =
+        secretsRef.current?.find((x) => x.user_id === m.sender_id)?.shared ?? null;
+      return {
+        id: m.id,
+        mine: m.sender_id === myId,
+        sender_id: m.sender_id,
+        text: sec ? decryptText(m.nonce, m.ciphertext, sec) : null,
+        created_at: m.created_at,
+      };
+    });
 
   // Initial load + polling. My rows only — each member reads their own copy.
   useEffect(() => {
     if (!secrets) return;
     let live = true;
     let timer: ReturnType<typeof setInterval>;
-    const mine = myShared(secrets);
-    if (!mine) return;
-    const s = mine;
     const load = async (after?: string) => {
       try {
         const url =
@@ -126,12 +138,12 @@ export default function ThreadView({
         if (!live) return;
         if (after) {
           if (rows.length > 0) {
-            setMsgs((prev) => [...prev, ...decryptAll(rows, s)]);
+            setMsgs((prev) => [...prev, ...decryptAll(rows)]);
             lastAtRef.current = rows[rows.length - 1].created_at;
             bottomRef.current?.scrollIntoView({ behavior: "smooth" });
           }
         } else {
-          setMsgs(decryptAll(rows, s));
+          setMsgs(decryptAll(rows));
           lastAtRef.current =
             rows.length > 0 ? rows[rows.length - 1].created_at : null;
           setTimeout(
@@ -159,19 +171,18 @@ export default function ThreadView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [secrets, peer.id]);
 
-  const send = async () => {
-    const text = draft.trim();
+  const sendPayload = async (payload: string, optimisticText: string | null = null) => {
     const secs = secretsRef.current;
-    if (!text || !secs || sending) return;
-    if (text.length > 2000) {
-      setNote("Messages are limited to 2000 characters.");
+    if (!payload || !secs || sending) return;
+    if (payload.length > 8000) {
+      setNote("That message is too long.");
       return;
     }
     setSending(true);
     setNote(null);
     try {
       const parts = secs.map(({ user_id, shared }) => {
-        const { nonce, ciphertext } = encryptText(text, shared);
+        const { nonce, ciphertext } = encryptText(payload, shared);
         return { recipient_id: user_id, nonce, ciphertext };
       });
       const d = await fishFetch(`/api/fishmb/msg/conversations/${peer.id}/messages`, {
@@ -183,7 +194,7 @@ export default function ThreadView({
       if (mine) {
         setMsgs((prev) => [
           ...prev,
-          { id: mine.id, mine: true, sender_id: myId, text, created_at: mine.created_at },
+          { id: mine.id, mine: true, sender_id: myId, text: optimisticText ?? payload, created_at: mine.created_at },
         ]);
         lastAtRef.current = mine.created_at;
       }
@@ -197,6 +208,46 @@ export default function ThreadView({
       setNote(e instanceof Error ? e.message : "Could not send.");
     } finally {
       setSending(false);
+    }
+  };
+
+  const send = async () => {
+    const text = draft.trim();
+    if (!text) return;
+    if (text.length > 2000) {
+      setNote("Messages are limited to 2000 characters.");
+      return;
+    }
+    await sendPayload(text);
+  };
+
+  const photoInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const sendPhoto = async (file: File) => {
+    const secs = secretsRef.current;
+    if (!secs || sending || uploading) return;
+    setUploading(true);
+    setNote(null);
+    try {
+      const { compressImage } = await import("../../_components/compressImage");
+      const { FISHMB_TOKEN_KEY } = await import("@/lib/fishmb-constants");
+      const token = localStorage.getItem(FISHMB_TOKEN_KEY);
+      const form = new FormData();
+      form.append("file", await compressImage(file));
+      const upRes = await fetch("/api/fish/photos/upload", {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: form,
+      });
+      const up = await upRes.json();
+      if (!upRes.ok) throw new Error(up.error || "Photo upload failed.");
+      const payload = JSON.stringify({ t: "photo", url: up.url as string });
+      await sendPayload(payload, payload);
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Could not send photo.");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -288,6 +339,7 @@ export default function ThreadView({
           const senderName = m.mine
             ? null
             : (peer.members.find((x) => x.user_id === m.sender_id)?.name ?? null);
+          const photo = photoUrl(m.text);
           return (
           <div key={m.id} className={`flex ${m.mine ? "justify-end" : "justify-start"}`}>
             <div
@@ -300,9 +352,14 @@ export default function ThreadView({
               {senderName && peer.is_group && (
                 <p className="text-[11px] font-bold text-signal-dark mb-0.5">{senderName}</p>
               )}
-              <p className="text-sm whitespace-pre-wrap break-words">
-                {m.text ?? "⚠️ Couldn't decrypt this message."}
-              </p>
+              {photo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={photo} alt="Shared photo" className="rounded-xl max-h-64 object-cover" loading="lazy" />
+              ) : (
+                <p className="text-sm whitespace-pre-wrap break-words">
+                  {m.text ?? "⚠️ Couldn't decrypt this message."}
+                </p>
+              )}
               <p
                 className={`text-[10px] mt-1 text-right ${m.mine ? "text-white/70" : "text-pine/40"}`}
               >
@@ -317,6 +374,26 @@ export default function ThreadView({
 
       <div className="flex gap-2 pt-3 border-t border-pine/10">
         <input
+          ref={photoInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            e.target.value = "";
+            if (f) sendPhoto(f);
+          }}
+        />
+        <button
+          type="button"
+          onClick={() => photoInputRef.current?.click()}
+          disabled={!secrets || keyMissing || uploading || sending}
+          aria-label="Send a photo"
+          className="shrink-0 w-12 h-12 rounded-full bg-pine/10 hover:bg-pine/20 text-pine font-bold text-lg disabled:opacity-40 transition-colors"
+        >
+          {uploading ? "…" : "📷"}
+        </button>
+        <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => {
@@ -330,7 +407,7 @@ export default function ThreadView({
         <button
           type="button"
           onClick={send}
-          disabled={!draft.trim() || sending || !secrets || keyMissing}
+          disabled={!draft.trim() || sending || uploading || !secrets || keyMissing}
           className="shrink-0 bg-signal hover:bg-signal-dark text-white font-bold text-sm px-6 rounded-full disabled:opacity-40 transition-colors"
         >
           {sending ? "…" : "Send"}
