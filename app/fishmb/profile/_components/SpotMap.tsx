@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import ContoursToggle from "../../_components/ContoursToggle";
+import { fishFetch } from "../../_components/fishFetch";
+import { SPOT_ICON_CHOICES, spotIconHtml, spotIconSize } from "./spotIcons";
+import { haversineM, formatDist } from "./geo";
 
 export interface SpotPin {
   id: string;
@@ -9,7 +12,14 @@ export interface SpotPin {
   lat: number;
   lng: number;
   notes: string | null;
+  icon: string;
   created_at: string;
+}
+
+export interface TrailPoint {
+  lat: number;
+  lng: number;
+  t?: number;
 }
 
 interface SpotMapProps {
@@ -23,6 +33,14 @@ interface SpotMapProps {
   pendingPin?: { lat: number; lng: number } | null;
   /** Recenter request: when the key changes, fly the map to lat/lng. */
   focus?: { lat: number; lng: number; key: string } | null;
+  /** Live GPS position — rendered as a person marker that follows you. */
+  myLoc?: { lat: number; lng: number; speed: number | null } | null;
+  /** A saved trail to overlay on the map (retrace your route). */
+  overlayTrail?: TrailPoint[] | null;
+  /** Navigate-to target: dashed line from your location to this point. */
+  goTo?: { lat: number; lng: number } | null;
+  /** Fired after a recorded trail is saved, so the parent can refresh. */
+  onTrailSaved?: () => void;
 }
 
 function fmtDate(iso: string): string {
@@ -37,6 +55,17 @@ function fmtDate(iso: string): string {
   }
 }
 
+function fmtElapsed(ms: number): string {
+  const s = Math.floor(ms / 1000);
+  const m = Math.floor(s / 60);
+  return `${m}:${String(s % 60).padStart(2, "0")}`;
+}
+
+function defaultTrailName(): string {
+  const d = new Date();
+  return `Trail ${d.toLocaleDateString("en-CA", { month: "short", day: "numeric" })} ${d.toLocaleTimeString("en-CA", { hour: "numeric", minute: "2-digit" })}`;
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")
@@ -47,9 +76,21 @@ function escapeHtml(s: string): string {
 
 /**
  * Personal fishing-spots map (Leaflet, dynamically imported so it never runs
- * during SSR). Same pattern as the lake map: pins, popups, fit-to-bounds.
+ * during SSR). Pins with custom icons, live GPS person marker, trail
+ * recording, distance measuring and go-to navigation.
  */
-export default function SpotMap({ spots, picking, onPick, onLongPress, pendingPin, focus }: SpotMapProps) {
+export default function SpotMap({
+  spots,
+  picking,
+  onPick,
+  onLongPress,
+  pendingPin,
+  focus,
+  myLoc,
+  overlayTrail,
+  goTo,
+  onTrailSaved,
+}: SpotMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<any>(null);
   const [expanded, setExpanded] = useState(false);
@@ -59,6 +100,22 @@ export default function SpotMap({ spots, picking, onPick, onLongPress, pendingPi
   onLongPressRef.current = onLongPress;
   const pickingRef = useRef(picking);
   pickingRef.current = picking;
+
+  // Trail recording state.
+  const [recording, setRecording] = useState(false);
+  const [trailPts, setTrailPts] = useState<TrailPoint[]>([]);
+  const [trailStart, setTrailStart] = useState<number | null>(null);
+  const [trailElapsed, setTrailElapsed] = useState(0);
+  const [showSave, setShowSave] = useState(false);
+  const [trailName, setTrailName] = useState("");
+  const [savingTrail, setSavingTrail] = useState(false);
+  const [trailNote, setTrailNote] = useState<string | null>(null);
+
+  // Measure mode state.
+  const [measureMode, setMeasureMode] = useState(false);
+  const [measurePts, setMeasurePts] = useState<{ lat: number; lng: number }[]>([]);
+  const measureModeRef = useRef(false);
+  measureModeRef.current = measureMode;
 
   // Create the map once.
   useEffect(() => {
@@ -79,7 +136,14 @@ export default function SpotMap({ spots, picking, onPick, onLongPress, pendingPi
       m.on("focus", () => m.scrollWheelZoom.enable());
       m.on("blur", () => m.scrollWheelZoom.disable());
       m.on("click", (e: { latlng: { lat: number; lng: number } }) => {
-        if (pickingRef.current) onPickRef.current?.(e.latlng.lat, e.latlng.lng);
+        if (pickingRef.current) {
+          onPickRef.current?.(e.latlng.lat, e.latlng.lng);
+          return;
+        }
+        if (measureModeRef.current) {
+          const { lat, lng } = e.latlng;
+          setMeasurePts((prev) => (prev.length >= 2 ? [{ lat, lng }] : [...prev, { lat, lng }]));
+        }
       });
       if (!cancelled) setMap(m);
     })();
@@ -90,7 +154,8 @@ export default function SpotMap({ spots, picking, onPick, onLongPress, pendingPi
 
   // Long-press (hold) on the map drops a pin via onLongPress.
   // Works for touch (mobile) and mouse (desktop). Moving more than a few
-  // pixels cancels, so panning the map never triggers it.
+  // pixels cancels, so panning the map never triggers it. Disabled in
+  // measure mode so measuring taps stay clean.
   useEffect(() => {
     if (!map || !containerRef.current) return;
     let L: any = null;
@@ -111,6 +176,7 @@ export default function SpotMap({ spots, picking, onPick, onLongPress, pendingPi
     };
 
     const fire = (clientX: number, clientY: number) => {
+      if (measureModeRef.current) return;
       const ll = pointToLatLng(clientX, clientY);
       if (ll) onLongPressRef.current?.(ll.lat, ll.lng);
     };
@@ -164,7 +230,6 @@ export default function SpotMap({ spots, picking, onPick, onLongPress, pendingPi
     return () => {
       cancel();
       el.removeEventListener("touchstart", ts);
-      el.removeEventListener("touchmove", tm);
       el.removeEventListener("touchend", cancel);
       el.removeEventListener("touchcancel", cancel);
       el.removeEventListener("mousedown", md);
@@ -172,9 +237,9 @@ export default function SpotMap({ spots, picking, onPick, onLongPress, pendingPi
       el.removeEventListener("mouseup", cancel);
       el.removeEventListener("mouseleave", cancel);
     };
-  }, [map ]);
+  }, [map]);
 
-  // Render pins when the map exists or spots change.
+  // Render spot pins when the map exists or spots change.
   const layerRef = useRef<any>(null);
   useEffect(() => {
     if (!map) return;
@@ -182,15 +247,16 @@ export default function SpotMap({ spots, picking, onPick, onLongPress, pendingPi
       const L = (await import("leaflet")).default;
       layerRef.current?.remove();
       const layer = L.layerGroup();
-      const pin = L.divIcon({
-        className: "",
-        html: `<div style="width:14px;height:14px;border-radius:50%;background:#C2410C;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.45)"></div>`,
-        iconSize: [14, 14],
-        iconAnchor: [7, 7],
-      });
       const bounds: [number, number][] = [];
       for (const s of spots) {
-        const marker = L.marker([s.lat, s.lng], { icon: pin }).bindPopup(
+        const { size, anchor } = spotIconSize(s.icon ?? "pin");
+        const icon = L.divIcon({
+          className: "",
+          html: spotIconHtml(s.icon ?? "pin"),
+          iconSize: size,
+          iconAnchor: anchor,
+        });
+        const marker = L.marker([s.lat, s.lng], { icon }).bindPopup(
           `<strong>${escapeHtml(s.name || "Fishing spot")}</strong><br/>${escapeHtml(
             fmtDate(s.created_at)
           )}${s.notes ? `<br/>${escapeHtml(s.notes)}` : ""}`
@@ -220,12 +286,171 @@ export default function SpotMap({ spots, picking, onPick, onLongPress, pendingPi
     })();
   }, [spots, pendingPin, map]);
 
+  // Live GPS person marker — follows you whenever we have a fix.
+  const personLayerRef = useRef<any>(null);
+  useEffect(() => {
+    if (!map) return;
+    (async () => {
+      const L = (await import("leaflet")).default;
+      personLayerRef.current?.remove();
+      if (!myLoc) return;
+      const layer = L.layerGroup();
+      const person = L.divIcon({
+        className: "",
+        html: `<div style="font-size:26px;line-height:1;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.55));">🧍</div>`,
+        iconSize: [26, 26],
+        iconAnchor: [13, 22],
+      });
+      L.marker([myLoc.lat, myLoc.lng], { icon: person, interactive: false, zIndexOffset: 500 }).addTo(layer);
+      layer.addTo(map);
+      personLayerRef.current = layer;
+    })();
+  }, [map, myLoc]);
+
+  // Trail polylines: live recording (orange) + saved overlay (blue).
+  const trailLayerRef = useRef<any>(null);
+  useEffect(() => {
+    if (!map) return;
+    (async () => {
+      const L = (await import("leaflet")).default;
+      trailLayerRef.current?.remove();
+      const layer = L.layerGroup();
+      if (trailPts.length >= 2) {
+        L.polyline(
+          trailPts.map((p) => [p.lat, p.lng]),
+          { color: "#EA580C", weight: 4, opacity: 0.9 }
+        ).addTo(layer);
+      }
+      if (overlayTrail && overlayTrail.length >= 2) {
+        L.polyline(
+          overlayTrail.map((p) => [p.lat, p.lng]),
+          { color: "#1D4ED8", weight: 4, opacity: 0.85, dashArray: "8 6" }
+        ).addTo(layer);
+      }
+      layer.addTo(map);
+      trailLayerRef.current = layer;
+    })();
+  }, [map, trailPts, overlayTrail]);
+
+  // Go-to line: dashed from your location to the target.
+  const goToLayerRef = useRef<any>(null);
+  useEffect(() => {
+    if (!map) return;
+    (async () => {
+      const L = (await import("leaflet")).default;
+      goToLayerRef.current?.remove();
+      if (!goTo || !myLoc) return;
+      const layer = L.layerGroup();
+      L.polyline(
+        [
+          [myLoc.lat, myLoc.lng],
+          [goTo.lat, goTo.lng],
+        ],
+        { color: "#15803D", weight: 3, opacity: 0.8, dashArray: "6 8" }
+      ).addTo(layer);
+      layer.addTo(map);
+      goToLayerRef.current = layer;
+    })();
+  }, [map, goTo, myLoc]);
+
+  // Measure line between the two tapped points.
+  const measureLayerRef = useRef<any>(null);
+  useEffect(() => {
+    if (!map) return;
+    (async () => {
+      const L = (await import("leaflet")).default;
+      measureLayerRef.current?.remove();
+      if (measurePts.length < 2) return;
+      const layer = L.layerGroup();
+      L.polyline(
+        measurePts.map((p) => [p.lat, p.lng]),
+        { color: "#7C3AED", weight: 3, opacity: 0.9, dashArray: "4 6" }
+      ).addTo(layer);
+      layer.addTo(map);
+      measureLayerRef.current = layer;
+    })();
+  }, [map, measurePts]);
+
+  const measureDist =
+    measurePts.length === 2
+      ? haversineM(measurePts[0].lat, measurePts[0].lng, measurePts[1].lat, measurePts[1].lng)
+      : null;
+
+  // Recording: append GPS fixes while recording (10 m movement filter).
+  useEffect(() => {
+    if (!recording || !myLoc) return;
+    setTrailPts((prev) => {
+      const last = prev[prev.length - 1];
+      if (last && haversineM(last.lat, last.lng, myLoc.lat, myLoc.lng) < 10) return prev;
+      return [...prev, { lat: myLoc.lat, lng: myLoc.lng, t: Date.now() }];
+    });
+  }, [recording, myLoc]);
+
+  // Recording elapsed clock.
+  useEffect(() => {
+    if (!recording || trailStart === null) return;
+    setTrailElapsed(Date.now() - trailStart);
+    const t = setInterval(() => setTrailElapsed(Date.now() - (trailStart as number)), 1000);
+    return () => clearInterval(t);
+  }, [recording, trailStart]);
+
+  const startRecording = () => {
+    setTrailPts([]);
+    setTrailElapsed(0);
+    setTrailStart(Date.now());
+    setTrailNote(null);
+    setRecording(true);
+  };
+
+  const stopRecording = () => {
+    setRecording(false);
+    setTrailPts((prev) => {
+      if (prev.length >= 2) {
+        setTrailName(defaultTrailName());
+        setShowSave(true);
+      }
+      return prev;
+    });
+  };
+
+  const cancelRecording = () => {
+    setRecording(false);
+    setTrailPts([]);
+    setShowSave(false);
+    setTrailNote(null);
+  };
+
+  const saveTrail = async () => {
+    if (trailPts.length < 2 || savingTrail) return;
+    setSavingTrail(true);
+    setTrailNote(null);
+    try {
+      let d = 0;
+      for (let i = 1; i < trailPts.length; i++) {
+        d += haversineM(trailPts[i - 1].lat, trailPts[i - 1].lng, trailPts[i].lat, trailPts[i].lng);
+      }
+      await fishFetch("/api/fishmb/trails", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: trailName.trim() || defaultTrailName(), points: trailPts, distance_m: d }),
+      });
+      setTrailPts([]);
+      setShowSave(false);
+      setTrailName("");
+      onTrailSaved?.();
+    } catch (e) {
+      setTrailNote(e instanceof Error ? e.message : "Could not save trail.");
+    } finally {
+      setSavingTrail(false);
+    }
+  };
+
   // Cursor feedback while picking a spot.
   useEffect(() => {
     if (map && containerRef.current) {
-      containerRef.current.style.cursor = picking ? "crosshair" : "";
+      containerRef.current.style.cursor = picking ? "crosshair" : measureMode ? "copy" : "";
     }
-  }, [picking, map]);
+  }, [picking, measureMode, map]);
 
   // External recenter requests (favorite lake or spot clicked).
   const lastFocusKey = useRef<string | null>(null);
@@ -236,7 +461,8 @@ export default function SpotMap({ spots, picking, onPick, onLongPress, pendingPi
   }, [map, focus]);
 
   // A quick tap on the map (not a drag, not a long-press) opens it fullscreen.
-  // Skipped while dropping a pin, and taps on markers/popups/controls are left alone.
+  // Skipped while dropping a pin or measuring, and taps on markers/popups/
+  // controls are left alone.
   useEffect(() => {
     if (expanded) return;
     const el = containerRef.current;
@@ -263,6 +489,7 @@ export default function SpotMap({ spots, picking, onPick, onLongPress, pendingPi
       tracking = false;
       if (
         !pickingRef.current &&
+        !measureModeRef.current &&
         Date.now() - st < 350 &&
         Math.hypot(x - sx, y - sy) < 12
       ) {
@@ -290,9 +517,8 @@ export default function SpotMap({ spots, picking, onPick, onLongPress, pendingPi
     };
   }, [expanded]);
 
-  // Leaflet needs to re-measure once the container resizes into/out of
-  // fullscreen — otherwise tiles can paint blank. A ResizeObserver catches
-  // the size settling; the delayed retries cover slow layout passes.
+  // Keep Leaflet's internal size in sync with the container (expand/collapse,
+  // rotation, etc.) so tiles always paint.
   useEffect(() => {
     if (!map || !containerRef.current) return;
     const el = containerRef.current;
@@ -334,6 +560,8 @@ export default function SpotMap({ spots, picking, onPick, onLongPress, pendingPi
     };
   }, [expanded]);
 
+  const speedKmh = myLoc?.speed != null && myLoc.speed > 0.5 ? myLoc.speed * 3.6 : null;
+
   return (
     <div
       className={
@@ -356,6 +584,108 @@ export default function SpotMap({ spots, picking, onPick, onLongPress, pendingPi
         ref={containerRef}
         className={expanded ? "h-full w-full z-0" : "h-[300px] md:h-[380px] w-full z-0"}
       />
+
+      {/* Measure result pill */}
+      {measureDist !== null && (
+        <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[600] bg-pine-deep/90 text-white text-xs font-bold rounded-full px-4 py-2 shadow-lg whitespace-nowrap">
+          📏 {formatDist(measureDist)}
+          <button
+            type="button"
+            aria-label="Clear measurement"
+            onClick={() => setMeasurePts([])}
+            className="ml-2 text-white/70 hover:text-white font-black"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* Live speed readout */}
+      {speedKmh !== null && (
+        <div className="absolute bottom-3 right-3 z-[600] bg-pine-deep/90 text-white text-xs font-bold rounded-full px-3.5 py-2 shadow-lg tabular-nums">
+          🚤 {speedKmh.toFixed(0)} km/h
+        </div>
+      )}
+
+      {/* Map toolbar: record trail + measure */}
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-[600] flex gap-2">
+        <button
+          type="button"
+          onClick={() => (recording ? stopRecording() : startRecording())}
+          aria-label={recording ? "Stop recording trail" : "Record boat trail"}
+          title={recording ? "Stop recording" : "Record your boat trail"}
+          className={`flex items-center gap-1.5 rounded-full px-4 py-2.5 text-xs font-black uppercase tracking-wider shadow-lg border transition-colors ${
+            recording
+              ? "bg-red-600 text-white border-red-700 animate-pulse"
+              : "bg-white/95 text-pine border-pine/15 hover:bg-white"
+          }`}
+        >
+          {recording ? `⏹ ${fmtElapsed(trailElapsed)}` : "⏺ Record"}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setMeasureMode((m) => !m);
+            setMeasurePts([]);
+          }}
+          aria-label="Measure distance"
+          title="Measure distance between two taps"
+          className={`rounded-full px-4 py-2.5 text-xs font-black uppercase tracking-wider shadow-lg border transition-colors ${
+            measureMode
+              ? "bg-pine text-white border-pine"
+              : "bg-white/95 text-pine border-pine/15 hover:bg-white"
+          }`}
+        >
+          📏
+        </button>
+      </div>
+      {measureMode && (
+        <p className="absolute bottom-16 left-1/2 -translate-x-1/2 z-[600] bg-pine-deep/90 text-white text-[11px] font-bold rounded-full px-3.5 py-1.5 shadow-lg whitespace-nowrap">
+          Tap two points on the map
+        </p>
+      )}
+
+      {/* Save-trail dialog */}
+      {showSave && (
+        <div className="absolute inset-0 z-[700] flex items-center justify-center p-4 bg-pine-deep/50">
+          <div className="bg-paper rounded-3xl p-6 w-full max-w-xs shadow-2xl">
+            <h3 className="font-bold text-pine text-lg mb-1">🛥️ Save trail</h3>
+            <p className="text-pine/55 text-xs mb-4 tabular-nums">
+              {trailPts.length} points · {formatDist(trailPts.reduce((d, p, i) => (i === 0 ? d : d + haversineM(trailPts[i - 1].lat, trailPts[i - 1].lng, p.lat, p.lng)), 0))} · {fmtElapsed(Date.now() - (trailStart ?? Date.now()))}
+            </p>
+            {trailNote && (
+              <p className="text-sm text-signal-dark bg-signal/10 border border-signal/30 rounded-2xl px-4 py-2.5 mb-3">
+                {trailNote}
+              </p>
+            )}
+            <input
+              value={trailName}
+              onChange={(e) => setTrailName(e.target.value)}
+              maxLength={80}
+              placeholder="Trail name"
+              className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal mb-3"
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={cancelRecording}
+                className="flex-1 bg-pine/10 hover:bg-pine/20 text-pine font-bold uppercase tracking-wider text-xs px-4 py-3 rounded-full transition-colors"
+              >
+                Discard
+              </button>
+              <button
+                type="button"
+                onClick={saveTrail}
+                disabled={savingTrail}
+                className="flex-1 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-4 py-3 rounded-full disabled:opacity-50 transition-colors"
+              >
+                {savingTrail ? "Saving…" : "Save"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {!expanded && (
         <p className="text-xs text-pine/50 px-4 py-2.5 bg-white">
           {picking
@@ -368,3 +698,6 @@ export default function SpotMap({ spots, picking, onPick, onLongPress, pendingPi
     </div>
   );
 }
+
+// Re-exported so parents can build matching icon pickers.
+export { SPOT_ICON_CHOICES };

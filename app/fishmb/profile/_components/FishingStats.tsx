@@ -32,7 +32,7 @@ function memberSince(iso: string | null): string | null {
   return d.toLocaleDateString("en-CA", { year: "numeric", month: "long" });
 }
 
-export default function FishingStats({ userId }: { userId: string }) {
+export default function FishingStats({ userId, hideTitle }: { userId: string; hideTitle?: boolean }) {
   const [stats, setStats] = useState<UserStats | null>(null);
   const [failed, setFailed] = useState(false);
 
@@ -54,9 +54,11 @@ export default function FishingStats({ userId }: { userId: string }) {
     if (failed) return null;
     return (
       <section className="mb-8">
-        <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
-          🎣 Fishing stats
-        </h2>
+        {!hideTitle && (
+          <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
+            🎣 Fishing stats
+          </h2>
+        )}
         <div className="bg-pine/5 rounded-3xl h-32 animate-pulse" />
       </section>
     );
@@ -74,9 +76,11 @@ export default function FishingStats({ userId }: { userId: string }) {
 
   return (
     <section className="mb-8">
-      <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
-        🎣 Fishing stats
-      </h2>
+      {!hideTitle && (
+        <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
+          🎣 Fishing stats
+        </h2>
+      )}
       <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5 mb-4">
         {tiles.map(([label, value]) => (
           <div

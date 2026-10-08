@@ -3,6 +3,13 @@
 
 import { query, queryOne } from "./db";
 
+/** Allowed spot icon ids (must match the client SPOT_ICON_CHOICES). */
+export const SPOT_ICON_IDS = ["pin", "fish", "rock", "weed"] as const;
+
+export function isSpotIconId(v: unknown): v is (typeof SPOT_ICON_IDS)[number] {
+  return typeof v === "string" && (SPOT_ICON_IDS as readonly string[]).includes(v);
+}
+
 export interface FishingSpot {
   id: string;
   user_id: string;
@@ -11,6 +18,7 @@ export interface FishingSpot {
   lng: number;
   notes: string | null;
   catch_id: string | null;
+  icon: string;
   created_at: string;
 }
 
@@ -32,6 +40,8 @@ export async function ensureSpotsTable(): Promise<void> {
   await query(
     `CREATE INDEX IF NOT EXISTS fm_fishing_spots_user_id_idx ON fm_fishing_spots(user_id)`
   );
+  // Per-spot map icon (pin/fish/rock/weed). Added Oct 2026.
+  await query(`ALTER TABLE fm_fishing_spots ADD COLUMN IF NOT EXISTS icon text NOT NULL DEFAULT 'pin'`);
   // Favorite lakes: the angler's saved lakes for quick map navigation on the
   // profile's fishing-spots section.
   await ensureFavoriteLakesTable();
@@ -89,7 +99,7 @@ export function isValidLng(v: unknown): v is number {
 
 export async function listSpots(userId: string): Promise<FishingSpot[]> {
   const rows = await query<FishingSpot>(
-    `SELECT id, user_id, name, lat, lng, notes, catch_id, created_at
+    `SELECT id, user_id, name, lat, lng, notes, catch_id, icon, created_at
        FROM fm_fishing_spots
       WHERE user_id = $1
       ORDER BY created_at DESC`,
@@ -100,12 +110,12 @@ export async function listSpots(userId: string): Promise<FishingSpot[]> {
 
 export async function createSpot(
   userId: string,
-  spot: { name: string; lat: number; lng: number; notes?: string | null; catchId?: string | null }
+  spot: { name: string; lat: number; lng: number; notes?: string | null; catchId?: string | null; icon?: string }
 ): Promise<FishingSpot> {
   const row = await queryOne<FishingSpot>(
-    `INSERT INTO fm_fishing_spots (user_id, name, lat, lng, notes, catch_id)
-     VALUES ($1, $2, $3, $4, $5, $6)
-     RETURNING id, user_id, name, lat, lng, notes, catch_id, created_at`,
+    `INSERT INTO fm_fishing_spots (user_id, name, lat, lng, notes, catch_id, icon)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
+     RETURNING id, user_id, name, lat, lng, notes, catch_id, icon, created_at`,
     [
       userId,
       spot.name.trim().slice(0, 80) || "Fishing spot",
@@ -113,6 +123,7 @@ export async function createSpot(
       spot.lng,
       spot.notes?.trim().slice(0, 500) || null,
       spot.catchId ?? null,
+      isSpotIconId(spot.icon) ? spot.icon : "pin",
     ]
   );
   if (!row) throw new Error("Could not create spot.");
@@ -122,7 +133,7 @@ export async function createSpot(
 export async function updateSpot(
   userId: string,
   spotId: string,
-  patch: { name?: string; notes?: string | null }
+  patch: { name?: string; notes?: string | null; icon?: string }
 ): Promise<FishingSpot | null> {
   const sets: string[] = [];
   const vals: unknown[] = [];
@@ -134,9 +145,13 @@ export async function updateSpot(
     vals.push(patch.notes === null ? null : patch.notes.trim().slice(0, 500) || null);
     sets.push(`notes = $${vals.length}`);
   }
+  if (patch.icon !== undefined) {
+    vals.push(isSpotIconId(patch.icon) ? patch.icon : "pin");
+    sets.push(`icon = $${vals.length}`);
+  }
   if (sets.length === 0) {
     return queryOne<FishingSpot>(
-      `SELECT id, user_id, name, lat, lng, notes, catch_id, created_at
+      `SELECT id, user_id, name, lat, lng, notes, catch_id, icon, created_at
          FROM fm_fishing_spots WHERE id = $${vals.length + 1} AND user_id = $${vals.length + 2}`,
       [spotId, userId]
     );
@@ -145,7 +160,7 @@ export async function updateSpot(
   return queryOne<FishingSpot>(
     `UPDATE fm_fishing_spots SET ${sets.join(", ")}
       WHERE id = $${vals.length - 1} AND user_id = $${vals.length}
-     RETURNING id, user_id, name, lat, lng, notes, catch_id, created_at`,
+     RETURNING id, user_id, name, lat, lng, notes, catch_id, icon, created_at`,
     vals
   );
 }

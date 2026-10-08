@@ -13,6 +13,7 @@ import {
   createSpot,
   isValidLat,
   isValidLng,
+  isSpotIconId,
 } from "@/lib/fish/spots";
 
 export async function GET(req: NextRequest) {
@@ -45,6 +46,12 @@ export async function POST(req: NextRequest) {
     typeof body.notes === "string" && body.notes.trim()
       ? body.notes.trim().slice(0, 500)
       : null;
-  const spot = await createSpot(me.id, { name, lat, lng, notes });
+  const spot = await createSpot(me.id, {
+    name,
+    lat,
+    lng,
+    notes,
+    icon: isSpotIconId(body.icon) ? body.icon : "pin",
+  });
   return NextResponse.json({ spot }, { status: 201 });
 }

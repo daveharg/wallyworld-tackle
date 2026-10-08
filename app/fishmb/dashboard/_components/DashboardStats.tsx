@@ -32,7 +32,7 @@ export default function DashboardStats() {
         <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
           🎣 Your fishing stats
         </h2>
-        <FishingStats userId={user.id} />
+        <FishingStats userId={user.id} hideTitle />
       </div>
 
       <div>
