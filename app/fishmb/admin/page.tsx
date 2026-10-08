@@ -57,6 +57,21 @@ interface TraditionalSuggestion {
   created_at: string;
 }
 
+interface AnglerStatsRow {
+  user_id: string;
+  name: string;
+  avatar_url: string | null;
+  total_catches: number;
+  tournament_catches: number;
+  species_count: number;
+  biggest: { species: string; length_in: number }[];
+  tournaments_joined: number;
+  tournament_wins: number;
+  posts_count: number;
+  tips_count: number;
+  member_since: string | null;
+}
+
 interface ContactMsg {
   id: string;
   name: string;
@@ -74,6 +89,97 @@ function timeAgo(iso: string) {
   return `${Math.floor(s / 86400)}d ago`;
 }
 
+function AnglerStatsTable({
+  rows,
+  search,
+  onSearch,
+}: {
+  rows: AnglerStatsRow[];
+  search: string;
+  onSearch: (v: string) => void;
+}) {
+  const q = search.trim().toLowerCase();
+  const filtered = q
+    ? rows.filter((r) => r.name.toLowerCase().includes(q))
+    : rows;
+  return (
+    <div>
+      <div className="mb-4 max-w-sm">
+        <input
+          value={search}
+          onChange={(e) => onSearch(e.target.value)}
+          placeholder="Search anglers…"
+          className="w-full bg-white border border-pine/15 rounded-full px-5 py-2.5 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal"
+        />
+      </div>
+      {filtered.length === 0 ? (
+        <div className="bg-white border border-pine/10 rounded-3xl p-10 text-center">
+          <p className="text-pine/60">No anglers found.</p>
+        </div>
+      ) : (
+        <div className="bg-white border border-pine/10 rounded-3xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[760px]">
+              <thead>
+                <tr className="text-left text-[11px] uppercase tracking-[0.14em] text-pine/45 border-b-2 border-pine/15">
+                  <th className="py-3 px-4 font-bold">Angler</th>
+                  <th className="py-3 px-3 font-bold text-center">Catches</th>
+                  <th className="py-3 px-3 font-bold text-center">Species</th>
+                  <th className="py-3 px-3 font-bold">Biggest fish</th>
+                  <th className="py-3 px-3 font-bold text-center">Tournaments</th>
+                  <th className="py-3 px-3 font-bold text-center">Wins</th>
+                  <th className="py-3 px-4 font-bold text-center">Posts</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((r) => (
+                  <tr key={r.user_id} className="border-b border-pine/8 align-middle">
+                    <td className="py-3 px-4">
+                      <Link
+                        href={`/fishmb/anglers/${r.user_id}`}
+                        className="flex items-center gap-3 hover:opacity-80"
+                      >
+                        {r.avatar_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={r.avatar_url}
+                            alt={r.name}
+                            className="w-9 h-9 rounded-full object-cover border border-gold"
+                          />
+                        ) : (
+                          <span className="w-9 h-9 rounded-full bg-pine/10 flex items-center justify-center font-bold text-pine text-sm">
+                            {r.name.charAt(0).toUpperCase()}
+                          </span>
+                        )}
+                        <span className="font-bold text-pine truncate max-w-[160px]">{r.name}</span>
+                      </Link>
+                    </td>
+                    <td className="py-3 px-3 text-center font-bold text-pine">{r.total_catches}</td>
+                    <td className="py-3 px-3 text-center text-pine/75">{r.species_count}</td>
+                    <td className="py-3 px-3 text-pine/75 text-xs">
+                      {r.biggest.length > 0 ? (
+                        <>
+                          <span className="font-bold text-pine">{r.biggest[0].species}</span>{" "}
+                          {Number(r.biggest[0].length_in).toFixed(1)}″
+                        </>
+                      ) : (
+                        <span className="text-pine/40">—</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-3 text-center text-pine/75">{r.tournaments_joined}</td>
+                    <td className="py-3 px-3 text-center font-bold text-gold">{r.tournament_wins}</td>
+                    <td className="py-3 px-4 text-center text-pine/75">{r.posts_count}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const { user } = useFishAuth();
   const [stats, setStats] = useState<Stats | null>(null);
@@ -81,7 +187,9 @@ export default function AdminPage() {
   const [ads, setAds] = useState<Ad[]>([]);
   const [suggestions, setSuggestions] = useState<TraditionalSuggestion[]>([]);
   const [messages, setMessages] = useState<ContactMsg[]>([]);
-  const [tab, setTab] = useState<"claims" | "ads" | "tournaments" | "messages">("claims");
+  const [anglerStats, setAnglerStats] = useState<AnglerStatsRow[]>([]);
+  const [anglerSearch, setAnglerSearch] = useState("");
+  const [tab, setTab] = useState<"claims" | "ads" | "tournaments" | "messages" | "anglers">("claims");
   const [denied, setDenied] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [acting, setActing] = useState<string | null>(null);
@@ -101,6 +209,9 @@ export default function AdminPage() {
       .catch(() => setDenied(true));
     fishFetch("/api/fishmb/admin/contact-messages?status=new")
       .then((d) => setMessages(d.messages ?? []))
+      .catch(() => setDenied(true));
+    fishFetch("/api/fishmb/admin/user-stats")
+      .then((d) => setAnglerStats(d.users ?? []))
       .catch(() => setDenied(true));
   };
 
@@ -202,6 +313,7 @@ export default function AdminPage() {
             ["ads", `📢 Ad submissions (${ads.length})`],
             ["tournaments", `🏆 Tournament suggestions (${suggestions.length})`],
             ["messages", `✉️ Messages (${messages.length})`],
+            ["anglers", `📊 Angler stats (${anglerStats.length})`],
           ] as const
         ).map(([v, label]) => (
           <button
@@ -340,6 +452,8 @@ export default function AdminPage() {
             ))}
           </div>
         )
+      ) : tab === "anglers" ? (
+        <AnglerStatsTable rows={anglerStats} search={anglerSearch} onSearch={setAnglerSearch} />
       ) : ads.length === 0 ? (
         <div className="bg-white border border-pine/10 rounded-3xl p-10 text-center">
           <p className="text-4xl mb-3">🎉</p>

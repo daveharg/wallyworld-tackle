@@ -845,40 +845,56 @@ export default function FeedPage() {
         </div>
       )}
 
-      {/* Fixed bottom tab bar — always visible, like the FishMB app. */}
+      {/* Floating bottom bar — white pill, icons only */}
       <nav
         aria-label="Feed sections"
-        className="fixed bottom-0 inset-x-0 z-40 bg-pine-deep/95 backdrop-blur border-t border-white/10"
-        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        className="fixed z-40 left-1/2 -translate-x-1/2"
+        style={{ bottom: "calc(0.9rem + env(safe-area-inset-bottom))" }}
       >
-        <div className="max-w-2xl mx-auto px-2 grid grid-cols-4">
+        <div className="flex items-center gap-1 bg-white/95 backdrop-blur rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.18)] border border-black/5 px-3 py-2">
           {(
             [
-              ["all", "🎣", "Full reel"],
-              ["catch", "🐟", "Fish"],
-              ["post", "💬", "Posts"],
+              ["all", "Home", "M4 11.5 12 4l8 7.5M6.5 10v9.5h11V10"],
+              ["catch", "Fish", "M6.5 12c2.5-3.5 6-5.5 10-5.5 0 0-1.5 2.5-1.5 5.5S16.5 17.5 16.5 17.5c-4 0-7.5-2-10-5.5ZM6.5 12 3.5 9.5v5L6.5 12Zm13 0h.01"],
+              ["post", "Posts", "M4 6.5h16v10H9l-5 4v-4H4v-10Z"],
             ] as const
-          ).map(([v, icon, label]) => (
+          ).map(([v, label, d]) => (
             <button
               key={v}
               onClick={() => {
                 setTab(v);
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
-              className={`flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-bold uppercase tracking-wider transition-colors ${
-                tab === v ? "text-gold" : "text-white/55 hover:text-white"
+              aria-label={label}
+              className={`w-12 h-12 flex items-center justify-center rounded-full transition-colors ${
+                tab === v ? "bg-pine/10 text-pine" : "text-pine/45 hover:text-pine"
               }`}
             >
-              <span className="text-xl leading-none">{icon}</span>
-              {label}
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d={d} />
+              </svg>
             </button>
           ))}
           <Link
-            href="/fishmb/tournaments"
-            className="flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-bold uppercase tracking-wider text-white/55 hover:text-white transition-colors"
+            href="/fishmb/search"
+            aria-label="Search"
+            className="w-12 h-12 flex items-center justify-center rounded-full text-pine/45 hover:text-pine transition-colors"
           >
-            <span className="text-xl leading-none">🏆</span>
-            Tournaments
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
+          </Link>
+          <Link
+            href="/fishmb/profile"
+            aria-label="Profile"
+            className="relative w-12 h-12 flex items-center justify-center rounded-full text-pine/45 hover:text-pine transition-colors"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <circle cx="12" cy="8" r="4" />
+              <path d="M4.5 20.5c1.5-3.5 4.5-5 7.5-5s6 1.5 7.5 5" />
+            </svg>
+            {!user && <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-signal rounded-full" />}
           </Link>
         </div>
       </nav>

@@ -7,6 +7,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { fishFetch } from "../../_components/fishFetch";
+import FishingStats from "./FishingStats";
 
 interface ProfilePhoto {
   url: string;
@@ -152,6 +153,8 @@ export default function ProfileView({
       )}
 
       {editor}
+
+      <FishingStats userId={userId} />
 
       {/* Tabs */}
       <div className="flex gap-2 border-b border-pine/10 mb-6">
