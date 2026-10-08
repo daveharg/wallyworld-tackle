@@ -6,6 +6,7 @@ import { useState } from "react";
 import { FishLoginButton, useFishAuth } from "./FishAuth";
 
 const NAV = [
+  { href: "/fishmb", label: "Home" },
   { href: "/fishmb/lakes", label: "Lakes" },
   { href: "/fishmb/lodges", label: "Lodges & Guides" },
   { href: "/fishmb/regulations", label: "Regulations" },
@@ -14,7 +15,6 @@ const NAV = [
   { href: "/fishmb/tips", label: "Tips" },
   { href: "/fishmb/feed", label: "The Feed" },
   { href: "/fishmb/rentals", label: "Rentals" },
-  { href: "/fishmb", label: "Home" },
 ];
 
 export function Wordmark({ light = false }: { light?: boolean }) {

@@ -10,6 +10,38 @@ export const metadata: Metadata = {
   },
   description:
     "Search 271 Manitoba lakes and 127 lodges & guides. Look up 2026 fishing regulations, stocking history, and what's biting right now.",
+  keywords: [
+    "Manitoba fishing",
+    "Manitoba lakes",
+    "fishing regulations Manitoba",
+    "walleye fishing Manitoba",
+    "Manitoba fishing lodges",
+    "ice fishing Manitoba",
+    "FishMB",
+  ],
+  openGraph: {
+    type: "website",
+    siteName: "FishMB",
+    title: "FishMB — Manitoba fishing lakes, lodges & regulations",
+    description:
+      "Search 271 Manitoba lakes and 127 lodges & guides. Look up 2026 fishing regulations, stocking history, and what's biting right now.",
+    url: "https://www.wallyworldtackle.ca/fishmb",
+    images: [
+      {
+        url: "https://www.wallyworldtackle.ca/fishmb/icon-512.png",
+        width: 512,
+        height: 512,
+        alt: "FishMB — Manitoba fishing",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: "FishMB — Manitoba fishing lakes, lodges & regulations",
+    description:
+      "Search 271 Manitoba lakes and 127 lodges & guides. Look up 2026 fishing regulations, stocking history, and what's biting right now.",
+    images: ["https://www.wallyworldtackle.ca/fishmb/icon-512.png"],
+  },
   manifest: "/fishmb/manifest.json",
   themeColor: "#1a2e1f",
   appleWebApp: {
