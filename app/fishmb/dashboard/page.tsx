@@ -8,6 +8,7 @@ import { useFishAuth } from "../_components/FishAuth";
 import FishingSpots from "../profile/_components/FishingSpots";
 import DashboardStats from "./_components/DashboardStats";
 import DashboardSettings from "./_components/DashboardSettings";
+import DashboardLicence from "./_components/DashboardLicence";
 import LakeNotes from "./_components/LakeNotes";
 
 const TABS = [
@@ -86,6 +87,8 @@ export default function DashboardPage() {
       )}
       {tab === "notes" && <LakeNotes />}
       {tab === "settings" && <DashboardSettings />}
+
+      <DashboardLicence />
     </div>
   );
 }

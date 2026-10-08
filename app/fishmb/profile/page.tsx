@@ -6,7 +6,6 @@
 import Link from "next/link";
 import { useFishAuth } from "../_components/FishAuth";
 import ProfileView from "./_components/ProfileView";
-import LicenseWallet from "./_components/LicenseWallet";
 
 export default function ProfilePage() {
   const { user, openLogin } = useFishAuth();
@@ -71,7 +70,6 @@ export default function ProfilePage() {
         </Link>
       </div>
       <ProfileView userId={user.id} />
-      <LicenseWallet />
     </>
   );
 }

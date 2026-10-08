@@ -63,7 +63,7 @@ function statusOf(expiry: string | null): {
  * FishMB just holds it and shows it on demand. The file is cached on-device
  * so "Show licence" works with no signal.
  */
-export default function LicenseWallet() {
+export default function LicenseWallet({ embedded = false }: { embedded?: boolean }) {
   const [lic, setLic] = useState<License | null>(null);
   const [loading, setLoading] = useState(true);
   const [file, setFile] = useState<File | null>(null);
@@ -160,7 +160,7 @@ export default function LicenseWallet() {
   const isPdf = lic?.file_type === "application/pdf";
 
   return (
-    <section className="max-w-3xl mx-auto px-4 mt-10">
+    <section className={embedded ? "" : "max-w-3xl mx-auto px-4 mt-10"}>
       <h2 className="font-display font-bold uppercase text-pine text-2xl md:text-3xl tracking-wide mb-1">
         🎣 Fishing licence
       </h2>
