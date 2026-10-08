@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFishAuth } from "../../_components/FishAuth";
 import { fishFetch } from "../../_components/fishFetch";
@@ -9,15 +9,26 @@ export function JoinButton({
   tournamentId,
   tournamentName,
   inviteCode,
+  autoOpen,
 }: {
   tournamentId: string;
   tournamentName: string;
   inviteCode?: string;
+  autoOpen?: boolean;
 }) {
   const { user, openLogin } = useFishAuth();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const opened = useRef(false);
+
+  // Shared invite links (?join=1) drop visitors straight into account creation.
+  useEffect(() => {
+    if (autoOpen && !user && !opened.current) {
+      opened.current = true;
+      openLogin();
+    }
+  }, [autoOpen, user, openLogin]);
 
   const join = async () => {
     if (!user) {

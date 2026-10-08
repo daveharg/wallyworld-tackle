@@ -7,7 +7,13 @@ import { RedeemKey } from "../../_components/RedeemKey";
 export const dynamic = "force-dynamic";
 export const revalidate = 60;
 
-export default async function JoinTournamentPage({ params }: { params: { code: string } }) {
+export default async function JoinTournamentPage({
+  params,
+  searchParams,
+}: {
+  params: { code: string };
+  searchParams: { join?: string };
+}) {
   const t = await getTournamentByInvite(params.code);
   if (!t) notFound();
 
@@ -23,7 +29,12 @@ export default async function JoinTournamentPage({ params }: { params: { code: s
       <p className="text-pine/60 mb-8">
         {t.participant_count} {t.participant_count === 1 ? "angler" : "anglers"} in so far
       </p>
-      <JoinButton tournamentId={t.id} tournamentName={t.name} inviteCode={params.code} />
+      <JoinButton
+        tournamentId={t.id}
+        tournamentName={t.name}
+        inviteCode={params.code}
+        autoOpen={searchParams?.join === "1"}
+      />
       <RedeemKey tournamentId={t.id} />
       <p className="mt-6">
         <Link href="/fishmb/tournaments" className="text-sm font-bold text-signal uppercase tracking-wider">
