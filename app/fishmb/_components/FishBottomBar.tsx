@@ -89,7 +89,7 @@ const LEFT: Item[] = [
 
 const RIGHT: Item[] = [
   { href: "/fishmb/dashboard", label: "Dashboard", icon: ICONS.dashboard, match: (p) => p.startsWith("/fishmb/dashboard") || p.startsWith("/fishmb/profile") },
-  { href: "/fishmb/lakes", label: "Maps", icon: ICONS.maps, match: (p) => p.startsWith("/fishmb/lakes") },
+  { href: "/fishmb/maps", label: "Maps", icon: ICONS.maps, match: (p) => p.startsWith("/fishmb/maps") || p.startsWith("/fishmb/lakes") },
   { href: "/fishmb/weather", label: "Weather", icon: ICONS.weather, match: (p) => p.startsWith("/fishmb/weather") },
 ];
 
@@ -133,12 +133,12 @@ function Bar() {
         href={item.href}
         aria-label={item.label}
         className={`relative flex flex-col items-center justify-center gap-0.5 w-11 py-1.5 rounded-2xl transition-colors ${
-          active ? "text-amber-300" : "text-white/55 hover:text-white"
+          active ? "text-signal" : "text-pine/45 hover:text-pine"
         }`}
       >
         {item.icon}
         <span className="text-[9px] font-bold leading-none">{item.label}</span>
-        {active && <span className="absolute bottom-0 w-6 h-0.5 rounded-full bg-amber-300" />}
+        {active && <span className="absolute bottom-0 w-6 h-0.5 rounded-full bg-signal" />}
       </Link>
     );
   };
@@ -146,27 +146,41 @@ function Bar() {
   return (
     <nav
       aria-label="FishMB sections"
-      className="md:hidden fixed z-40 left-1/2 -translate-x-1/2"
-      style={{ bottom: "calc(0.7rem + env(safe-area-inset-bottom))" }}
+      className="md:hidden fixed z-40 bottom-0 inset-x-0"
     >
-      <div className="relative flex items-end gap-0.5 bg-[#12241c]/95 backdrop-blur rounded-[1.75rem] shadow-[0_10px_36px_rgba(0,0,0,0.35)] border border-white/10 px-2 py-1.5">
-        {LEFT.map(renderItem)}
-        <Link
-          href="/fishmb/feed?compose=1"
-          aria-label="New post"
-          className="mx-0.5 -mt-8 w-14 h-14 rounded-full bg-signal hover:bg-signal-dark text-white shadow-[0_8px_24px_rgba(0,0,0,0.4)] border-4 border-[#12241c] flex items-center justify-center transition-colors"
-        >
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-        </Link>
-        {RIGHT.map(renderItem)}
+      <div
+        className="relative bg-white/95 backdrop-blur border-t border-pine/10 px-1 pt-1 shadow-[0_-8px_30px_rgba(0,0,0,0.08)]"
+        style={{ paddingBottom: "calc(0.6rem + env(safe-area-inset-bottom))" }}
+      >
+        <div className="flex items-stretch">
+          {LEFT.map((item) => (
+            <div key={item.href} className="flex-1 flex justify-center">
+              {renderItem(item)}
+            </div>
+          ))}
+          <div className="flex-1 flex justify-center">
+            <Link
+              href="/fishmb/feed?compose=1"
+              aria-label="New post"
+              className="-mt-8 w-14 h-14 rounded-full bg-signal hover:bg-signal-dark text-white shadow-[0_8px_24px_rgba(0,0,0,0.25)] border-4 border-white flex items-center justify-center transition-colors"
+            >
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+            </Link>
+          </div>
+          {RIGHT.map((item) => (
+            <div key={item.href} className="flex-1 flex justify-center">
+              {renderItem(item)}
+            </div>
+          ))}
+        </div>
         {/* Messages stays one tap away via a badge while the bar is full */}
         {unread > 0 && (
           <Link
             href="/fishmb/messages"
             aria-label={`Messages, ${unread} unread`}
-            className="absolute -top-2 -right-1 min-w-5 h-5 px-1 rounded-full bg-signal text-white text-[10px] font-black flex items-center justify-center"
+            className="absolute top-1 right-2 min-w-5 h-5 px-1 rounded-full bg-signal text-white text-[10px] font-black flex items-center justify-center"
           >
             {unread > 99 ? "99+" : unread}
           </Link>

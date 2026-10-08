@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import LocationPicker, { WxLoc } from "./_components/LocationPicker";
 
 /* ------------------------------------------------------------------ */
 /* WMO weather-code → label + emoji                                     */
@@ -51,6 +52,22 @@ type WxData = {
 };
 
 const DEFAULT_COORDS = { lat: 49.9, lon: -97.14, label: "Winnipeg area" };
+const CURRENT_KEY = "fishmb-wx-current";
+
+function loadCurrent(): { lat: number; lon: number; label: string } {
+  try {
+    const raw = localStorage.getItem(CURRENT_KEY);
+    if (raw) {
+      const c = JSON.parse(raw);
+      if (typeof c.lat === "number" && typeof c.lon === "number") {
+        return { lat: c.lat, lon: c.lon, label: typeof c.label === "string" ? c.label : "Saved spot" };
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return DEFAULT_COORDS;
+}
 
 /* ------------------------------------------------------------------ */
 /* Pressure gauge (SVG) — ideal fishing band marked                     */
@@ -151,10 +168,25 @@ function biteOutlook(p: number, trend: number, cloud: number, wind: number): { l
 /* ------------------------------------------------------------------ */
 export default function WeatherPage() {
   const [coords, setCoords] = useState(DEFAULT_COORDS);
-  const [locating, setLocating] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [data, setData] = useState<WxData | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [explainer, setExplainer] = useState<string | null>(null);
+
+  // Remember the last-viewed spot between visits.
+  useEffect(() => {
+    setCoords(loadCurrent());
+  }, []);
+
+  const pickLoc = (loc: WxLoc) => {
+    const next = { lat: loc.lat, lon: loc.lon, label: loc.name };
+    setCoords(next);
+    try {
+      localStorage.setItem(CURRENT_KEY, JSON.stringify(next));
+    } catch {
+      // non-fatal
+    }
+  };
 
   useEffect(() => {
     let stop = false;
@@ -181,19 +213,6 @@ export default function WeatherPage() {
       clearInterval(t);
     };
   }, [coords]);
-
-  const useMyLocation = () => {
-    if (!navigator.geolocation) return;
-    setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setLocating(false);
-        setCoords({ lat: pos.coords.latitude, lon: pos.coords.longitude, label: "Your location" });
-      },
-      () => setLocating(false),
-      { timeout: 10000 }
-    );
-  };
 
   const derived = useMemo(() => {
     if (!data) return null;
@@ -254,16 +273,11 @@ export default function WeatherPage() {
         <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-emerald-400/10 blur-3xl" />
         <div className="relative max-w-2xl mx-auto px-5 pt-6">
           <div className="flex items-center justify-between">
-            <div>
+            <button onClick={() => setPickerOpen(true)} className="text-left group">
               <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-200/60">FishMB Weather</p>
-              <h1 className="text-lg font-black">{coords.label}</h1>
-            </div>
-            <button
-              onClick={useMyLocation}
-              disabled={locating}
-              className="text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/15 rounded-full px-4 py-2.5 disabled:opacity-50"
-            >
-              {locating ? "Locating…" : "📍 Use my location"}
+              <h1 className="text-lg font-black">
+                📍 {coords.label} <span className="text-white/40 text-sm group-active:text-white/70">▾</span>
+              </h1>
             </button>
           </div>
 
@@ -412,6 +426,15 @@ export default function WeatherPage() {
             Weather by Open-Meteo · Wind map by Windy · Always check conditions before heading out
           </p>
         </div>
+      )}
+
+      {/* Location picker */}
+      {pickerOpen && (
+        <LocationPicker
+          current={{ name: coords.label, lat: coords.lat, lon: coords.lon }}
+          onSelect={pickLoc}
+          onClose={() => setPickerOpen(false)}
+        />
       )}
 
       {/* Explainer modal */}
