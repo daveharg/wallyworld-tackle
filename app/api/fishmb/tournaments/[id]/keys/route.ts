@@ -1,6 +1,9 @@
-// /api/fishmb/tournaments/[id]/keys — single-use entry keys (organizer only).
+// /api/fishmb/tournaments/[id]/keys — entry keys (organizer only).
 // GET: list keys with status + who used them.
-// POST: { count: 1–200 } → generates that many unused keys.
+// POST: { count: 1–200 } → N unlabeled one-time keys;
+//       { labels: ["Ann","Bob"] } → one labeled one-time key per name;
+//       { shared: true } → ONE shared key with unlimited uses (each angler
+//       still joins only once).
 
 import { NextRequest, NextResponse } from "next/server";
 import {
@@ -55,11 +58,26 @@ export async function POST(
   } catch {
     return badRequest("Invalid JSON body.");
   }
+  const tid = params.id;
+  if (body.shared === true) {
+    const keys = await generateTournamentKeys(tid, { shared: true });
+    return NextResponse.json({ keys }, { status: 201 });
+  }
+  const labels = Array.isArray(body.labels)
+    ? (body.labels as unknown[])
+        .map((l) => String(l).trim())
+        .filter((l) => l.length > 0)
+        .slice(0, 200)
+    : [];
+  if (labels.length > 0) {
+    const keys = await generateTournamentKeys(tid, { labels });
+    return NextResponse.json({ keys }, { status: 201 });
+  }
   const count =
     typeof body.count === "number" ? Math.floor(body.count) : 0;
   if (count < 1 || count > 200) {
     return badRequest("Count must be between 1 and 200.");
   }
-  const keys = await generateTournamentKeys(params.id, count);
+  const keys = await generateTournamentKeys(tid, { count });
   return NextResponse.json({ keys }, { status: 201 });
 }

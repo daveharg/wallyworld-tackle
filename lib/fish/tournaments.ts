@@ -113,6 +113,27 @@ export async function ensureTournamentTables(): Promise<void> {
     used_at timestamptz
   )`);
   await query(`CREATE INDEX IF NOT EXISTS fm_tournament_keys_tourney_idx ON fm_tournament_keys(tournament_id, status)`);
+  // Named + shared keys: label tracks which angler a key was issued to;
+  // max_uses NULL = one shared key with unlimited redemptions (each angler
+  // still joins only once); uses counts redemptions atomically.
+  await query(`ALTER TABLE fm_tournament_keys ADD COLUMN IF NOT EXISTS label TEXT`);
+  await query(`ALTER TABLE fm_tournament_keys ADD COLUMN IF NOT EXISTS max_uses INT DEFAULT 1`);
+  await query(`ALTER TABLE fm_tournament_keys ADD COLUMN IF NOT EXISTS uses INT NOT NULL DEFAULT 0`);
+  await query(`UPDATE fm_tournament_keys SET uses = 1 WHERE status = 'used' AND uses = 0`);
+  // Redemption log: who used which key (matters for shared keys).
+  await query(`CREATE TABLE IF NOT EXISTS fm_tournament_key_redemptions (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    key_id uuid NOT NULL REFERENCES fm_tournament_keys(id) ON DELETE CASCADE,
+    tournament_id uuid NOT NULL REFERENCES fm_tournaments(id) ON DELETE CASCADE,
+    user_id uuid REFERENCES fm_users(id) ON DELETE SET NULL,
+    redeemed_at timestamptz NOT NULL DEFAULT now(),
+    UNIQUE (key_id, user_id)
+  )`);
+  await query(`INSERT INTO fm_tournament_key_redemptions (key_id, tournament_id, user_id, redeemed_at)
+    SELECT id, tournament_id, used_by_user_id, COALESCE(used_at, created_at)
+    FROM fm_tournament_keys
+    WHERE status = 'used' AND used_by_user_id IS NOT NULL
+    ON CONFLICT (key_id, user_id) DO NOTHING`);
   await query(`CREATE TABLE IF NOT EXISTS fm_tournament_entries (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     tournament_id uuid NOT NULL REFERENCES fm_tournaments(id) ON DELETE CASCADE,
@@ -231,16 +252,29 @@ export async function isParticipant(tournamentId: string, userId: string): Promi
   return !!row;
 }
 
+export interface TournamentKeyRedeemer {
+  user_id: string;
+  name: string | null;
+  redeemed_at: string;
+}
 export interface TournamentKey {
   id: string;
   tournament_id: string;
   key_code: string;
   status: "unused" | "used";
+  label: string | null;
+  max_uses: number | null;
+  uses: number;
   used_by_user_id: string | null;
   used_by_name: string | null;
   created_at: string;
   used_at: string | null;
+  redeemers: TournamentKeyRedeemer[];
 }
+
+const TOURNAMENT_KEY_COLS = `id, tournament_id, key_code, status, label, max_uses, uses,
+  used_by_user_id, NULL::text AS used_by_name, created_at, used_at,
+  '[]'::json AS redeemers`;
 
 // 8-char uppercase alphanumeric, skipping confusing 0/O/1/I.
 const KEY_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -252,20 +286,36 @@ function randomKeyCode(): string {
   return s;
 }
 
-/** Generate `count` single-use entry keys for a tournament. Retries on unique collisions. */
-export async function generateTournamentKeys(tournamentId: string, count: number): Promise<TournamentKey[]> {
+/** Generate entry keys for a tournament. Retries on unique code collisions.
+ *  `{ shared: true }` → one unlimited-use key; `{ labels }` → one labeled
+ *  one-time key per name; otherwise `{ count }` unlabeled one-time keys. */
+export async function generateTournamentKeys(
+  tournamentId: string,
+  opts: { count?: number; labels?: string[]; shared?: boolean }
+): Promise<TournamentKey[]> {
   await ensureTournamentTables();
+  // One shared key (unlimited uses), one labeled key per name, or N unlabeled keys.
+  const specs: { label: string | null; maxUses: number | null }[] = [];
+  if (opts.shared) {
+    specs.push({ label: "Shared key", maxUses: null });
+  } else if (opts.labels && opts.labels.length > 0) {
+    for (const raw of opts.labels.slice(0, 200)) {
+      const label = raw.trim().slice(0, 80);
+      if (label) specs.push({ label, maxUses: 1 });
+    }
+  } else {
+    const n = Math.max(1, Math.min(200, Math.floor(opts.count ?? 0)));
+    for (let i = 0; i < n; i++) specs.push({ label: null, maxUses: 1 });
+  }
   const made: TournamentKey[] = [];
-  const n = Math.max(1, Math.min(200, Math.floor(count)));
-  for (let i = 0; i < n; i++) {
+  for (const spec of specs) {
     let row: TournamentKey | null = null;
     for (let attempt = 0; attempt < 10 && !row; attempt++) {
       try {
         row = await queryOne<TournamentKey>(
-          `INSERT INTO fm_tournament_keys (tournament_id, key_code) VALUES ($1, $2)
-           RETURNING id, tournament_id, key_code, status, used_by_user_id,
-                     NULL::text AS used_by_name, created_at, used_at`,
-          [tournamentId, randomKeyCode()]
+          `INSERT INTO fm_tournament_keys (tournament_id, key_code, label, max_uses) VALUES ($1, $2, $3, $4)
+           RETURNING ${TOURNAMENT_KEY_COLS}`,
+          [tournamentId, randomKeyCode(), spec.label, spec.maxUses]
         );
       } catch {
         row = null; // unique collision — try another code
@@ -280,8 +330,18 @@ export async function generateTournamentKeys(tournamentId: string, count: number
 export async function listTournamentKeys(tournamentId: string): Promise<TournamentKey[]> {
   await ensureTournamentTables();
   return query<TournamentKey>(
-    `SELECT k.id, k.tournament_id, k.key_code, k.status, k.used_by_user_id,
-            u.name AS used_by_name, k.created_at, k.used_at
+    `SELECT k.id, k.tournament_id, k.key_code, k.status, k.label, k.max_uses, k.uses,
+            k.used_by_user_id, u.name AS used_by_name, k.created_at, k.used_at,
+            COALESCE(
+              (SELECT json_agg(
+                 json_build_object('user_id', r.user_id, 'name', ru.name, 'redeemed_at', r.redeemed_at)
+                 ORDER BY r.redeemed_at
+               )
+               FROM fm_tournament_key_redemptions r
+               LEFT JOIN fm_users ru ON ru.id = r.user_id
+               WHERE r.key_id = k.id),
+              '[]'
+            ) AS redeemers
      FROM fm_tournament_keys k
      LEFT JOIN fm_users u ON u.id = k.used_by_user_id
      WHERE k.tournament_id = $1
@@ -291,8 +351,10 @@ export async function listTournamentKeys(tournamentId: string): Promise<Tourname
 }
 
 /**
- * Redeem a single-use key: marks it used and adds the user as a participant,
- * atomically. Returns { ok, tournament_id } or { error }.
+ * Redeem an entry key: claims one use atomically and adds the user as a
+ * participant. Single-use keys (max_uses=1) transition to 'used' as before;
+ * shared keys (max_uses NULL) accept unlimited redemptions. Returns
+ * { ok, tournament_id } or { error }.
  */
 export async function redeemTournamentKey(
   tournamentId: string,
@@ -310,19 +372,26 @@ export async function redeemTournamentKey(
   if (t.max_participants !== null && t.participant_count >= t.max_participants) {
     return { error: "This tournament is full." };
   }
-  // Atomically claim an unused key; exactly one concurrent redeemer wins.
+  // Atomically claim one use. The uses < max_uses condition is checked
+  // directly on the row (not in a subselect) so concurrent redeemers serialize
+  // on the row lock and the condition is re-checked against the latest row.
   const claimed = await queryOne<{ id: string }>(
     `UPDATE fm_tournament_keys
-     SET status = 'used', used_by_user_id = $3, used_at = now()
-     WHERE id = (
-       SELECT id FROM fm_tournament_keys
-       WHERE tournament_id = $1 AND key_code = $2 AND status = 'unused'
-       LIMIT 1
-     )
+     SET uses = uses + 1,
+         status = CASE WHEN max_uses IS NULL THEN status ELSE 'used' END,
+         used_by_user_id = CASE WHEN max_uses IS NULL THEN used_by_user_id ELSE $3 END,
+         used_at = CASE WHEN max_uses IS NULL THEN used_at ELSE now() END
+     WHERE tournament_id = $1 AND key_code = $2
+       AND (max_uses IS NULL OR uses < max_uses)
      RETURNING id`,
     [tournamentId, code, userId]
   );
   if (!claimed) return { error: "That key isn't valid or was already used." };
+  await query(
+    `INSERT INTO fm_tournament_key_redemptions (key_id, tournament_id, user_id)
+     VALUES ($1, $2, $3) ON CONFLICT (key_id, user_id) DO NOTHING`,
+    [claimed.id, tournamentId, userId]
+  );
   await query(
     `INSERT INTO fm_tournament_participants (tournament_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
     [tournamentId, userId]
