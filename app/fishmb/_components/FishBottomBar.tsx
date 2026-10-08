@@ -77,7 +77,13 @@ const LEFT: Item[] = [
     href: "/fishmb/feed",
     label: "Feed",
     icon: ICONS.community,
-    match: (p) => p === "/fishmb/feed",
+    match: (p, sp) => p === "/fishmb/feed" && sp.get("friends") !== "1",
+  },
+  {
+    href: "/fishmb/feed?friends=1",
+    label: "Friends",
+    icon: ICONS.buddies,
+    match: (p, sp) => p === "/fishmb/feed" && sp.get("friends") === "1",
   },
   {
     href: "/fishmb/dashboard",
