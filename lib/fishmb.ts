@@ -60,6 +60,8 @@ export interface Lodge {
   ice_fishing: boolean;
   ice_fishing_details: string;
   established: string | null;
+  /** How you get there, derived from the lodge's own description: "fly-in", "drive-in", "fly-in & drive-in", or null when not stated. */
+  access?: string | null;
 }
 
 export interface ZoneLimit {

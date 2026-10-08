@@ -38,7 +38,7 @@ export function SpeciesTips({ species }: { species: string }) {
       const d = await fishFetch("/api/fish/discussions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ body: draft.trim(), species_tag: species }),
+        body: JSON.stringify({ body: draft.trim(), species_tag: species, kind: "tip" }),
       });
       setTips([d.discussion, ...tips]);
       setDraft("");

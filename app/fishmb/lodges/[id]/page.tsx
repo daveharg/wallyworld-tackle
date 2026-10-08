@@ -66,6 +66,19 @@ export default function LodgeDetailPage({ params }: { params: { id: string } }) 
         {lodge.location && (
           <p className="text-pine/60 mt-2 text-lg">{lodge.location}</p>
         )}
+        {lodge.access && (
+          <p className="mt-3">
+            <span
+              className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider rounded-full px-4 py-1.5 ${
+                lodge.access.includes("fly-in")
+                  ? "bg-sky-100 text-sky-800"
+                  : "bg-pine/10 text-pine/70"
+              }`}
+            >
+              {lodge.access.includes("fly-in") ? "✈️" : "🚗"} {lodge.access} lodge
+            </span>
+          </p>
+        )}
         {lodge.species.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-4">
             {lodge.species.map((s) => (

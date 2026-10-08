@@ -32,7 +32,7 @@ function toItem(d: DiscussionRow) {
   return {
     id: d.id,
     body: d.body,
-    kind: d.kind === "ad" ? "ad" : "post",
+    kind: d.kind === "ad" ? "ad" : d.kind === "tip" ? "tip" : "post",
     photo_url: d.photo_url,
     visibility: d.visibility ?? "public",
     species_tag: d.species_tag ?? null,
@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
     return badRequest("body must be 500 characters or fewer.");
   }
 
-  const kind = body.kind === "ad" ? "ad" : "post";
+  const kind = body.kind === "ad" ? "ad" : body.kind === "tip" ? "tip" : "post";
   const visibility = body.visibility === "friends" ? "friends" : "public";
   const speciesTag =
     typeof body.species_tag === "string" && body.species_tag.trim()

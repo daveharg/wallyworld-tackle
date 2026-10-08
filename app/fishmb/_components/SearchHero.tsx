@@ -1,13 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FISHMB_HERO_PHOTO } from "@/lib/fishmb-constants";
+import { FISHMB_HERO_PHOTOS } from "@/lib/fishmb-constants";
+
+const ROTATE_MS = 7000;
 
 /** Hero search: type a query, hit Search (or Enter), land on a results page. No live dropdown. */
 export default function SearchHero() {
   const [q, setQ] = useState("");
+  const [idx, setIdx] = useState(0);
   const router = useRouter();
+
+  // Rotate through real Manitoba lake photos with a slow crossfade.
+  useEffect(() => {
+    if (FISHMB_HERO_PHOTOS.length < 2) return;
+    const t = setInterval(() => {
+      setIdx((i) => (i + 1) % FISHMB_HERO_PHOTOS.length);
+    }, ROTATE_MS);
+    return () => clearInterval(t);
+  }, []);
+
+  // Preload the next photo so the crossfade never flashes.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const next = FISHMB_HERO_PHOTOS[(idx + 1) % FISHMB_HERO_PHOTOS.length];
+    const img = new window.Image();
+    img.src = next.src;
+  }, [idx]);
 
   const submit = (value?: string) => {
     const query = (value ?? q).trim();
@@ -15,17 +35,32 @@ export default function SearchHero() {
     router.push(`/fishmb/search?q=${encodeURIComponent(query)}`);
   };
 
+  const current = FISHMB_HERO_PHOTOS[idx];
+
   return (
     <section className="relative overflow-hidden bg-pine-deep" aria-label="Search Manitoba fishing">
-      {/* backdrop */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={FISHMB_HERO_PHOTO}
-        alt="Wooden dock on a calm Manitoba lake"
-        className="absolute inset-0 w-full h-full object-cover"
-      />
+      {/* rotating backdrop — stacked imgs crossfade via opacity */}
+      {FISHMB_HERO_PHOTOS.map((p, i) => (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          key={p.src}
+          src={p.src}
+          alt=""
+          aria-hidden={i !== idx}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
+            i === idx ? "opacity-100" : "opacity-0"
+          }`}
+        />
+      ))}
       <div className="absolute inset-0 bg-gradient-to-r from-pine-deep/90 via-pine-deep/55 to-pine-deep/20" />
       <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-pine-deep/70 to-transparent" />
+      {/* photo credit */}
+      <p
+        key={`credit-${idx}`}
+        className="absolute bottom-2 right-3 text-[10px] text-white/60 z-10"
+      >
+        Photo: {current.credit} via Wikimedia Commons
+      </p>
 
       <div className="relative max-w-4xl mx-auto px-4 pt-12 pb-14 md:pt-16 md:pb-20 text-center">
         <p className="text-gold font-bold uppercase tracking-[0.28em] text-sm mb-3">

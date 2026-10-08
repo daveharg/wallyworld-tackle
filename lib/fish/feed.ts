@@ -7,7 +7,7 @@ import { query, queryOne } from "./db";
 
 export interface FeedItem {
   id: string;
-  kind: "catch" | "post";
+  kind: "catch" | "post" | "tip";
   user_id: string;
   user_name: string;
   avatar_url: string | null;
@@ -123,7 +123,7 @@ export async function getFeed(
        JOIN fm_users u ON u.id = c.user_id
        WHERE ${VISIBLE_TO("c")}
        UNION ALL
-       SELECT d.id, 'post' AS kind, d.user_id, u.name AS user_name, u.avatar_url,
+       SELECT d.id, d.kind, d.user_id, u.name AS user_name, u.avatar_url,
               d.body, d.photo_url,
               COALESCE(d.photos, '[]'::jsonb) AS photos,
               NULL AS species, NULL AS length_in,
@@ -132,7 +132,7 @@ export async function getFeed(
               d.created_at
        FROM fm_discussions d
        JOIN fm_users u ON u.id = d.user_id
-       WHERE d.kind = 'post' AND ${VISIBLE_TO("d")}
+       WHERE d.kind IN ('post', 'tip') AND ${VISIBLE_TO("d")}
      ) feed
      ${where}
      ORDER BY feed.created_at DESC
@@ -209,7 +209,7 @@ export async function toggleReaction(
 export async function getSpeciesTips(species: string, limit = 20): Promise<FeedItem[]> {
   await ensureFeedColumns();
   const rows = await query<FeedItem>(
-    `SELECT d.id, 'post' AS kind, d.user_id, u.name AS user_name, u.avatar_url,
+    `SELECT d.id, d.kind, d.user_id, u.name AS user_name, u.avatar_url,
             d.body, d.photo_url, COALESCE(d.photos, '[]'::jsonb) AS photos,
             NULL AS species, NULL AS length_in,
             d.visibility, d.species_tag,
@@ -218,7 +218,7 @@ export async function getSpeciesTips(species: string, limit = 20): Promise<FeedI
             d.created_at
      FROM fm_discussions d
      JOIN fm_users u ON u.id = d.user_id
-     WHERE d.kind = 'post' AND d.visibility = 'public'
+     WHERE d.kind IN ('post', 'tip') AND d.visibility = 'public'
        AND LOWER(d.species_tag) = LOWER($1)
      ORDER BY d.created_at DESC
      LIMIT $2`,

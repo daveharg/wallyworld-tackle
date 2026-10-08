@@ -15,6 +15,21 @@ export interface SlimLodge {
   kind: string;
   species: string[];
   ice_fishing: boolean;
+  access?: string | null;
+}
+
+export function AccessBadge({ access }: { access?: string | null }) {
+  if (!access) return null;
+  const fly = access.includes("fly-in");
+  return (
+    <span
+      className={`inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider rounded-full px-3 py-1 ${
+        fly ? "bg-sky-100 text-sky-800" : "bg-pine/10 text-pine/70"
+      }`}
+    >
+      {fly ? "✈️" : "🚗"} {access}
+    </span>
+  );
 }
 
 export default function LodgeDirectory({ lodges }: { lodges: SlimLodge[] }) {
@@ -102,14 +117,17 @@ export default function LodgeDirectory({ lodges }: { lodges: SlimLodge[] }) {
               {l.name}
             </h3>
             <p className="text-sm text-pine/55 mb-2">{l.location}</p>
+            <div className="flex flex-wrap gap-2 mb-2">
+              <AccessBadge access={l.access} />
+              {l.ice_fishing && (
+                <span className="inline-flex items-center text-[11px] font-bold uppercase tracking-wider text-pine/60">
+                  ❄ Ice fishing
+                </span>
+              )}
+            </div>
             <p className="text-xs text-pine/50 truncate">
               {l.species.slice(0, 5).join(" · ")}
             </p>
-            {l.ice_fishing && (
-              <p className="text-[11px] font-bold uppercase tracking-wider text-pine/60 mt-2">
-                ❄ Ice fishing
-              </p>
-            )}
           </Link>
         ))}
       </div>

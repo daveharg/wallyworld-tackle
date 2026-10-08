@@ -192,14 +192,14 @@ export function FishLoginButton() {
   const [menu, setMenu] = useState(false);
 
   if (loading) {
-    return <span className="hidden sm:inline-flex w-24 h-10 rounded-full bg-pine/10 animate-pulse" />;
+    return <span className="inline-flex w-24 h-10 rounded-full bg-pine/10 animate-pulse" />;
   }
 
   if (!user) {
     return (
       <button
         onClick={openLogin}
-        className="hidden sm:inline-flex bg-signal hover:bg-signal-dark text-white text-sm font-bold uppercase tracking-wider px-5 py-2.5 rounded-full transition-colors"
+        className="inline-flex bg-signal hover:bg-signal-dark text-white text-sm font-bold uppercase tracking-wider px-4 sm:px-5 py-2.5 rounded-full transition-colors"
       >
         Log in
       </button>
@@ -207,7 +207,7 @@ export function FishLoginButton() {
   }
 
   return (
-    <div className="relative hidden sm:block">
+    <div className="relative block">
       <button
         onClick={() => setMenu((m) => !m)}
         className="inline-flex items-center gap-2 bg-pine/5 hover:bg-pine/10 rounded-full pl-1 pr-4 py-1 transition-colors"

@@ -8,7 +8,7 @@ import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 
 interface FeedItem {
   id: string;
-  kind: "catch" | "post";
+  kind: "catch" | "post" | "tip";
   user_id: string;
   user_name: string;
   avatar_url: string | null;
@@ -17,6 +17,7 @@ interface FeedItem {
   photos: string[];
   species: string | null;
   length_in: number | null;
+  species_tag?: string | null;
   visibility?: string;
   comment_count: number;
   like_count: number;
@@ -420,7 +421,7 @@ export default function FeedPage() {
     setOpenComments(next);
   };
 
-  const visible = items.filter((i) => tab === "all" || i.kind === tab);
+  const visible = items.filter((i) => tab === "all" || i.kind === tab || (tab === "post" && i.kind === "tip"));
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10 md:py-14">
@@ -690,7 +691,12 @@ export default function FeedPage() {
                     {item.user_name}
                   </Link>
                   <p className="text-xs text-pine/45">
-                    {timeAgo(item.created_at)} · {item.kind === "catch" ? "logged a catch" : "posted"}
+                    {timeAgo(item.created_at)} ·{" "}
+                    {item.kind === "catch"
+                      ? "logged a catch"
+                      : item.kind === "tip"
+                        ? `💡 added a tip${item.species_tag ? ` for ${item.species_tag}` : ""}`
+                        : "posted"}
                     {item.visibility === "friends" && " · 👥 friends only"}
                   </p>
                 </div>

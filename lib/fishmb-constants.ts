@@ -63,8 +63,47 @@ export function lodgePhotoUrl(id: string): string | null {
   return realPhotoUrl("lodges", id);
 }
 
-export const FISHMB_HERO_PHOTO =
-  "https://images.unsplash.com/photo-1439066615861-d1af74d74000?auto=format&fit=crop&w=2000&q=70";
+export interface HeroPhoto {
+  src: string;
+  alt: string;
+  credit: string;
+}
+
+/**
+ * Rotating hero photos — real Manitoba lakes, researched on Wikimedia
+ * Commons (freely licensed; credit shown on the hero). Thumbnail URLs at
+ * 1920px wide, each verified 200 + image/jpeg.
+ */
+export const FISHMB_HERO_PHOTOS: HeroPhoto[] = [
+  {
+    src: "https://commons.wikimedia.org/wiki/Special:FilePath/Riding%20Mountain%20National%20Park%2C%20Wasagaming%2C%20Clear%20Lake%20%28340309%29%20%2813491133804%29.jpg?width=1920",
+    alt: "Clear Lake in Riding Mountain National Park",
+    credit: "Robert Linsdell, CC BY 2.0",
+  },
+  {
+    src: "https://commons.wikimedia.org/wiki/Special:FilePath/Grand%20Beach%2C%20Lake%20Winnipeg%2C%20Manitoba%20%28330170%29%20%289441674243%29.jpg?width=1920",
+    alt: "Grand Beach on Lake Winnipeg",
+    credit: "Robert Linsdell, CC BY 2.0",
+  },
+  {
+    src: "https://commons.wikimedia.org/wiki/Special:FilePath/Lake%20Manitoba%20comin%27%20at%20ya%20near%20Steep%20Rock%2C%20Manitoba%2C%20Canada.%20%2836378663843%29.jpg?width=1920",
+    alt: "Lake Manitoba shoreline near Steep Rock",
+    credit: "Rob Swystun, CC BY 2.0",
+  },
+  {
+    src: "https://commons.wikimedia.org/wiki/Special:FilePath/Falcon%20Lake%20Manitoba%20Canada%20Summer%202009.JPG?width=1920",
+    alt: "Falcon Lake in summer, Whiteshell",
+    credit: "Shahnoor Habib Munmun, CC BY 3.0",
+  },
+  {
+    src: "https://commons.wikimedia.org/wiki/Special:FilePath/Clearwater%20lake.jpg?width=1920",
+    alt: "Sunset over Clearwater Lake from the docks",
+    credit: "Canbun, CC BY-SA 4.0",
+  },
+];
+
+/** Kept for backward compatibility — the first rotating hero photo. */
+export const FISHMB_HERO_PHOTO = FISHMB_HERO_PHOTOS[0].src;
 
 export const FISHMB_CTA_PHOTO =
   "https://images.unsplash.com/photo-1541742425281-c1d3fc8aff96?auto=format&fit=crop&w=1800&q=70";

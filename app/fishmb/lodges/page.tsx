@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import LodgeDirectory from "./_components/LodgeDirectory";
+import Classifieds from "./_components/Classifieds";
 import { getLodges } from "@/lib/fishmb";
 
 export const metadata: Metadata = {
   title: "Manitoba lodges & fishing guides",
   description:
-    "127 Manitoba fishing lodges and guides — contact info, waters, species, packages and ice fishing.",
+    "127 Manitoba fishing lodges and guides — plus community guide classifieds and ice shack rentals.",
 };
 
 export const revalidate = 3600;
@@ -18,6 +19,7 @@ export default function LodgesPage() {
     kind: l.kind,
     species: l.species,
     ice_fishing: l.ice_fishing,
+    access: l.access ?? null,
   }));
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 md:py-14">
@@ -32,6 +34,8 @@ export default function LodgesPage() {
         waters they fish, species, packages and how to book.
       </p>
       <LodgeDirectory lodges={lodges} />
+      <Classifieds category="guide" />
+      <Classifieds category="shack" />
     </div>
   );
 }

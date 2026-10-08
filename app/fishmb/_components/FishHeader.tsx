@@ -50,7 +50,13 @@ export default function FishHeader() {
               </Link>
             ))}
           </nav>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link
+              href="/fishmb/app"
+              className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-pine/70 hover:text-signal border border-pine/20 hover:border-signal rounded-full px-4 py-2 transition-colors"
+            >
+              📱 Get the app
+            </Link>
             <FishLoginButton />
             <button
               className="md:hidden p-2 text-pine"
@@ -79,15 +85,31 @@ export default function FishHeader() {
             </Link>
           ))}
           {user ? (
-            <button
-              onClick={() => {
-                logout();
-                setOpen(false);
-              }}
-              className="mt-2 inline-flex justify-center bg-pine/10 text-pine text-sm font-bold uppercase tracking-wider px-5 py-3 rounded-full"
-            >
-              Log out ({user.name})
-            </button>
+            <>
+              <Link
+                href="/fishmb/profile"
+                onClick={() => setOpen(false)}
+                className="py-2.5 text-sm font-bold uppercase tracking-wider text-signal"
+              >
+                👤 My profile
+              </Link>
+              <Link
+                href="/fishmb/friends"
+                onClick={() => setOpen(false)}
+                className="py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70"
+              >
+                Friends
+              </Link>
+              <button
+                onClick={() => {
+                  logout();
+                  setOpen(false);
+                }}
+                className="mt-2 inline-flex justify-center bg-pine/10 text-pine text-sm font-bold uppercase tracking-wider px-5 py-3 rounded-full"
+              >
+                Log out ({user.name})
+              </button>
+            </>
           ) : (
             <button
               onClick={() => {
@@ -99,6 +121,13 @@ export default function FishHeader() {
               Log in
             </button>
           )}
+          <Link
+            href="/fishmb/app"
+            onClick={() => setOpen(false)}
+            className="py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70"
+          >
+            📱 Get the app
+          </Link>
         </nav>
       )}
     </header>

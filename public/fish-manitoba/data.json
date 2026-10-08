@@ -16718,7 +16718,8 @@
       "fishing_waters": [],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": 1992
+      "established": 1992,
+      "access": "fly-in"
     },
     {
       "id": "agassiz-outfitters",
@@ -16759,7 +16760,8 @@
       "fishing_waters": [],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "aikens-lake-wilderness-lodge",
@@ -16811,7 +16813,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": 1949
+      "established": 1949,
+      "access": "fly-in"
     },
     {
       "id": "bakers-narrows-lodge",
@@ -16887,7 +16890,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Yes — winter ice fishing packages at the main lodge on Lake Athapapuskow, plus the Kamuchawie Lake Fly-In Lodge, billed as the world's first remote fly-in ice fishing lodge; all-inclusive hardwater packages include guides, gear, meals and ice transport.",
-      "established": null
+      "established": null,
+      "access": "fly-in & drive-in"
     },
     {
       "id": "barrier-bay-resort",
@@ -16912,7 +16916,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Ice fishing packages offered in winter.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "bennett-lake-lodge",
@@ -16942,7 +16947,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "betula-lake-resort",
@@ -16970,7 +16976,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Ice fishing offered in winter.",
-      "established": null
+      "established": null,
+      "access": "drive-in"
     },
     {
       "id": "big-grass-outfitters",
@@ -17008,7 +17015,8 @@
       "fishing_waters": [],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "big-sand-lake-lodge",
@@ -17064,7 +17072,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "big-whiteshell-lodge",
@@ -17093,7 +17102,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Ice fishing offered in winter.",
-      "established": null
+      "established": null,
+      "access": "drive-in"
     },
     {
       "id": "birdtail-waterfowl",
@@ -17136,7 +17146,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Ice fishing listed as an amenity on the Travel Manitoba/Hunt Fish Manitoba directories; no packaged ice trips published.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "blackwater-cats-outfitter",
@@ -17226,7 +17237,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Offers Lake Winnipeg ice fishing for trophy greenback walleye with multiple guided package options (track truck, mobile wheelhouse combo, Snobear, and corporate all-inclusive trips) through Dec 27 – March 31.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "blue-lakes-resort",
@@ -17261,7 +17273,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "drive-in"
     },
     {
       "id": "bolton-lake-lodge",
@@ -17292,7 +17305,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": 1988
+      "established": 1988,
+      "access": "fly-in"
     },
     {
       "id": "breezy-creek-adventures",
@@ -17339,7 +17353,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "brereton-lake-resort",
@@ -17364,7 +17379,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "drive-in"
     },
     {
       "id": "bruin-outfitting",
@@ -17422,7 +17438,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Run & Gun Ice Fishing ($650 USD/$875 CAD, up to 4 anglers) is built for hardcore anglers aggressively chasing Lake Winnipeg's roaming greenbacks: guide, rods, reels, bait, tackle, heated shacks, hole drilling, and fish cleaning/packaging all included. Guided SnoBear Fishing ($850 USD/$1,150 CAD, 3 anglers) targets giant walleye in comfort from machines rigged with everything needed. SnoBear Rental ($750 USD/$1,015 CAD, 4 anglers) lets anglers fish the lake on their own terms with a fueled machine rigged with electronics. Bookings run through their reservations system (bruinoutfitting.ca).",
-      "established": 2004
+      "established": 2004,
+      "access": null
     },
     {
       "id": "budds-gunisao-lake-lodge",
@@ -17468,7 +17485,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": 1987
+      "established": 1987,
+      "access": "fly-in"
     },
     {
       "id": "burntwood-lake-lodge",
@@ -17505,7 +17523,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "caddy-lake-resort",
@@ -17533,7 +17552,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "carpenters-clearwater-lake-lodge",
@@ -17578,7 +17598,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "cat-eye-outfitter",
@@ -17619,7 +17640,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Ice fishing for giant greenback walleye on the Red River is offered in winter, with reservations for peak periods; the business also ran a winter camp option for Lake Winnipeg ice trips.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "catdaddy-fishing-guide-service",
@@ -17683,7 +17705,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "chasing-giants",
@@ -17711,7 +17734,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "childs-lake-lodge",
@@ -17742,7 +17766,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "city-cats-guiding-service",
@@ -17796,7 +17821,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Ice fishing available on Lake Winnipeg for huge greenback walleye; guests fish in style in an Ice Ridge Reaper track van seating up to six, with fishing equipment available upon request and a hot barbecue lunch provided.",
-      "established": 1999
+      "established": 1999,
+      "access": null
     },
     {
       "id": "cobham-river-lodge",
@@ -17827,7 +17853,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "crescent-beach-cottages",
@@ -17858,7 +17885,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Ice fishing listed as an amenity on Travel Manitoba.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "crunch-time-tackle-outfitting",
@@ -17890,7 +17918,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Guided ice fishing trips with two ice shack options and all tackle included, targeting walleye on Lake Winnipeg.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "dogskin-lake-lodge",
@@ -17922,7 +17951,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "dunlops-fishing-lodge",
@@ -17948,7 +17978,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "dunlops-fly-in-lodge",
@@ -17999,7 +18030,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "einarssons-guide-service",
@@ -18031,7 +18063,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Winter ice fishing trips offered; open year-round.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "elk-island-lodge",
@@ -18079,7 +18112,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "evergreen-lodge-resort",
@@ -18134,7 +18168,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Guided ice-fishing packages on Clearwater Lake with heated ice hut (propane furnace, stove, oven, microwave, toilet, 4 beds); transportation, holes drilled, bait and rods included in Deluxe Package.",
-      "established": null
+      "established": null,
+      "access": "fly-in & drive-in"
     },
     {
       "id": "fairy-rock-wilderness-camp",
@@ -18169,7 +18204,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "falcon-trails-resort",
@@ -18200,7 +18236,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Ice fishing listed as an amenity on Travel Manitoba.",
-      "established": null
+      "established": null,
+      "access": "drive-in"
     },
     {
       "id": "fishing-friends-manitoba",
@@ -18229,7 +18266,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "fly-fishing-manitoba",
@@ -18262,7 +18300,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": 2003
+      "established": 2003,
+      "access": null
     },
     {
       "id": "for-your-walleyes-only",
@@ -18300,7 +18339,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Website references ice fishing trips in winter.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "fortwhyte-alive",
@@ -18334,7 +18374,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Recurring Learn to Ice Fish instructional sessions with the Urban Angling Partnership on FortWhyte's lakes.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "ganglers-north-seal-river",
@@ -18372,7 +18413,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "gaune-fishin",
@@ -18412,7 +18454,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Run-and-gun guided day trips plus Yetti luxury hardhouse rentals for day and overnight stays on Lake Winnipeg's south basin.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "gearys-manitoba-outposts",
@@ -18446,7 +18489,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "george-lake-outfitters",
@@ -18474,7 +18518,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Winter ice fishing from heated ice shacks on George Lake.",
-      "established": 1993
+      "established": 1993,
+      "access": null
     },
     {
       "id": "gods-lake-haven",
@@ -18503,7 +18548,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "gods-river-lodge",
@@ -18542,7 +18588,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "golden-eagle-lodge",
@@ -18564,7 +18611,8 @@
       "fishing_waters": [],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "greenback-guiding-and-outfitting",
@@ -18606,7 +18654,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Operates year-round, including winter trips on Lake Winnipeg.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "grey-owl-outfitters",
@@ -18634,7 +18683,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "gull-harbour-marina",
@@ -18676,7 +18726,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Heated Fish Cave ice shack day rentals plus guided SnoBear adventures with shore lunch, January 1 to March 31.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "harrop-lake-wilderness-lodge",
@@ -18713,7 +18764,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "harvest-lodge",
@@ -18765,7 +18817,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Lodge site describes fishing 'from season opener to ice fishing' on the Waterhen River; no packaged ice trips published.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "hastings-bros-outfitters",
@@ -18808,7 +18861,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Ice fishing listed as a guided product on Lake Winnipeg in winter.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "healeys-gods-lake-narrows-lodge",
@@ -18839,7 +18893,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "ice-hole-fishing-adventures",
@@ -18888,7 +18943,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Guided winter ice fishing with SnoBears, heated shack rentals, and overnight Ice Castle stays.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "icebound-excursions",
@@ -18938,7 +18994,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "SnoBear rentals and guided SnoBear excursions on Lake Winnipeg's south basin, targeting greenback walleye. Rentals: machine ready with full tank of fuel and propane, meet at the lake access point, 50% deposit required, $1000 CDN credit-card damage hold, safety/driver overview with the licensed driver before you take it out. Guided excursions: meet south of Matlock, MB; driver takes you out, drills holes with an electric ice auger, provides sonar and gear, cooks pulled pork or pulled beef tacos for lunch, and cleans and packages kept fish at the end of the day. All-inclusive rates from $750 USD/day for rentals and $850 USD/day for guided excursions; run-and-gun trips from $650 USD/day for a group of 4.",
-      "established": 2017
+      "established": 2017,
+      "access": null
     },
     {
       "id": "inverness-falls-resort",
@@ -18965,7 +19022,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Ice fishing offered in winter.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "jacksons-lodge-outposts",
@@ -18999,7 +19057,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "jessica-lake-lodge",
@@ -19027,7 +19086,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Ice fishing and ice rink in winter, per the whiteshelloutfitters.com lodging page.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "kannuk-outfitters",
@@ -19089,7 +19149,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Core winter business on Lake Winnipeg's south basin chasing trophy greenback walleye. Trip options: (1) Fully Guided Trip up to 8 anglers, $600 USD/$825 CAD for 1-3 anglers plus $85/$115 per additional angler, with guide, pop-up shacks, bait, heaters, hot lunch, rods, tackle, flashers. (2) Fully Guided Trip with 8x12 heated skid house, $700 USD/$950 CAD for 1-3 anglers plus $85/$115 per extra angler (max 4). (3) Ultimate Lake Winnipeg Excursion with custom tracked SUV, pickup and drop-off, $800 USD/$1050 CAD for 1-3 anglers. (4) Corporate/large groups 8-25+ with luxury Ice Castles and pop-up tents, hot lunch and fish fry. Overnight Ice Castle rentals from $600 USD/$800 CAD per night (2-night minimum), sleeping 4-6, with propane furnace, bathroom, cooking gear, TV, and fishing gear included. Guests must provide their own 4x4 or tracked transportation unless arranged.",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "kaska-goose-lodge",
@@ -19124,7 +19185,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "keystone-resort",
@@ -19150,7 +19212,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": 1991
+      "established": 1991,
+      "access": null
     },
     {
       "id": "kickerfish",
@@ -19193,7 +19256,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Runs winter hard-water walleye tournaments on Lake Winnipeg (Icebreaker series, Eskimo gear qualifiers, championship).",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "kilman-resort",
@@ -19220,7 +19284,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "drive-in"
     },
     {
       "id": "kingsland-outfitting",
@@ -19257,7 +19322,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Full-day run-and-gun guiding plus Ice Castle placement service on Lake Winnipeg and the Red River.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "kississing-lake-lodge",
@@ -19311,7 +19377,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "kitchi-island-outposts",
@@ -19349,7 +19416,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "lake-winnipeg-ice-fishing-shack-rentals",
@@ -19380,7 +19448,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Heated 4-6 person ice shack rentals at Balsam Harbour on Lake Winnipeg's east side: fully insulated shacks with heat on and 6 holes drilled before arrival, rented daily 7:30am-7:30pm. Reserve by call/text/email at 204-406-5586 during call hours 8:30am-4:30pm, then pay in full by e-transfer once you receive a confirmation email. 48-hour cancellation notice earns a full refund or rescheduled date; if weather conditions keep them off the ice, guests also get a full refund or reschedule.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "lake-winnipeg-outfitters",
@@ -19414,7 +19483,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Year-round charter operation offering hard-water ice fishing trips on Lake Winnipeg.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "lakeview-hecla-resort",
@@ -19448,7 +19518,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Resort-offered winter ice fishing on Lake Winnipeg with equipment rentals available to guests.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "laurie-river-lodge",
@@ -19501,7 +19572,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "lawford-lake-outfitters",
@@ -19527,7 +19599,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "little-grand-rapids-lodge",
@@ -19551,7 +19624,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "lynn-lake-fly-in-outpost-camps",
@@ -19606,7 +19680,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": 1988
+      "established": 1988,
+      "access": "fly-in"
     },
     {
       "id": "mac-mulligan-guide-service",
@@ -19630,7 +19705,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "medicine-creek-adventures",
@@ -19662,7 +19738,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "moak-lodge",
@@ -19706,7 +19783,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Ice fishing listed as an amenity on Travel Manitoba and HuntFishManitoba listings; lodge website publishes no ice-fishing package details or rates.",
-      "established": null
+      "established": null,
+      "access": "drive-in"
     },
     {
       "id": "molson-lake-lodge",
@@ -19738,7 +19816,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "munroe-lake-lodge",
@@ -19797,7 +19876,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "mystery-country-fish-camps",
@@ -19826,7 +19906,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "narrows-sunset-lodge",
@@ -19872,7 +19953,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Ice fishing offered; listed as an amenity on Travel Manitoba.",
-      "established": null
+      "established": null,
+      "access": "drive-in"
     },
     {
       "id": "neso-lake-lodge",
@@ -19905,7 +19987,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "All-season lodge offering ice shack rentals for winter trophy pike and walleye fishing.",
-      "established": null
+      "established": null,
+      "access": "drive-in"
     },
     {
       "id": "north-haven-resort",
@@ -19947,7 +20030,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "north-mountain-adventures",
@@ -19990,7 +20074,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Travel Manitoba lists an ice fishing amenity.",
-      "established": 2014
+      "established": 2014,
+      "access": null
     },
     {
       "id": "north-star-executive-outpost",
@@ -20021,7 +20106,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "north-star-resort",
@@ -20068,7 +20154,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "northern-life-outfitters",
@@ -20101,7 +20188,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Separate winter listing for ice fishing trips, December through March.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "northern-lights-lodge",
@@ -20162,7 +20250,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "nueltin-fly-in-lodges",
@@ -20196,7 +20285,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "nutimik-lodge",
@@ -20234,7 +20324,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "drive-in"
     },
     {
       "id": "otter-falls-resort",
@@ -20267,7 +20358,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Ice fishing listed as an amenity on Travel Manitoba; toll-free 1-866-895-3045.",
-      "established": null
+      "established": null,
+      "access": "drive-in"
     },
     {
       "id": "out-of-the-blue-aquatic-adventures",
@@ -20314,7 +20406,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Runs winter ice fishing trips in addition to open-water guiding.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "pelican-river-outfitters",
@@ -20346,7 +20439,8 @@
       "fishing_waters": [],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "pinewood-lodge",
@@ -20370,7 +20464,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "drive-in"
     },
     {
       "id": "plum-lake-outfitters",
@@ -20410,7 +20505,8 @@
       "fishing_waters": [],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "drive-in"
     },
     {
       "id": "prairie-gal-fishing",
@@ -20447,7 +20543,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Heated shack rentals with live minnows plus ice fishing lessons on Lake Winnipeg, Friday through Sunday.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "pro-am-tackle",
@@ -20472,7 +20569,8 @@
       "fishing_waters": [],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "red-river-cats",
@@ -20499,7 +20597,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Connected with the Lockport Ice Village; winter ice fishing activity on the Red River.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "riverside-lodge",
@@ -20570,7 +20669,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Ice fishing shacks on site with dedicated ice fishing packages listed on the lodge website; open year-round.",
-      "established": 1961
+      "established": 1961,
+      "access": null
     },
     {
       "id": "riverview-lodge",
@@ -20598,7 +20698,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "drive-in"
     },
     {
       "id": "sandy-river-outfitters",
@@ -20632,7 +20733,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "sasa-ginni-gak-lodge",
@@ -20667,7 +20769,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "sharrons-outfitting-service",
@@ -20702,7 +20805,8 @@
       "fishing_waters": [],
       "ice_fishing": true,
       "ice_fishing_details": "Year-round road-accessible outfitter offering ice fishing for lake trout, walleye, and northern pike, with lodging, tackle, and licences on site.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "shield-outfitters",
@@ -20745,7 +20849,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Winter guiding offered, confirmed by Explore the Whiteshell.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "silsby-lake-lodge",
@@ -20777,7 +20882,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "snobear-expeditions",
@@ -20810,7 +20916,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Guided day trips aboard heated SnoBear ice machines on Lake Winnipeg, Lake Manitoba, Falcon Lake, and the Winnipeg River.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "south-shore-lodge",
@@ -20836,7 +20943,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "tall-timber-lodge",
@@ -20860,7 +20968,8 @@
       "fishing_waters": [],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "tallpine-lodges",
@@ -20888,7 +20997,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "tawow-lodge",
@@ -20933,7 +21043,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Travel Manitoba lists an ice fishing amenity; winter activities include ice fishing.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "teepee-outfitters",
@@ -20961,7 +21072,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "lodge-at-little-duck",
@@ -20991,7 +21103,8 @@
       "fishing_waters": [],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     },
     {
       "id": "trail-end-camp",
@@ -21058,7 +21171,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Offers guided ice fishing packages: three-night/two-day and two-night excursions (one full day plus one half day), plus one-day trips into George or Forbes lakes for lake trout or on the Winnipeg River for monster pike. Per their Guidefitter trip listings, day-trip ice fishing runs $450 for two persons with $100 per additional person; guide service is $450/day for two persons ($75 per extra person). The ice fishing gallery highlights big northern pike.",
-      "established": null
+      "established": null,
+      "access": "drive-in"
     },
     {
       "id": "trapper-toms-outfitting",
@@ -21094,7 +21208,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "turtle-tours",
@@ -21135,7 +21250,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Indigenous-led ice fishing experiences in two heated hot tents with six pre-drilled holes each on Lake Devonian; no permit required.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "turtle-village",
@@ -21176,7 +21292,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Indigenous ice fishing village with four heated 12x12 hot tents on Clear Lake, half-day and full-day bookings, firewood included.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "viking-lodge",
@@ -21233,7 +21350,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Guided multi-species ice fishing from a heated setup on First Cranberry Lake, with winter lodging on site.",
-      "established": null
+      "established": null,
+      "access": "fly-in & drive-in"
     },
     {
       "id": "wavey-creek-outfitters",
@@ -21254,7 +21372,8 @@
       "fishing_waters": [],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "webbers-lodges",
@@ -21293,7 +21412,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": 1967
+      "established": 1967,
+      "access": "fly-in"
     },
     {
       "id": "wekusko-falls-lodge",
@@ -21357,7 +21477,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Ice fishing season from mid-November to May 1; winter ice fishing packages include snowmobiling.",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "wellman-lake-lodge",
@@ -21389,7 +21510,8 @@
       ],
       "ice_fishing": true,
       "ice_fishing_details": "Ice fishing listed as an amenity on Travel Manitoba.",
-      "established": null
+      "established": null,
+      "access": "drive-in"
     },
     {
       "id": "west-hawk-lake-resort",
@@ -21413,7 +21535,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "white-lake-resort",
@@ -21439,7 +21562,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "whiteshell-lake-resort",
@@ -21470,7 +21594,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "drive-in"
     },
     {
       "id": "whiteshell-outfitters",
@@ -21519,7 +21644,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": null
     },
     {
       "id": "wolverine-lodge",
@@ -21547,7 +21673,8 @@
       ],
       "ice_fishing": false,
       "ice_fishing_details": "",
-      "established": null
+      "established": null,
+      "access": "fly-in"
     }
   ],
   "ice_fishing": {

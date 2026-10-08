@@ -17,7 +17,6 @@ import {
 } from "@/lib/fishmb";
 import { getSpeciesAdvice } from "@/lib/fishmb-species";
 import { FISHMB_CTA_PHOTO } from "@/lib/fishmb-constants";
-import { LiveTournaments } from "./_components/LiveTournaments";
 
 export const revalidate = 3600;
 
@@ -162,22 +161,6 @@ export default function FishMBHome() {
               </div>
             ))}
           </HSlider>
-
-          {/* Live tournaments on FishMB */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-display font-bold uppercase text-pine text-2xl tracking-wide">
-                Live on FishMB now
-              </h3>
-              <Link
-                href="/fishmb/tournaments"
-                className="text-signal-dark font-bold text-sm uppercase tracking-wider"
-              >
-                All tournaments →
-              </Link>
-            </div>
-            <LiveTournaments />
-          </div>
         </div>
       </section>
 
