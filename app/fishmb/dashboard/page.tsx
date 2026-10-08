@@ -8,9 +8,11 @@ import { useFishAuth } from "../_components/FishAuth";
 import DashboardStats from "./_components/DashboardStats";
 import DashboardSettings from "./_components/DashboardSettings";
 import DashboardLicence from "./_components/DashboardLicence";
+import DashboardTournaments from "./_components/DashboardTournaments";
 
 const TABS = [
   { id: "stats", label: "📊 Stats" },
+  { id: "tournaments", label: "🏆 Tournaments" },
   { id: "settings", label: "⚙️ Settings" },
 ] as const;
 
@@ -66,6 +68,7 @@ export default function DashboardPage() {
       </div>
 
       {tab === "stats" && <DashboardStats />}
+      {tab === "tournaments" && <DashboardTournaments />}
       {tab === "settings" && <DashboardSettings />}
 
       <DashboardLicence />

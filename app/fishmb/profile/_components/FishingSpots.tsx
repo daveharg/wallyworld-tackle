@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { fishFetch } from "../../_components/fishFetch";
-import type { SpotPin } from "./SpotMap";
+import type { SpotPin, TrailPoint } from "./SpotMap";
+import { SPOT_ICON_CHOICES } from "./spotIcons";
+import { haversineM, bearingDeg, compassLabel, formatDist } from "./geo";
 
 const SpotMap = dynamic(() => import("./SpotMap"), { ssr: false });
 
@@ -26,6 +28,41 @@ interface LakeResult {
   region?: string;
   lat: number | null;
   lng: number | null;
+}
+
+interface Trail {
+  id: string;
+  name: string;
+  points: TrailPoint[];
+  distance_m: number;
+}
+
+function spotEmoji(icon: string | null | undefined): string {
+  return SPOT_ICON_CHOICES.find((c) => c.id === icon)?.emoji ?? "📍";
+}
+
+/** Row of icon choices for a spot (pin / fish / rock / weeds). */
+function IconPicker({ value, onChange }: { value: string; onChange: (id: string) => void }) {
+  return (
+    <div className="flex gap-2">
+      {SPOT_ICON_CHOICES.map((c) => (
+        <button
+          key={c.id}
+          type="button"
+          onClick={() => onChange(c.id)}
+          title={c.label}
+          aria-label={`Spot icon: ${c.label}`}
+          className={`w-11 h-11 rounded-2xl border-2 text-xl flex items-center justify-center transition-colors ${
+            value === c.id
+              ? "border-signal bg-signal/10"
+              : "border-pine/15 bg-white hover:border-pine/30"
+          }`}
+        >
+          {c.emoji}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 const FAV_LAST_KEY = "fishmb-maps-last-lake";
@@ -73,6 +110,7 @@ export default function FishingSpots() {
     setPicking(false);
     setQuickName("");
     setQuickNotes("");
+    setQuickIcon("pin");
     setQuickAdd({ lat, lng });
   };
 
@@ -89,12 +127,14 @@ export default function FishingSpots() {
           notes: quickNotes.trim() || null,
           lat: quickAdd.lat,
           lng: quickAdd.lng,
+          icon: quickIcon,
         }),
       });
       setSpots([(d.spot as Spot), ...spots]);
       setQuickAdd(null);
       setQuickName("");
       setQuickNotes("");
+      setQuickIcon("pin");
       setManualLat(null);
       setManualLng(null);
       setNote("Spot saved!");
@@ -109,6 +149,7 @@ export default function FishingSpots() {
     setQuickAdd(null);
     setQuickName("");
     setQuickNotes("");
+    setQuickIcon("pin");
     setManualLat(null);
     setManualLng(null);
   };
@@ -117,6 +158,19 @@ export default function FishingSpots() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editNotes, setEditNotes] = useState("");
+  const [editIcon, setEditIcon] = useState("pin");
+
+  // Icon choices for the quick-add and manual-add forms
+  const [quickIcon, setQuickIcon] = useState("pin");
+  const [manualIcon, setManualIcon] = useState("pin");
+
+  // Live GPS position (person marker on the map, go-to navigation)
+  const [myLoc, setMyLoc] = useState<{ lat: number; lng: number; speed: number | null } | null>(null);
+
+  // Saved boat trails + overlay + go-to navigation target
+  const [trails, setTrails] = useState<Trail[]>([]);
+  const [overlayTrailId, setOverlayTrailId] = useState("");
+  const [goTo, setGoTo] = useState<Spot | null>(null);
 
   // Favorite lakes + map focus
   const [favs, setFavs] = useState<FavLake[]>([]);
@@ -146,7 +200,46 @@ export default function FishingSpots() {
 
   useEffect(() => {
     load();
+    loadTrails();
   }, []);
+
+  // Live GPS: the person marker on the map follows you whenever the page is open.
+  useEffect(() => {
+    if (!("geolocation" in navigator)) return;
+    const id = navigator.geolocation.watchPosition(
+      (pos) =>
+        setMyLoc({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          speed: pos.coords.speed,
+        }),
+      () => {
+        // Permission denied or unavailable — the map simply shows no marker.
+      },
+      { enableHighAccuracy: true, maximumAge: 5000, timeout: 30000 }
+    );
+    return () => navigator.geolocation.clearWatch(id);
+  }, []);
+
+  const loadTrails = async () => {
+    try {
+      const d = await fishFetch("/api/fishmb/trails");
+      setTrails((d.trails ?? []) as Trail[]);
+    } catch {
+      // Trails stay empty.
+    }
+  };
+
+  const deleteTrail = async (id: string) => {
+    if (!window.confirm("Delete this trail?")) return;
+    try {
+      await fishFetch(`/api/fishmb/trails/${encodeURIComponent(id)}`, { method: "DELETE" });
+      setTrails(trails.filter((t) => t.id !== id));
+      if (overlayTrailId === id) setOverlayTrailId("");
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Could not delete the trail.");
+    }
+  };
 
   // Debounced lake search.
   useEffect(() => {
@@ -274,11 +367,13 @@ export default function FishingSpots() {
           notes: notes.trim() || null,
           lat: manualLat,
           lng: manualLng,
+          icon: manualIcon,
         }),
       });
       setSpots([(d.spot as Spot), ...spots]);
       setName("");
       setNotes("");
+      setManualIcon("pin");
       setManualLat(null);
       setManualLng(null);
       setPicking(false);
@@ -293,6 +388,7 @@ export default function FishingSpots() {
     setEditingId(s.id);
     setEditName(s.name);
     setEditNotes(s.notes ?? "");
+    setEditIcon(s.icon ?? "pin");
   };
 
   const saveEdit = async (id: string) => {
@@ -300,7 +396,7 @@ export default function FishingSpots() {
       const d = await fishFetch(`/api/fishmb/spots/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: editName.trim(), notes: editNotes.trim() || null }),
+        body: JSON.stringify({ name: editName.trim(), notes: editNotes.trim() || null, icon: editIcon }),
       });
       setSpots(spots.map((s) => (s.id === id ? (d.spot as Spot) : s)));
       setEditingId(null);
@@ -347,6 +443,29 @@ export default function FishingSpots() {
               map to mark your first one.
             </p>
           )}
+          {goTo && (
+            <div className="flex items-center gap-3 bg-pine text-white rounded-2xl px-4 py-3 mb-3">
+              <span className="text-xl shrink-0">🧭</span>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-sm truncate">
+                  {goTo.name || "Fishing spot"}
+                </p>
+                <p className="text-xs text-white/70 tabular-nums">
+                  {myLoc
+                    ? `${formatDist(haversineM(myLoc.lat, myLoc.lng, Number(goTo.lat), Number(goTo.lng)))} · ${compassLabel(bearingDeg(myLoc.lat, myLoc.lng, Number(goTo.lat), Number(goTo.lng)))}`
+                    : "Waiting for GPS…"}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setGoTo(null)}
+                aria-label="Stop navigating"
+                className="text-white/70 hover:text-white font-black px-1"
+              >
+                ✕
+              </button>
+            </div>
+          )}
           <SpotMap
             spots={spots}
             picking={picking}
@@ -362,6 +481,14 @@ export default function FishingSpots() {
                 : null
             }
             focus={focus}
+            myLoc={myLoc}
+            overlayTrail={
+              overlayTrailId
+                ? (trails.find((t) => t.id === overlayTrailId)?.points ?? null)
+                : null
+            }
+            goTo={goTo ? { lat: Number(goTo.lat), lng: Number(goTo.lng) } : null}
+            onTrailSaved={loadTrails}
           />
         </>
       )}
@@ -397,6 +524,12 @@ export default function FishingSpots() {
               placeholder="Notes (optional)"
               className={`${inputCls} mt-2`}
             />
+            <div className="mt-3">
+              <p className="text-xs font-bold uppercase tracking-wider text-pine/55 mb-2">
+                Spot icon
+              </p>
+              <IconPicker value={quickIcon} onChange={setQuickIcon} />
+            </div>
             <div className="flex gap-2 mt-4">
               <button
                 type="button"
@@ -491,6 +624,48 @@ export default function FishingSpots() {
         )}
       </div>
 
+      {/* Recorded boat trails — overlay one to retrace your route */}
+      <div className="bg-white border border-pine/10 rounded-3xl p-6 mt-4">
+        <h3 className="font-display font-bold uppercase text-pine text-lg tracking-wide mb-1">
+          🛥️ My trails
+        </h3>
+        <p className="text-pine/55 text-xs mb-3">
+          Recorded boat routes — overlay one on the map to retrace it.
+        </p>
+        {trails.length > 0 ? (
+          <div className="flex gap-2">
+            <select
+              value={overlayTrailId}
+              onChange={(e) => setOverlayTrailId(e.target.value)}
+              aria-label="Choose a trail to overlay"
+              className="flex-1 min-w-0 bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold focus:outline-none focus:border-signal"
+            >
+              <option value="">No trail overlay</option>
+              {trails.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name} · {formatDist(t.distance_m)}
+                </option>
+              ))}
+            </select>
+            {overlayTrailId && (
+              <button
+                type="button"
+                onClick={() => deleteTrail(overlayTrailId)}
+                aria-label="Delete the selected trail"
+                title="Delete the selected trail"
+                className="shrink-0 bg-paper-deep border border-pine/15 rounded-2xl px-4 text-pine/50 hover:text-signal-dark text-sm font-bold"
+              >
+                🗑️
+              </button>
+            )}
+          </div>
+        ) : (
+          <p className="text-pine/40 text-xs">
+            No trails yet — tap <strong>⏺ Record</strong> on the map while boating.
+          </p>
+        )}
+      </div>
+
       {/* Manual add */}
       <div className="bg-white border border-pine/10 rounded-3xl p-6 mt-4">
         <h3 className="font-display font-bold uppercase text-pine text-lg tracking-wide mb-4">
@@ -512,6 +687,12 @@ export default function FishingSpots() {
             placeholder="Notes — depth, structure, what bit… (optional)"
             className={`${inputCls} resize-none`}
           />
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-pine/55 mb-2">
+              Spot icon
+            </p>
+            <IconPicker value={manualIcon} onChange={setManualIcon} />
+          </div>
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
@@ -581,6 +762,7 @@ export default function FishingSpots() {
                     placeholder="Notes (optional)"
                     className={inputCls}
                   />
+                  <IconPicker value={editIcon} onChange={setEditIcon} />
                   <div className="flex gap-2">
                     <button
                       onClick={() => saveEdit(s.id)}
@@ -605,7 +787,7 @@ export default function FishingSpots() {
                     title="Show on map"
                   >
                     <p className="font-bold text-pine truncate hover:text-gold-dark">
-                      📍 {s.name || "Fishing spot"}
+                      {spotEmoji(s.icon)} {s.name || "Fishing spot"}
                     </p>
                     <p className="text-xs text-pine/50 mt-0.5">
                       {fmtDate(s.created_at)} ·{" "}
@@ -616,6 +798,17 @@ export default function FishingSpots() {
                     {s.notes && <p className="text-sm text-pine/70 mt-1">{s.notes}</p>}
                   </button>
                   <div className="flex gap-1 shrink-0">
+                    <button
+                      onClick={() => {
+                        setGoTo(s);
+                        focusOn(Number(s.lat), Number(s.lng), `spot:${s.id}`);
+                      }}
+                      aria-label={`Navigate to ${s.name}`}
+                      title="Navigate to this spot"
+                      className="text-pine/50 hover:text-pine text-sm font-bold px-2 py-1"
+                    >
+                      🧭
+                    </button>
                     <button
                       onClick={() => startEdit(s)}
                       aria-label={`Rename ${s.name}`}

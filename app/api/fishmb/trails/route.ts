@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
   }
   try {
     const trail = await createTrail(me.id, {
-      name: body.name,
+      name: typeof body.name === "string" ? body.name : "",
       points: body.points,
       distance_m: body.distance_m,
     });
