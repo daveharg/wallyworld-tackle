@@ -57,6 +57,12 @@ const ICONS = {
       <path d="M9 4v14M15 6v14" />
     </svg>
   ),
+  messages: (
+    <svg {...iconProps}>
+      <path d="M4 6.5h16v10H9l-5 4v-4H4v-10Z" />
+      <path d="M8 10.5h8M8 13.5h5" />
+    </svg>
+  ),
   weather: (
     <svg {...iconProps}>
       <circle cx="8" cy="8" r="3.5" />
@@ -69,28 +75,22 @@ const ICONS = {
 const LEFT: Item[] = [
   {
     href: "/fishmb/feed",
-    label: "Community",
+    label: "Feed",
     icon: ICONS.community,
-    match: (p, sp) => p === "/fishmb/feed" && sp.get("kind") !== "catch" && sp.get("friends") !== "1",
+    match: (p) => p === "/fishmb/feed",
   },
   {
-    href: "/fishmb/feed?kind=catch",
-    label: "Catches",
-    icon: ICONS.catches,
-    match: (p, sp) => p === "/fishmb/feed" && sp.get("kind") === "catch",
-  },
-  {
-    href: "/fishmb/feed?friends=1",
-    label: "Buddies",
-    icon: ICONS.buddies,
-    match: (p, sp) => p === "/fishmb/feed" && sp.get("friends") === "1",
+    href: "/fishmb/dashboard",
+    label: "Dashboard",
+    icon: ICONS.dashboard,
+    match: (p) => p.startsWith("/fishmb/dashboard") || p.startsWith("/fishmb/profile"),
   },
 ];
 
 const RIGHT: Item[] = [
-  { href: "/fishmb/dashboard", label: "Dashboard", icon: ICONS.dashboard, match: (p) => p.startsWith("/fishmb/dashboard") || p.startsWith("/fishmb/profile") },
   { href: "/fishmb/maps", label: "Maps", icon: ICONS.maps, match: (p) => p.startsWith("/fishmb/maps") || p.startsWith("/fishmb/lakes") },
   { href: "/fishmb/weather", label: "Weather", icon: ICONS.weather, match: (p) => p.startsWith("/fishmb/weather") },
+  { href: "/fishmb/messages", label: "Messages", icon: ICONS.messages, match: (p) => p.startsWith("/fishmb/messages") },
 ];
 
 function Bar() {
@@ -127,17 +127,23 @@ function Bar() {
   const sp = new URLSearchParams(searchParams.toString());
   const renderItem = (item: Item) => {
     const active = item.match(pathname, sp);
+    const showBadge = item.href === "/fishmb/messages" && unread > 0;
     return (
       <Link
         key={item.href}
         href={item.href}
-        aria-label={item.label}
+        aria-label={showBadge ? `Messages, ${unread} unread` : item.label}
         className={`relative flex flex-col items-center justify-center gap-0.5 w-11 py-1.5 rounded-2xl transition-colors ${
           active ? "text-signal" : "text-pine/45 hover:text-pine"
         }`}
       >
         {item.icon}
         <span className="text-[9px] font-bold leading-none">{item.label}</span>
+        {showBadge && (
+          <span className="absolute top-0 right-0 min-w-5 h-5 px-1 rounded-full bg-signal text-white text-[10px] font-black flex items-center justify-center">
+            {unread > 99 ? "99+" : unread}
+          </span>
+        )}
         {active && <span className="absolute bottom-0 w-6 h-0.5 rounded-full bg-signal" />}
       </Link>
     );
@@ -175,16 +181,6 @@ function Bar() {
             </div>
           ))}
         </div>
-        {/* Messages stays one tap away via a badge while the bar is full */}
-        {unread > 0 && (
-          <Link
-            href="/fishmb/messages"
-            aria-label={`Messages, ${unread} unread`}
-            className="absolute top-1 right-2 min-w-5 h-5 px-1 rounded-full bg-signal text-white text-[10px] font-black flex items-center justify-center"
-          >
-            {unread > 99 ? "99+" : unread}
-          </Link>
-        )}
       </div>
     </nav>
   );

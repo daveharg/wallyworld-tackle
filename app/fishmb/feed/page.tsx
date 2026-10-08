@@ -291,6 +291,7 @@ function FeedPageInner() {
   const [hasMore, setHasMore] = useState(false);
   const [tab, setTab] = useState<"all" | "catch" | "post">("all");
   const [friendsOnly, setFriendsOnly] = useState(false);
+  const [sectionMenuOpen, setSectionMenuOpen] = useState(false);
   const [composerOpen, setComposerOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [q, setQ] = useState("");
@@ -652,11 +653,54 @@ function FeedPageInner() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 pt-4 md:pt-6 pb-32">
-      {/* Feed section header — the bottom bar switches sections */}
+      {/* Feed section header — tap the title to switch sections */}
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-black text-pine tracking-tight">
-          {friendsOnly ? "👥 Buddies" : tab === "catch" ? "🐟 Catches" : "🌊 Community"}
-        </h1>
+        <div className="relative">
+          <button
+            onClick={() => setSectionMenuOpen((o) => !o)}
+            aria-haspopup="menu"
+            aria-expanded={sectionMenuOpen}
+            className="flex items-center gap-1.5 text-xl font-black text-pine tracking-tight"
+          >
+            {friendsOnly ? "👥 Buddies" : tab === "catch" ? "🐟 Catches" : "🌊 Community"}
+            <span className="text-pine/40 text-sm">▾</span>
+          </button>
+          {sectionMenuOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setSectionMenuOpen(false)} />
+              <div role="menu" className="absolute z-50 mt-2 w-56 bg-white rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.18)] border border-pine/10 py-1.5">
+                {(
+                  [
+                    ["community", "🌊 Community", "/fishmb/feed"],
+                    ["buddies", "👥 Buddies", "/fishmb/feed?friends=1"],
+                    ["catches", "🐟 Catches", "/fishmb/feed?kind=catch"],
+                  ] as const
+                ).map(([id, label, href]) => {
+                  const current =
+                    (id === "buddies" && friendsOnly) ||
+                    (id === "catches" && tab === "catch" && !friendsOnly) ||
+                    (id === "community" && tab !== "catch" && !friendsOnly);
+                  return (
+                    <button
+                      key={id}
+                      role="menuitem"
+                      onClick={() => {
+                        setSectionMenuOpen(false);
+                        router.push(href);
+                      }}
+                      className={`w-full flex items-center justify-between px-4 py-3 text-sm font-bold ${
+                        current ? "text-signal-dark" : "text-pine/70 hover:bg-pine/5"
+                      }`}
+                    >
+                      {label}
+                      {current && <span>✓</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
         <button
           onClick={() => setSearchOpen(true)}
           aria-label="Search the feed"
