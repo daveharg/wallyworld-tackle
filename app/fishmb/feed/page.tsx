@@ -68,6 +68,58 @@ interface FeedAd {
 }
 
 /** Sponsored ad card interleaved into the feed. */
+/** First-party feature promos shown to new (signed-out) visitors, interleaved in the feed. */
+const FEATURE_PROMOS = [
+  {
+    img: "/fishmb/promos/tournaments.jpg",
+    badge: "🏆 Tournaments",
+    title: "Run your own fishing tournament",
+    body: "Challenge your buddies to a month-long walleye showdown. Invite codes, live leaderboard, GPS-verified catches — FishMB never touches the money.",
+    cta: "Start a tournament",
+    href: "/fishmb/tournaments",
+  },
+  {
+    img: "/fishmb/promos/maps.jpg",
+    badge: "🗺️ My Maps",
+    title: "Your secret spots, on your private map",
+    body: "Mark honey holes with a long-press, keep lake notes on depths and patterns, and flip to depth contours when they land. Only you can see them.",
+    cta: "Explore my maps",
+    href: "/fishmb/maps",
+  },
+  {
+    img: "/fishmb/promos/messaging.jpg",
+    badge: "🔒 Encrypted messaging",
+    title: "Chat with your fishing buddies — privately",
+    body: "End-to-end encrypted 1:1 and group chats. Plan the trip, share the photos, keep the spots secret. Not even FishMB can read them.",
+    cta: "Start chatting",
+    href: "/fishmb/messages",
+  },
+];
+
+function FeaturePromoCard({ promo }: { promo: (typeof FEATURE_PROMOS)[number] }) {
+  return (
+    <article className="bg-white border border-pine/10 rounded-3xl overflow-hidden max-sm:-mx-4 max-sm:rounded-none max-sm:border-x-0">
+      <div className="relative">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={promo.img} alt={promo.title} loading="lazy" className="w-full max-h-72 object-cover" />
+        <span className="absolute top-3 left-3 text-[10px] font-black uppercase tracking-[0.18em] bg-black/55 text-white px-3 py-1.5 rounded-full">
+          ✨ {promo.badge}
+        </span>
+      </div>
+      <div className="p-5">
+        <p className="font-black text-pine text-lg leading-snug">{promo.title}</p>
+        <p className="text-pine/70 text-sm mt-1.5 leading-relaxed">{promo.body}</p>
+        <Link
+          href={promo.href}
+          className="inline-block mt-4 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-6 py-3 rounded-full transition-colors"
+        >
+          {promo.cta} →
+        </Link>
+      </div>
+    </article>
+  );
+}
+
 function FeedAdCard({ ad }: { ad: FeedAd }) {
   return (
     <article className="bg-white border-2 border-gold/50 rounded-3xl p-5">
@@ -818,6 +870,10 @@ function FeedPageInner() {
             {/* Interleave a sponsored ad after every 8th post */}
             {feedAds.length > 0 && (idx + 1) % 8 === 0 && (
               <FeedAdCard ad={feedAds[Math.floor((idx + 1) / 8 - 1) % feedAds.length]} />
+            )}
+            {/* Feature promos for new visitors — after the 3rd, 6th and 9th posts */}
+            {!user && (idx === 2 || idx === 5 || idx === 8) && (
+              <FeaturePromoCard promo={FEATURE_PROMOS[(idx - 2) / 3]} />
             )}
             </Fragment>
           ))}
