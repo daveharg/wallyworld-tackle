@@ -5,7 +5,9 @@ import SWRegister from "./_components/SWRegister";
 
 export const metadata: Metadata = {
   title: {
-    default: "FishMB — Manitoba fishing lakes, lodges & regulations",
+    // absolute: the root layout's "%s | Wallyworld Tackle" template would
+    // otherwise wrap this default (templates apply to child-segment titles).
+    absolute: "FishMB — Manitoba fishing lakes, lodges & regulations",
     template: "%s | FishMB",
   },
   description:
