@@ -7,6 +7,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { fishFetch } from "../../_components/fishFetch";
+import { useFishAuth } from "../../_components/FishAuth";
 import FishingStats from "./FishingStats";
 import MyRentals from "./MyRentals";
 
@@ -52,6 +53,7 @@ export default function ProfileView({
   editor?: React.ReactNode;
 }) {
   const [data, setData] = useState<ProfileData | null>(null);
+  const { user: me } = useFishAuth();
   const [tab, setTab] = useState<"photos" | "friends">("photos");
   const [acting, setActing] = useState(false);
   const [note, setNote] = useState<string | null>(null);
@@ -69,6 +71,26 @@ export default function ProfileView({
       live = false;
     };
   }, [userId]);
+
+  // When viewing your own profile, keep the header (avatar, name, bio) in sync
+  // with the auth session — e.g. right after you change your profile picture
+  // in the editor, without needing a reload.
+  useEffect(() => {
+    if (!me || me.id !== userId) return;
+    setData((d) => {
+      if (!d) return d;
+      const bio = (me as { bio?: string }).bio;
+      return {
+        ...d,
+        user: {
+          ...d.user,
+          avatar_url: me.avatar_url,
+          name: me.name,
+          bio: bio ?? d.user.bio,
+        },
+      };
+    });
+  }, [me, userId]);
 
   const sendRequest = async () => {
     setActing(true);
