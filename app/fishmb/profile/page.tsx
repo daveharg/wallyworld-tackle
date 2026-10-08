@@ -6,6 +6,7 @@
 import Link from "next/link";
 import { useFishAuth } from "../_components/FishAuth";
 import ProfileView from "./_components/ProfileView";
+import StatsPrivacyEditor from "./_components/StatsPrivacyEditor";
 
 export default function ProfilePage() {
   const { user, openLogin } = useFishAuth();
@@ -69,7 +70,7 @@ export default function ProfilePage() {
           <span className="text-2xl shrink-0">→</span>
         </Link>
       </div>
-      <ProfileView userId={user.id} />
+      <ProfileView userId={user.id} editor={<StatsPrivacyEditor userId={user.id} />} />
     </>
   );
 }

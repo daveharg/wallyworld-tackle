@@ -8,10 +8,12 @@ import {
   fishUserFromRequest,
   badRequest,
   notFound,
+  forbidden,
 } from "@/lib/fish/auth";
 import { query, queryOne } from "@/lib/fish/db";
 import { ensureTournamentTables, getLeaderboard } from "@/lib/fish/tournaments";
 import { ensureFeedColumns } from "@/lib/fish/feed";
+import { getHiddenStats } from "@/lib/fish/stats";
 
 const STATS = [
   "catches",
@@ -46,6 +48,10 @@ export async function GET(
     me = null;
   }
   const isSelf = !!me && me.id === userId;
+  // A stat the angler hid is private to everyone but them.
+  if (!isSelf && (await getHiddenStats(userId)).includes(stat)) {
+    return forbidden("This stat is private.");
+  }
   const pubCatches = isSelf ? "" : `AND visibility = 'public'`;
   const pubPosts = isSelf ? "" : `AND visibility = 'public'`;
 

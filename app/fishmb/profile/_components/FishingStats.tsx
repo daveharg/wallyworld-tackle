@@ -23,6 +23,8 @@ interface UserStats {
   posts_count: number;
   tips_count: number;
   member_since: string | null;
+  hidden_stats?: string[];
+  is_self?: boolean;
 }
 
 function memberSince(iso: string | null): string | null {
@@ -72,6 +74,11 @@ export default function FishingStats({ userId, hideTitle }: { userId: string; hi
     ["Wins", stats.tournament_wins, "wins"],
     ["Posts", stats.posts_count, "posts"],
   ];
+  // Stats the angler hides from other people don't render as tiles for them.
+  const visibleTiles = tiles.filter(
+    ([, , key]) => stats.is_self || !(stats.hidden_stats ?? []).includes(key)
+  );
+  const showBiggest = stats.is_self || !(stats.hidden_stats ?? []).includes("biggest");
   const since = memberSince(stats.member_since);
 
   return (
@@ -82,7 +89,7 @@ export default function FishingStats({ userId, hideTitle }: { userId: string; hi
         </h2>
       )}
       <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5 mb-4">
-        {tiles.map(([label, value, key]) => (
+        {visibleTiles.map(([label, value, key]) => (
           <Link
             key={label}
             href={`/fishmb/anglers/${userId}/stats/${key}`}
@@ -95,6 +102,7 @@ export default function FishingStats({ userId, hideTitle }: { userId: string; hi
           </Link>
         ))}
       </div>
+      {showBiggest && (
       <div className="bg-white border border-pine/10 rounded-3xl p-5">
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-3">
           Biggest fish
@@ -122,6 +130,7 @@ export default function FishingStats({ userId, hideTitle }: { userId: string; hi
           </p>
         )}
       </div>
+      )}
       <Link
         href="/fishmb/leaderboards"
         className="mt-4 inline-flex items-center gap-2 bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-xs px-6 py-3 rounded-full transition-colors"

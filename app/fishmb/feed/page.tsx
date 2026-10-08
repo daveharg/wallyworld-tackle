@@ -30,6 +30,7 @@ interface FeedItem {
 
 interface FeedComment {
   id: string;
+  user_id?: string;
   user_name: string;
   avatar_url: string | null;
   body: string;
@@ -313,7 +314,14 @@ function Comments({ postId }: { postId: string }) {
           <Avatar name={c.user_name} url={c.avatar_url} />
           <div className="bg-paper-deep rounded-2xl px-3.5 py-2.5 flex-1">
             <p className="text-xs font-bold text-pine">
-              {c.user_name} <span className="font-normal text-pine/45">· {timeAgo(c.created_at)}</span>
+              {c.user_id ? (
+                <Link href={`/fishmb/anglers/${c.user_id}`} className="hover:text-signal-dark">
+                  {c.user_name}
+                </Link>
+              ) : (
+                c.user_name
+              )}{" "}
+              <span className="font-normal text-pine/45">· {timeAgo(c.created_at)}</span>
             </p>
             <p className="text-sm text-pine/80 mt-0.5">{c.body}</p>
           </div>

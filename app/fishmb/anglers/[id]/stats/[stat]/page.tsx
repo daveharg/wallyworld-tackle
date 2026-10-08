@@ -47,6 +47,7 @@ export default function StatDetailPage({
   const [board, setBoard] = useState<BoardRow[] | null>(null);
   const [name, setName] = useState<string>("");
   const [failed, setFailed] = useState(false);
+  const [isPrivate, setIsPrivate] = useState(false);
 
   useEffect(() => {
     let live = true;
@@ -63,8 +64,10 @@ export default function StatDetailPage({
         if (u?.name) setName(u.name);
         const rows = (lb as { rows?: BoardRow[] } | null)?.rows;
         if (rows) setBoard(rows);
-      } catch {
-        if (live) setFailed(true);
+      } catch (e) {
+        if (!live) return;
+        if (e instanceof Error && /private/i.test(e.message)) setIsPrivate(true);
+        else setFailed(true);
       }
     })();
     return () => {
@@ -98,6 +101,8 @@ export default function StatDetailPage({
 
       {failed ? (
         <p className="text-pine/60">Couldn&apos;t load these right now.</p>
+      ) : isPrivate ? (
+        <p className="text-pine/60">🔒 {name || "This angler"} keeps this stat private.</p>
       ) : items === null ? (
         <div className="bg-pine/5 rounded-3xl h-32 animate-pulse" />
       ) : items.length === 0 ? (

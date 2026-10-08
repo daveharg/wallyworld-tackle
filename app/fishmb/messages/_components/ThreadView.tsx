@@ -306,7 +306,7 @@ export default function ThreadView({
           {peer.members.map((m) => (
             <Link
               key={m.user_id}
-              href={`/fishmb/users/${m.user_id}`}
+              href={`/fishmb/anglers/${m.user_id}`}
               className="flex items-center gap-2 text-sm text-pine hover:text-signal-dark"
             >
               <span className="w-6 h-6 rounded-full bg-pine/10 flex items-center justify-center text-xs font-bold">

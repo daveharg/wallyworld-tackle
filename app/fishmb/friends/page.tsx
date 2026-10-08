@@ -134,8 +134,10 @@ export default function FriendsPage() {
           <ul className="mt-3 divide-y divide-pine/10">
             {results.map((p) => (
               <li key={p.id} className="flex items-center gap-3 py-2.5">
-                <Avatar p={p} size={40} />
-                <span className="flex-1 font-bold text-pine">{p.name}</span>
+                <Link href={`/fishmb/anglers/${p.id}`} className="flex items-center gap-3 flex-1 min-w-0">
+                  <Avatar p={p} size={40} />
+                  <span className="flex-1 font-bold text-pine truncate">{p.name}</span>
+                </Link>
                 {requestedIds.has(p.id) ? (
                   <span className="text-xs font-bold uppercase tracking-wider text-pine/40">Requested</span>
                 ) : (
@@ -159,8 +161,10 @@ export default function FriendsPage() {
           <ul className="divide-y divide-pine/10">
             {bundle!.pending_incoming.map((p) => (
               <li key={p.id} className="flex items-center gap-3 py-2.5">
-                <Avatar p={p} size={40} />
-                <span className="flex-1 font-bold text-pine">{p.name}</span>
+                <Link href={`/fishmb/anglers/${p.id}`} className="flex items-center gap-3 flex-1 min-w-0">
+                  <Avatar p={p} size={40} />
+                  <span className="flex-1 font-bold text-pine truncate">{p.name}</span>
+                </Link>
                 <button onClick={() => accept(p.id)} disabled={busy === p.id} className="text-sm font-bold text-pine uppercase tracking-wider bg-pine/10 hover:bg-pine/20 px-4 py-2 rounded-full disabled:opacity-50">Accept</button>
                 <button onClick={() => decline(p.id)} disabled={busy === p.id} className="text-sm font-bold text-pine/50 uppercase tracking-wider px-3 py-2 disabled:opacity-50">Decline</button>
               </li>
@@ -179,8 +183,10 @@ export default function FriendsPage() {
           <ul className="divide-y divide-pine/10">
             {bundle!.friends.map((p) => (
               <li key={p.id} className="flex items-center gap-3 py-2.5">
-                <Avatar p={p} size={40} />
-                <span className="flex-1 font-bold text-pine">{p.name}</span>
+                <Link href={`/fishmb/anglers/${p.id}`} className="flex items-center gap-3 flex-1 min-w-0">
+                  <Avatar p={p} size={40} />
+                  <span className="flex-1 font-bold text-pine truncate">{p.name}</span>
+                </Link>
                 <button onClick={() => remove(p.id)} disabled={busy === p.id} className="text-xs font-bold text-pine/45 uppercase tracking-wider disabled:opacity-50">Remove</button>
               </li>
             ))}

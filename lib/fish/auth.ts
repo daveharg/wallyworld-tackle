@@ -39,6 +39,8 @@ export async function ensureProfileColumns(): Promise<void> {
   if (profileColsEnsured) return;
   await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS bio text NOT NULL DEFAULT ''`);
   await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS account_type text NOT NULL DEFAULT 'personal'`);
+  // Stat privacy: keys of the stats tiles the user hides from other people.
+  await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS hidden_stats text[] NOT NULL DEFAULT '{}'`);
   profileColsEnsured = true;
 }
 

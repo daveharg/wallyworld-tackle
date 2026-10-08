@@ -142,15 +142,17 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
           {leaderboard.map((row, i) => (
             <div key={row.user_id} className={`flex items-center gap-4 px-5 py-4 ${i > 0 ? "border-t border-pine/10" : ""}`}>
               <span className={`font-display font-bold text-2xl w-10 ${i === 0 ? "text-gold" : "text-pine/40"}`}>{i + 1}</span>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              {row.avatar_url ? (
-                <img src={row.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover" />
-              ) : (
-                <span className="w-10 h-10 rounded-full bg-signal text-white flex items-center justify-center font-bold">
-                  {row.user_name.charAt(0).toUpperCase()}
-                </span>
-              )}
-              <span className="font-bold text-pine flex-1">{row.user_name}</span>
+              <Link href={`/fishmb/anglers/${row.user_id}`} className="flex items-center gap-4 flex-1 min-w-0 group">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {row.avatar_url ? (
+                  <img src={row.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover" />
+                ) : (
+                  <span className="w-10 h-10 rounded-full bg-signal text-white flex items-center justify-center font-bold">
+                    {row.user_name.charAt(0).toUpperCase()}
+                  </span>
+                )}
+                <span className="font-bold text-pine flex-1 truncate group-hover:text-signal-dark">{row.user_name}</span>
+              </Link>
               <span className="text-pine/55 text-sm">{row.fish_count} fish</span>
               <span className="font-display font-bold text-pine text-xl w-28 text-right">
                 {row.score.toFixed(1)} <span className="text-xs text-pine/50 font-body">{scoreLabel}</span>

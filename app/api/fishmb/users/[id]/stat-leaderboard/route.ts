@@ -4,9 +4,9 @@
 // viewer-aware visibility, friends always use public-only numbers.
 
 import { NextRequest, NextResponse } from "next/server";
-import { fishUserFromRequest, badRequest, notFound } from "@/lib/fish/auth";
+import { fishUserFromRequest, badRequest, notFound, forbidden } from "@/lib/fish/auth";
 import { query, queryOne } from "@/lib/fish/db";
-import { getUserStats, type UserStats } from "@/lib/fish/stats";
+import { getUserStats, getHiddenStats, type UserStats } from "@/lib/fish/stats";
 
 const STATS = [
   "catches",
@@ -54,6 +54,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     me = null;
   }
   const viewerId = me?.id ?? null;
+  const isSelf = viewerId !== null && viewerId === userId;
+  // A stat the angler hid is private to everyone but them.
+  if (!isSelf && (await getHiddenStats(userId)).includes(stat)) {
+    return forbidden("This stat is private.");
+  }
 
   // Accepted friends of the profile owner.
   const friends = await query<{ id: string; name: string; avatar_url: string | null }>(

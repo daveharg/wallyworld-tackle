@@ -86,7 +86,7 @@ export default function DashboardStats() {
                 <p className="text-pine/60 text-sm mb-2">
                   Showing stats for{" "}
                   <Link
-                    href={`/fishmb/users/${selected.id}`}
+                    href={`/fishmb/anglers/${selected.id}`}
                     className="font-bold text-signal-dark hover:underline"
                   >
                     {selected.name}

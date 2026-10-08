@@ -9,6 +9,7 @@
 import { query, queryOne } from "./db";
 import { ensureTournamentTables, getLeaderboard } from "./tournaments";
 import { ensureFeedColumns } from "./feed";
+import { ensureProfileColumns } from "./auth";
 
 export interface LegacyUserStats {
   total_catches: number;
@@ -60,6 +61,32 @@ export interface UserStats {
   posts_count: number;
   tips_count: number;
   member_since: string | null;
+  /** Stat keys this angler hides from other people. */
+  hidden_stats: string[];
+  /** Whether the viewer is the profile owner. */
+  is_self: boolean;
+}
+
+/** Valid keys for the hidden_stats privacy list. */
+export const STAT_KEYS = [
+  "catches",
+  "tournament-catches",
+  "species",
+  "tournaments",
+  "wins",
+  "posts",
+  "biggest",
+] as const;
+
+/** The stat keys one user hides from everyone else. */
+export async function getHiddenStats(userId: string): Promise<string[]> {
+  await ensureProfileColumns();
+  const row = await queryOne<{ hidden_stats: string[] | null }>(
+    `SELECT hidden_stats FROM fm_users WHERE id = $1`,
+    [userId]
+  );
+  const raw = row?.hidden_stats ?? [];
+  return raw.filter((k): k is string => (STAT_KEYS as readonly string[]).includes(k));
 }
 
 export interface AdminUserStats extends UserStats {
@@ -122,6 +149,8 @@ export async function getUserStats(
   const isSelf = viewerId !== null && viewerId === userId;
   const publicOnly = !isSelf;
   const vis = publicOnly ? `AND visibility = 'public'` : ``;
+  const hidden = await getHiddenStats(userId);
+  const hide = (key: string) => !isSelf && hidden.includes(key);
 
   const catches = await queryOne<{ c: string }>(
     `SELECT COUNT(*)::text AS c FROM fm_catches WHERE user_id = $1 ${vis}`,
@@ -158,15 +187,17 @@ export async function getUserStats(
 
   return {
     user_id: userId,
-    total_catches: Number(catches?.c ?? 0),
-    tournament_catches: Number(tEntries?.c ?? 0),
-    species_count: await speciesCount(userId, publicOnly),
-    biggest: await biggestFor(userId, publicOnly),
-    tournaments_joined: Number(joined?.c ?? 0),
-    tournament_wins: wins,
-    posts_count: Number(posts?.p ?? 0),
+    total_catches: hide("catches") ? 0 : Number(catches?.c ?? 0),
+    tournament_catches: hide("tournament-catches") ? 0 : Number(tEntries?.c ?? 0),
+    species_count: hide("species") ? 0 : await speciesCount(userId, publicOnly),
+    biggest: hide("biggest") ? [] : await biggestFor(userId, publicOnly),
+    tournaments_joined: hide("tournaments") ? 0 : Number(joined?.c ?? 0),
+    tournament_wins: hide("wins") ? 0 : wins,
+    posts_count: hide("posts") ? 0 : Number(posts?.p ?? 0),
     tips_count: Number(posts?.t ?? 0),
     member_since: user.created_at,
+    hidden_stats: hidden,
+    is_self: isSelf,
   };
 }
 
@@ -205,6 +236,8 @@ export async function getAllUserStats(limit = 500): Promise<AdminUserStats[]> {
       posts_count: 0,
       tips_count: 0,
       member_since: u.created_at,
+      hidden_stats: [],
+      is_self: false,
     });
   }
 
