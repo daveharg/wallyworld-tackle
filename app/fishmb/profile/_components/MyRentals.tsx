@@ -53,7 +53,7 @@ export default function MyRentals() {
 
   if (rentals === null) {
     return (
-      <section className="mt-8 bg-white border border-pine/10 rounded-3xl p-4 sm:p-5">
+      <section className="mt-8 mb-8 bg-white border border-pine/10 rounded-3xl p-4 sm:p-5">
         <div className="h-6 bg-pine/10 rounded-full w-40 animate-pulse mb-4" />
         <div className="h-16 bg-pine/10 rounded-2xl animate-pulse" />
       </section>
@@ -63,7 +63,7 @@ export default function MyRentals() {
   const totalPending = Object.values(pendingByRental).reduce((a, n) => a + n, 0);
 
   return (
-    <section className="mt-8 bg-white border border-pine/10 rounded-3xl p-4 sm:p-5">
+    <section className="mt-8 mb-8 bg-white border border-pine/10 rounded-3xl p-4 sm:p-5">
       <div className="flex items-center justify-between gap-2 flex-wrap mb-4 px-1">
         <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide">
           🏠 My rentals
