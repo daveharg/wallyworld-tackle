@@ -88,14 +88,27 @@ export default function LocationPicker({
     if (!navigator.geolocation) return;
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        // Resolve the GPS coords to a real place name so the user can see
+        // WHAT location they're getting weather for — not just "Current location".
+        let name = "Current location";
+        try {
+          const r = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`
+          );
+          if (r.ok) {
+            const d = await r.json();
+            const place: string = d.city || d.locality || "";
+            const prov: string = d.principalSubdivisionCode || d.principalSubdivision || "";
+            if (place) name = prov ? `${place}, ${prov}` : place;
+          }
+        } catch {
+          // Keep the generic label if the lookup fails.
+        }
         setLocating(false);
-        const loc: WxLoc = {
-          name: "Current location",
-          lat: pos.coords.latitude,
-          lon: pos.coords.longitude,
-        };
-        choose(loc);
+        choose({ name, lat, lon });
       },
       () => setLocating(false),
       { timeout: 10000 }
