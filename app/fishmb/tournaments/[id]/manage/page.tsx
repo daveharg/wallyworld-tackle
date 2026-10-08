@@ -24,6 +24,8 @@ interface Entry {
   gps_accuracy: number | null;
   notes: string;
   duplicate_of: string | null;
+  similar_photo_of: string | null;
+  similar_catch_of: string | null;
   status: string;
   review_note: string | null;
   created_at: string;
@@ -652,6 +654,19 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
                 {e.duplicate_of && (
                   <p className="text-xs font-bold text-signal-dark bg-signal/10 rounded-xl px-3 py-2 mt-2">
                     ⚠ Duplicate photo — this exact image was already submitted in this tournament.
+                  </p>
+                )}
+                {e.similar_photo_of && (
+                  <p className="text-xs font-bold text-signal-dark bg-signal/10 rounded-xl px-3 py-2 mt-2">
+                    ⚠ Possible same fish — this photo looks very similar to another entry&apos;s
+                    photo. Could be two pictures of one fish. Compare before approving.
+                  </p>
+                )}
+                {e.similar_catch_of && (
+                  <p className="text-xs font-bold text-gold-dark bg-gold/15 border border-gold/40 rounded-xl px-3 py-2 mt-2">
+                    🐟 Possible duplicate catch — same angler, same species, nearly the same
+                    length, caught within 30 minutes of another entry. Verify it&apos;s a
+                    different fish before approving.
                   </p>
                 )}
                 {e.time_flag === "future_timestamp" && (

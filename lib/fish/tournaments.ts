@@ -20,6 +20,52 @@
 import { randomBytes } from "crypto";
 import { query, queryOne } from "./db";
 
+/**
+ * Perceptual hash (pHash) for near-duplicate photo detection.
+ * Downscales to 8x8 grayscale and hashes against the mean — two photos of
+ * the same fish from slightly different angles produce similar hashes,
+ * unlike SHA-256 which changes completely. Returns a 16-char hex string.
+ */
+export async function computePHash(buf: Buffer): Promise<string | null> {
+  try {
+    const sharp = (await import("sharp")).default;
+    const { data } = await sharp(buf)
+      .resize(8, 8, { fit: "fill" })
+      .grayscale()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    if (data.length < 64) return null;
+    let sum = 0;
+    for (let i = 0; i < 64; i++) sum += data[i];
+    const avg = sum / 64;
+    let hash = BigInt(0);
+    for (let i = 0; i < 64; i++) {
+      if (data[i] > avg) hash |= BigInt(1) << BigInt(i);
+    }
+    return hash.toString(16).padStart(16, "0");
+  } catch {
+    return null;
+  }
+}
+
+/** Hamming distance between two 16-char hex pHashes (0–64). */
+export function phashDistance(a: string, b: string): number {
+  try {
+    let x = BigInt("0x" + a) ^ BigInt("0x" + b);
+    let d = 0;
+    while (x) {
+      d += Number(x & BigInt(1));
+      x >>= BigInt(1);
+    }
+    return d;
+  } catch {
+    return 64;
+  }
+}
+
+/** Max Hamming distance to consider two photos "possibly the same fish". */
+export const PHASH_SIMILARITY_THRESHOLD = 12;
+
 export interface PayoutTier {
   place: number;
   type: "percent" | "amount";
@@ -67,6 +113,9 @@ export interface TournamentEntry {
   gps_accuracy: number | null;
   notes: string;
   duplicate_of: string | null;
+  photo_phash: string | null;
+  similar_photo_of: string | null;
+  similar_catch_of: string | null;
   status: string;
   review_note: string | null;
   created_at: string;
@@ -202,6 +251,13 @@ export async function ensureTournamentTables(): Promise<void> {
   );
   await query(
     `CREATE INDEX IF NOT EXISTS fm_tournament_entries_hash_idx ON fm_tournament_entries(tournament_id, photo_hash)`
+  );
+  // Perceptual-hash + similar-catch flags (same-fish detection).
+  await query(`ALTER TABLE fm_tournament_entries ADD COLUMN IF NOT EXISTS photo_phash text`);
+  await query(`ALTER TABLE fm_tournament_entries ADD COLUMN IF NOT EXISTS similar_photo_of uuid REFERENCES fm_tournament_entries(id) ON DELETE SET NULL`);
+  await query(`ALTER TABLE fm_tournament_entries ADD COLUMN IF NOT EXISTS similar_catch_of uuid REFERENCES fm_tournament_entries(id) ON DELETE SET NULL`);
+  await query(
+    `CREATE INDEX IF NOT EXISTS fm_tournament_entries_phash_idx ON fm_tournament_entries(tournament_id, photo_phash)`
   );
   ensured = true;
 }

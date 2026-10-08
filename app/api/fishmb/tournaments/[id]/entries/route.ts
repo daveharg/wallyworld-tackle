@@ -27,6 +27,9 @@ import {
   gpsInManitoba,
   nearestTournamentLake,
   LAKE_BOUNDARY_KM,
+  computePHash,
+  phashDistance,
+  PHASH_SIMILARITY_THRESHOLD,
 } from "@/lib/fish/tournaments";
 import { query, queryOne } from "@/lib/fish/db";
 
@@ -123,17 +126,72 @@ export async function POST(
   const notes = typeof body.notes === "string" ? body.notes.trim().slice(0, 500) : "";
 
   // Hash the photo bytes for duplicate detection (same fish submitted twice).
+  // SHA-256 catches exact re-submits; the perceptual hash catches the same
+  // fish photographed again from a slightly different angle.
   let photoHash: string | null = null;
+  let photoPHash: string | null = null;
   try {
     const res = await fetch(photoUrl, { signal: AbortSignal.timeout(15000) });
     if (res.ok) {
       const buf = Buffer.from(await res.arrayBuffer());
       if (buf.length > 0 && buf.length < 20 * 1024 * 1024) {
         photoHash = createHash("sha256").update(buf).digest("hex");
+        photoPHash = await computePHash(buf);
       }
     }
   } catch {
     photoHash = null;
+  }
+
+  // Same-fish flags for the organizer:
+  //  - similar_photo_of: another entry whose photo looks like this one
+  //  - similar_catch_of: same angler, same species, near-identical length,
+  //    caught within 30 minutes — possibly two photos of one fish.
+  let similarPhotoOf: string | null = null;
+  let similarCatchOf: string | null = null;
+  try {
+    if (photoPHash) {
+      const candidates = await query<{ id: string; photo_phash: string }>(
+        `SELECT id, photo_phash FROM fm_tournament_entries
+         WHERE tournament_id = $1 AND photo_phash IS NOT NULL AND id != $2`,
+        [t.id, "00000000-0000-0000-0000-000000000000"]
+      );
+      let best: string | null = null;
+      let bestDist = PHASH_SIMILARITY_THRESHOLD + 1;
+      for (const c of candidates) {
+        const d = phashDistance(photoPHash, c.photo_phash);
+        if (d < bestDist) {
+          bestDist = d;
+          best = c.id;
+        }
+      }
+      // An exact byte-match is already covered by duplicate_of; the
+      // perceptual flag targets near-duplicates (same fish, new photo).
+      if (best) {
+        const exactDup = photoHash
+          ? await queryOne<{ id: string }>(
+              `SELECT id FROM fm_tournament_entries
+               WHERE tournament_id = $1 AND photo_hash = $2
+               ORDER BY created_at ASC LIMIT 1`,
+              [t.id, photoHash]
+            )
+          : null;
+        if (!exactDup || exactDup.id !== best) similarPhotoOf = best;
+      }
+    }
+    const like = await queryOne<{ id: string }>(
+      `SELECT id FROM fm_tournament_entries
+       WHERE tournament_id = $1 AND user_id = $2
+         AND LOWER(species) = LOWER($3)
+         AND length_inches IS NOT NULL AND $4 IS NOT NULL
+         AND ABS(length_inches - $4) <= 0.5
+         AND ABS(EXTRACT(EPOCH FROM (captured_at - $5::timestamptz))) <= 1800
+       ORDER BY captured_at DESC LIMIT 1`,
+      [t.id, me.id, species, lengthIn, capturedAt.toISOString()]
+    );
+    if (like) similarCatchOf = like.id;
+  } catch {
+    // Flags are best-effort; never block a submission.
   }
 
   // Lake-boundary check: tournaments run on specific water. Measure the entry
@@ -158,10 +216,10 @@ export async function POST(
 
   const entry = await queryOne(
     `INSERT INTO fm_tournament_entries
-       (tournament_id, user_id, photo_url, photo_urls, species, length_inches, latitude, longitude, gps_accuracy, notes, photo_hash, captured_at, time_flag, lake_distance_km, location_flag, status)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
+       (tournament_id, user_id, photo_url, photo_urls, species, length_inches, latitude, longitude, gps_accuracy, notes, photo_hash, photo_phash, similar_photo_of, similar_catch_of, captured_at, time_flag, lake_distance_km, location_flag, status)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
      RETURNING *`,
-    [t.id, me.id, photoUrl, JSON.stringify(photoUrls), species, lengthIn, lat, lng, acc, notes, photoHash, capturedAt.toISOString(), timeFlag, lakeDistanceKm, locationFlag, t.auto_approve_entries ? "approved" : "pending"]
+    [t.id, me.id, photoUrl, JSON.stringify(photoUrls), species, lengthIn, lat, lng, acc, notes, photoHash, photoPHash, similarPhotoOf, similarCatchOf, capturedAt.toISOString(), timeFlag, lakeDistanceKm, locationFlag, t.auto_approve_entries ? "approved" : "pending"]
   );
   return NextResponse.json({ entry }, { status: 201 });
 }

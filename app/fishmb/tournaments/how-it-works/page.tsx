@@ -50,7 +50,7 @@ const cheat = [
   },
   {
     title: "Duplicate-photo detection",
-    body: "Each photo is fingerprinted. The same fish submitted twice — by anyone — is flagged for the organizer.",
+    body: "Each photo is fingerprinted twice: an exact match catches the same image submitted again, and a perceptual match catches the same fish photographed from a different angle. Same species, near-identical length, caught minutes apart by one angler is flagged too.",
   },
   {
     title: "Organizer review",
