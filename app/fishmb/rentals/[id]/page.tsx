@@ -338,6 +338,28 @@ export default function RentalDetailPage() {
           {rental.location && <span>📍 {rental.location}</span>}
           <span>by {rental.owner_name}</span>
         </div>
+        <button
+          onClick={async () => {
+            const url = `${window.location.origin}/fishmb/rentals/${id}`;
+            if (navigator.share) {
+              try {
+                await navigator.share({
+                  title: rental.title,
+                  text: `${rental.title}${rental.price_text ? ` — ${rental.price_text}` : ""}${rental.location ? ` (${rental.location})` : ""}`,
+                  url,
+                });
+              } catch {
+                /* user dismissed the share sheet */
+              }
+            } else {
+              await navigator.clipboard.writeText(url);
+              setNote("Listing link copied — share it anywhere.");
+            }
+          }}
+          className="mt-3 inline-flex items-center gap-2 bg-pine text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full hover:bg-pine-deep transition-colors"
+        >
+          📤 Share this listing
+        </button>
       </div>
 
       {/* Owner: booking requests — front and center, above the public details */}

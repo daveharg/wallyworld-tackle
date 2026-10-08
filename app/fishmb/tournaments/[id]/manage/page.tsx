@@ -487,7 +487,7 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
   const t = detail.tournament;
   const pending = detail.entries.filter((e) => e.status === "pending");
   const decided = detail.entries.filter((e) => e.status !== "pending");
-  const inviteUrl = typeof window !== "undefined" ? `${window.location.origin}/fishmb/tournaments/join/${t.invite_code}?join=1` : "";
+  const inviteUrl = typeof window !== "undefined" ? `${window.location.origin}/fishmb/tournaments/join/${t.invite_code}` : "";
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10 md:py-14">
@@ -523,7 +523,7 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
       {/* Invite */}
       <section className="bg-pine rounded-3xl p-6 md:p-8 mb-8">
         <h2 className="font-display font-bold uppercase text-white text-xl tracking-wide mb-2">Invite anglers</h2>
-        <p className="text-white/70 text-sm mb-4">Share this link — anglers land straight on account creation, the invite code is already filled in, and they join with one tap.</p>
+        <p className="text-white/70 text-sm mb-4">Share this link — anglers see the full tournament details first, then create a free account and join with one tap. The invite code is already in the link.</p>
         <div className="flex flex-wrap gap-3 items-center">
           <code className="bg-white/10 text-gold font-bold tracking-[0.2em] px-5 py-3 rounded-full text-lg">{t.invite_code}</code>
           <button
