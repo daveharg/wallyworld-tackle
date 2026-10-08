@@ -54,7 +54,7 @@ export default function FishHeader() {
           </nav>
           <div className="flex items-center gap-2 sm:gap-3">
             <Link
-              href="/fishmb/app"
+              href="/fishmb/feed"
               className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-pine/70 hover:text-signal border border-pine/20 hover:border-signal rounded-full px-4 py-2 transition-colors"
             >
               📱 Get the app
@@ -127,7 +127,7 @@ export default function FishHeader() {
             </button>
           )}
           <Link
-            href="/fishmb/app"
+            href="/fishmb/feed"
             onClick={() => setOpen(false)}
             className="py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70"
           >
