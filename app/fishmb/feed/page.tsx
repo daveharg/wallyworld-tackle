@@ -373,12 +373,18 @@ export default function FeedPage() {
   }, [load]);
 
   // Deep link: /fishmb/feed?log=catch opens the composer in catch-logging mode.
+  // /fishmb/feed?compose=1 opens the share-a-post composer (bottom-bar + button).
   const logCatchOpened = useRef(false);
   useEffect(() => {
     if (logCatchOpened.current || !user) return;
-    if (new URLSearchParams(window.location.search).get("log") === "catch") {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("log") === "catch") {
       logCatchOpened.current = true;
       setMode("catch");
+      setComposerOpen(true);
+    } else if (params.get("compose") === "1") {
+      logCatchOpened.current = true;
+      setMode("post");
       setComposerOpen(true);
     }
   }, [user]);
