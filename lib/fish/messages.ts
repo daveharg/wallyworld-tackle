@@ -32,6 +32,7 @@ export interface ConversationPreview {
   last_at: string | null;
   last_sender_id: string | null;
   unread: number;
+  pinned_at: string | null;
 }
 
 export interface StoredMessage {
@@ -70,6 +71,7 @@ export async function ensureMsgTables(): Promise<void> {
     last_read_at timestamptz NOT NULL DEFAULT now(),
     PRIMARY KEY (conversation_id, user_id)
   )`);
+  await query(`ALTER TABLE fm_conversation_members ADD COLUMN IF NOT EXISTS pinned_at timestamptz`);
   await query(`CREATE TABLE IF NOT EXISTS fm_messages (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     conversation_id uuid NOT NULL REFERENCES fm_conversations(id) ON DELETE CASCADE,
@@ -140,9 +142,10 @@ export async function listConversations(userId: string): Promise<ConversationPre
     last_at: string | null;
     last_sender_id: string | null;
     unread: number;
+    pinned_at: string | null;
   }>(
     `WITH mine AS (
-       SELECT conversation_id, last_read_at
+       SELECT conversation_id, last_read_at, pinned_at
          FROM fm_conversation_members WHERE user_id = $1
      )
      SELECT c.id, c.name,
@@ -152,7 +155,8 @@ export async function listConversations(userId: string): Promise<ConversationPre
               WHERE mm.conversation_id = c.id
                 AND mm.recipient_id = $1
                 AND mm.created_at > mine.last_read_at
-                AND mm.sender_id <> $1) AS unread
+                AND mm.sender_id <> $1) AS unread,
+            mine.pinned_at AS pinned_at
        FROM mine
        JOIN fm_conversations c ON c.id = mine.conversation_id
        LEFT JOIN LATERAL (
@@ -161,7 +165,8 @@ export async function listConversations(userId: string): Promise<ConversationPre
           WHERE conversation_id = c.id AND recipient_id = $1
           ORDER BY created_at DESC LIMIT 1
        ) m ON true
-      ORDER BY m.created_at DESC NULLS LAST, c.created_at DESC`,
+      ORDER BY (mine.pinned_at IS NULL), mine.pinned_at DESC,
+               m.created_at DESC NULLS LAST, c.created_at DESC`,
     [userId]
   );
   const previews: ConversationPreview[] = [];
@@ -175,9 +180,25 @@ export async function listConversations(userId: string): Promise<ConversationPre
       last_at: r.last_at,
       last_sender_id: r.last_sender_id,
       unread: r.unread,
+      pinned_at: r.pinned_at,
     });
   }
   return previews;
+}
+
+/** Pin or unpin a conversation for one user (pins are personal). */
+export async function setPinned(
+  conversationId: string,
+  userId: string,
+  pinned: boolean
+): Promise<void> {
+  await ensureMsgTables();
+  await query(
+    `UPDATE fm_conversation_members
+        SET pinned_at = CASE WHEN $3 THEN now() ELSE NULL END
+      WHERE conversation_id = $1 AND user_id = $2`,
+    [conversationId, userId, pinned]
+  );
 }
 
 /** All 1:1 conversation ids between two users (healthy state: at most one). */

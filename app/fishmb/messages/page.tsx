@@ -3,7 +3,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
 import ThreadView, { type ThreadPeer } from "./_components/ThreadView";
@@ -27,6 +27,7 @@ interface Convo {
   last_at: string | null;
   last_sender_id: string | null;
   unread: number;
+  pinned_at: string | null;
 }
 
 interface Friend {
@@ -48,6 +49,28 @@ function timeAgo(iso: string | null): string {
   });
 }
 
+/** iOS-style list timestamp: "5:05 PM", "Yesterday", "Tuesday", "Oct 5". */
+function iosTime(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const now = new Date();
+  const day = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const diffDays = Math.round((day(now) - day(d)) / 86400000);
+  if (diffDays <= 0)
+    return d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return d.toLocaleDateString("en-US", { weekday: "long" });
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+/** Stable avatar background per name, in app colors. */
+function avatarBg(name: string): string {
+  const colors = ["bg-pine", "bg-signal", "bg-[#2f6b4f]", "bg-[#b4552d]"];
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return colors[h % colors.length];
+}
+
 export default function MessagesPage() {
   const { user, openLogin } = useFishAuth();
   const [setup, setSetup] = useState<"checking" | "needed" | "ready">("checking");
@@ -61,6 +84,52 @@ export default function MessagesPage() {
   const [groupPicks, setGroupPicks] = useState<string[]>([]);
   const [groupName, setGroupName] = useState("");
   const [note, setNote] = useState<string | null>(null);
+  const [sheetConvo, setSheetConvo] = useState<Convo | null>(null);
+  const pressTimer = useRef<number | null>(null);
+  const longPressed = useRef(false);
+
+  const cancelPress = () => {
+    if (pressTimer.current !== null) {
+      clearTimeout(pressTimer.current);
+      pressTimer.current = null;
+    }
+  };
+  const beginPress = (c: Convo) => {
+    cancelPress();
+    longPressed.current = false;
+    pressTimer.current = window.setTimeout(() => {
+      longPressed.current = true;
+      setSheetConvo(c);
+    }, 500);
+  };
+
+  const openConvo = (c: Convo) => {
+    // A long-press that opened the action sheet shouldn't also open the thread.
+    if (longPressed.current) {
+      longPressed.current = false;
+      return;
+    }
+    setSelected({
+      id: c.id,
+      name: c.name,
+      is_group: c.is_group,
+      members: c.members,
+    });
+  };
+
+  const togglePin = async (c: Convo) => {
+    setSheetConvo(null);
+    try {
+      await fishFetch(`/api/fishmb/msg/conversations/${c.id}/pin`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pinned: !c.pinned_at }),
+      });
+      loadConvos();
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Could not pin conversation.");
+    }
+  };
 
   const loadConvos = async () => {
     try {
@@ -280,73 +349,117 @@ export default function MessagesPage() {
               </button>
             </div>
           ) : (
-            <div className="space-y-2">
-              {convos.map((c) => {
-                const title = convoTitle(c);
-                const other = c.is_group
-                  ? null
-                  : c.members.find((m) => m.user_id !== user?.id);
-                return (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() =>
-                    setSelected({
-                      id: c.id,
-                      name: c.name,
-                      is_group: c.is_group,
-                      members: c.members,
-                    })
-                  }
-                  className={`w-full flex items-center gap-3 rounded-2xl p-3 border text-left transition-colors ${
-                    peer?.id === c.id
-                      ? "bg-pine text-white border-pine"
-                      : "bg-white border-pine/10 hover:border-signal/40"
-                  }`}
-                >
-                  {c.is_group ? (
-                    <span className="w-11 h-11 rounded-full bg-pine/15 text-pine flex items-center justify-center font-bold shrink-0">
-                      👥
-                    </span>
-                  ) : other?.avatar_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={other.avatar_url}
-                      alt=""
-                      className="w-11 h-11 rounded-full object-cover shrink-0"
-                    />
-                  ) : (
-                    <span className="w-11 h-11 rounded-full bg-signal text-white flex items-center justify-center font-bold shrink-0">
+            <div>
+              {(() => {
+                const pinned = convos.filter((c) => c.pinned_at);
+                const rest = convos.filter((c) => !c.pinned_at);
+                const avatar = (c: Convo, title: string, size: string, text: string) => {
+                  const other = c.is_group
+                    ? null
+                    : c.members.find((m) => m.user_id !== user?.id);
+                  if (c.is_group)
+                    return (
+                      <span className={`${size} rounded-full bg-pine/15 text-pine flex items-center justify-center shrink-0 ${text}`}>
+                        👥
+                      </span>
+                    );
+                  if (other?.avatar_url)
+                    return (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={other.avatar_url} alt="" className={`${size} rounded-full object-cover shrink-0`} />
+                    );
+                  return (
+                    <span className={`${size} rounded-full ${avatarBg(title)} text-white flex items-center justify-center font-bold shrink-0 ${text}`}>
                       {title.charAt(0).toUpperCase()}
                     </span>
-                  )}
-                  <span className="min-w-0 flex-1">
-                    <span
-                      className={`block font-bold text-sm truncate ${peer?.id === c.id ? "text-white" : "text-pine"}`}
-                    >
-                      {title}
-                    </span>
-                    <span
-                      className={`block text-xs truncate ${peer?.id === c.id ? "text-white/60" : "text-pine/50"}`}
-                    >
-                      {c.last_at ? "🔒 Encrypted message" : "Say hey 👋"}
-                    </span>
-                  </span>
-                  <span className="flex flex-col items-end gap-1 shrink-0">
-                    <span
-                      className={`text-[10px] ${peer?.id === c.id ? "text-white/60" : "text-pine/40"}`}
-                    >
-                      {timeAgo(c.last_at)}
-                    </span>
-                    {c.unread > 0 && (
-                      <span className="bg-signal text-white text-[10px] font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5">
-                        {c.unread}
-                      </span>
+                  );
+                };
+                const rowProps = (c: Convo) => ({
+                  onTouchStart: () => beginPress(c),
+                  onTouchEnd: cancelPress,
+                  onTouchMove: cancelPress,
+                  onContextMenu: (e: React.MouseEvent) => {
+                    e.preventDefault();
+                    setSheetConvo(c);
+                  },
+                });
+                return (
+                  <>
+                    {/* Pinned to the top, iOS style */}
+                    {pinned.length > 0 && (
+                      <div className="flex gap-4 overflow-x-auto pb-4 px-1">
+                        {pinned.map((c) => {
+                          const title = convoTitle(c);
+                          return (
+                            <button
+                              key={c.id}
+                              type="button"
+                              onClick={() => openConvo(c)}
+                              {...rowProps(c)}
+                              className="flex flex-col items-center gap-1 w-16 shrink-0 select-none"
+                              aria-label={`${title}, pinned`}
+                            >
+                              <span className="relative">
+                                {avatar(c, title, "w-16 h-16", "text-2xl")}
+                                {c.unread > 0 && (
+                                  <span className="absolute -top-1 -right-1 bg-signal text-white text-[10px] font-black rounded-full min-w-5 h-5 px-1 flex items-center justify-center">
+                                    {c.unread > 99 ? "99+" : c.unread}
+                                  </span>
+                                )}
+                              </span>
+                              <span className="text-[11px] text-pine/70 font-medium truncate w-full text-center leading-tight">
+                                📌 {title}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
                     )}
-                  </span>
-                </button>
+                    {/* Conversation rows, iOS style */}
+                    <div className="bg-white rounded-3xl border border-pine/10 overflow-hidden">
+                      {rest.map((c, i) => {
+                        const title = convoTitle(c);
+                        return (
+                          <div key={c.id}>
+                            <button
+                              type="button"
+                              onClick={() => openConvo(c)}
+                              {...rowProps(c)}
+                              className="w-full flex items-center gap-3 px-4 py-3 text-left active:bg-pine/5 transition-colors select-none"
+                            >
+                              {avatar(c, title, "w-12 h-12", "text-xl")}
+                              <span className="min-w-0 flex-1">
+                                <span className="flex items-baseline justify-between gap-2">
+                                  <span className="font-bold text-pine text-[17px] truncate">
+                                    {title}
+                                  </span>
+                                  <span className="text-[13px] text-pine/40 shrink-0">
+                                    {iosTime(c.last_at)}
+                                  </span>
+                                </span>
+                                <span className="flex items-center justify-between gap-2 mt-0.5">
+                                  <span className="text-[15px] text-pine/50 truncate">
+                                    {c.last_at ? "🔒 Encrypted message" : "Say hey 👋"}
+                                  </span>
+                                  <span className="flex items-center gap-1.5 shrink-0">
+                                    {c.unread > 0 && (
+                                      <span className="bg-signal text-white text-[11px] font-black rounded-full min-w-5 h-5 px-1.5 flex items-center justify-center">
+                                        {c.unread > 99 ? "99+" : c.unread}
+                                      </span>
+                                    )}
+                                    <span className="text-pine/25 text-xl leading-none">›</span>
+                                  </span>
+                                </span>
+                              </span>
+                            </button>
+                            {i < rest.length - 1 && <div className="ml-[76px] border-b border-pine/10" />}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </>
                 );
-              })}
+              })()}
             </div>
           )}
         </div>
@@ -520,6 +633,32 @@ export default function MessagesPage() {
         unscrambled on your friend's. Your encryption key never leaves this
         device.
       </p>
+
+      {/* Pin / unpin action sheet (long-press a conversation) */}
+      {sheetConvo && (
+        <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true" aria-label="Conversation options">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setSheetConvo(null)} />
+          <div className="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+            <p className="text-center font-bold text-pine mb-3 truncate px-8">
+              {convoTitle(sheetConvo)}
+            </p>
+            <button
+              type="button"
+              onClick={() => togglePin(sheetConvo)}
+              className="w-full bg-pine/10 hover:bg-pine/20 text-pine font-bold text-[17px] px-6 py-3.5 rounded-2xl transition-colors"
+            >
+              📌 {sheetConvo.pinned_at ? "Unpin from top" : "Pin to top"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setSheetConvo(null)}
+              className="w-full mt-2 bg-pine/10 hover:bg-pine/20 text-pine font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

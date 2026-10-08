@@ -34,13 +34,6 @@ export interface ThreadPeer {
   members: { user_id: string; name: string; avatar_url: string | null }[];
 }
 
-function timeAgo(iso: string): string {
-  const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
-  if (s < 60) return "now";
-  if (s < 3600) return `${Math.floor(s / 60)}m`;
-  if (s < 86400) return `${Math.floor(s / 3600)}h`;
-  return `${Math.floor(s / 86400)}d`;
-}
 
 /** Photo payloads are JSON { t: "photo", url } inside the encrypted text. */
 function photoUrl(text: string | null): string | null {
@@ -281,46 +274,93 @@ export default function ThreadView({
     : (peer.members.find((m) => m.user_id !== myId)?.name ?? "Chat");
   const others = peer.members.filter((m) => m.user_id !== myId);
 
+  // iOS-style avatar colors, derived from the name so they're stable.
+  const avatarBg = (name: string) => {
+    const colors = ["bg-pine", "bg-signal", "bg-[#2f6b4f]", "bg-[#b4552d]"];
+    let h = 0;
+    for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+    return colors[h % colors.length];
+  };
+
+  const peerAvatar = (size: string, textSize: string) =>
+    peer.is_group ? (
+      <span className={`${size} rounded-full bg-pine/15 text-pine flex items-center justify-center font-bold shrink-0`}>
+        👥
+      </span>
+    ) : others[0]?.avatar_url ? (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={others[0].avatar_url} alt="" className={`${size} rounded-full object-cover shrink-0`} />
+    ) : (
+      <span className={`${size} rounded-full ${avatarBg(title)} text-white flex items-center justify-center font-bold shrink-0 ${textSize}`}>
+        {title.charAt(0).toUpperCase()}
+      </span>
+    );
+
+  const senderAvatar = (m: Decrypted, size: string) => {
+    const member = peer.members.find((x) => x.user_id === m.sender_id);
+    const name = member?.name ?? "?";
+    return member?.avatar_url ? (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={member.avatar_url} alt="" className={`${size} rounded-full object-cover shrink-0`} />
+    ) : (
+      <span className={`${size} rounded-full ${avatarBg(name)} text-white flex items-center justify-center font-bold shrink-0 text-[10px]`}>
+        {name.charAt(0).toUpperCase()}
+      </span>
+    );
+  };
+
+  // "Today 5:01 PM" style divider labels between messages.
+  const dividerLabel = (iso: string): string => {
+    const d = new Date(iso);
+    const now = new Date();
+    const day = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+    const diffDays = Math.round((day(now) - day(d)) / 86400000);
+    const time = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+    const dayName =
+      diffDays <= 0 ? "Today" :
+      diffDays === 1 ? "Yesterday" :
+      diffDays < 7 ? d.toLocaleDateString("en-US", { weekday: "long" }) :
+      d.toLocaleDateString("en-US", { month: "numeric", day: "numeric", year: "numeric" });
+    return `${dayName} ${time}`;
+  };
+  const showDivider = (prev: Decrypted | undefined, m: Decrypted): boolean => {
+    if (!prev) return true;
+    const gap = new Date(m.created_at).getTime() - new Date(prev.created_at).getTime();
+    if (gap > 60 * 60 * 1000) return true;
+    const a = new Date(prev.created_at), b = new Date(m.created_at);
+    return a.getFullYear() !== b.getFullYear() || a.getMonth() !== b.getMonth() || a.getDate() !== b.getDate();
+  };
+
   return (
     <div className="flex flex-col h-full min-h-0">
-      <div className="flex items-center gap-3 pb-3 border-b border-pine/10 shrink-0">
+      {/* iOS-style header: back chevron, centered avatar + name */}
+      <div className="flex items-center gap-1 pb-2 shrink-0">
         <button
           type="button"
           onClick={onBack}
-          className="md:hidden text-pine/60 text-xl px-1"
+          className="md:hidden w-8 h-8 -ml-1 flex items-center justify-center text-pine text-3xl leading-none"
           aria-label="Back to conversations"
         >
-          ←
+          ‹
         </button>
-        {peer.is_group ? (
-          <span className="w-10 h-10 rounded-full bg-pine text-white flex items-center justify-center font-bold shrink-0">
-            👥
-          </span>
-        ) : others[0]?.avatar_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={others[0].avatar_url}
-            alt=""
-            className="w-10 h-10 rounded-full object-cover"
-          />
-        ) : (
-          <span className="w-10 h-10 rounded-full bg-signal text-white flex items-center justify-center font-bold">
-            {title.charAt(0).toUpperCase()}
-          </span>
-        )}
-        <div className="min-w-0 flex-1">
+        <div className="flex-1 min-w-0 flex flex-col items-center">
           <button
             type="button"
             onClick={() => peer.is_group && setShowMembers((s) => !s)}
-            className={`font-bold text-pine truncate block ${peer.is_group ? "hover:text-signal-dark" : ""}`}
+            className="flex flex-col items-center gap-1 min-w-0"
+            aria-label={peer.is_group ? "Show members" : title}
           >
-            {title}
+            {peerAvatar("w-11 h-11", "text-lg")}
+            <span className="font-bold text-pine text-[17px] leading-tight truncate max-w-full">
+              {title}
+              <span className="text-pine/30 text-sm"> ›</span>
+            </span>
           </button>
-          <p className="text-xs text-pine/50">
-            🔒 End-to-end encrypted
-            {peer.is_group ? ` · ${peer.members.length} members` : ""}
+          <p className="text-[11px] text-pine/45 mt-0.5">
+            🔒 End-to-end encrypted{peer.is_group ? ` · ${peer.members.length} members` : ""}
           </p>
         </div>
+        <span className="w-8 md:hidden shrink-0" />
       </div>
 
       {showMembers && peer.is_group && (
@@ -355,42 +395,53 @@ export default function ThreadView({
         </p>
       )}
 
-      <div className="flex-1 min-h-0 overflow-y-auto py-4 space-y-2">
+      <div className="flex-1 min-h-0 overflow-y-auto py-4 space-y-1">
         {msgs.length === 0 && secrets && (
           <p className="text-center text-pine/45 text-sm mt-8">
             No messages yet — say hey. 🔒
           </p>
         )}
-        {msgs.map((m) => {
+        {msgs.map((m, i) => {
+          const prev = i > 0 ? msgs[i - 1] : undefined;
+          const next = i < msgs.length - 1 ? msgs[i + 1] : undefined;
           const senderName = m.mine
             ? null
             : (peer.members.find((x) => x.user_id === m.sender_id)?.name ?? null);
           const photo = photoUrl(m.text);
+          // iOS touches: name above the first bubble of a sender run (groups),
+          // avatar only on the last bubble of a sender run.
+          const showName = !m.mine && peer.is_group && senderName && prev?.sender_id !== m.sender_id;
+          const showAvatar = !m.mine && peer.is_group && next?.sender_id !== m.sender_id;
           return (
-          <div key={m.id} className={`flex ${m.mine ? "justify-end" : "justify-start"}`}>
-            <div
-              className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${
-                m.mine
-                  ? "bg-signal text-white rounded-br-md"
-                  : "bg-white border border-pine/10 text-pine rounded-bl-md"
-              }`}
-            >
-              {senderName && peer.is_group && (
-                <p className="text-[11px] font-bold text-signal-dark mb-0.5">{senderName}</p>
-              )}
-              {photo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={photo} alt="Shared photo" className="rounded-xl max-h-64 object-cover" loading="lazy" />
-              ) : (
-                <p className="text-sm whitespace-pre-wrap break-words">
-                  {m.text ?? "⚠️ Couldn't decrypt this message."}
-                </p>
-              )}
-              <p
-                className={`text-[10px] mt-1 text-right ${m.mine ? "text-white/70" : "text-pine/40"}`}
-              >
-                {timeAgo(m.created_at)}
+          <div key={m.id}>
+            {showDivider(prev, m) && (
+              <p className="text-center text-[11px] text-pine/40 py-2.5">
+                {dividerLabel(m.created_at)}
               </p>
+            )}
+            <div className={`flex ${m.mine ? "justify-end" : "justify-start"} items-end gap-1.5`}>
+              {!m.mine && peer.is_group && (
+                <span className="w-7 shrink-0">{showAvatar ? senderAvatar(m, "w-7 h-7") : null}</span>
+              )}
+              <div
+                className={`max-w-[75%] px-3.5 py-2 rounded-[1.25rem] ${
+                  m.mine
+                    ? "bg-pine text-white rounded-br-md"
+                    : "bg-[rgb(233,233,235)] text-pine rounded-bl-md"
+                }`}
+              >
+                {showName && (
+                  <p className="text-[11px] font-semibold text-pine/50 mb-0.5">{senderName}</p>
+                )}
+                {photo ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={photo} alt="Shared photo" className="rounded-2xl max-h-64 object-cover" loading="lazy" />
+                ) : (
+                  <p className="text-[17px] leading-snug whitespace-pre-wrap break-words">
+                    {m.text ?? "⚠️ Couldn't decrypt this message."}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
           );
@@ -398,7 +449,7 @@ export default function ThreadView({
         <div ref={bottomRef} />
       </div>
 
-      <div className="flex gap-2 pt-3 border-t border-pine/10 shrink-0">
+      <div className="flex items-center gap-2 pt-2 shrink-0">
         <input
           ref={photoInputRef}
           type="file"
@@ -415,9 +466,9 @@ export default function ThreadView({
           onClick={() => photoInputRef.current?.click()}
           disabled={!secrets || uploading || sending}
           aria-label="Send a photo"
-          className="shrink-0 w-12 h-12 rounded-full bg-pine/10 hover:bg-pine/20 text-pine font-bold text-lg disabled:opacity-40 transition-colors"
+          className="shrink-0 w-9 h-9 rounded-full bg-pine/10 hover:bg-pine/20 text-pine font-bold text-xl disabled:opacity-40 transition-colors"
         >
-          {uploading ? "…" : "📷"}
+          {uploading ? "…" : "+"}
         </button>
         <input
           value={draft}
@@ -429,15 +480,16 @@ export default function ThreadView({
           placeholder="Message…"
           disabled={!secrets}
           enterKeyHint="send"
-          className="flex-1 min-w-0 bg-white border border-pine/15 rounded-full px-4 py-3 text-base md:text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal disabled:opacity-50"
+          className="flex-1 min-w-0 bg-white border border-pine/15 rounded-full px-4 py-2.5 text-[17px] md:text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-pine disabled:opacity-50"
         />
         <button
           type="button"
           onClick={send}
           disabled={!draft.trim() || sending || uploading || !secrets}
-          className="shrink-0 bg-signal hover:bg-signal-dark text-white font-bold text-sm px-6 rounded-full disabled:opacity-40 transition-colors"
+          aria-label="Send message"
+          className="shrink-0 w-9 h-9 rounded-full bg-pine text-white text-lg font-bold disabled:opacity-30 transition-colors flex items-center justify-center"
         >
-          {sending ? "…" : "Send"}
+          {sending ? "…" : "↑"}
         </button>
       </div>
     </div>
