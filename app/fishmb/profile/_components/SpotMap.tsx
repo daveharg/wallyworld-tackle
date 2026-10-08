@@ -146,6 +146,8 @@ export default function SpotMap({
         }
       });
       if (!cancelled) setMap(m);
+      // Debug handle for live diagnostics (tile painting issues).
+      (window as unknown as { __spotMap?: unknown }).__spotMap = m;
     })();
     return () => {
       cancelled = true;

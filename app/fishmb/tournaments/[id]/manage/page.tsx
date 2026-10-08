@@ -52,6 +52,7 @@ interface Detail {
     entry_fee_cents: number;
     payouts: PayoutTier[];
     auto_approve_entries: boolean;
+    photo_mode?: string | null;
     cover_photo_url: string | null;
     venue_name: string | null;
     venue_address: string | null;
@@ -167,6 +168,7 @@ function EditTournament({ tournament, onSaved }: { tournament: Detail["tournamen
   );
   const [payouts, setPayouts] = useState<PayoutTier[]>(tournament.payouts ?? []);
   const [autoApprove, setAutoApprove] = useState(!!tournament.auto_approve_entries);
+  const [photoMode, setPhotoMode] = useState(tournament.photo_mode === "measure_only" ? "measure_only" : "standard");
   const [cover, setCover] = useState<string | null>(tournament.cover_photo_url ?? null);
   const [venueName, setVenueName] = useState(tournament.venue_name ?? "");
   const [venueAddress, setVenueAddress] = useState(tournament.venue_address ?? "");
@@ -235,6 +237,7 @@ function EditTournament({ tournament, onSaved }: { tournament: Detail["tournamen
           entry_fee_cents: Math.max(0, Math.round((parseFloat(entryFee) || 0) * 100)),
           payouts,
           auto_approve_entries: autoApprove,
+          photo_mode: photoMode,
           cover_photo_url: cover ?? "",
           venue_name: venueName,
           venue_address: venueAddress,
@@ -335,6 +338,27 @@ function EditTournament({ tournament, onSaved }: { tournament: Detail["tournamen
         <div className="md:col-span-2">
           <label className={labelCls}>Payouts</label>
           <PayoutEditor value={payouts} onChange={setPayouts} />
+        </div>
+        <div className="md:col-span-2">
+          <label className={labelCls}>Catch photos</label>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              ["standard", "📸 Standard", "Your rules decide — hero shots welcome"],
+              ["measure_only", "📏 Measure only", "Just the fish on the board — no posed photo needed"],
+            ].map(([v, l, d]) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setPhotoMode(v)}
+                className={`py-3 px-3 rounded-2xl text-sm font-bold transition-colors text-left ${photoMode === v ? "bg-signal text-white" : "bg-white border border-pine/20 text-pine/70"}`}
+              >
+                {l}
+                <span className={`block text-xs font-normal mt-1 ${photoMode === v ? "text-white/85" : "text-pine/50"}`}>
+                  {d}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
         <div className="md:col-span-2">
           <label className="flex items-center gap-3 cursor-pointer">

@@ -9,7 +9,15 @@ const inputCls =
   "w-full bg-white border border-pine/20 rounded-2xl px-4 py-3 text-pine focus:outline-none focus:border-signal";
 
 /** Catch submission: up to 4 photos + species + length + GPS. Server stamps the time. */
-export function SubmitEntry({ tournamentId, species }: { tournamentId: string; species: string[] }) {
+export function SubmitEntry({
+  tournamentId,
+  species,
+  photoMode,
+}: {
+  tournamentId: string;
+  species: string[];
+  photoMode?: string | null;
+}) {
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [fishSpecies, setFishSpecies] = useState(species[0] || "");
@@ -121,6 +129,12 @@ export function SubmitEntry({ tournamentId, species }: { tournamentId: string; s
         <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/60 mb-1.5">
           Photos * <span className="normal-case font-normal">(up to 4)</span>
         </label>
+        {photoMode === "measure_only" && (
+          <p className="text-xs text-pine/60 bg-pine/5 border border-pine/10 rounded-2xl px-3.5 py-2.5 mb-2">
+            📏 Just the fish on your measuring board — no posed photo with the fish needed. Extra
+            photos are optional.
+          </p>
+        )}
         <input
           type="file"
           accept="image/*"

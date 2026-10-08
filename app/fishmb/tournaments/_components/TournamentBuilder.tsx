@@ -37,6 +37,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
   const [entryFee, setEntryFee] = useState("");
   const [payouts, setPayouts] = useState<PayoutTier[]>([]);
   const [autoApprove, setAutoApprove] = useState(false);
+  const [photoMode, setPhotoMode] = useState("standard");
   const [coverPhotoUrl, setCoverPhotoUrl] = useState<string | null>(null);
   const [venueName, setVenueName] = useState("");
   const [venueAddress, setVenueAddress] = useState("");
@@ -101,6 +102,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
           entry_fee_cents: Math.max(0, Math.round((parseFloat(entryFee) || 0) * 100)),
           payouts,
           auto_approve_entries: autoApprove,
+          photo_mode: photoMode,
           cover_photo_url: coverPhotoUrl,
           venue_name: venueName.trim() || null,
           venue_address: venueAddress.trim() || null,
@@ -248,6 +250,35 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
             <PayoutEditor value={payouts} onChange={setPayouts} />
             <p className="text-xs text-pine/50 mt-2">
               Each place pays a % of the pot or a fixed $ amount. Leave empty for bragging rights.
+            </p>
+          </div>
+          <div>
+            <label className={labelCls}>Catch photos</label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setPhotoMode("standard")}
+                className={`py-3 px-3 rounded-2xl text-sm font-bold transition-colors text-left ${photoMode === "standard" ? "bg-signal text-white" : "bg-white border border-pine/20 text-pine/70"}`}
+              >
+                📸 Standard
+                <span className={`block text-xs font-normal mt-1 ${photoMode === "standard" ? "text-white/85" : "text-pine/50"}`}>
+                  Your rules decide — hero shots welcome
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPhotoMode("measure_only")}
+                className={`py-3 px-3 rounded-2xl text-sm font-bold transition-colors text-left ${photoMode === "measure_only" ? "bg-signal text-white" : "bg-white border border-pine/20 text-pine/70"}`}
+              >
+                📏 Measure only
+                <span className={`block text-xs font-normal mt-1 ${photoMode === "measure_only" ? "text-white/85" : "text-pine/50"}`}>
+                  Just the fish on the board — no posed photo needed
+                </span>
+              </button>
+            </div>
+            <p className="text-xs text-pine/50 mt-2">
+              For friendly tournaments where anglers don&apos;t want to pose with the fish — a
+              photo with the fish stays optional either way.
             </p>
           </div>
           <div className="flex items-start gap-3 bg-white border border-pine/15 rounded-2xl p-4">

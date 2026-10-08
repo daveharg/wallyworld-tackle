@@ -57,6 +57,11 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
           <p className="text-pine/60 mt-2">
             Organized by {t.organizer_name} · {t.participant_count} anglers · {formatDateTime(t.starts_at)} → {formatDateTime(t.ends_at)}
           </p>
+          {t.photo_mode === "measure_only" && (
+            <p className="mt-3 inline-block text-xs font-bold uppercase tracking-wider text-pine bg-pine/10 rounded-full px-4 py-2">
+              📏 Measure-only photos — no posed photo with the fish needed
+            </p>
+          )}
         </div>
         <TournamentActions tournamentId={t.id} />
       </div>

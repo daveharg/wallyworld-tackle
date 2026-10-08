@@ -90,6 +90,7 @@ export interface Tournament {
   entry_fee_cents: number;
   payouts: PayoutTier[];
   auto_approve_entries: boolean;
+  photo_mode: string;
   cover_photo_url: string | null;
   venue_name: string | null;
   venue_address: string | null;
@@ -229,6 +230,10 @@ export async function ensureTournamentTables(): Promise<void> {
   await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS cover_photo_url text`);
   await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS venue_name text`);
   await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS venue_address text`);
+  // Photo mode: 'standard' (organizer's photo rules) or 'measure_only'
+  // (friendly tournaments — just the fish on the measuring board, no posed
+  // photo with the fish required; extra photos stay optional).
+  await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS photo_mode text NOT NULL DEFAULT 'standard'`);
   // One-time repair: the seeded demo's posted rules say entries are
   // auto-approved, so honor that and clear the stuck "pending" backlog.
   // (Organizer ownership is left alone — it isn't needed for this fix.)

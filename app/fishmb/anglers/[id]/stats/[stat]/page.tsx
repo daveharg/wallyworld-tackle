@@ -28,6 +28,14 @@ function fmtDate(iso: string | null): string {
   });
 }
 
+interface BoardRow {
+  user_id: string;
+  name: string;
+  avatar_url: string | null;
+  value: number;
+  is_you: boolean;
+}
+
 export default function StatDetailPage({
   params,
 }: {
@@ -36,6 +44,7 @@ export default function StatDetailPage({
   const { id, stat } = params;
   const title = TITLES[stat];
   const [items, setItems] = useState<Record<string, unknown>[] | null>(null);
+  const [board, setBoard] = useState<BoardRow[] | null>(null);
   const [name, setName] = useState<string>("");
   const [failed, setFailed] = useState(false);
 
@@ -43,14 +52,17 @@ export default function StatDetailPage({
     let live = true;
     (async () => {
       try {
-        const [res, user] = await Promise.all([
+        const [res, user, lb] = await Promise.all([
           fishFetch(`/api/fishmb/users/${id}/stat-items?stat=${stat}`),
           fishFetch(`/api/fishmb/users/${id}`).catch(() => null),
+          fishFetch(`/api/fishmb/users/${id}/stat-leaderboard?stat=${stat}`).catch(() => null),
         ]);
         if (!live) return;
         setItems((res as { items: Record<string, unknown>[] }).items);
         const u = (user as { user?: { name?: string } } | null)?.user;
         if (u?.name) setName(u.name);
+        const rows = (lb as { rows?: BoardRow[] } | null)?.rows;
+        if (rows) setBoard(rows);
       } catch {
         if (live) setFailed(true);
       }
@@ -203,6 +215,43 @@ export default function StatDetailPage({
               </div>
             ))}
         </div>
+      )}
+
+      {/* You vs friends leaderboard for this stat */}
+      {board !== null && board.length > 1 && (
+        <section className="mt-10">
+          <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
+            🏆 You vs friends
+          </h2>
+          <div className="bg-white border border-pine/10 rounded-3xl overflow-hidden">
+            <ul className="divide-y divide-pine/8">
+              {board.map((r, i) => (
+                <li key={r.user_id}>
+                  <Link
+                    href={`/fishmb/anglers/${r.user_id}`}
+                    className={`flex items-center gap-3 px-5 py-3 hover:bg-pine/5 transition-colors ${
+                      r.is_you ? "bg-gold/15" : ""
+                    }`}
+                  >
+                    <span
+                      className={`font-display font-bold w-7 text-center ${
+                        i === 0 ? "text-gold" : "text-pine/40"
+                      }`}
+                    >
+                      {i + 1}
+                    </span>
+                    <span className="flex-1 min-w-0 font-bold text-pine text-sm truncate">
+                      {r.is_you ? "You" : r.name}
+                    </span>
+                    <span className="font-display font-bold text-pine text-lg tabular-nums">
+                      {r.value}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
       )}
     </div>
   );

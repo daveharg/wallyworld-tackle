@@ -9,7 +9,7 @@ import { SubmitEntry } from "./SubmitEntry";
 interface Detail {
   joined: boolean;
   is_organizer: boolean;
-  tournament: { status: string; species: string[] };
+  tournament: { status: string; species: string[]; photo_mode?: string | null };
 }
 
 /** Join / submit-catch / manage buttons on the tournament detail page. */
@@ -104,7 +104,7 @@ export function TournamentActions({ tournamentId }: { tournamentId: string }) {
       {error && <p className="text-signal-dark text-xs">{error}</p>}
       {showSubmit && detail.joined && (
         <div className="w-full max-w-md mt-2">
-          <SubmitEntry tournamentId={tournamentId} species={detail.tournament.species} />
+          <SubmitEntry tournamentId={tournamentId} species={detail.tournament.species} photoMode={detail.tournament.photo_mode} />
         </div>
       )}
     </div>
