@@ -11,9 +11,10 @@ import DashboardLicence from "./_components/DashboardLicence";
 import DashboardTournaments from "./_components/DashboardTournaments";
 
 const TABS = [
-  { id: "stats", label: "📊 Stats" },
-  { id: "tournaments", label: "🏆 Tournaments" },
-  { id: "settings", label: "⚙️ Settings" },
+  { id: "stats", label: "Stats", icon: "📊" },
+  { id: "tournaments", label: "Tournaments", icon: "🏆" },
+  { id: "licence", label: "Licence", icon: "🪪" },
+  { id: "settings", label: "Settings", icon: "⚙️" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -50,28 +51,28 @@ export default function DashboardPage() {
         Dashboard
       </h1>
 
-      <div className="flex gap-2 pb-2 mb-8 sticky top-16 z-10 bg-paper/95 backdrop-blur py-2">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
         {TABS.map((t) => (
           <button
             key={t.id}
             type="button"
             onClick={() => setTab(t.id)}
-            className={`flex-1 md:flex-none whitespace-nowrap font-bold uppercase tracking-wider text-xs md:text-sm px-2 py-2 md:px-5 md:py-2.5 rounded-full transition-colors ${
+            className={`aspect-square rounded-3xl border flex flex-col items-center justify-center gap-2 transition-colors ${
               tab === t.id
-                ? "bg-pine text-white"
-                : "bg-pine/10 text-pine hover:bg-pine/20"
+                ? "bg-pine text-white border-pine shadow-lg"
+                : "bg-white text-pine border-pine/10 hover:border-signal/40"
             }`}
           >
-            {t.label}
+            <span className="text-4xl leading-none">{t.icon}</span>
+            <span className="font-bold uppercase tracking-wider text-xs">{t.label}</span>
           </button>
         ))}
       </div>
 
       {tab === "stats" && <DashboardStats />}
       {tab === "tournaments" && <DashboardTournaments />}
+      {tab === "licence" && <DashboardLicence />}
       {tab === "settings" && <DashboardSettings />}
-
-      <DashboardLicence />
     </div>
   );
 }
