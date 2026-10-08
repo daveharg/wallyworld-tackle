@@ -21,15 +21,16 @@ interface StoredMessage {
 interface Decrypted {
   id: string;
   mine: boolean;
+  sender_id: string;
   text: string | null;
   created_at: string;
 }
 
 export interface ThreadPeer {
   id: string;
-  other_id: string;
-  other_name: string;
-  other_avatar: string | null;
+  name: string | null;
+  is_group: boolean;
+  members: { user_id: string; name: string; avatar_url: string | null }[];
 }
 
 function timeAgo(iso: string): string {
@@ -53,30 +54,39 @@ export default function ThreadView({
   onBack: () => void;
   onSent: () => void;
 }) {
-  const [shared, setShared] = useState<Uint8Array | null>(null);
+  const [secrets, setSecrets] = useState<{ user_id: string; shared: Uint8Array }[] | null>(null);
   const [keyMissing, setKeyMissing] = useState(false);
   const [msgs, setMsgs] = useState<Decrypted[]>([]);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const [note, setNote] = useState<string | null>(null);
+  const [showMembers, setShowMembers] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const lastAtRef = useRef<string | null>(null);
-  const sharedRef = useRef<Uint8Array | null>(null);
+  const secretsRef = useRef<{ user_id: string; shared: Uint8Array }[] | null>(null);
 
-  // Their public key -> shared secret.
+  // Every member's public key -> per-member shared secret. Each message is
+  // encrypted separately for each member (including yourself).
   useEffect(() => {
     let live = true;
-    fishFetch(`/api/fishmb/msg/keys/${peer.other_id}`)
+    fishFetch(`/api/fishmb/msg/conversations/${peer.id}/members`)
       .then((d) => {
         if (!live) return;
-        const pk = (d as { public_key: string | null }).public_key;
-        if (!pk) {
+        const members = (d.members ?? []) as {
+          user_id: string;
+          public_key: string | null;
+        }[];
+        const missing = members.filter((m) => !m.public_key);
+        if (missing.length > 0) {
           setKeyMissing(true);
           return;
         }
-        const s = sharedSecret(pk, keypair.secretKey);
-        sharedRef.current = s;
-        setShared(s);
+        const s = members.map((m) => ({
+          user_id: m.user_id,
+          shared: sharedSecret(m.public_key as string, keypair.secretKey),
+        }));
+        secretsRef.current = s;
+        setSecrets(s);
       })
       .catch(() => {
         if (live) setNote("Could not load encryption keys.");
@@ -84,22 +94,28 @@ export default function ThreadView({
     return () => {
       live = false;
     };
-  }, [peer.other_id, keypair]);
+  }, [peer.id, keypair]);
+
+  const myShared = (s: { user_id: string; shared: Uint8Array }[]): Uint8Array | null =>
+    s.find((x) => x.user_id === myId)?.shared ?? null;
 
   const decryptAll = (rows: StoredMessage[], s: Uint8Array): Decrypted[] =>
     rows.map((m) => ({
       id: m.id,
       mine: m.sender_id === myId,
+      sender_id: m.sender_id,
       text: decryptText(m.nonce, m.ciphertext, s),
       created_at: m.created_at,
     }));
 
-  // Initial load + polling.
+  // Initial load + polling. My rows only — each member reads their own copy.
   useEffect(() => {
-    if (!shared) return;
+    if (!secrets) return;
     let live = true;
     let timer: ReturnType<typeof setInterval>;
-    const s = shared;
+    const mine = myShared(secrets);
+    if (!mine) return;
+    const s = mine;
     const load = async (after?: string) => {
       try {
         const url =
@@ -141,11 +157,12 @@ export default function ThreadView({
       clearInterval(timer);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [shared, peer.id]);
+  }, [secrets, peer.id]);
 
   const send = async () => {
     const text = draft.trim();
-    if (!text || !sharedRef.current || sending) return;
+    const secs = secretsRef.current;
+    if (!text || !secs || sending) return;
     if (text.length > 2000) {
       setNote("Messages are limited to 2000 characters.");
       return;
@@ -153,18 +170,23 @@ export default function ThreadView({
     setSending(true);
     setNote(null);
     try {
-      const { nonce, ciphertext } = encryptText(text, sharedRef.current);
+      const parts = secs.map(({ user_id, shared }) => {
+        const { nonce, ciphertext } = encryptText(text, shared);
+        return { recipient_id: user_id, nonce, ciphertext };
+      });
       const d = await fishFetch(`/api/fishmb/msg/conversations/${peer.id}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nonce, ciphertext }),
+        body: JSON.stringify({ parts }),
       });
-      const m = d.message as StoredMessage;
-      setMsgs((prev) => [
-        ...prev,
-        { id: m.id, mine: true, text, created_at: m.created_at },
-      ]);
-      lastAtRef.current = m.created_at;
+      const mine = (d.messages as StoredMessage[]).find((m) => m.sender_id === myId);
+      if (mine) {
+        setMsgs((prev) => [
+          ...prev,
+          { id: mine.id, mine: true, sender_id: myId, text, created_at: mine.created_at },
+        ]);
+        lastAtRef.current = mine.created_at;
+      }
       setTimeout(
         () => bottomRef.current?.scrollIntoView({ behavior: "smooth" }),
         50
@@ -178,6 +200,11 @@ export default function ThreadView({
     }
   };
 
+  const title = peer.is_group
+    ? (peer.name ?? "Group chat")
+    : (peer.members.find((m) => m.user_id !== myId)?.name ?? "Chat");
+  const others = peer.members.filter((m) => m.user_id !== myId);
+
   return (
     <div className="flex flex-col h-[calc(100dvh-220px)] min-h-[420px]">
       <div className="flex items-center gap-3 pb-3 border-b border-pine/10">
@@ -189,28 +216,56 @@ export default function ThreadView({
         >
           ←
         </button>
-        {peer.other_avatar ? (
+        {peer.is_group ? (
+          <span className="w-10 h-10 rounded-full bg-pine text-white flex items-center justify-center font-bold shrink-0">
+            👥
+          </span>
+        ) : others[0]?.avatar_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={peer.other_avatar}
+            src={others[0].avatar_url}
             alt=""
             className="w-10 h-10 rounded-full object-cover"
           />
         ) : (
           <span className="w-10 h-10 rounded-full bg-signal text-white flex items-center justify-center font-bold">
-            {peer.other_name.charAt(0).toUpperCase()}
+            {title.charAt(0).toUpperCase()}
           </span>
         )}
         <div className="min-w-0 flex-1">
-          <Link
-            href={`/fishmb/users/${peer.other_id}`}
-            className="font-bold text-pine truncate block hover:text-signal-dark"
+          <button
+            type="button"
+            onClick={() => peer.is_group && setShowMembers((s) => !s)}
+            className={`font-bold text-pine truncate block ${peer.is_group ? "hover:text-signal-dark" : ""}`}
           >
-            {peer.other_name}
-          </Link>
-          <p className="text-xs text-pine/50">🔒 End-to-end encrypted</p>
+            {title}
+          </button>
+          <p className="text-xs text-pine/50">
+            🔒 End-to-end encrypted
+            {peer.is_group ? ` · ${peer.members.length} members` : ""}
+          </p>
         </div>
       </div>
+
+      {showMembers && peer.is_group && (
+        <div className="bg-white border border-pine/10 rounded-2xl p-3 mt-3 space-y-1">
+          {peer.members.map((m) => (
+            <Link
+              key={m.user_id}
+              href={`/fishmb/users/${m.user_id}`}
+              className="flex items-center gap-2 text-sm text-pine hover:text-signal-dark"
+            >
+              <span className="w-6 h-6 rounded-full bg-pine/10 flex items-center justify-center text-xs font-bold">
+                {m.name.charAt(0).toUpperCase()}
+              </span>
+              {m.name}
+              {m.user_id === myId && (
+                <span className="text-xs text-pine/45">(you)</span>
+              )}
+            </Link>
+          ))}
+        </div>
+      )}
 
       {note && (
         <p className="text-sm text-signal-dark bg-signal/10 border border-signal/30 rounded-2xl px-4 py-2.5 mt-3">
@@ -219,17 +274,21 @@ export default function ThreadView({
       )}
       {keyMissing && (
         <p className="text-sm text-pine bg-pine/5 border border-pine/15 rounded-2xl px-4 py-3 mt-3">
-          {peer.other_name} hasn't enabled encrypted messaging yet.
+          Someone in this chat hasn't enabled encrypted messaging yet.
         </p>
       )}
 
       <div className="flex-1 overflow-y-auto py-4 space-y-2">
-        {msgs.length === 0 && shared && !keyMissing && (
+        {msgs.length === 0 && secrets && !keyMissing && (
           <p className="text-center text-pine/45 text-sm mt-8">
             No messages yet — say hey. 🔒
           </p>
         )}
-        {msgs.map((m) => (
+        {msgs.map((m) => {
+          const senderName = m.mine
+            ? null
+            : (peer.members.find((x) => x.user_id === m.sender_id)?.name ?? null);
+          return (
           <div key={m.id} className={`flex ${m.mine ? "justify-end" : "justify-start"}`}>
             <div
               className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${
@@ -238,6 +297,9 @@ export default function ThreadView({
                   : "bg-white border border-pine/10 text-pine rounded-bl-md"
               }`}
             >
+              {senderName && peer.is_group && (
+                <p className="text-[11px] font-bold text-signal-dark mb-0.5">{senderName}</p>
+              )}
               <p className="text-sm whitespace-pre-wrap break-words">
                 {m.text ?? "⚠️ Couldn't decrypt this message."}
               </p>
@@ -248,7 +310,8 @@ export default function ThreadView({
               </p>
             </div>
           </div>
-        ))}
+          );
+        })}
         <div ref={bottomRef} />
       </div>
 
@@ -261,13 +324,13 @@ export default function ThreadView({
           }}
           maxLength={2000}
           placeholder="Message…"
-          disabled={!shared || keyMissing}
+          disabled={!secrets || keyMissing}
           className="flex-1 bg-white border border-pine/15 rounded-full px-4 py-3 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal disabled:opacity-50"
         />
         <button
           type="button"
           onClick={send}
-          disabled={!draft.trim() || sending || !shared || keyMissing}
+          disabled={!draft.trim() || sending || !secrets || keyMissing}
           className="shrink-0 bg-signal hover:bg-signal-dark text-white font-bold text-sm px-6 rounded-full disabled:opacity-40 transition-colors"
         >
           {sending ? "…" : "Send"}

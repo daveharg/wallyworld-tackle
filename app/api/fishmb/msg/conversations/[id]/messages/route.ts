@@ -1,5 +1,5 @@
 // /api/fishmb/msg/conversations/[id]/messages — ciphertext relay.
-// GET ?after=<iso>: messages. POST: { nonce, ciphertext } stores one.
+// GET ?after=<iso>: my rows. POST: { parts: [{ recipient_id, nonce, ciphertext }] }.
 import { NextRequest, NextResponse } from "next/server";
 import {
   fishUserFromRequest,
@@ -26,7 +26,7 @@ export async function GET(
   const g = await guard(req, id);
   if (g.err) return g.err;
   const after = new URL(req.url).searchParams.get("after") ?? undefined;
-  const messages = await listMessages(id, after);
+  const messages = await listMessages(id, g.me!.id, after);
   return NextResponse.json({ messages });
 }
 
@@ -36,21 +36,33 @@ export async function POST(
 ) {
   const { id } = await params;
   const g = await guard(req, id);
-  if (!g.err) {
-    let body: Record<string, unknown>;
-    try {
-      body = await req.json();
-    } catch {
-      return badRequest("Invalid JSON body.");
-    }
-    const nonce = typeof body.nonce === "string" ? body.nonce.trim() : "";
-    const ciphertext = typeof body.ciphertext === "string" ? body.ciphertext.trim() : "";
-    // 24-byte nonce -> 32 chars; ciphertext must be non-trivial base64.
+  if (g.err) return g.err;
+  let body: Record<string, unknown>;
+  try {
+    body = await req.json();
+  } catch {
+    return badRequest("Invalid JSON body.");
+  }
+  const parts = Array.isArray(body.parts) ? body.parts : [];
+  if (parts.length === 0 || parts.length > 50) return badRequest("Invalid parts.");
+  const clean: { recipient_id: string; nonce: string; ciphertext: string }[] = [];
+  const seen = new Set<string>();
+  for (const p of parts) {
+    const r = p as Record<string, unknown>;
+    const recipient_id = typeof r.recipient_id === "string" ? r.recipient_id.trim() : "";
+    const nonce = typeof r.nonce === "string" ? r.nonce.trim() : "";
+    const ciphertext = typeof r.ciphertext === "string" ? r.ciphertext.trim() : "";
+    if (!recipient_id || seen.has(recipient_id)) return badRequest("Invalid parts.");
     if (!B64.test(nonce) || nonce.length !== 32) return badRequest("Invalid nonce.");
     if (!B64.test(ciphertext) || ciphertext.length < 24 || ciphertext.length > 20000)
       return badRequest("Invalid ciphertext.");
-    const msg = await storeMessage(id, g.me!.id, nonce, ciphertext);
-    return NextResponse.json({ message: msg });
+    seen.add(recipient_id);
+    clean.push({ recipient_id, nonce, ciphertext });
   }
-  return g.err;
+  try {
+    const stored = await storeMessage(id, g.me!.id, clean);
+    return NextResponse.json({ messages: stored });
+  } catch (e) {
+    return badRequest(e instanceof Error ? e.message : "Could not store message.");
+  }
 }
