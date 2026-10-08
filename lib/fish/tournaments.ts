@@ -100,6 +100,19 @@ export async function ensureTournamentTables(): Promise<void> {
     joined_at timestamptz NOT NULL DEFAULT now(),
     PRIMARY KEY (tournament_id, user_id)
   )`);
+  // Single-use entry keys: the organizer generates codes and hands one to each
+  // angler after they pay (payment itself stays off-platform/manual). Each key
+  // joins exactly one angler, once.
+  await query(`CREATE TABLE IF NOT EXISTS fm_tournament_keys (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    tournament_id uuid NOT NULL REFERENCES fm_tournaments(id) ON DELETE CASCADE,
+    key_code text UNIQUE NOT NULL,
+    status text NOT NULL DEFAULT 'unused' CHECK (status IN ('unused', 'used')),
+    used_by_user_id uuid REFERENCES fm_users(id) ON DELETE SET NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    used_at timestamptz
+  )`);
+  await query(`CREATE INDEX IF NOT EXISTS fm_tournament_keys_tourney_idx ON fm_tournament_keys(tournament_id, status)`);
   await query(`CREATE TABLE IF NOT EXISTS fm_tournament_entries (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     tournament_id uuid NOT NULL REFERENCES fm_tournaments(id) ON DELETE CASCADE,
@@ -216,6 +229,105 @@ export async function isParticipant(tournamentId: string, userId: string): Promi
     [tournamentId, userId]
   );
   return !!row;
+}
+
+export interface TournamentKey {
+  id: string;
+  tournament_id: string;
+  key_code: string;
+  status: "unused" | "used";
+  used_by_user_id: string | null;
+  used_by_name: string | null;
+  created_at: string;
+  used_at: string | null;
+}
+
+// 8-char uppercase alphanumeric, skipping confusing 0/O/1/I.
+const KEY_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+function randomKeyCode(): string {
+  let s = "";
+  for (let i = 0; i < 8; i++) {
+    s += KEY_ALPHABET[Math.floor(Math.random() * KEY_ALPHABET.length)];
+  }
+  return s;
+}
+
+/** Generate `count` single-use entry keys for a tournament. Retries on unique collisions. */
+export async function generateTournamentKeys(tournamentId: string, count: number): Promise<TournamentKey[]> {
+  await ensureTournamentTables();
+  const made: TournamentKey[] = [];
+  const n = Math.max(1, Math.min(200, Math.floor(count)));
+  for (let i = 0; i < n; i++) {
+    let row: TournamentKey | null = null;
+    for (let attempt = 0; attempt < 10 && !row; attempt++) {
+      try {
+        row = await queryOne<TournamentKey>(
+          `INSERT INTO fm_tournament_keys (tournament_id, key_code) VALUES ($1, $2)
+           RETURNING id, tournament_id, key_code, status, used_by_user_id,
+                     NULL::text AS used_by_name, created_at, used_at`,
+          [tournamentId, randomKeyCode()]
+        );
+      } catch {
+        row = null; // unique collision — try another code
+      }
+    }
+    if (row) made.push(row);
+  }
+  return made;
+}
+
+/** List a tournament's keys (organizer view), newest first. */
+export async function listTournamentKeys(tournamentId: string): Promise<TournamentKey[]> {
+  await ensureTournamentTables();
+  return query<TournamentKey>(
+    `SELECT k.id, k.tournament_id, k.key_code, k.status, k.used_by_user_id,
+            u.name AS used_by_name, k.created_at, k.used_at
+     FROM fm_tournament_keys k
+     LEFT JOIN fm_users u ON u.id = k.used_by_user_id
+     WHERE k.tournament_id = $1
+     ORDER BY k.created_at DESC`,
+    [tournamentId]
+  );
+}
+
+/**
+ * Redeem a single-use key: marks it used and adds the user as a participant,
+ * atomically. Returns { ok, tournament_id } or { error }.
+ */
+export async function redeemTournamentKey(
+  tournamentId: string,
+  rawKey: string,
+  userId: string
+): Promise<{ tournament_id?: string; error?: string }> {
+  await ensureTournamentTables();
+  const code = rawKey.trim().toUpperCase();
+  if (!code) return { error: "Enter your entry key." };
+  if (await isParticipant(tournamentId, userId)) {
+    return { error: "You're already in this tournament." };
+  }
+  const t = await getTournament(tournamentId);
+  if (!t) return { error: "Tournament not found." };
+  if (t.max_participants !== null && t.participant_count >= t.max_participants) {
+    return { error: "This tournament is full." };
+  }
+  // Atomically claim an unused key; exactly one concurrent redeemer wins.
+  const claimed = await queryOne<{ id: string }>(
+    `UPDATE fm_tournament_keys
+     SET status = 'used', used_by_user_id = $3, used_at = now()
+     WHERE id = (
+       SELECT id FROM fm_tournament_keys
+       WHERE tournament_id = $1 AND key_code = $2 AND status = 'unused'
+       LIMIT 1
+     )
+     RETURNING id`,
+    [tournamentId, code, userId]
+  );
+  if (!claimed) return { error: "That key isn't valid or was already used." };
+  await query(
+    `INSERT INTO fm_tournament_participants (tournament_id, user_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+    [tournamentId, userId]
+  );
+  return { tournament_id: tournamentId };
 }
 
 export async function getEntries(tournamentId: string, statuses: string[]): Promise<TournamentEntry[]> {

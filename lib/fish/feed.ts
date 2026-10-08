@@ -45,6 +45,10 @@ export async function ensureFeedColumns(): Promise<void> {
   await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS species_tag text`);
   await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS photos jsonb`);
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS photos jsonb`);
+  // Comments can target either an fm_discussions row or an fm_catches row, so
+  // post_id carries NO foreign key (the original 003.sql FK to fm_discussions
+  // broke commenting on catches). Keep the post_id index for lookups.
+  await query(`ALTER TABLE fm_comments DROP CONSTRAINT IF EXISTS fm_comments_post_id_fkey`);
   // Reactions live in one table keyed by post_id with NO foreign key, because a
   // "post" in the feed is either an fm_discussions row or an fm_catches row.
   await query(`CREATE TABLE IF NOT EXISTS fm_post_reactions (

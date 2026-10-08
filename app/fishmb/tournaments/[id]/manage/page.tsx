@@ -7,6 +7,7 @@ import { fishFetch, formatDateTime } from "../../../_components/fishFetch";
 import { compressImage } from "../../../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 import { CatchMap } from "../../_components/CatchMap";
+import { EntryKeys } from "../../_components/EntryKeys";
 import { PayoutEditor } from "../../_components/PayoutEditor";
 import type { PayoutTier } from "@/lib/fish/tournaments";
 
@@ -540,6 +541,9 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
 
       {/* Full tournament editor */}
       <EditTournament tournament={t} onSaved={load} />
+
+      {/* Single-use entry keys */}
+      <EntryKeys tournamentId={t.id} />
 
       {/* Pending review */}
       <h2 className="font-display font-bold uppercase text-pine text-2xl tracking-wide mb-4">

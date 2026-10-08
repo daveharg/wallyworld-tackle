@@ -81,9 +81,9 @@ export const FISHMB_HERO_PHOTOS: HeroPhoto[] = [
     credit: "Robert Linsdell, CC BY 2.0",
   },
   {
-    src: "https://commons.wikimedia.org/wiki/Special:FilePath/Grand%20Beach%2C%20Lake%20Winnipeg%2C%20Manitoba%20%28330170%29%20%289441674243%29.jpg?width=1920",
-    alt: "Grand Beach on Lake Winnipeg",
-    credit: "Robert Linsdell, CC BY 2.0",
+    src: "https://commons.wikimedia.org/wiki/Special:FilePath/Fishing%20in%20a%20Sunset%20in%20Matlock%2C%20Manitoba%2C%20Canada.jpg?width=1920",
+    alt: "Fishing at sunset in Matlock, Manitoba",
+    credit: "Will Darracott, CC BY-SA 4.0",
   },
   {
     src: "https://commons.wikimedia.org/wiki/Special:FilePath/Lake%20Manitoba%20comin%27%20at%20ya%20near%20Steep%20Rock%2C%20Manitoba%2C%20Canada.%20%2836378663843%29.jpg?width=1920",

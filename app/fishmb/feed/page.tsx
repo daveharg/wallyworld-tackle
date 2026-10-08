@@ -104,7 +104,7 @@ function PhotoCarousel({ photos }: { photos: string[] }) {
   if (photos.length === 0) return null;
   const go = (d: number) => setIdx((i) => (i + d + photos.length) % photos.length);
   return (
-    <div className="mt-3 rounded-2xl overflow-hidden bg-pine-deep/10 relative">
+    <div className="mt-3 rounded-2xl overflow-hidden bg-pine-deep/10 relative max-sm:-mx-5 max-sm:rounded-none">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={photos[idx]}
@@ -794,7 +794,7 @@ export default function FeedPage() {
         <div className="space-y-4">
           {visible.map((item, idx) => (
             <Fragment key={item.id}>
-            <article className="bg-white border border-pine/10 rounded-3xl p-5">
+            <article className="bg-white border border-pine/10 rounded-3xl p-5 max-sm:-mx-4 max-sm:rounded-none max-sm:border-x-0">
               <div className="flex items-center gap-3 mb-3">
                 <Avatar name={item.user_name} url={item.avatar_url} />
                 <div>

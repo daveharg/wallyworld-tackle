@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTournamentByInvite } from "@/lib/fish/tournaments";
 import { JoinButton } from "../../_components/JoinButton";
+import { RedeemKey } from "../../_components/RedeemKey";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 60;
@@ -23,6 +24,7 @@ export default async function JoinTournamentPage({ params }: { params: { code: s
         {t.participant_count} {t.participant_count === 1 ? "angler" : "anglers"} in so far
       </p>
       <JoinButton tournamentId={t.id} tournamentName={t.name} inviteCode={params.code} />
+      <RedeemKey tournamentId={t.id} />
       <p className="mt-6">
         <Link href="/fishmb/tournaments" className="text-sm font-bold text-signal uppercase tracking-wider">
           Browse all tournaments

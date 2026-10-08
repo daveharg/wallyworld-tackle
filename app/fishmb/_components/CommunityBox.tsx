@@ -12,6 +12,7 @@ interface FeedItem {
   avatar_url: string | null;
   body: string | null;
   photo_url: string | null;
+  photos: string[];
   species: string | null;
   length_in: number | null;
   created_at: string;
@@ -123,6 +124,27 @@ export function CommunityBox() {
                     )}
                     {!item.body && !item.species && (
                       <p className="text-white/50 text-sm italic">Shared a photo</p>
+                    )}
+                    {(item.photos?.length > 0 || item.photo_url) && (
+                      <div className="flex gap-1.5 mt-3">
+                        {(item.photos?.length > 0 ? item.photos : [item.photo_url as string])
+                          .slice(0, 3)
+                          .map((src, i) => (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              key={i}
+                              src={src}
+                              alt=""
+                              loading="lazy"
+                              className="w-16 h-16 rounded-xl object-cover"
+                            />
+                          ))}
+                        {(item.photos?.length ?? 0) > 3 && (
+                          <span className="w-16 h-16 rounded-xl bg-white/10 text-white/60 text-xs font-bold flex items-center justify-center">
+                            +{(item.photos?.length ?? 0) - 3}
+                          </span>
+                        )}
+                      </div>
                     )}
                   </Link>
                 ))}
