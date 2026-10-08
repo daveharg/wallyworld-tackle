@@ -5,6 +5,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { fishFetch } from "../../_components/fishFetch";
 
 interface BiggestFish {
@@ -116,6 +117,12 @@ export default function FishingStats({ userId }: { userId: string }) {
           </p>
         )}
       </div>
+      <Link
+        href="/fishmb/leaderboards"
+        className="mt-4 inline-flex items-center gap-2 bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-xs px-6 py-3 rounded-full transition-colors"
+      >
+        🏆 View leaderboards →
+      </Link>
     </section>
   );
 }
