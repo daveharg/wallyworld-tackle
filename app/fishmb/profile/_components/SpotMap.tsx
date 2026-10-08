@@ -582,10 +582,16 @@ export default function SpotMap({
         </button>
       )}
       <ContoursToggle />
-      <div
-        ref={containerRef}
-        className={expanded ? "h-full w-full z-0" : "h-[300px] md:h-[380px] w-full z-0"}
-      />
+      {/*
+        Sizing wrapper is React-owned; the inner div belongs to Leaflet.
+        Its className must NEVER change between renders — when it does,
+        React rewrites the whole class attribute and wipes the
+        `leaflet-container` class L.map() adds, which blanks every tile
+        (all Leaflet tile CSS is scoped under .leaflet-container).
+      */}
+      <div className={expanded ? "h-full w-full" : "h-[300px] md:h-[380px] w-full z-0"}>
+        <div ref={containerRef} className="h-full w-full" />
+      </div>
 
       {/* Measure result pill */}
       {measureDist !== null && (
