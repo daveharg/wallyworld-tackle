@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import ContoursToggle from "../../_components/ContoursToggle";
 
 export interface SpotPin {
   id: string;
@@ -144,7 +145,8 @@ export default function SpotMap({ spots, picking, onPick, pendingPin, focus }: S
   }, [map, focus]);
 
   return (
-    <div className="rounded-3xl overflow-hidden border border-pine/10 shadow-sm">
+    <div className="rounded-3xl overflow-hidden border border-pine/10 shadow-sm relative">
+      <ContoursToggle />
       <div ref={containerRef} className="h-[300px] md:h-[380px] w-full z-0" />
       <p className="text-xs text-pine/50 px-4 py-2.5 bg-white">
         {picking
