@@ -9,7 +9,7 @@ import {
   forbidden,
   notFound,
 } from "@/lib/fish/auth";
-import { isMember, getMembers, addMember, removeMember, getPublicKey } from "@/lib/fish/messages";
+import { isMember, getMembers, addMember, removeMember } from "@/lib/fish/messages";
 import { queryOne } from "@/lib/fish/db";
 
 async function guard(req: NextRequest, id: string) {
@@ -46,8 +46,8 @@ export async function POST(
   if (!userId || userId === g.me!.id) return badRequest("Invalid user.");
   const exists = await queryOne<{ n: string }>(`SELECT 1 AS n FROM fm_users WHERE id = $1`, [userId]);
   if (!exists) return notFound("User not found.");
-  if (!(await getPublicKey(userId)))
-    return badRequest("That angler hasn't set up encrypted messaging yet.");
+  // Anyone can be added to a group — members without keys yet simply can't
+  // read messages until they enable encrypted messaging.
   await addMember(id, userId);
   return NextResponse.json({ ok: true });
 }

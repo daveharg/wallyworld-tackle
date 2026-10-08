@@ -24,11 +24,8 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({ conversations: convos });
 }
 
-async function keysReady(userIds: string[]): Promise<string | null> {
-  for (const uid of userIds) {
-    if (!(await getPublicKey(uid))) return uid;
-  }
-  return null;
+async function myKeyReady(userId: string): Promise<boolean> {
+  return !!(await getPublicKey(userId));
 }
 
 export async function POST(req: NextRequest) {
@@ -54,9 +51,10 @@ export async function POST(req: NextRequest) {
       [ids]
     );
     if (rows.length !== ids.length) return notFound("A friend was not found.");
-    const missing = await keysReady([me.id, ...ids]);
-    if (missing === me.id) return badRequest("Set up your messaging keys first.");
-    if (missing) return badRequest("A friend hasn't set up encrypted messaging yet.");
+    // Anyone can be added — members without keys yet simply can't read
+    // messages until they enable encrypted messaging. Only the creator
+    // needs keys (they're the one encrypting).
+    if (!(await myKeyReady(me.id))) return badRequest("Set up your messaging keys first.");
     const id = await createConversation([me.id, ...ids], name || null);
     return NextResponse.json({ id });
   }
@@ -66,9 +64,9 @@ export async function POST(req: NextRequest) {
   if (!otherId || otherId === me.id) return badRequest("Invalid user.");
   const rows = await query<{ id: string }>(`SELECT id FROM fm_users WHERE id = $1`, [otherId]);
   if (rows.length === 0) return notFound("User not found.");
-  const missing = await keysReady([me.id, otherId]);
-  if (missing === me.id) return badRequest("Set up your messaging keys first.");
-  if (missing) return badRequest("That angler hasn't set up encrypted messaging yet.");
+  // Anyone can be messaged — a user without keys yet just can't read
+  // messages until they enable encrypted messaging.
+  if (!(await myKeyReady(me.id))) return badRequest("Set up your messaging keys first.");
   const id =
     (await findDirectConversation(me.id, otherId)) ??
     (await createConversation([me.id, otherId], null));

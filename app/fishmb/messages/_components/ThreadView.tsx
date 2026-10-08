@@ -66,7 +66,7 @@ export default function ThreadView({
   onSent: () => void;
 }) {
   const [secrets, setSecrets] = useState<{ user_id: string; shared: Uint8Array }[] | null>(null);
-  const [keyMissing, setKeyMissing] = useState(false);
+  const [missingNames, setMissingNames] = useState<string[]>([]);
   const [msgs, setMsgs] = useState<Decrypted[]>([]);
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
@@ -77,7 +77,9 @@ export default function ThreadView({
   const secretsRef = useRef<{ user_id: string; shared: Uint8Array }[] | null>(null);
 
   // Every member's public key -> per-member shared secret. Each message is
-  // encrypted separately for each member (including yourself).
+  // encrypted separately for each member that HAS a key (including yourself).
+  // Members without keys yet can't read anything until they enable encrypted
+  // messaging — the thread still works for everyone else.
   useEffect(() => {
     let live = true;
     fishFetch(`/api/fishmb/msg/conversations/${peer.id}/members`)
@@ -85,14 +87,14 @@ export default function ThreadView({
         if (!live) return;
         const members = (d.members ?? []) as {
           user_id: string;
+          name: string;
           public_key: string | null;
         }[];
-        const missing = members.filter((m) => !m.public_key);
-        if (missing.length > 0) {
-          setKeyMissing(true);
-          return;
-        }
-        const s = members.map((m) => ({
+        setMissingNames(
+          members.filter((m) => !m.public_key && m.user_id !== myId).map((m) => m.name || "Someone")
+        );
+        const keyed = members.filter((m) => m.public_key);
+        const s = keyed.map((m) => ({
           user_id: m.user_id,
           shared: sharedSecret(m.public_key as string, keypair.secretKey),
         }));
@@ -105,6 +107,7 @@ export default function ThreadView({
     return () => {
       live = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [peer.id, keypair]);
 
   // Each message copy was encrypted by its sender for us, so it must be
@@ -173,7 +176,7 @@ export default function ThreadView({
 
   const sendPayload = async (payload: string, optimisticText: string | null = null) => {
     const secs = secretsRef.current;
-    if (!payload || !secs || sending) return;
+    if (!payload || !secs || secs.length === 0 || sending) return;
     if (payload.length > 8000) {
       setNote("That message is too long.");
       return;
@@ -323,14 +326,15 @@ export default function ThreadView({
           {note}
         </p>
       )}
-      {keyMissing && (
+      {missingNames.length > 0 && (
         <p className="text-sm text-pine bg-pine/5 border border-pine/15 rounded-2xl px-4 py-3 mt-3">
-          Someone in this chat hasn't enabled encrypted messaging yet.
+          ⚠️ {missingNames.join(", ")} {missingNames.length === 1 ? "hasn't" : "haven't"} enabled
+          encrypted messaging yet — they'll only see messages sent after they turn it on.
         </p>
       )}
 
       <div className="flex-1 overflow-y-auto py-4 space-y-2">
-        {msgs.length === 0 && secrets && !keyMissing && (
+        {msgs.length === 0 && secrets && (
           <p className="text-center text-pine/45 text-sm mt-8">
             No messages yet — say hey. 🔒
           </p>
@@ -387,7 +391,7 @@ export default function ThreadView({
         <button
           type="button"
           onClick={() => photoInputRef.current?.click()}
-          disabled={!secrets || keyMissing || uploading || sending}
+          disabled={!secrets || uploading || sending}
           aria-label="Send a photo"
           className="shrink-0 w-12 h-12 rounded-full bg-pine/10 hover:bg-pine/20 text-pine font-bold text-lg disabled:opacity-40 transition-colors"
         >
@@ -401,13 +405,13 @@ export default function ThreadView({
           }}
           maxLength={2000}
           placeholder="Message…"
-          disabled={!secrets || keyMissing}
+          disabled={!secrets}
           className="flex-1 bg-white border border-pine/15 rounded-full px-4 py-3 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal disabled:opacity-50"
         />
         <button
           type="button"
           onClick={send}
-          disabled={!draft.trim() || sending || uploading || !secrets || keyMissing}
+          disabled={!draft.trim() || sending || uploading || !secrets}
           className="shrink-0 bg-signal hover:bg-signal-dark text-white font-bold text-sm px-6 rounded-full disabled:opacity-40 transition-colors"
         >
           {sending ? "…" : "Send"}
