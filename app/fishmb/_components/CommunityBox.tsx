@@ -30,7 +30,7 @@ const FEATURES = [
   { icon: "🐟", title: "Share your catches", body: "Post photos with species and length — your personal fishing log." },
   { icon: "💬", title: "Join the discussion", body: "Ask questions, swap spots and talk technique with Manitoba anglers." },
   { icon: "💡", title: "Tips that travel", body: "Post tips on any species page — they land in the feed for everyone." },
-  { icon: "👥", title: "Fish with friends", body: "Add fishing buddies and share catches with friends only." },
+  { icon: "👥", title: "Fish with friends", body: "Add fishing friends and share catches with friends only." },
 ];
 
 const photoOf = (it: FeedItem) => (it.photos?.length > 0 ? it.photos[0] : it.photo_url);

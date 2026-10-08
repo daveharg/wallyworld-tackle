@@ -75,7 +75,7 @@ const FEATURE_PROMOS = [
     img: "/fishmb/promos/tournaments.jpg",
     badge: "🏆 Tournaments",
     title: "Run your own fishing tournament",
-    body: "Challenge your buddies to a month-long walleye showdown. Invite codes, live leaderboard, GPS-verified catches — FishMB never touches the money.",
+    body: "Challenge your friends to a month-long walleye showdown. Invite codes, live leaderboard, GPS-verified catches — FishMB never touches the money.",
     cta: "Start a tournament",
     href: "/fishmb/tournaments",
   },
@@ -90,7 +90,7 @@ const FEATURE_PROMOS = [
   {
     img: "/fishmb/promos/messaging.jpg",
     badge: "🔒 Encrypted messaging",
-    title: "Chat with your fishing buddies — privately",
+    title: "Chat with your fishing friends — privately",
     body: "End-to-end encrypted 1:1 and group chats. Plan the trip, share the photos, keep the spots secret. Not even FishMB can read them.",
     cta: "Start chatting",
     href: "/fishmb/messages",
@@ -454,7 +454,7 @@ function FeedPageInner() {
   // Keep the feed section and composer in sync with the URL, so bottom-bar
   // taps work every time (even tapping the same button twice in a row).
   // ?log=catch → catch composer, ?compose=1 → post composer,
-  // ?kind=catch → Catches, ?friends=1 → Buddies.
+  // ?kind=catch → Catches, ?friends=1 → Friends.
   const lastActionRef = useRef<string | null>(null);
   useEffect(() => {
     const kind = searchParams.get("kind");
@@ -731,7 +731,7 @@ function FeedPageInner() {
             aria-expanded={sectionMenuOpen}
             className="flex items-center gap-1.5 text-xl font-black text-pine tracking-tight"
           >
-            {friendsOnly ? "👥 Buddies" : tab === "catch" ? "🐟 Catches" : "🌊 Community"}
+            {friendsOnly ? "👥 Friends" : tab === "catch" ? "🐟 Catches" : "🌊 Community"}
             <span className="text-pine/40 text-sm">▾</span>
           </button>
           {sectionMenuOpen && (
@@ -741,7 +741,7 @@ function FeedPageInner() {
                 {(
                   [
                     ["community", "🌊 Community", "/fishmb/feed"],
-                    ["buddies", "👥 Buddies", "/fishmb/feed?friends=1"],
+                    ["buddies", "👥 Friends", "/fishmb/feed?friends=1"],
                     ["catches", "🐟 Catches", "/fishmb/feed?kind=catch"],
                   ] as const
                 ).map(([id, label, href]) => {

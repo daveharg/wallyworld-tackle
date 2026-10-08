@@ -100,7 +100,7 @@ export default function FriendsPage() {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide mb-4">Friends</h1>
-        <p className="text-pine/60 mb-6">Log in to find fishing buddies and share posts with just friends.</p>
+        <p className="text-pine/60 mb-6">Log in to find fishing friends and share posts with just friends.</p>
         <button onClick={openLogin} className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-8 py-3.5 rounded-full">
           Log in
         </button>
@@ -118,7 +118,7 @@ export default function FriendsPage() {
     <div className="max-w-3xl mx-auto px-4 py-10 md:py-14">
       <Link href="/fishmb/feed" className="text-sm font-bold text-signal uppercase tracking-wider">← Community feed</Link>
       <h1 className="font-display font-bold uppercase text-pine text-4xl md:text-5xl tracking-wide mt-4 mb-2">Friends</h1>
-      <p className="text-pine/60 mb-8">Add fishing buddies, then share catches and posts with just friends.</p>
+      <p className="text-pine/60 mb-8">Add fishing friends, then share catches and posts with just friends.</p>
 
       {note && <p className="text-sm text-pine bg-gold/20 border border-gold/50 rounded-2xl px-4 py-3 mb-6">{note}</p>}
 
@@ -178,7 +178,7 @@ export default function FriendsPage() {
           Your friends ({bundle?.friends.length ?? 0})
         </h2>
         {(bundle?.friends.length ?? 0) === 0 ? (
-          <p className="text-pine/55 text-sm">No friends yet — search above to find your fishing buddies.</p>
+          <p className="text-pine/55 text-sm">No friends yet — search above to find friends.</p>
         ) : (
           <ul className="divide-y divide-pine/10">
             {bundle!.friends.map((p) => (

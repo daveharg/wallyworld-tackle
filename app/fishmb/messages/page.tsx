@@ -338,7 +338,7 @@ export default function MessagesPage() {
               <p className="text-4xl mb-3">💬</p>
               <p className="text-pine/70 font-bold">No conversations yet</p>
               <p className="text-pine/50 text-sm mt-1 mb-4">
-                Start one with a fishing buddy.
+                Start one with a fishing friend.
               </p>
               <button
                 type="button"
@@ -528,7 +528,7 @@ export default function MessagesPage() {
             </div>
             {friends.length === 0 ? (
               <p className="text-pine/60 text-sm">
-                You need friends to message. Find fishing buddies first.
+                You need friends to message. Find friends first.
               </p>
             ) : newMode === "dm" ? (
               <div className="space-y-1">

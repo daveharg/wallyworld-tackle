@@ -101,10 +101,10 @@ export default function HowTournamentsWorkPage() {
 
       <div className="bg-gold/10 border border-gold/30 rounded-3xl p-6 mb-10 max-w-2xl">
         <p className="font-display font-bold uppercase text-pine tracking-wide mb-3">
-          🎣 Example: a June buddy challenge
+          🎣 Example: a June friends challenge
         </p>
         <p className="text-pine/70 text-sm leading-relaxed">
-          Say you and five buddies want to compete all through June for the
+          Say you and five friends want to compete all through June for the
           longest walleye. One of you creates the tournament — name it, set the
           dates to June 1–30, pick your lakes (or leave it open to any Manitoba
           water), choose longest-fish scoring, and set a $20 entry fee. Share
@@ -116,7 +116,7 @@ export default function HowTournamentsWorkPage() {
           and submit it as an entry. You approve catches as the organizer (or
           turn on auto-approve), the leaderboard updates all month, and on June
           30 the longest fish takes the pot. Entry money stays between you and
-          your buddies — cash, e-transfer, whatever you agree on.
+          your friends — cash, e-transfer, whatever you agree on.
         </p>
       </div>
 

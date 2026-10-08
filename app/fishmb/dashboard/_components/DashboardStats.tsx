@@ -40,7 +40,7 @@ export default function DashboardStats() {
           <div className="bg-white border border-pine/10 rounded-3xl p-6 text-center">
             <p className="text-pine/70 font-bold">No friends yet</p>
             <p className="text-pine/50 text-sm mt-1 mb-4">
-              Add fishing buddies to compare stats.
+              Add fishing friends to compare stats.
             </p>
             <Link
               href="/fishmb/friends"
