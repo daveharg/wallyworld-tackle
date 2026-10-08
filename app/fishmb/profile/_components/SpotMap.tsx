@@ -316,8 +316,8 @@ export default function SpotMap({ spots, picking, onPick, onLongPress, pendingPi
     <div
       className={
         expanded
-          ? "fixed inset-0 z-[900] bg-white relative"
-          : "-mx-4 md:mx-0 md:rounded-3xl md:overflow-hidden md:border md:border-pine/10 md:shadow-sm relative"
+          ? "fixed inset-0 z-[900] bg-white"
+          : "-mx-8 md:mx-0 md:rounded-3xl md:overflow-hidden md:border md:border-pine/10 md:shadow-sm relative"
       }
     >
       {expanded && (
