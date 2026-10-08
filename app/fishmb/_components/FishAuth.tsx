@@ -335,6 +335,13 @@ export function FishLoginButton() {
           onClick={() => setMenu(false)}
         >
             <Link
+              href="/fishmb/dashboard"
+              onClick={() => setMenu(false)}
+              className="block px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70 hover:text-signal hover:bg-pine/5"
+            >
+              📊 Dashboard
+            </Link>
+            <Link
               href="/fishmb/profile"
               onClick={() => setMenu(false)}
               className="block px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70 hover:text-signal hover:bg-pine/5"
