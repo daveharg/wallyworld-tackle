@@ -3,6 +3,10 @@ import { notFound } from "next/navigation";
 import { getSpeciesAdvice, getSpeciesBySlug, slugifySpecies } from "@/lib/fishmb-species";
 import { getLakes } from "@/lib/fishmb";
 import { SpeciesTips } from "../_components/SpeciesTips";
+import { LakeMap, type MapLake } from "../../lakes/_components/LakeMap";
+import coordsJson from "@/public/fishmb/lake-coords.json";
+
+const COORDS = coordsJson as Record<string, { lat: number; lng: number }>;
 
 export async function generateStaticParams() {
   return getSpeciesAdvice().map((s) => ({ slug: slugifySpecies(s.species) }));
@@ -82,6 +86,22 @@ export default function SpeciesGuidePage({ params }: { params: { slug: string } 
           <h2 className="font-display font-bold uppercase text-pine text-2xl md:text-3xl tracking-wide mb-4">
             Where to catch {advice.species.toLowerCase()}
           </h2>
+          {(() => {
+            const mapLakes: MapLake[] = lakes
+              .filter((l) => COORDS[l.id])
+              .map((l) => ({
+                id: l.id,
+                name: l.name,
+                region: l.region,
+                lat: COORDS[l.id].lat,
+                lng: COORDS[l.id].lng,
+              }));
+            return mapLakes.length > 0 ? (
+              <div className="mb-6">
+                <LakeMap lakes={mapLakes} />
+              </div>
+            ) : null;
+          })()}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-8">
             {lakes.map((l) => (
               <Link
