@@ -18,6 +18,8 @@ interface SpotMapProps {
   onPick?: (lat: number, lng: number) => void;
   /** The in-progress manual pin (rendered distinctly). */
   pendingPin?: { lat: number; lng: number } | null;
+  /** Recenter request: when the key changes, fly the map to lat/lng. */
+  focus?: { lat: number; lng: number; key: string } | null;
 }
 
 function fmtDate(iso: string): string {
@@ -44,7 +46,7 @@ function escapeHtml(s: string): string {
  * Personal fishing-spots map (Leaflet, dynamically imported so it never runs
  * during SSR). Same pattern as the lake map: pins, popups, fit-to-bounds.
  */
-export default function SpotMap({ spots, picking, onPick, pendingPin }: SpotMapProps) {
+export default function SpotMap({ spots, picking, onPick, pendingPin, focus }: SpotMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<any>(null);
   const onPickRef = useRef(onPick);
@@ -132,6 +134,14 @@ export default function SpotMap({ spots, picking, onPick, pendingPin }: SpotMapP
       containerRef.current.style.cursor = picking ? "crosshair" : "";
     }
   }, [picking, map]);
+
+  // External recenter requests (favorite lake or spot clicked).
+  const lastFocusKey = useRef<string | null>(null);
+  useEffect(() => {
+    if (!map || !focus || focus.key === lastFocusKey.current) return;
+    lastFocusKey.current = focus.key;
+    map.flyTo([focus.lat, focus.lng], 11, { animate: true, duration: 1.2 });
+  }, [map, focus]);
 
   return (
     <div className="rounded-3xl overflow-hidden border border-pine/10 shadow-sm">

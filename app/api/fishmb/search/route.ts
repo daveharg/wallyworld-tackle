@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import { searchAll, getLake } from "@/lib/fishmb";
+import coordsJson from "@/public/fishmb/lake-coords.json";
+
+const COORDS = coordsJson as Record<string, { lat: number; lng: number }>;
 
 /** Lightweight lake+lodge search for the FishMB site hero. */
 export async function GET(req: Request) {
@@ -25,6 +28,8 @@ export async function GET(req: Request) {
       species: l.species.slice(0, 4),
       stocked: l.stocked,
       photo: l.photo,
+      lat: COORDS[l.id]?.lat ?? null,
+      lng: COORDS[l.id]?.lng ?? null,
     })),
     lodges: lodges.map((l) => ({
       id: l.id,

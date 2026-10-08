@@ -15,6 +15,7 @@ export interface FishingSpot {
 }
 
 let ensured = false;
+let favoritesEnsured = false;
 
 export async function ensureSpotsTable(): Promise<void> {
   if (ensured) return;
@@ -31,10 +32,51 @@ export async function ensureSpotsTable(): Promise<void> {
   await query(
     `CREATE INDEX IF NOT EXISTS fm_fishing_spots_user_id_idx ON fm_fishing_spots(user_id)`
   );
+  // Favorite lakes: the angler's saved lakes for quick map navigation on the
+  // profile's fishing-spots section.
+  await ensureFavoriteLakesTable();
   // Catches can carry their own GPS coords (saved from the catch composer).
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS lat double precision`);
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS lng double precision`);
   ensured = true;
+}
+
+/** Standalone ensure for favorite lakes (own flag so it always runs). */
+export async function ensureFavoriteLakesTable(): Promise<void> {
+  if (favoritesEnsured) return;
+  await query(`CREATE TABLE IF NOT EXISTS fm_favorite_lakes (
+    user_id uuid NOT NULL REFERENCES fm_users(id) ON DELETE CASCADE,
+    lake_id text NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (user_id, lake_id)
+  )`);
+  favoritesEnsured = true;
+}
+
+export interface FavoriteLake {
+  lake_id: string;
+  created_at: string;
+}
+
+export async function listFavoriteLakes(userId: string): Promise<FavoriteLake[]> {
+  await ensureFavoriteLakesTable();
+  return query<FavoriteLake>(
+    `SELECT lake_id, created_at FROM fm_favorite_lakes WHERE user_id = $1 ORDER BY created_at ASC`,
+    [userId]
+  );
+}
+
+export async function addFavoriteLake(userId: string, lakeId: string): Promise<void> {
+  await ensureFavoriteLakesTable();
+  await query(
+    `INSERT INTO fm_favorite_lakes (user_id, lake_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+    [userId, lakeId]
+  );
+}
+
+export async function removeFavoriteLake(userId: string, lakeId: string): Promise<void> {
+  await ensureFavoriteLakesTable();
+  await query(`DELETE FROM fm_favorite_lakes WHERE user_id = $1 AND lake_id = $2`, [userId, lakeId]);
 }
 
 export function isValidLat(v: unknown): v is number {

@@ -12,6 +12,22 @@ interface Spot extends SpotPin {
   catch_id: string | null;
 }
 
+interface FavLake {
+  id: string;
+  name: string;
+  region?: string;
+  lat: number | null;
+  lng: number | null;
+}
+
+interface LakeResult {
+  id: string;
+  name: string;
+  region?: string;
+  lat: number | null;
+  lng: number | null;
+}
+
 function fmtDate(iso: string): string {
   try {
     return new Date(iso).toLocaleDateString("en-CA", {
@@ -48,6 +64,13 @@ export default function FishingSpots() {
   const [editName, setEditName] = useState("");
   const [editNotes, setEditNotes] = useState("");
 
+  // Favorite lakes + map focus
+  const [favs, setFavs] = useState<FavLake[]>([]);
+  const [lakeQuery, setLakeQuery] = useState("");
+  const [lakeResults, setLakeResults] = useState<LakeResult[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [focus, setFocus] = useState<{ lat: number; lng: number; key: string } | null>(null);
+
   const load = async () => {
     try {
       const d = await fishFetch("/api/fishmb/spots");
@@ -57,11 +80,73 @@ export default function FishingSpots() {
     } finally {
       setLoading(false);
     }
+    try {
+      const f = await fishFetch("/api/fishmb/favorite-lakes");
+      setFavs((f.lakes ?? []) as FavLake[]);
+    } catch {
+      // Favorites stay empty.
+    }
   };
 
   useEffect(() => {
     load();
   }, []);
+
+  // Debounced lake search.
+  useEffect(() => {
+    const q = lakeQuery.trim();
+    if (q.length < 2) {
+      setLakeResults([]);
+      return;
+    }
+    setSearching(true);
+    const t = setTimeout(async () => {
+      try {
+        const d = await fishFetch(`/api/fishmb/search?q=${encodeURIComponent(q)}`);
+        setLakeResults((d.lakes ?? []) as LakeResult[]);
+      } catch {
+        setLakeResults([]);
+      } finally {
+        setSearching(false);
+      }
+    }, 250);
+    return () => clearTimeout(t);
+  }, [lakeQuery]);
+
+  const favIds = new Set(favs.map((f) => f.id));
+
+  const addFav = async (lake: LakeResult) => {
+    if (favIds.has(lake.id)) return;
+    try {
+      await fishFetch("/api/fishmb/favorite-lakes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lake_id: lake.id }),
+      });
+      setFavs([...favs, { id: lake.id, name: lake.name, region: lake.region, lat: lake.lat, lng: lake.lng }]);
+      setLakeQuery("");
+      setLakeResults([]);
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Could not save the lake.");
+    }
+  };
+
+  const removeFav = async (lakeId: string) => {
+    try {
+      await fishFetch(`/api/fishmb/favorite-lakes/${encodeURIComponent(lakeId)}`, { method: "DELETE" });
+      setFavs(favs.filter((f) => f.id !== lakeId));
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Could not remove the lake.");
+    }
+  };
+
+  const focusOn = (lat: number | null, lng: number | null, key: string) => {
+    if (lat === null || lng === null) {
+      setNote("No map coordinates for that lake yet.");
+      return;
+    }
+    setFocus({ lat, lng, key });
+  };
 
   const useCurrentLocation = () => {
     if (!("geolocation" in navigator)) {
@@ -185,8 +270,80 @@ export default function FishingSpots() {
               ? { lat: manualLat, lng: manualLng }
               : null
           }
+          focus={focus}
         />
       )}
+
+      {/* Favorite lakes — quick map navigation */}
+      <div className="bg-white border border-pine/10 rounded-3xl p-6 mt-4">
+        <h3 className="font-display font-bold uppercase text-pine text-lg tracking-wide mb-1">
+          ⭐ Favorite lakes
+        </h3>
+        <p className="text-pine/55 text-xs mb-3">
+          Save lakes to jump the map straight to them.
+        </p>
+        <input
+          value={lakeQuery}
+          onChange={(e) => setLakeQuery(e.target.value)}
+          placeholder="Search lakes to add…"
+          className={inputCls}
+        />
+        {searching && <p className="text-pine/50 text-xs mt-2">Searching…</p>}
+        {!searching && lakeResults.length > 0 && (
+          <div className="mt-2 bg-paper-deep border border-pine/10 rounded-2xl overflow-hidden">
+            {lakeResults.map((l) => (
+              <div
+                key={l.id}
+                className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-pine/5 last:border-0"
+              >
+                <div className="min-w-0">
+                  <p className="text-pine text-sm font-bold truncate">{l.name}</p>
+                  {l.region && <p className="text-pine/50 text-xs">{l.region}</p>}
+                </div>
+                {favIds.has(l.id) ? (
+                  <span className="text-gold text-xs font-bold shrink-0">★ Saved</span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => addFav(l)}
+                    className="text-xs font-bold uppercase tracking-wider text-pine border border-pine/20 rounded-full px-3 py-1.5 hover:border-gold hover:text-gold-dark shrink-0"
+                  >
+                    ★ Save
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+        {favs.length > 0 ? (
+          <div className="flex flex-wrap gap-2 mt-3">
+            {favs.map((f) => (
+              <span
+                key={f.id}
+                className="inline-flex items-center gap-1 bg-gold/15 border border-gold/40 rounded-full pl-3 pr-1.5 py-1.5"
+              >
+                <button
+                  type="button"
+                  onClick={() => focusOn(f.lat, f.lng, `lake:${f.id}`)}
+                  className="text-pine text-xs font-bold hover:text-gold-dark"
+                >
+                  ★ {f.name}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => removeFav(f.id)}
+                  aria-label={`Remove ${f.name} from favorites`}
+                  className="text-pine/40 hover:text-signal-dark text-xs font-bold px-1"
+                >
+                  ✕
+                </button>
+              </span>
+            ))}
+          </div>
+        ) : (
+          <p className="text-pine/40 text-xs mt-3">No favorite lakes yet — search above to add some.</p>
+        )}
+      </div>
 
       {/* Manual add */}
       <div className="bg-white border border-pine/10 rounded-3xl p-6 mt-4">
@@ -295,8 +452,15 @@ export default function FishingSpots() {
                 </div>
               ) : (
                 <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="font-bold text-pine truncate">{s.name || "Fishing spot"}</p>
+                  <button
+                    type="button"
+                    onClick={() => focusOn(Number(s.lat), Number(s.lng), `spot:${s.id}`)}
+                    className="min-w-0 text-left flex-1"
+                    title="Show on map"
+                  >
+                    <p className="font-bold text-pine truncate hover:text-gold-dark">
+                      📍 {s.name || "Fishing spot"}
+                    </p>
                     <p className="text-xs text-pine/50 mt-0.5">
                       {fmtDate(s.created_at)} ·{" "}
                       <span className="tabular-nums">
@@ -304,7 +468,7 @@ export default function FishingSpots() {
                       </span>
                     </p>
                     {s.notes && <p className="text-sm text-pine/70 mt-1">{s.notes}</p>}
-                  </div>
+                  </button>
                   <div className="flex gap-1 shrink-0">
                     <button
                       onClick={() => startEdit(s)}
