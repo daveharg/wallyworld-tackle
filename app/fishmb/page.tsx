@@ -1,5 +1,6 @@
 import Link from "next/link";
 import SearchHero from "./_components/SearchHero";
+import HomepageBannerAd from "./_components/HomepageBannerAd";
 import HSlider, { SectionHeading } from "./_components/HSlider";
 import { LakeCard, LodgeCard, HotLakeCard } from "./_components/Cards";
 import { LoginCtaSection } from "./_components/LoginCta";
@@ -52,6 +53,7 @@ export default function FishMBHome() {
   return (
     <>
       <SearchHero />
+      <HomepageBannerAd />
 
       {/* Run your own tournament — first section */}
       <section className="bg-paper-deep border-b border-pine/10">

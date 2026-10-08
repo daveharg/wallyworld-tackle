@@ -13,6 +13,7 @@ function EditPanel() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
+  const [accountType, setAccountType] = useState("personal");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [note, setNote] = useState<string | null>(null);
@@ -21,6 +22,7 @@ function EditPanel() {
     if (user) {
       setName(user.name ?? "");
       setBio((user as { bio?: string }).bio ?? "");
+      setAccountType((user as { account_type?: string }).account_type ?? "personal");
     }
   }, [user]);
 
@@ -59,7 +61,7 @@ function EditPanel() {
       await fishFetch("/api/fish/auth/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), bio: bio.trim() }),
+        body: JSON.stringify({ name: name.trim(), bio: bio.trim(), account_type: accountType }),
       });
       await refresh();
       setNote("Profile saved!");
@@ -122,6 +124,22 @@ function EditPanel() {
               className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal resize-none"
             />
             <p className="text-xs text-pine/45 mt-1 text-right">{bio.length}/500</p>
+          </div>
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-2">
+              Account type
+            </label>
+            <select
+              value={accountType}
+              onChange={(e) => setAccountType(e.target.value)}
+              className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine focus:outline-none focus:border-signal"
+            >
+              <option value="personal">🎣 Personal</option>
+              <option value="business">🏢 Business</option>
+            </select>
+            <p className="text-xs text-pine/45 mt-1">
+              Business accounts can list a business page and advertise.
+            </p>
           </div>
           <button
             onClick={save}

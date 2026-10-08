@@ -23,6 +23,7 @@ export async function PATCH(req: NextRequest) {
   if (!me) return unauthorized();
 
   await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS bio text NOT NULL DEFAULT ''`);
+  await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS account_type text NOT NULL DEFAULT 'personal'`);
 
   let body: Record<string, unknown>;
   try {
@@ -52,6 +53,10 @@ export async function PATCH(req: NextRequest) {
   if (typeof body.bio === "string") {
     params.push(body.bio.trim().slice(0, 500));
     updates.push(`bio = $${params.length}`);
+  }
+  if (body.account_type === "personal" || body.account_type === "business") {
+    params.push(body.account_type);
+    updates.push(`account_type = $${params.length}`);
   }
   if (updates.length === 0) return badRequest("Nothing to update.");
 

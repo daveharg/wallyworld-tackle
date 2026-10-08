@@ -13,6 +13,7 @@ export interface FishAuthUser {
   email: string | null;
   avatar_url: string | null;
   is_anonymous: boolean;
+  account_type?: string;
 }
 
 interface FishAuthCtx {
@@ -50,6 +51,7 @@ export function FishAuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<FishAuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [loginOpen, setLoginOpen] = useState(false);
+  const [chooseType, setChooseType] = useState<FishAuthUser | null>(null);
 
   const refresh = useCallback(async () => {
     const token = typeof window !== "undefined" ? localStorage.getItem(FISHMB_TOKEN_KEY) : null;
@@ -90,8 +92,23 @@ export function FishAuthProvider({ children }: { children: React.ReactNode }) {
       {loginOpen && (
         <LoginModal
           onClose={() => setLoginOpen(false)}
+          onDone={(u, isNew) => {
+            if (isNew) {
+              // First signup — ask personal or business before entering.
+              setChooseType(u);
+            } else {
+              setUser(u);
+              setLoginOpen(false);
+            }
+          }}
+        />
+      )}
+      {chooseType && (
+        <AccountTypeChooser
+          user={chooseType}
           onDone={(u) => {
             setUser(u);
+            setChooseType(null);
             setLoginOpen(false);
           }}
         />
@@ -100,7 +117,7 @@ export function FishAuthProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-function LoginModal({ onClose, onDone }: { onClose: () => void; onDone: (u: FishAuthUser) => void }) {
+function LoginModal({ onClose, onDone }: { onClose: () => void; onDone: (u: FishAuthUser, isNew: boolean) => void }) {
   const btnRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -123,7 +140,7 @@ function LoginModal({ onClose, onDone }: { onClose: () => void; onDone: (u: Fish
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || "Sign-in failed.");
             localStorage.setItem(FISHMB_TOKEN_KEY, data.token);
-            onDone(data.user);
+            onDone(data.user, data.is_new_user === true);
           } catch (e) {
             setError(e instanceof Error ? e.message : "Sign-in failed.");
           } finally {
@@ -181,6 +198,76 @@ function LoginModal({ onClose, onDone }: { onClose: () => void; onDone: (u: Fish
         >
           Cancel
         </button>
+      </div>
+    </div>
+  );
+}
+
+/** First-signup step: personal or business account? */
+function AccountTypeChooser({ user, onDone }: { user: FishAuthUser; onDone: (u: FishAuthUser) => void }) {
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const pick = async (account_type: "personal" | "business") => {
+    setSaving(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem(FISHMB_TOKEN_KEY);
+      const res = await fetch("/api/fish/auth/me", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ account_type }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not save.");
+      onDone(data.user);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not save.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-pine-deep/60 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Choose account type"
+    >
+      <div className="bg-paper rounded-3xl max-w-md w-full p-8 text-center shadow-2xl">
+        <h2 className="font-display font-bold uppercase text-pine text-2xl tracking-wide mb-2">
+          Welcome, {user.name.split(" ")[0]}!
+        </h2>
+        <p className="text-pine/70 text-sm mb-6">
+          Is this a personal account or a business account? Businesses get their
+          own page, advertising options, and listing tools.
+        </p>
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => pick("personal")}
+            disabled={saving}
+            className="bg-white border-2 border-pine/15 hover:border-signal rounded-3xl p-5 text-left transition-colors disabled:opacity-50"
+          >
+            <p className="text-3xl mb-2">🎣</p>
+            <p className="font-bold text-pine">Personal</p>
+            <p className="text-xs text-pine/60 mt-1">Fish, post, join tournaments.</p>
+          </button>
+          <button
+            onClick={() => pick("business")}
+            disabled={saving}
+            className="bg-white border-2 border-pine/15 hover:border-signal rounded-3xl p-5 text-left transition-colors disabled:opacity-50"
+          >
+            <p className="text-3xl mb-2">🏢</p>
+            <p className="font-bold text-pine">Business</p>
+            <p className="text-xs text-pine/60 mt-1">Lodge, guide, shop — get a business page + ads.</p>
+          </button>
+        </div>
+        {saving && <p className="text-sm text-pine/60 mt-4">Saving…</p>}
+        {error && <p className="text-sm text-signal-dark mt-4">{error}</p>}
       </div>
     </div>
   );

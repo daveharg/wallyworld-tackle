@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
     // Non-anonymous Bearer: fall through to the classic upsert below.
   }
 
-  const user = await withTransaction(async (client) => {
+  const { user, isNew } = await withTransaction(async (client) => {
     const existing = await txQueryOne<FishUser>(
       client,
       `SELECT * FROM fm_users WHERE google_sub = $1`,
@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
           WHERE id = $1 RETURNING *`,
         [existing.id, profile.name, profile.email, profile.picture]
       );
-      return updated!;
+      return { user: updated!, isNew: false };
     }
     const created = await txQueryOne<FishUser>(
       client,
@@ -128,11 +128,11 @@ export async function POST(req: NextRequest) {
        VALUES ($1, NULL, 1000, 'signup_bonus')`,
       [created!.id]
     );
-    return created!;
+    return { user: created!, isNew: true };
   });
 
   const token = await createSession(user.id);
   pruneExpiredSessions();
 
-  return NextResponse.json({ token, user: toApiUser(user) });
+  return NextResponse.json({ token, user: toApiUser(user), is_new_user: isNew });
 }

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useFishAuth } from "../../../_components/FishAuth";
 import { fishFetch, formatDateTime } from "../../../_components/fishFetch";
+import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 import { CatchMap } from "../../_components/CatchMap";
 
 interface Entry {
@@ -34,13 +35,151 @@ interface Detail {
     ends_at: string;
     invite_code: string;
     status: string;
+    cover_photo_url: string | null;
+    venue_name: string | null;
+    venue_address: string | null;
   };
   entries: Entry[];
   is_organizer: boolean;
 }
 
-export default function ManageTournamentPage({ params }: { params: { id: string } }) {
-  const { user, openLogin } = useFishAuth();
+/** Organizer-editable rich details: cover photo, venue name, venue address. */
+function EditDetails({ tournament, onSaved }: { tournament: Detail["tournament"]; onSaved: () => void }) {
+  const [cover, setCover] = useState<string | null>(tournament.cover_photo_url ?? null);
+  const [venueName, setVenueName] = useState(tournament.venue_name ?? "");
+  const [venueAddress, setVenueAddress] = useState(tournament.venue_address ?? "");
+  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+
+  const uploadCover = async (file: File) => {
+    setUploading(true);
+    setNote(null);
+    try {
+      const token = localStorage.getItem(FISHMB_TOKEN_KEY);
+      const form = new FormData();
+      form.append("file", file);
+      const upRes = await fetch("/api/fish/photos/upload", {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: form,
+      });
+      const up = await upRes.json();
+      if (!upRes.ok) throw new Error(up.error || "Photo upload failed.");
+      setCover(up.url as string);
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Could not upload the cover photo.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const save = async () => {
+    setSaving(true);
+    setNote(null);
+    try {
+      await fishFetch(`/api/fishmb/tournaments/${tournament.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          cover_photo_url: cover ?? "",
+          venue_name: venueName,
+          venue_address: venueAddress,
+        }),
+      });
+      setNote("Tournament details updated!");
+      onSaved();
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Could not save.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <section className="bg-white border border-pine/10 rounded-3xl p-6 md:p-8 mb-8">
+      <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-1">
+        Tournament page details
+      </h2>
+      <p className="text-pine/55 text-sm mb-5">
+        Cover photo, venue name and address show on the public tournament page.
+      </p>
+      {note && (
+        <p className="text-sm text-pine bg-gold/20 border border-gold/50 rounded-2xl px-4 py-3 mb-5">{note}</p>
+      )}
+      <div className="grid md:grid-cols-2 gap-5">
+        <div>
+          <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-1.5">
+            Cover photo
+          </label>
+          {cover ? (
+            <div className="relative rounded-2xl overflow-hidden border border-pine/20">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={cover} alt="Tournament cover" className="w-full h-40 object-cover" />
+              <button
+                onClick={() => setCover(null)}
+                className="absolute top-2 right-2 bg-pine-deep/80 text-white text-xs font-bold px-3 py-1.5 rounded-full"
+              >
+                Remove
+              </button>
+            </div>
+          ) : (
+            <label className="flex items-center justify-center gap-2 bg-paper-deep border border-dashed border-pine/30 rounded-2xl px-4 py-8 text-sm text-pine/60 cursor-pointer hover:border-signal transition-colors">
+              {uploading ? "Uploading…" : "📷 Upload a cover photo"}
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                disabled={uploading}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) uploadCover(f);
+                }}
+              />
+            </label>
+          )}
+        </div>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-1.5">
+              Venue name
+            </label>
+            <input
+              value={venueName}
+              onChange={(e) => setVenueName(e.target.value)}
+              maxLength={120}
+              placeholder="e.g. Selkirk Park"
+              className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-1.5">
+              Venue address
+            </label>
+            <input
+              value={venueAddress}
+              onChange={(e) => setVenueAddress(e.target.value)}
+              maxLength={200}
+              placeholder="e.g. 112 Main St, Selkirk MB"
+              className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal"
+            />
+          </div>
+        </div>
+      </div>
+      <div className="flex justify-end mt-5">
+        <button
+          onClick={save}
+          disabled={saving}
+          className="bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-xs px-6 py-2.5 rounded-full disabled:opacity-50 transition-colors"
+        >
+          {saving ? "Saving…" : "Save details"}
+        </button>
+      </div>
+    </section>
+  );
+}
+
+export default function ManageTournamentPage({ params }: { params: { id: string } }) {  const { user, openLogin } = useFishAuth();
   const [detail, setDetail] = useState<Detail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -165,6 +304,9 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
           </button>
         </div>
       </section>
+
+      {/* Tournament page details */}
+      <EditDetails tournament={t} onSaved={load} />
 
       {/* Pending review */}
       <h2 className="font-display font-bold uppercase text-pine text-2xl tracking-wide mb-4">

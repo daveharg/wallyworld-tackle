@@ -7,6 +7,7 @@ import { fishFetch } from "../../_components/fishFetch";
 import { PayoutEditor } from "./PayoutEditor";
 import { RULE_TEMPLATES } from "./ruleTemplates";
 import type { PayoutTier } from "@/lib/fish/tournaments";
+import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 
 interface LakeOpt {
   id: string;
@@ -35,6 +36,10 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
   const [entryFee, setEntryFee] = useState("");
   const [payouts, setPayouts] = useState<PayoutTier[]>([]);
   const [autoApprove, setAutoApprove] = useState(false);
+  const [coverPhotoUrl, setCoverPhotoUrl] = useState<string | null>(null);
+  const [venueName, setVenueName] = useState("");
+  const [venueAddress, setVenueAddress] = useState("");
+  const [uploadingCover, setUploadingCover] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -47,6 +52,28 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
   const lakeName = (id: string) => lakes.find((l) => l.id === id)?.name || id;
 
   const validBasics = name.trim().length > 0 && startsAt && endsAt && new Date(endsAt) > new Date(startsAt);
+
+  const uploadCover = async (file: File) => {
+    setUploadingCover(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem(FISHMB_TOKEN_KEY);
+      const form = new FormData();
+      form.append("file", file);
+      const upRes = await fetch("/api/fish/photos/upload", {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: form,
+      });
+      const up = await upRes.json();
+      if (!upRes.ok) throw new Error(up.error || "Photo upload failed.");
+      setCoverPhotoUrl(up.url as string);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not upload the cover photo.");
+    } finally {
+      setUploadingCover(false);
+    }
+  };
 
   const create = async () => {
     setError(null);
@@ -73,6 +100,9 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
           entry_fee_cents: Math.max(0, Math.round((parseFloat(entryFee) || 0) * 100)),
           payouts,
           auto_approve_entries: autoApprove,
+          cover_photo_url: coverPhotoUrl,
+          venue_name: venueName.trim() || null,
+          venue_address: venueAddress.trim() || null,
         }),
       });
       router.push(`/fishmb/tournaments/${data.tournament.id}/manage`);
@@ -109,6 +139,45 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
           <div>
             <label className={labelCls}>Description</label>
             <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder="What is it, who is it for, what are the prizes?" className={inputCls} />
+          </div>
+          <div>
+            <label className={labelCls}>Cover photo (optional)</label>
+            {coverPhotoUrl ? (
+              <div className="relative rounded-2xl overflow-hidden border border-pine/20">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={coverPhotoUrl} alt="Tournament cover" className="w-full h-40 object-cover" />
+                <button
+                  onClick={() => setCoverPhotoUrl(null)}
+                  className="absolute top-2 right-2 bg-pine-deep/80 text-white text-xs font-bold px-3 py-1.5 rounded-full"
+                >
+                  Remove
+                </button>
+              </div>
+            ) : (
+              <label className="flex items-center justify-center gap-2 bg-white border border-dashed border-pine/30 rounded-2xl px-4 py-6 text-sm text-pine/60 cursor-pointer hover:border-signal transition-colors">
+                {uploadingCover ? "Uploading…" : "📷 Upload a cover photo for the tournament page"}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  disabled={uploadingCover}
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) uploadCover(f);
+                  }}
+                />
+              </label>
+            )}
+          </div>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className={labelCls}>Venue name (optional)</label>
+              <input value={venueName} onChange={(e) => setVenueName(e.target.value)} maxLength={120} placeholder="e.g. Selkirk Park" className={inputCls} />
+            </div>
+            <div>
+              <label className={labelCls}>Venue address (optional)</label>
+              <input value={venueAddress} onChange={(e) => setVenueAddress(e.target.value)} maxLength={200} placeholder="e.g. 112 Main St, Selkirk MB" className={inputCls} />
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -267,6 +336,9 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
           <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide">Review</h3>
           <dl className="bg-white rounded-2xl border border-pine/10 p-5 space-y-2.5 text-sm">
             <div className="flex justify-between"><dt className="text-pine/55 font-bold uppercase text-xs tracking-wider">Name</dt><dd className="text-pine font-bold">{name}</dd></div>
+            {(venueName || venueAddress) && (
+              <div className="flex justify-between"><dt className="text-pine/55 font-bold uppercase text-xs tracking-wider">Where</dt><dd className="text-pine text-right">{[venueName.trim(), venueAddress.trim()].filter(Boolean).join(" — ")}</dd></div>
+            )}
             <div className="flex justify-between"><dt className="text-pine/55 font-bold uppercase text-xs tracking-wider">Dates</dt><dd className="text-pine">{startsAt.replace("T", " ")} → {endsAt.replace("T", " ")}</dd></div>
             <div className="flex justify-between"><dt className="text-pine/55 font-bold uppercase text-xs tracking-wider">Scoring</dt><dd className="text-pine capitalize">{scoring === "longest" ? "Longest fish" : scoring === "total" ? "Total length" : "Most fish"}</dd></div>
             <div className="flex justify-between"><dt className="text-pine/55 font-bold uppercase text-xs tracking-wider">Waters</dt><dd className="text-pine text-right">{lakeIds.length ? lakeIds.map(lakeName).join(", ") : "Any Manitoba water"}</dd></div>

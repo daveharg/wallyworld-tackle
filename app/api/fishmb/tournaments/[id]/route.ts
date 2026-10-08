@@ -84,6 +84,14 @@ export async function PATCH(
     set("entry_fee_cents", Math.min(Math.floor(body.entry_fee_cents), 10000000));
   if (typeof body.auto_approve_entries === "boolean")
     set("auto_approve_entries", body.auto_approve_entries);
+  if (typeof body.cover_photo_url === "string") {
+    const url = body.cover_photo_url.trim();
+    set("cover_photo_url", url && /^https?:\/\//.test(url) ? url : null);
+  }
+  if (typeof body.venue_name === "string")
+    set("venue_name", body.venue_name.trim().slice(0, 120) || null);
+  if (typeof body.venue_address === "string")
+    set("venue_address", body.venue_address.trim().slice(0, 200) || null);
   if (Array.isArray(body.payouts))
     set(
       "payouts",

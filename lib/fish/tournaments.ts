@@ -44,6 +44,9 @@ export interface Tournament {
   entry_fee_cents: number;
   payouts: PayoutTier[];
   auto_approve_entries: boolean;
+  cover_photo_url: string | null;
+  venue_name: string | null;
+  venue_address: string | null;
   created_at: string;
   participant_count: number;
   entry_count: number;
@@ -124,6 +127,10 @@ export async function ensureTournamentTables(): Promise<void> {
   // Friendly/demo tournaments can skip organizer review (Dave's call — real
   // tournaments keep manual approval as the anti-cheat default).
   await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS auto_approve_entries boolean NOT NULL DEFAULT false`);
+  // Richer tournament pages: cover photo, venue name + address.
+  await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS cover_photo_url text`);
+  await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS venue_name text`);
+  await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS venue_address text`);
   // One-time repair: the seeded demo's posted rules say entries are
   // auto-approved, so honor that and clear the stuck "pending" backlog.
   // (Organizer ownership is left alone — it isn't needed for this fix.)

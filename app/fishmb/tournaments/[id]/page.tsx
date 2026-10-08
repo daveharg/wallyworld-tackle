@@ -17,6 +17,10 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
   const lakeNames = new Map(getLakes().map((l) => [l.id, l.name]));
 
   const scoreLabel = t.scoring === "total" ? "Total in." : t.scoring === "count" ? "Fish" : "Best in.";
+  const venueQuery = [t.venue_name, t.venue_address].filter(Boolean).join(", ");
+  const mapsUrl = venueQuery
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venueQuery)}`
+    : null;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 md:py-14">
@@ -24,12 +28,30 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
         ← All tournaments
       </Link>
 
+      {/* Cover hero */}
+      {t.cover_photo_url ? (
+        <div className="relative mt-4 rounded-3xl overflow-hidden bg-pine-deep">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={t.cover_photo_url} alt={t.name} className="w-full h-64 md:h-96 object-cover" />
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-pine-deep/90 via-pine-deep/40 to-transparent pt-24 pb-6 px-6 md:px-10">
+            <p className="text-gold font-bold uppercase tracking-[0.24em] text-xs mb-2">{t.status}</p>
+            <h1 className="font-display font-bold uppercase text-white text-4xl md:text-6xl tracking-wide">
+              {t.name}
+            </h1>
+          </div>
+        </div>
+      ) : null}
+
       <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-signal font-bold uppercase tracking-[0.24em] text-xs mb-2">{t.status}</p>
-          <h1 className="font-display font-bold uppercase text-pine text-4xl md:text-5xl tracking-wide">
-            {t.name}
-          </h1>
+          {!t.cover_photo_url && (
+            <>
+              <p className="text-signal font-bold uppercase tracking-[0.24em] text-xs mb-2">{t.status}</p>
+              <h1 className="font-display font-bold uppercase text-pine text-4xl md:text-5xl tracking-wide">
+                {t.name}
+              </h1>
+            </>
+          )}
           <p className="text-pine/60 mt-2">
             Organized by {t.organizer_name} · {t.participant_count} anglers · {formatDateTime(t.starts_at)} → {formatDateTime(t.ends_at)}
           </p>
@@ -39,7 +61,28 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
 
       {t.description && <p className="text-pine/75 mt-6 max-w-3xl whitespace-pre-line">{t.description}</p>}
 
-      <div className="grid md:grid-cols-3 gap-4 mt-6">
+      {/* Where — venue name + address with a map link */}
+      {(t.venue_name || t.venue_address) && (
+        <div className="bg-white border border-pine/10 rounded-2xl p-6 mt-6 flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-1.5">📍 Where</h3>
+            {t.venue_name && <p className="text-pine font-bold text-lg">{t.venue_name}</p>}
+            {t.venue_address && <p className="text-pine/60 text-sm">{t.venue_address}</p>}
+          </div>
+          {mapsUrl && (
+            <a
+              href={mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-xs px-6 py-3 rounded-full transition-colors"
+            >
+              Open in Google Maps →
+            </a>
+          )}
+        </div>
+      )}
+
+      <div className="grid md:grid-cols-3 gap-4 mt-4">
         <div className="bg-white border border-pine/10 rounded-2xl p-5">
           <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-2">Waters</h3>
           <p className="text-pine text-sm">{t.lake_ids.length ? t.lake_ids.map((id) => lakeNames.get(id) || id).join(", ") : "Any Manitoba water"}</p>
@@ -54,11 +97,16 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
         </div>
       </div>
 
+      {/* Rules — dedicated section */}
       {t.rules && (
-        <div className="bg-paper-deep border border-pine/10 rounded-2xl p-6 mt-4">
-          <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-2">Rules</h3>
-          <p className="text-pine/75 text-sm whitespace-pre-line">{t.rules}</p>
-        </div>
+        <section className="mt-10">
+          <h2 className="font-display font-bold uppercase text-pine text-2xl md:text-3xl tracking-wide mb-4">
+            Tournament rules
+          </h2>
+          <div className="bg-paper-deep border border-pine/10 rounded-3xl p-6 md:p-8">
+            <p className="text-pine/80 whitespace-pre-line leading-relaxed">{t.rules}</p>
+          </div>
+        </section>
       )}
 
       <div className="grid md:grid-cols-2 gap-4 mt-4">

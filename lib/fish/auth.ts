@@ -18,6 +18,7 @@ export interface FishUser {
   stats_public: boolean;
   play_balance: number;
   bio: string;
+  account_type: string;
   created_at: string;
 }
 
@@ -47,6 +48,7 @@ export interface ApiUser {
   bio: string;
   is_anonymous: boolean;
   created_at: string;
+  account_type: string;
 }
 
 export function toApiUser(u: FishUser): ApiUser {
@@ -60,6 +62,7 @@ export function toApiUser(u: FishUser): ApiUser {
     play_balance: u.play_balance,
     is_anonymous: isAnonymousUser(u),
     created_at: u.created_at,
+    account_type: (u as { account_type?: string }).account_type ?? "personal",
   };
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, Fragment } from "react";
 import Link from "next/link";
 import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
@@ -51,6 +51,44 @@ function Avatar({ name, url }: { name: string; url: string | null }) {
     <span className="w-10 h-10 rounded-full bg-signal text-white flex items-center justify-center font-bold">
       {name.charAt(0).toUpperCase()}
     </span>
+  );
+}
+
+interface FeedAd {
+  id: string;
+  title: string;
+  body: string;
+  image_url: string | null;
+  video_url: string | null;
+  link_url: string | null;
+  business_name: string | null;
+}
+
+/** Sponsored ad card interleaved into the feed. */
+function FeedAdCard({ ad }: { ad: FeedAd }) {
+  return (
+    <article className="bg-white border-2 border-gold/50 rounded-3xl p-5">
+      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold mb-2">Sponsored</p>
+      <p className="font-bold text-pine">{ad.title}</p>
+      {ad.business_name && <p className="text-xs text-pine/55 mb-2">by {ad.business_name}</p>}
+      {ad.video_url ? (
+        <video src={ad.video_url} controls className="w-full rounded-2xl mt-2" />
+      ) : ad.image_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={ad.image_url} alt={ad.title} loading="lazy" className="w-full rounded-2xl mt-2 object-cover max-h-80" />
+      ) : null}
+      {ad.body && <p className="text-pine/75 text-sm mt-2">{ad.body}</p>}
+      {ad.link_url && (
+        <a
+          href={ad.link_url}
+          target="_blank"
+          rel="noopener noreferrer sponsored"
+          className="inline-block mt-3 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-5 py-2.5 rounded-full transition-colors"
+        >
+          Learn more →
+        </a>
+      )}
+    </article>
   );
 }
 
@@ -276,6 +314,32 @@ export default function FeedPage() {
     load();
   }, [load]);
 
+  const [friends, setFriends] = useState<{ id: string; name: string; avatar_url: string | null }[]>([]);
+  const [feedAds, setFeedAds] = useState<
+    { id: string; title: string; body: string; image_url: string | null; video_url: string | null; link_url: string | null; business_name: string | null }[]
+  >([]);
+  useEffect(() => {
+    fetch("/api/fishmb/ads?slot=feed")
+      .then((r) => r.json())
+      .then((d) => setFeedAds(d.ads ?? []))
+      .catch(() => {});
+  }, []);
+  useEffect(() => {
+    if (!user) {
+      setFriends([]);
+      return;
+    }
+    let live = true;
+    fishFetch("/api/fish/friends")
+      .then((d) => {
+        if (live) setFriends((d as { friends?: { id: string; name: string; avatar_url: string | null }[] }).friends ?? []);
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [user]);
+
   const runSearch = (e?: React.FormEvent) => {
     e?.preventDefault();
     setActiveQ(q.trim());
@@ -494,7 +558,7 @@ export default function FeedPage() {
                       : "📷 Add photos (up to 4)"}
                     <input
                       type="file"
-                      accept="image/jpeg,image/png,image/webp"
+                      accept="image/*"
                       multiple
                       className="hidden"
                       onChange={(e) => {
@@ -615,11 +679,45 @@ export default function FeedPage() {
         )}
       </div>
 
-      <p className="text-center text-sm text-pine/55 mb-6">
-        <Link href="/fishmb/friends" className="font-bold text-signal-dark">
-          Manage your friends →
-        </Link>
-      </p>
+      {user ? (
+        <div className="flex items-center justify-center mb-6">
+          {friends.length > 0 ? (
+            <div className="flex -space-x-2">
+              {friends.slice(0, 8).map((f) => (
+                <Link key={f.id} href={`/fishmb/anglers/${f.id}`} title={f.name}>
+                  {f.avatar_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={f.avatar_url}
+                      alt={f.name}
+                      className="w-9 h-9 rounded-full object-cover border-2 border-paper"
+                    />
+                  ) : (
+                    <span className="w-9 h-9 rounded-full bg-pine/10 border-2 border-paper flex items-center justify-center font-bold text-pine text-sm">
+                      {f.name.charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                </Link>
+              ))}
+              <Link
+                href="/fishmb/friends"
+                aria-label="Add friends"
+                title="Add friends"
+                className="w-9 h-9 rounded-full bg-signal text-white border-2 border-paper flex items-center justify-center font-bold text-lg leading-none"
+              >
+                +
+              </Link>
+            </div>
+          ) : (
+            <Link
+              href="/fishmb/friends"
+              className="text-xs font-bold uppercase tracking-wider text-signal-dark border border-signal/40 rounded-full px-4 py-2"
+            >
+              + Find friends
+            </Link>
+          )}
+        </div>
+      ) : null}
 
       {/* Tabs */}
       <form onSubmit={runSearch} className="flex gap-2 mb-4">
@@ -682,8 +780,9 @@ export default function FeedPage() {
         </p>
       ) : (
         <div className="space-y-4">
-          {visible.map((item) => (
-            <article key={item.id} className="bg-white border border-pine/10 rounded-3xl p-5">
+          {visible.map((item, idx) => (
+            <Fragment key={item.id}>
+            <article className="bg-white border border-pine/10 rounded-3xl p-5">
               <div className="flex items-center gap-3 mb-3">
                 <Avatar name={item.user_name} url={item.avatar_url} />
                 <div>
@@ -725,6 +824,11 @@ export default function FeedPage() {
               </div>
               {openComments.has(item.id) && <Comments postId={item.id} />}
             </article>
+            {/* Interleave a sponsored ad after every 8th post */}
+            {feedAds.length > 0 && (idx + 1) % 8 === 0 && (
+              <FeedAdCard ad={feedAds[Math.floor((idx + 1) / 8 - 1) % feedAds.length]} />
+            )}
+            </Fragment>
           ))}
         </div>
       )}
