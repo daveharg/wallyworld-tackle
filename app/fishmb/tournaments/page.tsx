@@ -30,27 +30,24 @@ export default async function TournamentsPage() {
           📱 Full FishMB app coming soon
         </p>
         <h2 className="font-display font-bold uppercase text-white text-2xl md:text-3xl tracking-wide mb-3">
-          Offline catch logging is on its way
+          Tournaments without cell service
         </h2>
         <p className="text-white/75 max-w-3xl mb-5">
-          Most good fishing spots have zero bars. The full FishMB app will let
-          anglers snap the catch photo right in the app with no service — stamped
-          with the time and GPS on the spot, then synced automatically when
-          they&apos;re back in range. A catch made inside the tournament window
-          counts even if it uploads hours later.
+          Most good fishing spots have zero bars. The full FishMB app is coming
+          soon and will let anglers run tournaments with no cell service — snap
+          the catch photo right in the app, stamped with the time and GPS on the
+          spot, then synced automatically when they&apos;re back in range. A catch
+          made inside the tournament window counts even if it uploads hours later.
         </p>
         <p className="text-white/75 max-w-3xl mb-5">
-          Until then, everything here already works in your browser — and you can
-          install FishMB as a web app on your Home Screen today:{" "}
-          <Link href="/fishmb/app" className="font-bold text-gold underline">
-            get the FishMB web app →
-          </Link>
+          For now, this webpage works like an app on your mobile phone. Add it
+          to your Home Screen and it launches full-screen like a web app:
         </p>
         <div className="grid sm:grid-cols-2 gap-3 max-w-3xl">
           <div className="bg-white/10 rounded-2xl p-4">
             <p className="font-bold text-white text-sm mb-2">🍎 iPhone (Safari)</p>
             <ol className="text-white/70 text-sm list-decimal list-inside space-y-1">
-              <li>Open <Link href="/fishmb/app" className="underline text-gold">fishmb/app</Link> in Safari</li>
+              <li>Open this page in Safari</li>
               <li>Tap the Share button ⬆️</li>
               <li>Tap &ldquo;Add to Home Screen&rdquo; → Add</li>
             </ol>
@@ -58,8 +55,8 @@ export default async function TournamentsPage() {
           <div className="bg-white/10 rounded-2xl p-4">
             <p className="font-bold text-white text-sm mb-2">🤖 Android (Chrome)</p>
             <ol className="text-white/70 text-sm list-decimal list-inside space-y-1">
-              <li>Open <Link href="/fishmb/app" className="underline text-gold">fishmb/app</Link> in Chrome</li>
-              <li>Tap Menu ⋮ → &ldquo;Install app&rdquo;</li>
+              <li>Open this page in Chrome</li>
+              <li>Tap Menu ⋮ → &ldquo;Install app&rdquo; (or &ldquo;Add to Home screen&rdquo;)</li>
               <li>Tap Install — it&apos;s on your Home Screen</li>
             </ol>
           </div>
