@@ -52,6 +52,7 @@ function escapeHtml(s: string): string {
 export default function SpotMap({ spots, picking, onPick, onLongPress, pendingPin, focus }: SpotMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<any>(null);
+  const [expanded, setExpanded] = useState(false);
   const onPickRef = useRef(onPick);
   onPickRef.current = onPick;
   const onLongPressRef = useRef(onLongPress);
@@ -234,17 +235,114 @@ export default function SpotMap({ spots, picking, onPick, onLongPress, pendingPi
     map.flyTo([focus.lat, focus.lng], 11, { animate: true, duration: 1.2 });
   }, [map, focus]);
 
+  // A quick tap on the map (not a drag, not a long-press) opens it fullscreen.
+  // Skipped while dropping a pin, and taps on markers/popups/controls are left alone.
+  useEffect(() => {
+    if (expanded) return;
+    const el = containerRef.current;
+    if (!el) return;
+    let sx = 0;
+    let sy = 0;
+    let st = 0;
+    let tracking = false;
+    const interactive = (t: EventTarget | null) =>
+      t instanceof HTMLElement &&
+      !!t.closest(".leaflet-marker-icon, .leaflet-popup, .leaflet-control, button, a");
+    const down = (x: number, y: number, t: EventTarget | null) => {
+      if (interactive(t)) {
+        tracking = false;
+        return;
+      }
+      tracking = true;
+      sx = x;
+      sy = y;
+      st = Date.now();
+    };
+    const up = (x: number, y: number) => {
+      if (!tracking) return;
+      tracking = false;
+      if (
+        !pickingRef.current &&
+        Date.now() - st < 350 &&
+        Math.hypot(x - sx, y - sy) < 12
+      ) {
+        setExpanded(true);
+      }
+    };
+    const tDown = (e: TouchEvent) => {
+      if (e.touches.length === 1) down(e.touches[0].clientX, e.touches[0].clientY, e.target);
+    };
+    const tUp = (e: TouchEvent) => {
+      const t = e.changedTouches[0];
+      up(t.clientX, t.clientY);
+    };
+    const mDown = (e: MouseEvent) => down(e.clientX, e.clientY, e.target);
+    const mUp = (e: MouseEvent) => up(e.clientX, e.clientY);
+    el.addEventListener("touchstart", tDown, { passive: true });
+    el.addEventListener("touchend", tUp);
+    el.addEventListener("mousedown", mDown);
+    el.addEventListener("mouseup", mUp);
+    return () => {
+      el.removeEventListener("touchstart", tDown);
+      el.removeEventListener("touchend", tUp);
+      el.removeEventListener("mousedown", mDown);
+      el.removeEventListener("mouseup", mUp);
+    };
+  }, [expanded]);
+
+  // Leaflet needs to re-measure once the container resizes into/out of fullscreen.
+  useEffect(() => {
+    if (!map) return;
+    const t = setTimeout(() => map.invalidateSize(), 60);
+    return () => clearTimeout(t);
+  }, [expanded, map]);
+
+  // Fullscreen mode: lock the page behind the map, Escape exits.
+  useEffect(() => {
+    if (!expanded) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setExpanded(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [expanded]);
+
   return (
-    <div className="rounded-3xl overflow-hidden border border-pine/10 shadow-sm relative">
+    <div
+      className={
+        expanded
+          ? "fixed inset-0 z-[900] bg-white relative"
+          : "-mx-4 md:mx-0 md:rounded-3xl md:overflow-hidden md:border md:border-pine/10 md:shadow-sm relative"
+      }
+    >
+      {expanded && (
+        <button
+          type="button"
+          onClick={() => setExpanded(false)}
+          className="absolute top-3 left-3 z-[1001] bg-white/95 backdrop-blur border border-pine/15 rounded-full px-5 py-2.5 text-sm font-bold text-pine shadow-lg"
+        >
+          ← Back
+        </button>
+      )}
       <ContoursToggle />
-      <div ref={containerRef} className="h-[300px] md:h-[380px] w-full z-0" />
-      <p className="text-xs text-pine/50 px-4 py-2.5 bg-white">
-        {picking
-          ? "Tap the map to drop your pin — or hold your finger down on any spot to mark it."
-          : spots.length === 0
-            ? "No spots on the map yet — hold your finger down on the map to mark one."
-            : `${spots.length} spot${spots.length === 1 ? "" : "s"} — only you can see them.`}
-      </p>
+      <div
+        ref={containerRef}
+        className={expanded ? "h-full w-full z-0" : "h-[300px] md:h-[380px] w-full z-0"}
+      />
+      {!expanded && (
+        <p className="text-xs text-pine/50 px-4 py-2.5 bg-white">
+          {picking
+            ? "Tap the map to drop your pin — or hold your finger down on any spot to mark it."
+            : spots.length === 0
+              ? "No spots yet — tap the map to go fullscreen, or hold your finger down to mark one."
+              : `${spots.length} spot${spots.length === 1 ? "" : "s"} — only you can see them. Tap the map to go fullscreen.`}
+        </p>
+      )}
     </div>
   );
 }
