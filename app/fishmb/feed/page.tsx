@@ -287,6 +287,7 @@ export default function FeedPage() {
   const [hasMore, setHasMore] = useState(false);
   const [tab, setTab] = useState<"all" | "catch" | "post">("all");
   const [composerOpen, setComposerOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [q, setQ] = useState("");
   const [activeQ, setActiveQ] = useState("");
   const [mode, setMode] = useState<"post" | "catch">("post");
@@ -388,7 +389,6 @@ export default function FeedPage() {
     load(activeQRef.current || undefined, v);
   };
 
-  const [friends, setFriends] = useState<{ id: string; name: string; avatar_url: string | null }[]>([]);
   const [feedAds, setFeedAds] = useState<
     { id: string; title: string; body: string; image_url: string | null; video_url: string | null; link_url: string | null; business_name: string | null }[]
   >([]);
@@ -398,21 +398,6 @@ export default function FeedPage() {
       .then((d) => setFeedAds(d.ads ?? []))
       .catch(() => {});
   }, []);
-  useEffect(() => {
-    if (!user) {
-      setFriends([]);
-      return;
-    }
-    let live = true;
-    fishFetch("/api/fish/friends")
-      .then((d) => {
-        if (live) setFriends((d as { friends?: { id: string; name: string; avatar_url: string | null }[] }).friends ?? []);
-      })
-      .catch(() => {});
-    return () => {
-      live = false;
-    };
-  }, [user]);
 
   const runSearch = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -572,20 +557,152 @@ export default function FeedPage() {
 
 
   return (
-    <div className="max-w-2xl mx-auto px-4 pt-10 md:pt-14 pb-32">
-      <p className="text-signal font-bold uppercase tracking-[0.28em] text-sm mb-3">Community</p>
-      <h1 className="font-display font-bold uppercase text-pine text-4xl md:text-5xl tracking-wide mb-2">
-        The feed
-      </h1>
-      <p className="text-pine/60 mb-8">
-        Catches and discussions from Manitoba anglers — the same feed as the FishMB app.
-      </p>
+    <div className="max-w-2xl mx-auto px-4 pt-4 md:pt-6 pb-32">
 
-      {/* Composer — collapsed until tapped */}
-      <div className="bg-white border border-pine/10 rounded-3xl p-5 mb-6">
-        {user ? (
-          composerOpen ? (
-          <>
+
+
+
+
+
+      {activeQ && (
+        <div className="flex items-center gap-2 mb-4">
+          <p className="text-sm text-pine/60">
+            Results for <span className="font-bold text-pine">“{activeQ}”</span>
+          </p>
+          <button
+            onClick={clearSearch}
+            className="text-xs font-bold text-signal-dark hover:underline"
+          >
+            Clear ✕
+          </button>
+        </div>
+      )}
+      {/* Bottom tab bar — fixed, like the FishMB app. Top filter row removed. */}
+
+      {/* Items */}
+      {loading ? (
+        <div className="space-y-4">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="bg-white border border-pine/10 rounded-3xl p-5 h-40 animate-pulse" />
+          ))}
+        </div>
+      ) : items.length === 0 ? (
+        <p className="text-pine/55 text-center py-10">
+          {activeQ ? `No posts match “${activeQ}”.` : "Nothing here yet — be the first to post."}
+        </p>
+      ) : (
+        <div className="space-y-4">
+          {items.map((item, idx) => (
+            <Fragment key={item.id}>
+            <article className="bg-white border border-pine/10 rounded-3xl p-5 max-sm:-mx-4 max-sm:rounded-none max-sm:border-x-0">
+              <div className="flex items-center gap-3 mb-3">
+                <Avatar name={item.user_name} url={item.avatar_url} />
+                <div>
+                  <Link href={`/fishmb/anglers/${item.user_id}`} className="font-bold text-pine text-sm hover:text-signal-dark">
+                    {item.user_name}
+                  </Link>
+                  <p className="text-xs text-pine/45">
+                    {timeAgo(item.created_at)} ·{" "}
+                    {item.kind === "catch"
+                      ? "logged a catch"
+                      : item.kind === "tip"
+                        ? `💡 added a tip${item.species_tag ? ` for ${item.species_tag}` : ""}`
+                        : "posted"}
+                    {item.visibility === "friends" && " · 👥 friends only"}
+                  </p>
+                </div>
+                {item.kind === "catch" && (
+                  <span className="ml-auto text-[10px] font-bold uppercase tracking-wider bg-accentTeal/15 text-accentTeal px-3 py-1 rounded-full">
+                    Catch
+                  </span>
+                )}
+              </div>
+              {item.species && (
+                <p className="font-bold text-pine mb-1">
+                  {item.species}
+                  {item.length_in ? ` · ${Number(item.length_in).toFixed(1)}″` : ""}
+                </p>
+              )}
+              {item.body && <p className="text-pine/80 text-sm whitespace-pre-line">{item.body}</p>}
+              <PhotoCarousel photos={cardPhotos(item)} />
+              <div className="mt-3 flex items-center justify-between">
+                <Reactions item={item} onReacted={handleReacted} />
+                <button
+                  onClick={() => toggleComments(item.id)}
+                  className="text-xs font-bold uppercase tracking-wider text-pine/50 hover:text-signal-dark"
+                >
+                  💬 {item.comment_count} {item.comment_count === 1 ? "comment" : "comments"}
+                </button>
+              </div>
+              {openComments.has(item.id) && <Comments postId={item.id} />}
+            </article>
+            {/* Interleave a sponsored ad after every 8th post */}
+            {feedAds.length > 0 && (idx + 1) % 8 === 0 && (
+              <FeedAdCard ad={feedAds[Math.floor((idx + 1) / 8 - 1) % feedAds.length]} />
+            )}
+            </Fragment>
+          ))}
+        </div>
+      )}
+
+      {/* Infinite-scroll sentinel */}
+      {!loading && items.length > 0 && (
+        <div ref={sentinelRef} className="py-6 text-center min-h-[4rem]">
+          {loadingMore && (
+            <div className="flex items-center justify-center gap-2 text-pine/50 text-sm">
+              <span className="w-5 h-5 border-2 border-pine/20 border-t-pine rounded-full animate-spin" />
+              Loading more…
+            </div>
+          )}
+          {!loadingMore && !hasMore && (
+            <p className="text-pine/45 text-sm">You&apos;re all caught up 🎣</p>
+          )}
+        </div>
+      )}
+
+      {/* Feed search overlay */}
+      {searchOpen && (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-pine-deep/60" onClick={() => setSearchOpen(false)} />
+          <div className="absolute inset-x-0 top-0 bg-paper border-b border-pine/10 px-4 pb-4 pt-[max(1rem,env(safe-area-inset-top))]">
+            <form
+              onSubmit={(e) => {
+                runSearch(e);
+                setSearchOpen(false);
+              }}
+              className="flex gap-2 max-w-2xl mx-auto"
+            >
+              <input
+                autoFocus
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Search the feed…"
+                className="flex-1 bg-white border border-pine/15 rounded-full px-4 py-2.5 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal"
+              />
+              <button
+                type="submit"
+                className="bg-pine text-white text-xs font-bold uppercase tracking-wider px-5 rounded-full"
+              >
+                Search
+              </button>
+              <button
+                type="button"
+                onClick={() => setSearchOpen(false)}
+                aria-label="Close search"
+                className="text-pine/50 hover:text-pine font-bold px-2"
+              >
+                ✕
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Composer modal */}
+      {user && composerOpen && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-pine-deep/60" onClick={() => setComposerOpen(false)} />
+          <div className="relative bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl p-5 max-h-[92vh] overflow-y-auto">
             <div className="flex gap-2 mb-4 items-center">
               {(
                 [
@@ -781,188 +898,7 @@ export default function FeedPage() {
                 {catchNote && <p className="text-sm text-pine mt-3">{catchNote}</p>}
               </>
             )}
-          </>
-          ) : (
-            <button
-              onClick={() => setComposerOpen(true)}
-              className="w-full flex items-center gap-3 text-left"
-            >
-              {user.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={user.avatar_url} alt={user.name} className="w-10 h-10 rounded-full object-cover" />
-              ) : (
-                <span className="w-10 h-10 rounded-full bg-pine/10 flex items-center justify-center font-bold text-pine">
-                  {user.name.charAt(0).toUpperCase()}
-                </span>
-              )}
-              <span className="flex-1 bg-paper-deep border border-pine/10 rounded-full px-4 py-3 text-sm text-pine/40">
-                Share a report or log a catch…
-              </span>
-            </button>
-          )
-        ) : (
-          <div className="text-center py-2">
-            <p className="text-pine/60 text-sm mb-4">
-              Log in to join the discussion and share your catches.
-            </p>
-            <button
-              onClick={openLogin}
-              className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-7 py-3 rounded-full transition-colors"
-            >
-              Log in
-            </button>
           </div>
-        )}
-      </div>
-
-      {user ? (
-        <div className="flex items-center justify-center mb-6">
-          {friends.length > 0 ? (
-            <div className="flex -space-x-2">
-              {friends.slice(0, 8).map((f) => (
-                <Link key={f.id} href={`/fishmb/anglers/${f.id}`} title={f.name}>
-                  {f.avatar_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={f.avatar_url}
-                      alt={f.name}
-                      className="w-9 h-9 rounded-full object-cover border-2 border-paper"
-                    />
-                  ) : (
-                    <span className="w-9 h-9 rounded-full bg-pine/10 border-2 border-paper flex items-center justify-center font-bold text-pine text-sm">
-                      {f.name.charAt(0).toUpperCase()}
-                    </span>
-                  )}
-                </Link>
-              ))}
-              <Link
-                href="/fishmb/friends"
-                aria-label="Add friends"
-                title="Add friends"
-                className="w-9 h-9 rounded-full bg-signal text-white border-2 border-paper flex items-center justify-center font-bold text-lg leading-none"
-              >
-                +
-              </Link>
-            </div>
-          ) : (
-            <Link
-              href="/fishmb/friends"
-              className="text-xs font-bold uppercase tracking-wider text-signal-dark border border-signal/40 rounded-full px-4 py-2"
-            >
-              + Find friends
-            </Link>
-          )}
-        </div>
-      ) : null}
-
-      {/* Tabs */}
-      <form onSubmit={runSearch} className="flex gap-2 mb-4">
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Search the feed…"
-          className="flex-1 bg-white border border-pine/15 rounded-full px-4 py-2.5 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal"
-        />
-        <button
-          type="submit"
-          className="bg-pine text-white text-xs font-bold uppercase tracking-wider px-5 rounded-full"
-        >
-          Search
-        </button>
-      </form>
-      {activeQ && (
-        <div className="flex items-center gap-2 mb-4">
-          <p className="text-sm text-pine/60">
-            Results for <span className="font-bold text-pine">“{activeQ}”</span>
-          </p>
-          <button
-            onClick={clearSearch}
-            className="text-xs font-bold text-signal-dark hover:underline"
-          >
-            Clear ✕
-          </button>
-        </div>
-      )}
-      {/* Bottom tab bar — fixed, like the FishMB app. Top filter row removed. */}
-
-      {/* Items */}
-      {loading ? (
-        <div className="space-y-4">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="bg-white border border-pine/10 rounded-3xl p-5 h-40 animate-pulse" />
-          ))}
-        </div>
-      ) : items.length === 0 ? (
-        <p className="text-pine/55 text-center py-10">
-          {activeQ ? `No posts match “${activeQ}”.` : "Nothing here yet — be the first to post."}
-        </p>
-      ) : (
-        <div className="space-y-4">
-          {items.map((item, idx) => (
-            <Fragment key={item.id}>
-            <article className="bg-white border border-pine/10 rounded-3xl p-5 max-sm:-mx-4 max-sm:rounded-none max-sm:border-x-0">
-              <div className="flex items-center gap-3 mb-3">
-                <Avatar name={item.user_name} url={item.avatar_url} />
-                <div>
-                  <Link href={`/fishmb/anglers/${item.user_id}`} className="font-bold text-pine text-sm hover:text-signal-dark">
-                    {item.user_name}
-                  </Link>
-                  <p className="text-xs text-pine/45">
-                    {timeAgo(item.created_at)} ·{" "}
-                    {item.kind === "catch"
-                      ? "logged a catch"
-                      : item.kind === "tip"
-                        ? `💡 added a tip${item.species_tag ? ` for ${item.species_tag}` : ""}`
-                        : "posted"}
-                    {item.visibility === "friends" && " · 👥 friends only"}
-                  </p>
-                </div>
-                {item.kind === "catch" && (
-                  <span className="ml-auto text-[10px] font-bold uppercase tracking-wider bg-accentTeal/15 text-accentTeal px-3 py-1 rounded-full">
-                    Catch
-                  </span>
-                )}
-              </div>
-              {item.species && (
-                <p className="font-bold text-pine mb-1">
-                  {item.species}
-                  {item.length_in ? ` · ${Number(item.length_in).toFixed(1)}″` : ""}
-                </p>
-              )}
-              {item.body && <p className="text-pine/80 text-sm whitespace-pre-line">{item.body}</p>}
-              <PhotoCarousel photos={cardPhotos(item)} />
-              <div className="mt-3 flex items-center justify-between">
-                <Reactions item={item} onReacted={handleReacted} />
-                <button
-                  onClick={() => toggleComments(item.id)}
-                  className="text-xs font-bold uppercase tracking-wider text-pine/50 hover:text-signal-dark"
-                >
-                  💬 {item.comment_count} {item.comment_count === 1 ? "comment" : "comments"}
-                </button>
-              </div>
-              {openComments.has(item.id) && <Comments postId={item.id} />}
-            </article>
-            {/* Interleave a sponsored ad after every 8th post */}
-            {feedAds.length > 0 && (idx + 1) % 8 === 0 && (
-              <FeedAdCard ad={feedAds[Math.floor((idx + 1) / 8 - 1) % feedAds.length]} />
-            )}
-            </Fragment>
-          ))}
-        </div>
-      )}
-
-      {/* Infinite-scroll sentinel */}
-      {!loading && items.length > 0 && (
-        <div ref={sentinelRef} className="py-6 text-center min-h-[4rem]">
-          {loadingMore && (
-            <div className="flex items-center justify-center gap-2 text-pine/50 text-sm">
-              <span className="w-5 h-5 border-2 border-pine/20 border-t-pine rounded-full animate-spin" />
-              Loading more…
-            </div>
-          )}
-          {!loadingMore && !hasMore && (
-            <p className="text-pine/45 text-sm">You&apos;re all caught up 🎣</p>
-          )}
         </div>
       )}
 
@@ -993,16 +929,16 @@ export default function FeedPage() {
               </svg>
             </button>
           ))}
-          <Link
-            href="/fishmb/search"
-            aria-label="Search"
+          <button
+            onClick={() => setSearchOpen(true)}
+            aria-label="Search the feed"
             className="w-12 h-12 flex items-center justify-center rounded-full text-pine/45 hover:text-pine transition-colors"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <circle cx="11" cy="11" r="7" />
               <path d="m20 20-3.5-3.5" />
             </svg>
-          </Link>
+          </button>
           <Link
             href="/fishmb/profile"
             aria-label="Profile"
@@ -1020,10 +956,7 @@ export default function FeedPage() {
       {/* Floating post button — opens the composer */}
       {user && (
         <button
-          onClick={() => {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-            setComposerOpen(true);
-          }}
+          onClick={() => setComposerOpen(true)}
           aria-label="Create a post"
           title="Create a post"
           className="fixed z-40 right-4 md:right-8 w-14 h-14 rounded-full bg-signal hover:bg-signal-dark text-white shadow-[0_8px_30px_rgba(0,0,0,0.25)] flex items-center justify-center transition-colors"
