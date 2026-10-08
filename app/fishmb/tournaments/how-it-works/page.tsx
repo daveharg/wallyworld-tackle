@@ -94,10 +94,31 @@ export default function HowTournamentsWorkPage() {
       <h1 className="font-display font-bold uppercase text-pine text-4xl md:text-5xl tracking-wide mb-4">
         How tournaments work
       </h1>
-      <p className="text-pine/65 mb-10 max-w-2xl">
+      <p className="text-pine/65 mb-6 max-w-2xl">
         Run your own catch-photo tournament with real anti-cheat — or join one.
         No entry caps, no platform cut, and FishMB never touches the money.
       </p>
+
+      <div className="bg-gold/10 border border-gold/30 rounded-3xl p-6 mb-10 max-w-2xl">
+        <p className="font-display font-bold uppercase text-pine tracking-wide mb-3">
+          🎣 Example: a June buddy challenge
+        </p>
+        <p className="text-pine/70 text-sm leading-relaxed">
+          Say you and five buddies want to compete all through June for the
+          longest walleye. One of you creates the tournament — name it, set the
+          dates to June 1–30, pick your lakes (or leave it open to any Manitoba
+          water), choose longest-fish scoring, and set a $20 entry fee. Share
+          the invite code in the group chat and everyone joins.
+        </p>
+        <p className="text-pine/70 text-sm leading-relaxed mt-3">
+          All June, whenever anyone lands a walleye, they snap its photo in the
+          app — the GPS location and capture time are stamped automatically —
+          and submit it as an entry. You approve catches as the organizer (or
+          turn on auto-approve), the leaderboard updates all month, and on June
+          30 the longest fish takes the pot. Entry money stays between you and
+          your buddies — cash, e-transfer, whatever you agree on.
+        </p>
+      </div>
 
       <h2 className="font-display font-bold uppercase text-pine text-2xl tracking-wide mb-6">
         Running a tournament
