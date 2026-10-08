@@ -369,6 +369,7 @@ function FeedPageInner() {
   const [locating, setLocating] = useState(false);
   const [myTournaments, setMyTournaments] = useState<{ id: string; name: string }[]>([]);
   const [tournamentId, setTournamentId] = useState("");
+  const [tournamentHelpOpen, setTournamentHelpOpen] = useState(false);
   const [catchNote, setCatchNote] = useState<string | null>(null);
   const [openComments, setOpenComments] = useState<Set<string>>(new Set());
 
@@ -1142,9 +1143,20 @@ function FeedPageInner() {
                 )}
                 {myTournaments.length > 0 && (
                   <div className="mt-3">
-                    <label className="text-xs font-bold uppercase tracking-wider text-pine/55">
-                      Also enter in tournament
-                    </label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold uppercase tracking-wider text-pine/55">
+                        Also enter in tournament
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setTournamentHelpOpen(true)}
+                        aria-label="How do tournaments work?"
+                        title="How do tournaments work?"
+                        className="w-6 h-6 rounded-full bg-pine/10 hover:bg-pine/20 text-pine/70 text-xs font-black flex items-center justify-center shrink-0"
+                      >
+                        ?
+                      </button>
+                    </div>
                     <select
                       value={tournamentId}
                       onChange={(e) => setTournamentId(e.target.value)}
@@ -1169,6 +1181,57 @@ function FeedPageInner() {
                 {catchNote && <p className="text-sm text-pine mt-3">{catchNote}</p>}
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Tournament explainer popup */}
+      {tournamentHelpOpen && (
+        <div
+          className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-label="How tournaments work"
+        >
+          <div className="absolute inset-0 bg-pine-deep/60" onClick={() => setTournamentHelpOpen(false)} />
+          <div className="relative bg-paper rounded-3xl p-6 w-full max-w-sm shadow-2xl max-h-[80dvh] overflow-y-auto">
+            <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-3">
+              🏆 How tournaments work
+            </h3>
+            <div className="space-y-3 text-sm text-pine/75 leading-relaxed">
+              <p>
+                <strong className="text-pine">Make one:</strong> go to Tournaments
+                and start your own — set the name, dates, lakes, species and
+                rules. You&apos;ll get a private invite link to share with your crew.
+              </p>
+              <p>
+                <strong className="text-pine">Join one:</strong> open the
+                organizer&apos;s invite link and join up. Only people with the
+                link can enter.
+              </p>
+              <p>
+                <strong className="text-pine">Enter catches:</strong> log a catch
+                from the feed and pick the tournament in the dropdown. Only
+                tournaments you&apos;ve joined show up there.
+              </p>
+              <p>
+                <strong className="text-pine">Fair play:</strong> entries are
+                GPS-checked and reviewed by the organizer before they hit the
+                leaderboard.
+              </p>
+              <p className="text-xs text-pine/55">
+                FishMB never touches entry money — any fees are handled directly
+                with the organizer. Events with 25+ anglers need Manitoba&apos;s
+                free Competitive Fishing Event licence.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setTournamentHelpOpen(false)}
+              className="w-full mt-5 bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
+            >
+              Got it
+            </button>
           </div>
         </div>
       )}
