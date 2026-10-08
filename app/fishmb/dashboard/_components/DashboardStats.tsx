@@ -29,9 +29,6 @@ export default function DashboardStats() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
-          🎣 Your fishing stats
-        </h2>
         <FishingStats userId={user.id} hideTitle />
       </div>
 
