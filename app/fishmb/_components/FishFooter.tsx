@@ -17,6 +17,7 @@ export default function FishFooter() {
             Explore
           </h3>
           <ul className="space-y-2.5 text-sm">
+            <li><Link href="/fishmb/contact" className="text-white/70 hover:text-white">Contact us</Link></li>
             <li><Link href="/fishmb/lakes" className="text-white/70 hover:text-white">Lake directory</Link></li>
             <li><Link href="/fishmb/lodges" className="text-white/70 hover:text-white">Lodges &amp; guides</Link></li>
             <li><Link href="/fishmb/regulations" className="text-white/70 hover:text-white">Fishing regulations</Link></li>

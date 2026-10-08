@@ -53,6 +53,15 @@ export default function FishMBHome() {
   return (
     <>
       <SearchHero />
+      <div className="max-w-7xl mx-auto px-4">
+        <p className="text-xs text-pine/45 py-2">
+          FishMB is a beta web app —{" "}
+          <Link href="/fishmb/contact" className="text-signal-dark font-bold underline">
+            click here to report any issues
+          </Link>
+          .
+        </p>
+      </div>
       <HomepageBannerAd />
 
       {/* Run your own tournament — first section */}
@@ -148,6 +157,9 @@ export default function FishMBHome() {
         </div>
       </section>
 
+      {/* Community — right below the tournament section */}
+      <CommunityBox />
+
       {/* Upcoming tournaments */}
       {tournaments.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 mt-12 md:mt-16">
@@ -212,9 +224,6 @@ export default function FishMBHome() {
         allLakes={getLakes().map(toCardLake)}
       />
 
-      {/* Community */}
-      <CommunityBox />
-
       {/* Top lodges & guides */}
       <section className="max-w-7xl mx-auto px-4 mt-12 md:mt-16">
         <SectionHeading
@@ -228,6 +237,45 @@ export default function FishMBHome() {
             <LodgeCard key={l.id} lodge={l} />
           ))}
         </HSlider>
+      </section>
+
+      {/* Rentals — ice shacks, tents, equipment, guide services */}
+      <section className="max-w-7xl mx-auto px-4 mt-12 md:mt-16">
+        <div className="bg-gold/15 border border-gold/40 rounded-[2rem] p-8 md:p-10">
+          <p className="text-signal-dark font-bold uppercase tracking-[0.28em] text-sm mb-3">
+            Rentals
+          </p>
+          <h2 className="font-display font-bold uppercase text-pine text-3xl md:text-4xl tracking-wide mb-4">
+            Need a shack for the weekend?
+          </h2>
+          <p className="text-pine/70 max-w-2xl mb-6">
+            Rent ice shacks, tents, fishing equipment and guide services straight
+            from local Manitoba owners. Owners mark their available days on a
+            calendar — you book only the days that are open, and the owner calls
+            you to close the deal. No middleman, no platform cut.
+          </p>
+          <div className="flex flex-wrap gap-2.5 mb-7">
+            {["🛖 Ice shacks", "⛺ Tents", "🎿 Equipment", "🎣 Guide services"].map((c) => (
+              <span key={c} className="bg-white/70 border border-pine/10 text-pine text-sm font-bold px-4 py-2 rounded-full">
+                {c}
+              </span>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/fishmb/rentals"
+              className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors"
+            >
+              Browse rentals
+            </Link>
+            <Link
+              href="/fishmb/rentals"
+              className="border border-pine/25 text-pine hover:bg-pine/5 font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors"
+            >
+              List your rental
+            </Link>
+          </div>
+        </div>
       </section>
 
       {/* Fishing licence */}

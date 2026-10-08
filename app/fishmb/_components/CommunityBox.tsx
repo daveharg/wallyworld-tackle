@@ -25,6 +25,13 @@ function timeAgo(iso: string): string {
   return `${Math.floor(s / 86400)}d ago`;
 }
 
+const FEATURES = [
+  { icon: "🐟", title: "Share your catches", body: "Post photos with species and length — your personal fishing log." },
+  { icon: "💬", title: "Join the discussion", body: "Ask questions, swap spots and talk technique with Manitoba anglers." },
+  { icon: "💡", title: "Tips that travel", body: "Post tips on any species page — they land in the feed for everyone." },
+  { icon: "👥", title: "Fish with friends", body: "Add fishing buddies and share catches with friends only." },
+];
+
 /**
  * Mid-homepage community box. Logged out: a login prompt for discussions
  * and fish catches. Logged in: expands with the latest feed items and a
@@ -36,10 +43,22 @@ export function CommunityBox() {
 
   useEffect(() => {
     if (!user) return;
-    fishFetch("/api/fishmb/feed?limit=3")
+    fishFetch("/api/fishmb/feed?limit=6")
       .then((d) => setItems(d.items))
       .catch(() => {});
   }, [user]);
+
+  const featureGrid = (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-7">
+      {FEATURES.map((f) => (
+        <div key={f.title} className="bg-white/10 rounded-2xl p-4">
+          <p className="text-2xl mb-1.5">{f.icon}</p>
+          <p className="text-white font-bold text-sm mb-1">{f.title}</p>
+          <p className="text-white/60 text-xs leading-relaxed">{f.body}</p>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <section className="max-w-7xl mx-auto px-4 mt-12 md:mt-16">
@@ -49,22 +68,25 @@ export function CommunityBox() {
             Community
           </p>
           {!user ? (
-            <div className="md:flex md:items-center md:justify-between gap-8">
-              <div>
-                <h2 className="font-display font-bold uppercase text-white text-3xl md:text-4xl tracking-wide mb-3">
-                  Talk fishing. Show your catches.
-                </h2>
-                <p className="text-white/70 max-w-xl">
-                  Log in to join the discussion, share your fish, and comment —
-                  the same community feed as the FishMB app.
-                </p>
+            <div>
+              <div className="md:flex md:items-center md:justify-between gap-8">
+                <div>
+                  <h2 className="font-display font-bold uppercase text-white text-3xl md:text-4xl tracking-wide mb-3">
+                    Talk fishing. Show your catches.
+                  </h2>
+                  <p className="text-white/70 max-w-xl">
+                    Log in to join the discussion, share your fish, and comment —
+                    the same community feed as the FishMB app.
+                  </p>
+                </div>
+                <button
+                  onClick={openLogin}
+                  className="mt-6 md:mt-0 shrink-0 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-8 py-4 rounded-full transition-colors"
+                >
+                  Log in to join
+                </button>
               </div>
-              <button
-                onClick={openLogin}
-                className="mt-6 md:mt-0 shrink-0 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-8 py-4 rounded-full transition-colors"
-              >
-                Log in to join
-              </button>
+              {featureGrid}
             </div>
           ) : (
             <div>

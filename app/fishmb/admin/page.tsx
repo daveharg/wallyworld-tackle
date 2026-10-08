@@ -57,6 +57,16 @@ interface TraditionalSuggestion {
   created_at: string;
 }
 
+interface ContactMsg {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  status: string;
+  created_at: string;
+}
+
 function timeAgo(iso: string) {
   const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
   if (s < 3600) return `${Math.max(1, Math.floor(s / 60))}m ago`;
@@ -70,7 +80,8 @@ export default function AdminPage() {
   const [claims, setClaims] = useState<Claim[]>([]);
   const [ads, setAds] = useState<Ad[]>([]);
   const [suggestions, setSuggestions] = useState<TraditionalSuggestion[]>([]);
-  const [tab, setTab] = useState<"claims" | "ads" | "tournaments">("claims");
+  const [messages, setMessages] = useState<ContactMsg[]>([]);
+  const [tab, setTab] = useState<"claims" | "ads" | "tournaments" | "messages">("claims");
   const [denied, setDenied] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [acting, setActing] = useState<string | null>(null);
@@ -88,6 +99,9 @@ export default function AdminPage() {
     fishFetch("/api/fishmb/admin/traditional?status=pending")
       .then((d) => setSuggestions(d.suggestions ?? []))
       .catch(() => setDenied(true));
+    fishFetch("/api/fishmb/admin/contact-messages?status=new")
+      .then((d) => setMessages(d.messages ?? []))
+      .catch(() => setDenied(true));
   };
 
   useEffect(() => {
@@ -95,7 +109,7 @@ export default function AdminPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
-  const act = async (kind: "claims" | "ads" | "traditional", id: string, status: string) => {
+  const act = async (kind: "claims" | "ads" | "traditional" | "contact-messages", id: string, status: string) => {
     setActing(id);
     setNote(null);
     try {
@@ -187,6 +201,7 @@ export default function AdminPage() {
             ["claims", `📨 Business claims (${claims.length})`],
             ["ads", `📢 Ad submissions (${ads.length})`],
             ["tournaments", `🏆 Tournament suggestions (${suggestions.length})`],
+            ["messages", `✉️ Messages (${messages.length})`],
           ] as const
         ).map(([v, label]) => (
           <button
@@ -277,6 +292,48 @@ export default function AdminPage() {
                     className="bg-red-50 hover:bg-red-100 text-red-800 text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full disabled:opacity-40 transition-colors"
                   >
                     Reject
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )
+      ) : tab === "messages" ? (
+        messages.length === 0 ? (
+          <div className="bg-white border border-pine/10 rounded-3xl p-10 text-center">
+            <p className="text-4xl mb-3">🎉</p>
+            <p className="text-pine/60">No new messages. All caught up.</p>
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 gap-4">
+            {messages.map((m) => (
+              <div key={m.id} className="bg-white border border-pine/10 rounded-3xl p-5">
+                <div className="flex items-start justify-between gap-3 mb-1">
+                  <p className="font-display font-bold text-pine text-xl uppercase tracking-wide">
+                    {m.subject || "No subject"}
+                  </p>
+                  <span className="text-xs text-pine/45 whitespace-nowrap">{timeAgo(m.created_at)}</span>
+                </div>
+                <p className="text-xs text-pine/55 mb-3">
+                  {m.name} · <a href={`mailto:${m.email}`} className="text-signal-dark underline">{m.email}</a>
+                </p>
+                <p className="text-sm text-pine/70 bg-paper-deep rounded-2xl px-4 py-3 mb-3 whitespace-pre-line">
+                  {m.message}
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => act("contact-messages", m.id, "read")}
+                    disabled={acting === m.id}
+                    className="bg-pine hover:bg-pine-deep text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full disabled:opacity-40 transition-colors"
+                  >
+                    ✓ Mark read
+                  </button>
+                  <button
+                    onClick={() => act("contact-messages", m.id, "archived")}
+                    disabled={acting === m.id}
+                    className="bg-red-50 hover:bg-red-100 text-red-800 text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full disabled:opacity-40 transition-colors"
+                  >
+                    Archive
                   </button>
                 </div>
               </div>
