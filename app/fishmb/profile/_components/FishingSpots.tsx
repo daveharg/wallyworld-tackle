@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { fishFetch } from "../../_components/fishFetch";
 import type { SpotPin } from "./SpotMap";
@@ -27,6 +27,8 @@ interface LakeResult {
   lat: number | null;
   lng: number | null;
 }
+
+const FAV_LAST_KEY = "fishmb-maps-last-lake";
 
 function fmtDate(iso: string): string {
   try {
@@ -122,6 +124,8 @@ export default function FishingSpots() {
   const [lakeResults, setLakeResults] = useState<LakeResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [focus, setFocus] = useState<{ lat: number; lng: number; key: string } | null>(null);
+  const [selectedFav, setSelectedFav] = useState("");
+  const autoLoadedFav = useRef(false);
 
   const load = async () => {
     try {
@@ -187,10 +191,45 @@ export default function FishingSpots() {
     try {
       await fishFetch(`/api/fishmb/favorite-lakes/${encodeURIComponent(lakeId)}`, { method: "DELETE" });
       setFavs(favs.filter((f) => f.id !== lakeId));
+      if (selectedFav === lakeId) setSelectedFav("");
+      try {
+        if (localStorage.getItem(FAV_LAST_KEY) === lakeId) localStorage.removeItem(FAV_LAST_KEY);
+      } catch {
+        // non-fatal
+      }
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not remove the lake.");
     }
   };
+
+  const chooseFav = (lakeId: string) => {
+    const f = favs.find((x) => x.id === lakeId);
+    if (!f) return;
+    setSelectedFav(lakeId);
+    try {
+      localStorage.setItem(FAV_LAST_KEY, lakeId);
+    } catch {
+      // non-fatal
+    }
+    focusOn(f.lat, f.lng, `lake:${f.id}`);
+  };
+
+  // Auto-load the last chosen saved lake when the page opens.
+  useEffect(() => {
+    if (autoLoadedFav.current || favs.length === 0) return;
+    autoLoadedFav.current = true;
+    try {
+      const lastId = localStorage.getItem(FAV_LAST_KEY);
+      if (!lastId) return;
+      const f = favs.find((x) => x.id === lastId);
+      if (f && f.lat !== null && f.lng !== null) {
+        setSelectedFav(lastId);
+        setFocus({ lat: f.lat, lng: f.lng, key: `lake:${f.id}:init` });
+      }
+    } catch {
+      // non-fatal
+    }
+  }, [favs]);
 
   const focusOn = (lat: number | null, lng: number | null, key: string) => {
     if (lat === null || lng === null) {
@@ -382,11 +421,41 @@ export default function FishingSpots() {
       {/* Favorite lakes — quick map navigation */}
       <div className="bg-white border border-pine/10 rounded-3xl p-6 mt-4">
         <h3 className="font-display font-bold uppercase text-pine text-lg tracking-wide mb-1">
-          ⭐ Favorite lakes
+          ⭐ Saved locations
         </h3>
         <p className="text-pine/55 text-xs mb-3">
-          Save lakes to jump the map straight to them.
+          Jump the map straight to a saved lake.
         </p>
+        {favs.length > 0 ? (
+          <div className="flex gap-2 mb-3">
+            <select
+              value={selectedFav}
+              onChange={(e) => chooseFav(e.target.value)}
+              aria-label="Choose a saved lake"
+              className="flex-1 min-w-0 bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold focus:outline-none focus:border-signal"
+            >
+              <option value="">Choose a saved lake…</option>
+              {favs.map((f) => (
+                <option key={f.id} value={f.id}>
+                  {f.name}
+                </option>
+              ))}
+            </select>
+            {selectedFav && (
+              <button
+                type="button"
+                onClick={() => removeFav(selectedFav)}
+                aria-label="Remove the selected lake"
+                title="Remove the selected lake"
+                className="shrink-0 bg-paper-deep border border-pine/15 rounded-2xl px-4 text-pine/50 hover:text-signal-dark text-sm font-bold"
+              >
+                🗑️
+              </button>
+            )}
+          </div>
+        ) : (
+          <p className="text-pine/40 text-xs mb-3">No saved lakes yet — search below to add some.</p>
+        )}
         <input
           value={lakeQuery}
           onChange={(e) => setLakeQuery(e.target.value)}
@@ -419,34 +488,6 @@ export default function FishingSpots() {
               </div>
             ))}
           </div>
-        )}
-        {favs.length > 0 ? (
-          <div className="flex flex-wrap gap-2 mt-3">
-            {favs.map((f) => (
-              <span
-                key={f.id}
-                className="inline-flex items-center gap-1 bg-gold/15 border border-gold/40 rounded-full pl-3 pr-1.5 py-1.5"
-              >
-                <button
-                  type="button"
-                  onClick={() => focusOn(f.lat, f.lng, `lake:${f.id}`)}
-                  className="text-pine text-xs font-bold hover:text-gold-dark"
-                >
-                  ★ {f.name}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => removeFav(f.id)}
-                  aria-label={`Remove ${f.name} from favorites`}
-                  className="text-pine/40 hover:text-signal-dark text-xs font-bold px-1"
-                >
-                  ✕
-                </button>
-              </span>
-            ))}
-          </div>
-        ) : (
-          <p className="text-pine/40 text-xs mt-3">No favorite lakes yet — search above to add some.</p>
         )}
       </div>
 
