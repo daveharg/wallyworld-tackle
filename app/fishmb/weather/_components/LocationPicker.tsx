@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-export type WxLoc = { name: string; lat: number; lon: number };
+export type WxLoc = { name: string; lat: number; lon: number; kind?: "lake" | "town" };
 
 const STORE_KEY = "fishmb-wx-locs";
 
@@ -40,6 +40,7 @@ export default function LocationPicker({
   const [saved, setSaved] = useState<WxLoc[]>([]);
   const [q, setQ] = useState("");
   const [lakes, setLakes] = useState<WxLoc[]>([]);
+  const [towns, setTowns] = useState<WxLoc[]>([]);
   const [locating, setLocating] = useState(false);
   const [mode, setMode] = useState<"list" | "add">("list");
 
@@ -56,9 +57,30 @@ export default function LocationPicker({
             continue;
           const short = shortLakeName(l.name);
           if (!short) continue;
-          list.push({ name: short, lat: l.lat, lon: l.lng });
+          list.push({ name: short, lat: l.lat, lon: l.lng, kind: "lake" });
         }
         setLakes(list);
+      })
+      .catch(() => {});
+    // Manitoba cities/towns/villages — real coordinates, bundled at build time.
+    fetch("/fishmb/mb-places.json")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((d: unknown) => {
+        const list: WxLoc[] = [];
+        if (Array.isArray(d)) {
+          for (const p of d) {
+            const q = p as { name?: unknown; lat?: unknown; lon?: unknown };
+            if (
+              typeof q.name === "string" &&
+              q.name &&
+              Number.isFinite(q.lat) &&
+              Number.isFinite(q.lon)
+            ) {
+              list.push({ name: q.name, lat: q.lat as number, lon: q.lon as number, kind: "town" });
+            }
+          }
+        }
+        setTowns(list);
       })
       .catch(() => {});
   }, []);
@@ -66,8 +88,15 @@ export default function LocationPicker({
   const results = useMemo(() => {
     const t = q.trim().toLowerCase();
     if (t.length < 2) return [];
-    return lakes.filter((l) => l.name.toLowerCase().includes(t)).slice(0, 12);
-  }, [q, lakes]);
+    const match = (l: WxLoc) => l.name.toLowerCase().includes(t);
+    // Towns first (exact community match), then lakes; prefix hits rank top.
+    const scored = [...towns, ...lakes].filter(match).map((l) => ({
+      l,
+      score: l.name.toLowerCase().startsWith(t) ? 0 : 1,
+    }));
+    scored.sort((a, b) => a.score - b.score || a.l.name.localeCompare(b.l.name));
+    return scored.slice(0, 12).map((s) => s.l);
+  }, [q, lakes, towns]);
 
   const remember = (loc: WxLoc) => {
     setSaved((prev) => {

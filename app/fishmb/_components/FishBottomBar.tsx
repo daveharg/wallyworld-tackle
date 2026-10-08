@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useFishAuth } from "./FishAuth";
+import { fishFetch } from "./fishFetch";
 
 type Item = {
   href: string;
@@ -110,17 +111,16 @@ function Bar() {
     async function check() {
       try {
         if (!user || stop) return;
-        const r = await fetch("/api/fishmb/msg/unread", { credentials: "include" });
-        if (r.ok) {
-          const d = await r.json();
-          if (!stop) setUnread(d.unread ?? 0);
-        }
+        // fishFetch attaches the FishMB bearer token — a bare fetch with
+        // credentials:include never authenticates, so the badge stayed 0.
+        const d = await fishFetch("/api/fishmb/msg/unread");
+        if (!stop) setUnread((d as { unread?: number }).unread ?? 0);
       } catch {
-        // non-fatal
+        // non-fatal (signed out, offline, etc.)
       }
     }
     check();
-    const t = setInterval(check, 60000);
+    const t = setInterval(check, 30000);
     return () => {
       stop = true;
       clearInterval(t);
