@@ -42,6 +42,7 @@ export async function GET(req: NextRequest) {
       pendingByRental[b.rental_id] = (pendingByRental[b.rental_id] ?? 0) + 1;
     }
   }
+  const rentalsWithPending = pendingByRental;
 
   const active = tournaments.filter((t) => t.status !== "ended");
   const past = tournaments.filter((t) => t.status === "ended");
@@ -63,7 +64,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     business,
     rentals,
-    pendingByRental,
+    rentalsWithPending,
     tournaments: { active, past },
     bookingStats,
     bookings,

@@ -1,11 +1,24 @@
 import Link from "next/link";
 import { searchAll } from "@/lib/fishmb";
+import { LakeMap, type MapLake } from "../lakes/_components/LakeMap";
+import coordsJson from "@/public/fishmb/lake-coords.json";
 
 export const dynamic = "force-dynamic";
+
+const COORDS = coordsJson as Record<string, { lat: number; lng: number }>;
 
 export default function SearchPage({ searchParams }: { searchParams: { q?: string } }) {
   const q = (searchParams.q ?? "").trim();
   const { lakes, lodges } = q.length >= 2 ? searchAll(q, 50) : { lakes: [], lodges: [] };
+  const mapLakes: MapLake[] = lakes
+    .filter((l) => COORDS[l.id])
+    .map((l) => ({
+      id: l.id,
+      name: l.name,
+      region: l.region,
+      lat: COORDS[l.id].lat,
+      lng: COORDS[l.id].lng,
+    }));
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10 md:py-14">
@@ -37,6 +50,11 @@ export default function SearchPage({ searchParams }: { searchParams: { q?: strin
           <h2 className="text-xs font-black uppercase tracking-[0.2em] text-pine/50 mb-3">
             Lakes ({lakes.length})
           </h2>
+          {mapLakes.length > 0 && (
+            <div className="mb-6">
+              <LakeMap lakes={mapLakes} />
+            </div>
+          )}
           <ul className="grid sm:grid-cols-2 gap-3">
             {lakes.map((l) => (
               <li key={l.id}>

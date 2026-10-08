@@ -6,12 +6,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useFishAuth } from "../_components/FishAuth";
-import { fishFetch } from "../_components/fishFetch";
-import { compressImage } from "../_components/compressImage";
+import { useFishAuth } from "../../_components/FishAuth";
+import { fishFetch } from "../../_components/fishFetch";
+import { compressImage } from "../../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
-import MyRentals from "../profile/_components/MyRentals";
-import { catMeta } from "../rentals/_meta";
+import MyRentals from "../../profile/_components/MyRentals";
+import { catMeta } from "../../rentals/_meta";
 
 type Tab = "rentals" | "business" | "tournaments" | "bookings" | "advertise";
 
@@ -26,7 +26,7 @@ interface DashboardData {
     photos: string[];
   } | null;
   rentals: { id: string; title: string; category: string; photos: string[] }[];
-  pendingByRental: Record<string, number>;
+  rentalsWithPending: Record<string, number>;
   tournaments: {
     active: TournamentRow[];
     past: TournamentRow[];
