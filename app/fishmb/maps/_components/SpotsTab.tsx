@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { SPOT_ICON_CHOICES } from "../../profile/_components/spotIcons";
-import { haversineM, formatDist } from "../../profile/_components/geo";
 import type { SpotPin } from "../../profile/_components/SpotMap";
 
 export interface Spot extends SpotPin {
@@ -12,7 +10,6 @@ export interface Spot extends SpotPin {
 
 interface SpotsTabProps {
   spots: Spot[];
-  myLoc: { lat: number; lng: number } | null;
   onSelect: (s: Spot) => void;
   onNavigate: (s: Spot) => void;
   onEdit: (id: string, patch: { name: string; notes: string | null; icon: string }) => Promise<void>;
@@ -20,10 +17,6 @@ interface SpotsTabProps {
   onShare: (id: string) => void;
   sharingId: string | null;
   onAddSpot: () => void;
-}
-
-function spotEmoji(icon: string | null | undefined): string {
- return SPOT_ICON_CHOICES.find((c) => c.id === icon)?.emoji ?? "";
 }
 
 function fmtDate(iso: string): string {
@@ -37,10 +30,9 @@ function fmtDate(iso: string): string {
 const inputCls =
   "w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal";
 
-/** Saved spots tab — spots grouped by the icon you chose for each. */
+/** Saved spots tab — one clean box per spot, newest first. */
 export default function SpotsTab({
   spots,
-  myLoc,
   onSelect,
   onNavigate,
   onEdit,
@@ -52,14 +44,12 @@ export default function SpotsTab({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editNotes, setEditNotes] = useState("");
-  const [editIcon, setEditIcon] = useState("pin");
   const [saving, setSaving] = useState(false);
 
   const startEdit = (s: Spot) => {
     setEditingId(s.id);
     setEditName(s.name);
     setEditNotes(s.notes ?? "");
-    setEditIcon(s.icon ?? "pin");
   };
 
   const saveEdit = async (id: string) => {
@@ -68,7 +58,7 @@ export default function SpotsTab({
       await onEdit(id, {
         name: editName.trim() || "Fishing spot",
         notes: editNotes.trim() || null,
-        icon: editIcon,
+        icon: "pin",
       });
       setEditingId(null);
     } catch {
@@ -78,10 +68,9 @@ export default function SpotsTab({
     }
   };
 
-  const groups = SPOT_ICON_CHOICES.map((c) => ({
-    ...c,
-    spots: spots.filter((s) => (s.icon ?? "pin") === c.id),
-  })).filter((g) => g.spots.length > 0);
+  const sorted = [...spots].sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
 
   return (
     <div className="pt-1">
@@ -101,16 +90,9 @@ export default function SpotsTab({
           </p>
         </div>
       ) : (
-        <div className="space-y-5">
-          {groups.map((g) => (
-            <section key={g.id}>
-              <h3 className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-pine/55 mb-2 px-1">
-                <span className="text-lg">{g.emoji}</span>
-                {g.label} · {g.spots.length}
-              </h3>
-              <div className="space-y-2">
-                {g.spots.map((s) =>
-                  editingId === s.id ? (
+        <div className="space-y-3">
+          {sorted.map((s) =>
+            editingId === s.id ? (
                     <div key={s.id} className="bg-white border border-signal/40 rounded-2xl p-4 space-y-2">
                       <input
                         value={editName}
@@ -126,24 +108,6 @@ export default function SpotsTab({
                         placeholder="Notes (optional)"
                         className={inputCls}
                       />
-                      <div className="flex gap-2">
-                        {SPOT_ICON_CHOICES.map((c) => (
-                          <button
-                            key={c.id}
-                            type="button"
-                            onClick={() => setEditIcon(c.id)}
-                            title={c.label}
-                            aria-label={`Spot icon: ${c.label}`}
-                            className={`w-11 h-11 rounded-2xl border-2 text-xl flex items-center justify-center transition-colors ${
-                              editIcon === c.id
-                                ? "border-signal bg-signal/10"
-                                : "border-pine/15 bg-white"
-                            }`}
-                          >
-                            {c.emoji}
-                          </button>
-                        ))}
-                      </div>
                       <div className="flex gap-2">
                         <button
                           type="button"
@@ -173,21 +137,10 @@ export default function SpotsTab({
                         className="w-full text-left"
                       >
                         <p className="font-bold text-pine truncate">
-                          {spotEmoji(s.icon)} {s.name || "Fishing spot"}
+                          {s.name || "Fishing spot"}
                         </p>
                         <p className="text-xs text-pine/50 mt-0.5">
                           {fmtDate(s.created_at)}
-                          {myLoc && (
-                            <>
-                              {" · "}
-                              <span className="tabular-nums">
-                                {formatDist(
-                                  haversineM(myLoc.lat, myLoc.lng, Number(s.lat), Number(s.lng))
-                                )}{" "}
-                                away
-                              </span>
-                            </>
-                          )}
                         </p>
                         {s.notes && (
                           <p className="text-sm text-pine/70 mt-1 line-clamp-2">{s.notes}</p>
@@ -227,9 +180,6 @@ export default function SpotsTab({
                     </div>
                   )
                 )}
-              </div>
-            </section>
-          ))}
         </div>
       )}
     </div>

@@ -668,7 +668,6 @@ export default function MapsHub() {
         {tab === "spots" && (
           <SpotsTab
             spots={spots}
-            myLoc={myLoc}
             onSelect={(s) => flyTo(Number(s.lat), Number(s.lng), `spot:${s.id}`, 15)}
             onNavigate={(s) => {
               setGoTo(s);
