@@ -90,19 +90,19 @@ const RIGHT: Item[] = [
   },
 ];
 
-/** TikTok-style create button: white pill with cyan/red offset layers. */
+/** TikTok-style create button as a circle: white with cyan/red offset layers. */
 function PlusButton({ onClick, label }: { onClick: () => void; label: string }) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="relative w-[54px] h-[38px] shrink-0 active:scale-95 transition-transform"
+      className="relative w-[52px] h-[52px] shrink-0 active:scale-95 transition-transform"
     >
-      <span className="absolute inset-y-0 left-0 right-[7px] rounded-xl bg-cyan-400" />
-      <span className="absolute inset-y-0 left-[7px] right-0 rounded-xl bg-rose-500" />
-      <span className="absolute inset-y-0 left-[3.5px] right-[3.5px] rounded-xl bg-white flex items-center justify-center">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.8" strokeLinecap="round">
+      <span className="absolute inset-0 translate-x-[3px] rounded-full bg-cyan-400" />
+      <span className="absolute inset-0 -translate-x-[3px] rounded-full bg-rose-500" />
+      <span className="absolute inset-0 rounded-full bg-white shadow-lg flex items-center justify-center">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.8" strokeLinecap="round">
           <path d="M12 5v14M5 12h14" />
         </svg>
       </span>
@@ -174,7 +174,7 @@ function Bar() {
         href={item.href}
         aria-label={showBadge ? `Inbox, ${unread} unread` : item.label}
         className={`relative flex flex-col items-center justify-center gap-1 w-14 py-1 transition-colors ${
-          active ? "text-white" : "text-white/55 hover:text-white/85"
+          active ? "text-signal" : "text-pine/45 hover:text-pine"
         }`}
       >
         {item.icon}
@@ -219,7 +219,7 @@ function Bar() {
       )}
 
       <div
-        className="relative bg-black px-2 pt-2"
+        className="relative bg-white/95 backdrop-blur border-t border-pine/10 px-2 pt-2 shadow-[0_-8px_30px_rgba(0,0,0,0.08)]"
         style={{ paddingBottom: "calc(1.1rem + env(safe-area-inset-bottom))" }}
       >
         <div className="flex items-center">
