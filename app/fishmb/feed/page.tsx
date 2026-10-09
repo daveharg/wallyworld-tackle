@@ -13,6 +13,91 @@ import { TournamentBuilder } from "../tournaments/_components/TournamentBuilder"
 import { JoinByCode } from "../tournaments/_components/JoinByCode";
 
 /** Tournament tab inside the + composer: build one here or join with a code. */
+/** Bottom sheet for the + composer: swipe down to dismiss, no X button. */
+function ComposerSheet({
+  mode,
+  setMode,
+  setCatchNote,
+  closeComposer,
+  children,
+}: {
+  mode: "post" | "catch" | "tournament";
+  setMode: (m: "post" | "catch" | "tournament") => void;
+  setCatchNote: (s: string | null) => void;
+  closeComposer: () => void;
+  children: React.ReactNode;
+}) {
+  const startY = useRef<number | null>(null);
+  const [dragY, setDragY] = useState(0);
+  const [dragging, setDragging] = useState(false);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    // Only start a dismiss-drag from the top handle area, not from scrollable content.
+    const target = e.target as HTMLElement;
+    if (!target.closest("[data-sheet-handle]")) return;
+    startY.current = e.touches[0].clientY;
+    setDragging(true);
+  };
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (startY.current === null) return;
+    const dy = e.touches[0].clientY - startY.current;
+    if (dy > 0) setDragY(dy);
+  };
+  const onTouchEnd = () => {
+    if (startY.current === null) return;
+    if (dragY > 120) closeComposer();
+    startY.current = null;
+    setDragging(false);
+    setDragY(0);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+      <div className="absolute inset-0 bg-pine-deep/60" onClick={closeComposer} />
+      <div
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        style={{
+          transform: dragY > 0 ? `translateY(${dragY}px)` : undefined,
+          transition: dragging ? "none" : "transform 0.2s ease-out",
+        }}
+        className={`relative bg-white w-full rounded-t-3xl sm:rounded-3xl max-h-[92vh] overflow-y-auto ${
+          mode === "tournament" ? "sm:max-w-3xl" : "sm:max-w-lg"
+        }`}
+      >
+        {/* Drag handle — swipe down here to dismiss */}
+        <div data-sheet-handle className="sticky top-0 bg-white pt-3 pb-1 px-5 cursor-grab touch-none">
+          <div className="w-10 h-1.5 bg-pine/20 rounded-full mx-auto mb-3" />
+          <div className="flex gap-2">
+            {(
+              [
+                ["post", "Share a post"],
+                ["catch", "🐟 Log a catch"],
+                ["tournament", "🏆 Tournament"],
+              ] as const
+            ).map(([v, label]) => (
+              <button
+                key={v}
+                onClick={() => {
+                  setMode(v);
+                  setCatchNote(null);
+                }}
+                className={`flex-1 px-4 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors ${
+                  mode === v ? "bg-pine text-white" : "bg-pine/5 text-pine/60 hover:bg-pine/10"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="p-5 pt-4">{children}</div>
+      </div>
+    </div>
+  );
+}
+
 function TournamentPanel() {
   const [sub, setSub] = useState<"build" | "join">("join");
   const [lakes, setLakes] = useState<{ id: string; name: string; region: string }[]>([]);
@@ -1376,40 +1461,8 @@ function FeedPageInner() {
 
       {/* Composer modal */}
       {user && composerOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
-          <div className="absolute inset-0 bg-pine-deep/60" onClick={() => closeComposer()} />
-          <div className={`relative bg-white w-full rounded-t-3xl sm:rounded-3xl p-5 max-h-[92vh] overflow-y-auto transition-all ${mode === "tournament" ? "sm:max-w-3xl" : "sm:max-w-lg"}`}>
-            <div className="flex gap-2 mb-4 items-center">
-              {(
-                [
-                  ["post", "Share a post"],
-                  ["catch", "🐟 Log a catch"],
-                  ["tournament", "🏆 Tournament"],
-                ] as const
-              ).map(([v, label]) => (
-                <button
-                  key={v}
-                  onClick={() => {
-                    setMode(v);
-                    setCatchNote(null);
-                  }}
-                  className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors ${
-                    mode === v ? "bg-pine text-white" : "bg-pine/5 text-pine/60 hover:bg-pine/10"
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-              <button
-                onClick={() => closeComposer()}
-                aria-label="Close composer"
-                className="ml-auto text-pine/40 hover:text-pine font-bold text-lg leading-none px-2"
-              >
-                ✕
-              </button>
-            </div>
-
-            {mode === "post" ? (
+        <ComposerSheet mode={mode} setMode={setMode} setCatchNote={setCatchNote} closeComposer={closeComposer}>
+          {mode === "post" ? (
               <>
                 <textarea
                   value={draft}
@@ -1651,8 +1704,7 @@ function FeedPageInner() {
             ) : (
               <TournamentPanel />
             )}
-          </div>
-        </div>
+        </ComposerSheet>
       )}
 
       {/* Tournament explainer popup */}
