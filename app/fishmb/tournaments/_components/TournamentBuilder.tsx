@@ -130,7 +130,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
               i === step ? "bg-pine text-white" : i < step ? "bg-signal/15 text-signal-dark" : "bg-pine/5 text-pine/40"
             }`}
           >
-            {s}
+            {i + 1}. {s}
           </button>
         ))}
       </div>
