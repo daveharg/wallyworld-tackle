@@ -28,8 +28,9 @@ export async function POST(
     return badRequest("Invalid JSON body.");
   }
   const text = typeof body.body === "string" ? body.body.trim().slice(0, 1000) : "";
-  if (!text) return badRequest("Write something first.");
+  const photoUrl = typeof body.photo_url === "string" && /^https?:\/\//.test(body.photo_url) ? body.photo_url.slice(0, 2048) : null;
+  if (!text && !photoUrl) return badRequest("Write something or add a photo first.");
   const parentId = typeof body.parent_id === "string" && body.parent_id.trim() ? body.parent_id.trim() : null;
-  const comment = await addComment(params.id, me.id, text, parentId);
+  const comment = await addComment(params.id, me.id, text, parentId, photoUrl);
   return NextResponse.json({ comment }, { status: 201 });
 }

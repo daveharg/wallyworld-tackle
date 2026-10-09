@@ -182,6 +182,7 @@ interface FeedComment {
   user_name: string;
   avatar_url: string | null;
   body: string;
+  photo_url: string | null;
   parent_id: string | null;
   like_count: number;
   dislike_count: number;
@@ -593,10 +594,12 @@ function Reactions({
   );
 }
 
-function Comments({ postId }: { postId: string }) {
+function Comments({ postId, uploadPhoto }: { postId: string; uploadPhoto: (f: File) => Promise<string> }) {
   const { user, openLogin } = useFishAuth();
   const [comments, setComments] = useState<FeedComment[]>([]);
   const [draft, setDraft] = useState("");
+  const [photo, setPhoto] = useState<string | null>(null);
+  const [photoBusy, setPhotoBusy] = useState(false);
   const [busy, setBusy] = useState(false);
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [replyDraft, setReplyDraft] = useState("");
@@ -616,20 +619,34 @@ function Comments({ postId }: { postId: string }) {
       openLogin();
       return;
     }
-    if (!draft.trim() || busy) return;
+    if ((!draft.trim() && !photo) || busy) return;
     setBusy(true);
     try {
       const d = await fishFetch(`/api/fishmb/feed/${postId}/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ body: draft.trim() }),
+        body: JSON.stringify({ body: draft.trim(), photo_url: photo }),
       });
       setComments([...comments, d.comment]);
       setDraft("");
+      setPhoto(null);
     } catch {
       // non-fatal
     } finally {
       setBusy(false);
+    }
+  };
+
+  const pickPhoto = async (file: File | undefined) => {
+    if (!file || photoBusy) return;
+    setPhotoBusy(true);
+    try {
+      const url = await uploadPhoto(file);
+      setPhoto(url);
+    } catch {
+      // non-fatal
+    } finally {
+      setPhotoBusy(false);
     }
   };
 
@@ -716,6 +733,14 @@ function Comments({ postId }: { postId: string }) {
             <span className="font-normal text-pine/45">· {timeAgo(c.created_at)}</span>
           </p>
           <p className="text-sm text-pine/80 mt-0.5">{c.body}</p>
+          {c.photo_url && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={c.photo_url}
+              alt=""
+              className="mt-2 rounded-xl max-h-48 w-auto object-cover"
+            />
+          )}
           <div className="flex items-center gap-3 mt-1.5">
             <button
               onClick={() => react(c.id, 1)}
@@ -787,7 +812,37 @@ function Comments({ postId }: { postId: string }) {
   return (
     <div className="mt-3 pt-3 border-t border-pine/10 space-y-3">
       {topLevel.map((c) => renderComment(c, false))}
+      {photo && (
+        <div className="relative inline-block">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={photo} alt="" className="h-20 w-20 rounded-xl object-cover" />
+          <button
+            type="button"
+            onClick={() => setPhoto(null)}
+            aria-label="Remove photo"
+            className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-pine-deep text-white text-xs font-bold"
+          >
+            ✕
+          </button>
+        </div>
+      )}
       <div className="flex gap-2">
+        <label className="shrink-0 w-10 h-10 rounded-full bg-paper-deep border border-pine/15 flex items-center justify-center cursor-pointer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-pine/60">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <path d="M21 15l-5-5L5 21" />
+          </svg>
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              pickPhoto(e.target.files?.[0]);
+              e.target.value = "";
+            }}
+          />
+        </label>
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
@@ -798,10 +853,10 @@ function Comments({ postId }: { postId: string }) {
         />
         <button
           onClick={send}
-          disabled={busy}
+          disabled={busy || photoBusy}
           className="bg-pine text-white text-xs font-bold uppercase tracking-wider px-4 rounded-full disabled:opacity-50"
         >
-          Send
+          {photoBusy ? "…" : "Send"}
         </button>
       </div>
     </div>
@@ -835,6 +890,7 @@ function FeedPageInner() {
   const [videoPlayback, setVideoPlayback] = useState<{ playback_id: string; duration: number | null } | null>(null);
   const [videoErr, setVideoErr] = useState<string | null>(null);
   const [posting, setPosting] = useState(false);
+  const [shareNote, setShareNote] = useState<string | null>(null);
   const [visibility, setVisibility] = useState<"public" | "friends" | "private">("public");
   const [shareLocation, setShareLocation] = useState(true);
   const [catchSpecies, setCatchSpecies] = useState("");
@@ -1369,6 +1425,11 @@ function FeedPageInner() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 pt-4 md:pt-6 pb-32">
+      {shareNote && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[1300] bg-pine-deep text-white text-sm font-bold rounded-full px-5 py-3 shadow-xl max-w-[90vw] truncate">
+          {shareNote}
+        </div>
+      )}
       {/* Feed section header — tap the title to switch sections */}
       <div className="flex items-center justify-between mb-4">        <div className="relative">
           <button
@@ -1551,6 +1612,21 @@ function FeedPageInner() {
                 <div className="mt-3 flex items-center justify-between">
                   <Reactions item={item} onReacted={handleReacted} />
                   <button
+                    onClick={async () => {
+                      const url = `https://www.fishmb.ca/fishmb/share/${item.id}`;
+                      try {
+                        await navigator.clipboard.writeText(url);
+                        setShareNote("Link copied — paste it anywhere.");
+                      } catch {
+                        setShareNote(url);
+                      }
+                      setTimeout(() => setShareNote(null), 3000);
+                    }}
+                    className="text-xs font-bold uppercase tracking-wider text-pine/50 hover:text-signal-dark"
+                  >
+                    Share
+                  </button>
+                  <button
                     onClick={() => toggleComments(item.id)}
                     className="text-xs font-bold uppercase tracking-wider text-pine/50 hover:text-signal-dark"
                   >
@@ -1560,7 +1636,7 @@ function FeedPageInner() {
               </div>
               {openComments.has(item.id) && (
                 <div className="px-5 pb-4">
-                  <Comments postId={item.id} />
+                  <Comments postId={item.id} uploadPhoto={uploadPhoto} />
                 </div>
               )}
             </article>

@@ -37,6 +37,7 @@ export interface FeedComment {
   user_name: string;
   avatar_url: string | null;
   body: string;
+  photo_url: string | null;
   parent_id: string | null;
   like_count: number;
   dislike_count: number;
@@ -62,6 +63,8 @@ export async function ensureFeedColumns(): Promise<void> {
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS video jsonb`);
   // A shared fishing spot on a post: { name, lat, lng, notes, icon }.
   await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS spot_share jsonb`);
+  // Comments can carry one photo.
+  await query(`ALTER TABLE fm_comments ADD COLUMN IF NOT EXISTS photo_url text`);
   // Comments can target either an fm_discussions row or an fm_catches row, so
   // post_id carries NO foreign key (the original 003.sql FK to fm_discussions
   // broke commenting on catches). Keep the post_id index for lookups.
@@ -308,6 +311,7 @@ export async function getComments(postId: string, viewerId?: string): Promise<Fe
   await ensureFeedColumns();
   const rows = await query<FeedComment>(
     `SELECT cm.id, cm.user_id::text AS user_id, u.name AS user_name, u.avatar_url, cm.body,
+            cm.photo_url,
             cm.parent_id::text AS parent_id,
             (SELECT COUNT(*) FROM fm_comment_reactions r WHERE r.comment_id = cm.id AND r.value = 1)::int AS like_count,
             (SELECT COUNT(*) FROM fm_comment_reactions r WHERE r.comment_id = cm.id AND r.value = -1)::int AS dislike_count,
@@ -329,7 +333,8 @@ export async function addComment(
   postId: string,
   userId: string,
   body: string,
-  parentId?: string | null
+  parentId?: string | null,
+  photoUrl?: string | null
 ): Promise<FeedComment> {
   await ensureFeedColumns();
   // A reply must belong to a comment on the same post.
@@ -342,15 +347,15 @@ export async function addComment(
     parent = check?.id ?? null;
   }
   const rows = await query<FeedComment>(
-    `INSERT INTO fm_comments (post_id, user_id, body, parent_id)
-     VALUES ($1, $2, $3, $4::uuid)
+    `INSERT INTO fm_comments (post_id, user_id, body, parent_id, photo_url)
+     VALUES ($1, $2, $3, $4::uuid, $5)
      RETURNING id,
        (SELECT name FROM fm_users WHERE id = $2) AS user_name,
        (SELECT avatar_url FROM fm_users WHERE id = $2) AS avatar_url,
-       body, parent_id::text AS parent_id,
+       body, photo_url, parent_id::text AS parent_id,
        0 AS like_count, 0 AS dislike_count, NULL::smallint AS viewer_reaction,
        created_at`,
-    [postId, userId, body, parent]
+    [postId, userId, body, parent, photoUrl ?? null]
   );
   return { ...rows[0], viewer_reaction: null };
 }
