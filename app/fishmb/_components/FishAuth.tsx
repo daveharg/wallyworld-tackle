@@ -133,6 +133,12 @@ function LoginModal({ onClose, onDone }: { onClose: () => void; onDone: (u: Fish
   const [ageOk, setAgeOk] = useState(false);
   const [termsOk, setTermsOk] = useState(false);
   const canContinue = ageOk && termsOk;
+  // Email/password sign-in — works on preview URLs where Google OAuth blocks.
+  const [mode, setMode] = useState<"google" | "email">("google");
+  const [emailMode, setEmailMode] = useState<"login" | "signup">("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
 
   // Remember a previous acceptance so returning users don't check twice.
   useEffect(() => {
@@ -230,6 +236,24 @@ function LoginModal({ onClose, onDone }: { onClose: () => void; onDone: (u: Fish
         <p className="text-pine/70 text-sm mb-5">
           Log in with Google — the same account as the FishMB app. Your catches and profile follow you.
         </p>
+        {/* Sign-in method tabs */}
+        <div className="flex bg-paper-deep rounded-full p-1 mb-5">
+          {(["google", "email"] as const).map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => {
+                setMode(m);
+                setError(null);
+              }}
+              className={`flex-1 rounded-full py-2 text-xs font-black uppercase tracking-wider transition-colors ${
+                mode === m ? "bg-pine text-white shadow" : "text-pine/50 hover:text-pine"
+              }`}
+            >
+              {m === "google" ? "Google" : "Email"}
+            </button>
+          ))}
+        </div>
         <label className="flex items-start gap-2.5 text-left bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 mb-3 cursor-pointer">
           <input
             type="checkbox"
@@ -261,39 +285,143 @@ function LoginModal({ onClose, onDone }: { onClose: () => void; onDone: (u: Fish
             .
           </span>
         </label>
-        {canContinue ? (
-          <div ref={btnRef} className="flex justify-center min-h-[44px]" />
-        ) : (
-          <p className="text-xs text-pine/50 mb-2">
-            Check both boxes above to continue with Google.
-          </p>
+        {mode === "google" && (
+          <>
+            {canContinue ? (
+              <div ref={btnRef} className="flex justify-center min-h-[44px]" />
+            ) : (
+              <p className="text-xs text-pine/50 mb-2">
+                Check both boxes above to continue with Google.
+              </p>
+            )}
+            {canContinue && (
+              <button
+                onClick={() => {
+                  // Reset Google's button state — fixes the "locked" state where
+                  // the button shows your email but won't respond to taps.
+                  try {
+                    window.google?.accounts.id.disableAutoSelect();
+                  } catch { /* noop */ }
+                  setError(null);
+                  const btn = btnRef.current;
+                  if (btn) {
+                    btn.innerHTML = "";
+                    try {
+                      window.google?.accounts.id.renderButton(btn, {
+                        theme: "outline",
+                        size: "large",
+                        text: "signin_with",
+                        width: 280,
+                      });
+                    } catch { /* noop */ }
+                  }
+                }}
+                className="mt-3 text-xs font-bold text-pine/40 hover:text-pine underline"
+              >
+                Button not working? Tap to reset it
+              </button>
+            )}
+          </>
         )}
-        {canContinue && (
-          <button
-            onClick={() => {
-              // Reset Google's button state — fixes the "locked" state where
-              // the button shows your email but won't respond to taps.
-              try {
-                window.google?.accounts.id.disableAutoSelect();
-              } catch { /* noop */ }
+        {mode === "email" && (
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              if (!canContinue) {
+                setError("Check both boxes above first.");
+                return;
+              }
+              setBusy(true);
               setError(null);
-              const btn = btnRef.current;
-              if (btn) {
-                btn.innerHTML = "";
+              try {
+                const endpoint =
+                  emailMode === "login"
+                    ? "/api/fish/auth/email/login"
+                    : "/api/fish/auth/email/signup";
+                const res = await fetch(endpoint, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    email,
+                    password,
+                    name: displayName,
+                    age_confirmed: true,
+                    terms_accepted: true,
+                  }),
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || "Sign-in failed.");
                 try {
-                  window.google?.accounts.id.renderButton(btn, {
-                    theme: "outline",
-                    size: "large",
-                    text: "signin_with",
-                    width: 280,
-                  });
-                } catch { /* noop */ }
+                  localStorage.setItem(FISHMB_TOKEN_KEY, data.token);
+                  localStorage.setItem("fishmb-terms-ok", "1");
+                } catch {
+                  // storage unavailable — non-fatal
+                }
+                onDone(data.user, data.is_new_user === true);
+              } catch (err) {
+                setError(err instanceof Error ? err.message : "Sign-in failed.");
+              } finally {
+                setBusy(false);
               }
             }}
-            className="mt-3 text-xs font-bold text-pine/40 hover:text-pine underline"
+            className="space-y-3"
           >
-            Button not working? Tap to reset it
-          </button>
+            <div className="flex bg-paper-deep rounded-full p-1">
+              {(["login", "signup"] as const).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => {
+                    setEmailMode(m);
+                    setError(null);
+                  }}
+                  className={`flex-1 rounded-full py-1.5 text-xs font-black uppercase tracking-wider transition-colors ${
+                    emailMode === m ? "bg-white text-pine shadow" : "text-pine/50 hover:text-pine"
+                  }`}
+                >
+                  {m === "login" ? "Log in" : "Sign up"}
+                </button>
+              ))}
+            </div>
+            {emailMode === "signup" && (
+              <input
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="Display name (optional)"
+                maxLength={80}
+                className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal"
+              />
+            )}
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email address"
+              type="email"
+              autoComplete="email"
+              required
+              className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal"
+            />
+            <input
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={emailMode === "signup" ? "Password (8+ characters)" : "Password"}
+              type="password"
+              autoComplete={emailMode === "signup" ? "new-password" : "current-password"}
+              required
+              minLength={8}
+              className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal"
+            />
+            <button
+              type="submit"
+              disabled={busy || !canContinue}
+              className="w-full bg-pine text-white font-black uppercase tracking-wider text-sm rounded-full py-3.5 disabled:opacity-50"
+            >
+              {busy ? "Please wait…" : emailMode === "login" ? "Log in" : "Create account"}
+            </button>
+            {!canContinue && (
+              <p className="text-xs text-pine/50">Check both boxes above first.</p>
+            )}
+          </form>
         )}
         {busy && <p className="text-sm text-pine/60 mt-4">Signing you in…</p>}
         {error && <p className="text-sm text-signal-dark mt-4">{error}</p>}
