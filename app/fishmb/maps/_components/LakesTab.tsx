@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { fishFetch } from "../../_components/fishFetch";
 
 interface SavedLake {
@@ -39,8 +38,13 @@ function weatherEmoji(code: number | null): string {
 }
 
 /** Lakes tab — saved lakes as full-width cards with weather, catches, species. */
-export default function LakesTab({ onFlyToLake }: { onFlyToLake: (lake: SavedLake) => void }) {
-  const router = useRouter();
+export default function LakesTab({
+  onFlyToLake,
+  onSelectLake,
+}: {
+  onFlyToLake: (lake: SavedLake) => void;
+  onSelectLake: (lake: SavedLake) => void;
+}) {
   const [favs, setFavs] = useState<SavedLake[]>([]);
   const [allLakes, setAllLakes] = useState<LakeMeta[]>([]);
   const [cards, setCards] = useState<LakeCardData[]>([]);
@@ -134,7 +138,7 @@ export default function LakesTab({ onFlyToLake }: { onFlyToLake: (lake: SavedLak
     setSelectedId(id);
     if (!id) return;
     const lake = favs.find((f) => f.id === id);
-    if (lake && lake.lat !== null && lake.lng !== null) onFlyToLake(lake);
+    if (lake && lake.lat !== null && lake.lng !== null) onSelectLake(lake);
   };
 
   return (
@@ -189,7 +193,7 @@ export default function LakesTab({ onFlyToLake }: { onFlyToLake: (lake: SavedLak
             <button
               key={lake.id}
               type="button"
-              onClick={() => router.push(`/fishmb/lakes/${lake.id}`)}
+              onClick={() => onSelectLake(lake)}
               className="w-full text-left bg-white border-y border-pine/10 px-5 py-4 active:bg-pine/5"
             >
               <div className="flex items-start justify-between gap-3">

@@ -623,6 +623,14 @@ export default function SpotMap({
     lastFocusKey.current = focus.key;
     mapPlacedRef.current = true;
     map.flyTo([focus.lat, focus.lng], focus.zoom ?? 11, { animate: true, duration: 1.2 });
+    // Optional: shift the target up on screen (fraction of viewport height)
+    // so it sits centred in the visible map area above a half-open sheet.
+    const offsetY = (focus as { offsetY?: number }).offsetY;
+    if (offsetY) {
+      map.once("moveend", () => {
+        map.panBy([0, -window.innerHeight * offsetY], { animate: false });
+      });
+    }
   }, [map, focus]);
 
   // A quick tap on the map (not a drag, not a long-press) opens it fullscreen.

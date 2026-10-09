@@ -17,10 +17,11 @@ import {
   compassLabel,
   formatDist,
 } from "../../profile/_components/geo";
-import MapSheet, { type SheetTab } from "./MapSheet";
+import MapSheet, { type SheetTab, type SheetSnap } from "./MapSheet";
 import CatchesTab from "./CatchesTab";
 import SpotsTab, { type Spot } from "./SpotsTab";
 import LakesTab from "./LakesTab";
+import LakeSheetDetail from "./LakeSheetDetail";
 import SettingsTab from "./SettingsTab";
 import MapSearch from "./MapSearch";
 import WindWidget from "./WindWidget";
@@ -50,7 +51,9 @@ export default function MapsHub() {
 
   // Sheet
   const [tab, setTab] = useState<SheetTab>("catches");
-  const [expanded, setExpanded] = useState(false);
+  const [snap, setSnap] = useState<SheetSnap>("collapsed");
+  // Lake opened in the sheet (half/full) instead of a separate page.
+  const [selectedLake, setSelectedLake] = useState<SavedLake | null>(null);
 
   // Map state
   const [spots, setSpots] = useState<Spot[]>([]);
@@ -58,7 +61,13 @@ export default function MapsHub() {
   const [note, setNote] = useState<string | null>(null);
   const [myLoc, setMyLoc] = useState<{ lat: number; lng: number; speed: number | null } | null>(null);
   const [mapCenter, setMapCenter] = useState({ lat: 53.5, lng: -96.5 });
-  const [focus, setFocus] = useState<{ lat: number; lng: number; key: string; zoom?: number } | null>(null);
+  const [focus, setFocus] = useState<{
+    lat: number;
+    lng: number;
+    key: string;
+    zoom?: number;
+    offsetY?: number;
+  } | null>(null);
   const [basemap, setBasemap] = useState<BasemapId>("streets");
   const [windOn, setWindOn] = useState(false);
   const centeredOnGps = useRef(false);
@@ -272,7 +281,7 @@ export default function MapsHub() {
 
   const flyTo = (lat: number, lng: number, key: string, zoom = 13) => {
     setFocus({ lat, lng, key: `${key}:${Date.now()}`, zoom });
-    setExpanded(false);
+    setSnap("collapsed");
   };
 
   // ---- spot CRUD ----
@@ -380,6 +389,51 @@ export default function MapsHub() {
     flyTo(lake.lat, lake.lng, `lake:${lake.id}`, 11);
   };
 
+  /** Open a lake's detail page in the sheet at half height, with the lake
+   *  centred on the map in the top half of the screen. */
+  const openLake = (lake: SavedLake) => {
+    if (lake.lat === null || lake.lng === null) {
+      setNote("No map coordinates for that lake yet.");
+      return;
+    }
+    setSelectedLake(lake);
+    // offsetY 0.25 shifts the lake up to the centre of the visible top half.
+    setFocus({
+      lat: lake.lat,
+      lng: lake.lng,
+      key: `lakedetail:${lake.id}:${Date.now()}`,
+      zoom: 11,
+      offsetY: 0.25,
+    });
+    setSnap("half");
+  };
+
+  /** Sheet snap changes: leaving the half view re-centres the lake for the
+   *  full map, and picking a tab clears the lake detail. */
+  const handleSnapChange = (s: SheetSnap) => {
+    if (s === "collapsed" && selectedLake && snap === "half") {
+      // Full GPS view of the lake — re-centre without the half-sheet offset.
+      if (selectedLake.lat !== null && selectedLake.lng !== null) {
+        setFocus({
+          lat: selectedLake.lat,
+          lng: selectedLake.lng,
+          key: `lakefull:${selectedLake.id}:${Date.now()}`,
+          zoom: 11,
+        });
+      }
+    }
+    setSnap(s);
+  };
+
+  const handleTabChange = (t: SheetTab) => {
+    setTab(t);
+    if (selectedLake) {
+      // Leaving the lake detail for a tab — open the tab fullscreen.
+      setSelectedLake(null);
+      setSnap("full");
+    }
+  };
+
   return (
     <div className="fixed inset-0 top-0 md:top-16 bottom-0 overflow-hidden bg-paper">
       <div className="absolute inset-0">
@@ -453,7 +507,8 @@ export default function MapsHub() {
         type="button"
         onClick={() => {
           setTab("settings");
-          setExpanded(true);
+          setSelectedLake(null);
+          setSnap("full");
         }}
         aria-label="Map settings"
         title="Map settings"
@@ -522,10 +577,26 @@ export default function MapsHub() {
       {/* Bottom sheet */}
       <MapSheet
         tab={tab}
-        onTabChange={setTab}
-        expanded={expanded}
-        onExpandedChange={setExpanded}
+        onTabChange={handleTabChange}
+        snap={snap}
+        onSnapChange={handleSnapChange}
+        detailMode={selectedLake !== null}
       >
+        {selectedLake ? (
+          <LakeSheetDetail
+            lake={selectedLake}
+            spots={spots}
+            onBack={() => {
+              setSelectedLake(null);
+              setSnap("collapsed");
+            }}
+            onSelectSpot={(s) => {
+              setSelectedLake(null);
+              flyTo(Number(s.lat), Number(s.lng), `spot:${s.id}`, 15);
+            }}
+          />
+        ) : (
+          <>
         {tab === "catches" && (
           <CatchesTab
             mine={myCatches}
@@ -551,14 +622,14 @@ export default function MapsHub() {
             onShare={shareSpot}
             sharingId={sharingId}
             onAddSpot={() => {
-              setExpanded(false);
+              setSnap("collapsed");
               setPicking(true);
  setNote("Tap the map to drop your pin ");
               setTimeout(() => setNote(null), 3500);
             }}
           />
         )}
-        {tab === "lakes" && <LakesTab onFlyToLake={flyToLake} />}
+        {tab === "lakes" && <LakesTab onFlyToLake={flyToLake} onSelectLake={openLake} />}
         {tab === "settings" && (
           <SettingsTab
             basemap={basemap}
@@ -572,6 +643,8 @@ export default function MapsHub() {
             onTrailsChanged={loadTrails}
             onFlyToLake={flyToLake}
           />
+        )}
+          </>
         )}
       </MapSheet>
 
