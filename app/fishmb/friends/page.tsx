@@ -143,9 +143,10 @@ export default function FriendsPage() {
 
       {note && <p className="text-sm text-pine bg-gold/20 border border-gold/50 rounded-2xl px-4 py-3 mb-6">{note}</p>}
 
-      <div className="bg-white border border-pine/10 rounded-3xl p-6 mb-8">
+      <div id="find-anglers" className="bg-white border border-pine/10 rounded-3xl p-6 mb-8 scroll-mt-24">
         <h2 className="font-bold text-pine uppercase tracking-wider text-sm mb-3">Find anglers</h2>
         <input
+          id="find-anglers-input"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by name…"
@@ -195,9 +196,20 @@ export default function FriendsPage() {
       )}
 
       <div className="bg-white border border-pine/10 rounded-3xl p-6">
-        <h2 className="font-bold text-pine uppercase tracking-wider text-sm mb-3">
-          Your friends ({bundle?.friends.length ?? 0})
-        </h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-bold text-pine uppercase tracking-wider text-sm">
+            Your friends ({bundle?.friends.length ?? 0})
+          </h2>
+          <button
+            onClick={() => {
+              document.getElementById("find-anglers")?.scrollIntoView({ behavior: "smooth", block: "start" });
+              document.getElementById("find-anglers-input")?.focus({ preventScroll: true });
+            }}
+            className="bg-signal hover:bg-signal-dark text-white text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full transition-colors"
+          >
+            ＋ Add friends
+          </button>
+        </div>
         {(bundle?.friends.length ?? 0) === 0 ? (
           <p className="text-pine/55 text-sm">No friends yet — search above to find friends.</p>
         ) : (
