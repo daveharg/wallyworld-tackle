@@ -4,7 +4,8 @@ import type { Metadata } from "next";
 /** fishmb.ca root — coming soon page with features list. */
 
 export const metadata: Metadata = {
-  title: "FishMB — Coming Soon",
+  // absolute bypasses the root layout's "%s | Wallyworld Tackle" title template
+  title: { absolute: "FishMB — Coming Soon" },
   description:
     "FishMB — Manitoba's fishing community. Tournaments, private maps, encrypted messaging and bite weather. Coming soon.",
   openGraph: {
