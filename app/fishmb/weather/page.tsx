@@ -202,6 +202,7 @@ export default function WeatherPage() {
   const [data, setData] = useState<WxData | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [explainer, setExplainer] = useState<string | null>(null);
+  const [windFull, setWindFull] = useState(false);
 
   // Remember the last-viewed spot between visits.
   useEffect(() => {
@@ -439,15 +440,23 @@ export default function WeatherPage() {
               <h2 className="text-sm font-black">🌬️ Live wind map</h2>
               <span className="text-[10px] text-white/40">windy.com</span>
             </div>
-            <iframe
-              title="Live wind map"
-              src={windySrc}
-              className="w-full h-80 border-0"
-              loading="lazy"
-              allowFullScreen
-            />
+            <button
+              onClick={() => setWindFull(true)}
+              className="relative block w-full cursor-pointer group"
+              aria-label="Open wind map full screen"
+            >
+              <iframe
+                title="Live wind map"
+                src={windySrc}
+                className="w-full h-80 border-0 pointer-events-none"
+                loading="lazy"
+              />
+              <span className="absolute bottom-3 right-3 bg-black/60 text-white text-xs font-bold rounded-full px-3 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                ⛶ Full screen
+              </span>
+            </button>
             <p className="px-4 py-2.5 text-[11px] text-white/50">
-              Live wind over your waters. Zoom in to your lake — fish the windy side of structure where bait stacks up.
+              Live wind over your waters. Tap the map for full screen — zoom in to your lake, fish the windy side of structure where bait stacks up.
             </p>
           </section>
 
@@ -524,6 +533,25 @@ export default function WeatherPage() {
               ))}
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Fullscreen wind map */}
+      {windFull && (
+        <div className="fixed inset-0 z-50 bg-black">
+          <button
+            onClick={() => setWindFull(false)}
+            aria-label="Back to weather"
+            className="absolute top-4 left-4 z-10 flex items-center gap-1.5 bg-black/60 hover:bg-black/80 text-white text-sm font-bold rounded-full pl-3 pr-4 py-2.5 backdrop-blur transition-colors"
+          >
+            ← Back
+          </button>
+          <iframe
+            title="Live wind map — full screen"
+            src={windySrc}
+            className="w-full h-full border-0"
+            allowFullScreen
+          />
         </div>
       )}
     </div>
