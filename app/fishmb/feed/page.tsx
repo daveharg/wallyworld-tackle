@@ -1220,6 +1220,13 @@ function FeedPageInner() {
                   {label}
                 </button>
               ))}
+              <Link
+                href="/fishmb/tournaments/create"
+                onClick={() => closeComposer()}
+                className="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors bg-gold/15 text-gold-dark hover:bg-gold/25"
+              >
+                🏆 Tournament
+              </Link>
               <button
                 onClick={() => closeComposer()}
                 aria-label="Close composer"
