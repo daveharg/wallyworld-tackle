@@ -622,14 +622,20 @@ export default function SpotMap({
     if (!map || !focus || focus.key === lastFocusKey.current) return;
     lastFocusKey.current = focus.key;
     mapPlacedRef.current = true;
-    map.flyTo([focus.lat, focus.lng], focus.zoom ?? 11, { animate: true, duration: 1.2 });
-    // Optional: shift the target up on screen (fraction of viewport height)
-    // so it sits centred in the visible map area above a half-open sheet.
+    const zoom = focus.zoom ?? 11;
     const offsetY = (focus as { offsetY?: number }).offsetY;
     if (offsetY) {
-      map.once("moveend", () => {
-        map.panBy([0, -window.innerHeight * offsetY], { animate: false });
-      });
+      // Place the target up on screen (fraction of viewport height) so it
+      // sits centred in the visible map area above a half-open sheet.
+      // Done in one flyTo: project the lake, shift down by the offset, and
+      // unproject — that point becomes the map centre, putting the lake
+      // offsetY * height above screen centre.
+      const lakePoint = map.project([focus.lat, focus.lng], zoom);
+      const centrePoint = lakePoint.add([0, window.innerHeight * offsetY]);
+      const centre = map.unproject(centrePoint, zoom);
+      map.flyTo(centre, zoom, { animate: true, duration: 1.2 });
+    } else {
+      map.flyTo([focus.lat, focus.lng], zoom, { animate: true, duration: 1.2 });
     }
   }, [map, focus]);
 

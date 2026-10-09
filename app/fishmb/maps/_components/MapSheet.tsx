@@ -52,11 +52,18 @@ export default function MapSheet({
   const [dragging, setDragging] = useState(false);
   const startY = useRef<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
   const dragTarget = useRef<SheetSnap | null>(null);
+  const fromHeader = useRef(false);
 
   const onTouchStart = (e: TouchEvent) => {
     startY.current = e.touches[0].clientY;
     dragTarget.current = null;
+    // Touches starting on the grabber/header always drag the sheet,
+    // regardless of the content's scroll position.
+    fromHeader.current = !!(
+      headerRef.current && headerRef.current.contains(e.target as Node)
+    );
     setDragging(true);
   };
 
@@ -64,7 +71,7 @@ export default function MapSheet({
     if (startY.current === null) return;
     const dy = e.touches[0].clientY - startY.current;
     const scroller = scrollRef.current;
-    const atTop = !scroller || scroller.scrollTop <= 0;
+    const atTop = fromHeader.current || !scroller || scroller.scrollTop <= 0;
 
     if (snap === "collapsed") {
       // Peek: drag up to open — back to the lake detail if one is open.
@@ -107,6 +114,7 @@ export default function MapSheet({
     setDragging(false);
     startY.current = null;
     dragTarget.current = null;
+    fromHeader.current = false;
   };
 
   const tapTab = (id: SheetTab) => {
@@ -133,7 +141,8 @@ export default function MapSheet({
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      {/* Grabber */}
+      {/* Grabber + header zone — always drags the sheet */}
+      <div ref={headerRef}>
       <div className="shrink-0 pt-2.5 pb-1 flex justify-center">
         <div className="w-10 h-1.5 rounded-full bg-pine/20" />
       </div>
@@ -156,6 +165,7 @@ export default function MapSheet({
           ))}
         </div>
       )}
+      </div>
 
       {/* Scrollable page content */}
       <div
