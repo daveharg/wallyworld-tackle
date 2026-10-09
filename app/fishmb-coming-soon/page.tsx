@@ -27,7 +27,7 @@ const SECTIONS = [
   {
     icon: "📰",
     title: "The Feed",
-    text: "An Instagram-style feed for Manitoba anglers. Share catches with up to 4 photos, videos, lake reports and fishing tips. React, comment, and follow the anglers you fish with. No two posts of the same type back to back — every scroll stays fresh.",
+    text: "A social-media-style feed for Manitoba anglers. Share catches with up to 4 photos, videos, lake reports and fishing tips. React, comment, and follow the anglers you fish with. No two posts of the same type back to back — every scroll stays fresh.",
   },
   {
     icon: "🗺️",
