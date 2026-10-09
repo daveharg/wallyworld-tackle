@@ -91,7 +91,7 @@ function PressureGauge({ value }: { value: number }) {
     [1030, MAX, "#f97316"],
   ];
   return (
-    <svg viewBox="0 0 200 115" className="w-full">
+    <svg viewBox="0 0 200 140" className="w-full">
       {zones.map(([p0, p1, c], i) => (
         <path key={i} d={arc(ang(p0), ang(p1))} stroke={c} strokeWidth="13" fill="none" strokeLinecap="butt" />
       ))}
@@ -100,14 +100,44 @@ function PressureGauge({ value }: { value: number }) {
         IDEAL
       </text>
       {/* Needle */}
-      <line x1={cx} y1={cy} x2={pt(angle, 62)} stroke="#ffffff" strokeWidth="4" strokeLinecap="round" />
+      <line x1={cx} y1={cy} x2={pt(angle, 72)} stroke="#ffffff" strokeWidth="4" strokeLinecap="round" />
       <circle cx={cx} cy={cy} r="7" fill="#ffffff" />
-      <text x={cx} y={cy + 22} textAnchor="middle" fontSize="17" fontWeight="900" fill="#ffffff">
+      <text x={cx} y={cy + 24} textAnchor="middle" fontSize="17" fontWeight="900" fill="#ffffff">
         {Math.round(value)}
       </text>
-      <text x={cx} y={cy + 34} textAnchor="middle" fontSize="9" fill="#ffffff" opacity="0.65">
+      <text x={cx} y={cy + 37} textAnchor="middle" fontSize="9" fill="#ffffff" opacity="0.65">
         hPa
       </text>
+    </svg>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* 7-day pressure history sparkline — shows when fronts came through     */
+/* ------------------------------------------------------------------ */
+function PressureHistory({ times, pressures, nowTime }: { times: string[]; pressures: number[]; nowTime: string }) {
+  const W = 300, H = 64, PAD = 4;
+  if (!times.length || !pressures.length) return null;
+  const min = Math.min(...pressures) - 1;
+  const max = Math.max(...pressures) + 1;
+  const n = pressures.length;
+  const x = (i: number) => PAD + (i / Math.max(1, n - 1)) * (W - PAD * 2);
+  const y = (p: number) => PAD + (1 - (p - min) / Math.max(0.1, max - min)) * (H - PAD * 2);
+  const d = pressures.map((p, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(p).toFixed(1)}`).join(" ");
+  // "now" marker
+  const nowIdx = times.findIndex((t) => t >= nowTime.slice(0, 13));
+  const nx = nowIdx > 0 ? x(nowIdx) : x(n - 1);
+  // day ticks (every 24h from the end)
+  const ticks: number[] = [];
+  for (let i = n - 1; i >= 0; i -= 24) ticks.push(i);
+  return (
+    <svg viewBox={`0 0 ${W} ${H + 14}`} className="w-full mt-2">
+      {ticks.map((i) => (
+        <line key={i} x1={x(i)} y1={PAD} x2={x(i)} y2={H - PAD} stroke="#ffffff" strokeOpacity="0.12" strokeWidth="1" />
+      ))}
+      <path d={d} fill="none" stroke="#7dd3fc" strokeWidth="2" />
+      <line x1={nx} y1={PAD} x2={nx} y2={H - PAD} stroke="#ffffff" strokeOpacity="0.5" strokeWidth="1" strokeDasharray="3 2" />
+      <text x={W - 2} y={H + 11} textAnchor="end" fontSize="8" fill="#ffffff" opacity="0.45">7-day pressure history</text>
     </svg>
   );
 }
@@ -197,7 +227,7 @@ export default function WeatherPage() {
           `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat.toFixed(3)}&longitude=${coords.lon.toFixed(3)}` +
           `&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m` +
           `&hourly=temperature_2m,precipitation_probability,pressure_msl,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max` +
-          `&timezone=auto&forecast_days=7&past_days=1`;
+          `&timezone=auto&forecast_days=2&past_days=7`;
         const r = await fetch(url);
         if (!r.ok) throw new Error("weather request failed");
         const d = (await r.json()) as WxData;
@@ -229,13 +259,38 @@ export default function WeatherPage() {
       trend = 0;
     }
     const outlook = biteOutlook(c.pressure_msl, trend, c.cloud_cover, c.wind_speed_10m);
+    // Long-range front analysis: scan the full past pressure history for the
+    // steepest drop (a front coming through). After a cold front the bite can
+    // stay off for days, so anglers need to see WHEN it hit, not just the 3h trend.
+    let frontAgoH: number | null = null;
+    let frontDrop = 0;
+    try {
+      const ps = data.hourly.pressure_msl;
+      const idx = data.hourly.time.findIndex((t) => t >= c.time.slice(0, 13));
+      const nowI = idx > 0 ? idx : ps.length - 1;
+      // steepest 12-hour drop in the past data (front signature)
+      let best = 0;
+      let bestI = -1;
+      for (let j = Math.max(0, nowI - 7 * 24); j <= nowI - 12; j++) {
+        const drop = ps[j] - ps[j + 12];
+        if (drop > best) { best = drop; bestI = j; }
+      }
+      if (best >= 4 && bestI >= 0) {
+        frontDrop = best;
+        frontAgoH = nowI - (bestI + 12); // hours since the drop completed
+      }
+    } catch {
+      frontAgoH = null;
+    }
     const front =
       trend <= -2
         ? { label: "Front approaching", color: "#ef4444", icon: "🌩️" }
         : trend >= 2
           ? { label: "Front passing", color: "#f59e0b", icon: "🌤️" }
-          : { label: "Stable", color: "#22c55e", icon: "✅" };
-    return { c, trend, outlook, front, wmo: wmo(c.weather_code) };
+          : frontAgoH !== null && frontAgoH < 72
+            ? { label: "Post-front", color: "#f59e0b", icon: "🧊" }
+            : { label: "Stable", color: "#22c55e", icon: "✅" };
+    return { c, trend, outlook, front, frontAgoH, frontDrop, wmo: wmo(c.weather_code) };
   }, [data]);
 
   const windySrc = useMemo(() => {
@@ -358,11 +413,22 @@ export default function WeatherPage() {
               <p className="text-[10px] text-emerald-200/50 mt-1 underline underline-offset-2">How to read it for fishing</p>
             </button>
 
-            <button onClick={() => setExplainer("front")} className="text-left rounded-3xl bg-white/[0.07] border border-white/10 p-4 active:scale-[0.98] transition">
+            <button onClick={() => setExplainer("front")} className="text-left rounded-3xl bg-white/[0.07] border border-white/10 p-4 active:scale-[0.98] transition col-span-2">
               <p className="text-[10px] font-bold uppercase tracking-widest text-white/50">Storm front</p>
-              <p className="text-3xl mt-2">{derived.front.icon}</p>
-              <p className="text-sm font-black mt-1" style={{ color: derived.front.color }}>{derived.front.label}</p>
-              <p className="text-[11px] text-white/60">3h pressure trend {derived.trend >= 0 ? "+" : ""}{derived.trend.toFixed(1)} hPa</p>
+              <div className="flex items-center gap-3 mt-2">
+                <p className="text-3xl">{derived.front.icon}</p>
+                <div>
+                  <p className="text-sm font-black" style={{ color: derived.front.color }}>{derived.front.label}</p>
+                  <p className="text-[11px] text-white/60">3h trend {derived.trend >= 0 ? "+" : ""}{derived.trend.toFixed(1)} hPa</p>
+                </div>
+              </div>
+              {derived.frontAgoH !== null && (
+                <p className="text-[11px] text-white/70 mt-1">
+                  🧊 Cold front came through ~{derived.frontAgoH < 24 ? `${Math.round(derived.frontAgoH)}h` : `${Math.round(derived.frontAgoH / 24)}d`} ago
+                  ({derived.frontDrop.toFixed(0)} hPa drop). Bite can stay off for days after — fish slow and deep.
+                </p>
+              )}
+              {data && <PressureHistory times={data.hourly.time} pressures={data.hourly.pressure_msl} nowTime={data.current.time} />}
               <p className="text-[10px] text-emerald-200/50 mt-1 underline underline-offset-2">How to read it for fishing</p>
             </button>
           </div>
