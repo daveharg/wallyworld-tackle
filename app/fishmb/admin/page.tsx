@@ -7,6 +7,20 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
+import { UserActivityMap } from "./UserActivityMap";
+
+interface MapCell {
+  lat: number;
+  lng: number;
+  anglers: number;
+  pins: number;
+}
+
+interface UserMapData {
+  cells: MapCell[];
+  totalAnglers: number;
+  totalPins: number;
+}
 
 interface Claim {
   id: string;
@@ -381,7 +395,8 @@ export default function AdminPage() {
   const [allUsers, setAllUsers] = useState<ManagedUser[]>([]);
   const [userSearch, setUserSearch] = useState("");
   const [growth, setGrowth] = useState<GrowthData | null>(null);
-  const [tab, setTab] = useState<"claims" | "ads" | "tournaments" | "messages" | "anglers" | "users" | "growth">("claims");
+  const [userMap, setUserMap] = useState<UserMapData | null>(null);
+  const [tab, setTab] = useState<"claims" | "ads" | "tournaments" | "messages" | "anglers" | "users" | "growth" | "map">("claims");
   const [denied, setDenied] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [acting, setActing] = useState<string | null>(null);
@@ -410,6 +425,9 @@ export default function AdminPage() {
       .catch(() => {});
     fishFetch("/api/fishmb/admin/growth")
       .then((d) => setGrowth(d as GrowthData))
+      .catch(() => {});
+    fishFetch("/api/fishmb/admin/user-map")
+      .then((d) => setUserMap(d as UserMapData))
       .catch(() => {});
   };
 
@@ -540,6 +558,7 @@ export default function AdminPage() {
             ["anglers", `📊 Angler stats (${anglerStats.length})`],
             ["users", `👥 Users (${allUsers.length})`],
             ["growth", `📈 Growth`],
+            ["map", `🗺️ Angler map`],
           ] as const
         ).map(([v, label]) => (
           <button
@@ -690,6 +709,58 @@ export default function AdminPage() {
         />
       ) : tab === "growth" ? (
         <GrowthChart data={growth} />
+      ) : tab === "map" ? (
+        <div>
+          <div className="bg-white border border-pine/10 rounded-3xl p-5 mb-4">
+            <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-1">
+              🗺️ Where your anglers fish
+            </h3>
+            <p className="text-sm text-pine/60 mb-1">
+              Aggregated from saved spots and GPS-tagged catches. Areas only
+              appear when at least 2 anglers are active there — individual
+              private spots are never shown.
+            </p>
+            {userMap && (
+              <p className="text-xs text-pine/50">
+                {userMap.totalAnglers} anglers with location data · {userMap.totalPins} saved spots/catches
+              </p>
+            )}
+          </div>
+          {userMap ? (
+            <>
+              <UserActivityMap cells={userMap.cells} />
+              {userMap.cells.length > 0 && (
+                <div className="bg-white border border-pine/10 rounded-3xl p-5 mt-4">
+                  <h4 className="font-bold text-pine text-sm uppercase tracking-wider mb-3">
+                    🏆 Top areas by angler activity
+                  </h4>
+                  <div className="divide-y divide-pine/10">
+                    {userMap.cells.slice(0, 10).map((c, i) => (
+                      <div key={i} className="py-2.5 flex items-center justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="text-sm font-bold text-pine">
+                            #{i + 1} · {c.lat.toFixed(2)}°, {c.lng.toFixed(2)}°
+                          </p>
+                          <p className="text-xs text-pine/55">
+                            {c.pins} saved spot{c.pins === 1 ? "" : "s"}
+                          </p>
+                        </div>
+                        <span className="text-xs font-black uppercase tracking-wider text-signal-dark bg-signal/10 rounded-full px-3 py-1.5 whitespace-nowrap">
+                          {c.anglers} angler{c.anglers === 1 ? "" : "s"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[11px] text-pine/40 mt-3">
+                    Tip: host tournaments near the top areas — that&apos;s where your anglers already fish.
+                  </p>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="h-64 bg-pine/10 rounded-3xl animate-pulse" />
+          )}
+        </div>
       ) : ads.length === 0 ? (
         <div className="bg-white border border-pine/10 rounded-3xl p-10 text-center">
           <p className="text-4xl mb-3">🎉</p>
