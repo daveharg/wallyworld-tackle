@@ -57,6 +57,12 @@ function TournamentPanel() {
             tournament.
           </p>
           <JoinByCode />
+          <Link
+            href="/fishmb/tournaments"
+            className="block text-center mt-5 text-sm font-bold uppercase tracking-wider text-signal-dark hover:underline"
+          >
+            🏆 Browse all tournaments →
+          </Link>
         </div>
       )}
     </div>
