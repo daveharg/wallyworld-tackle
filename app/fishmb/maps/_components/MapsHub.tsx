@@ -358,7 +358,8 @@ export default function MapsHub() {
       setQuickName("");
       setQuickNotes("");
       setQuickIcon("pin");
- setNote("Spot saved! ");
+      setNote("Spot saved! ");
+      setTimeout(() => setNote(null), 3500);
       return true;
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not save the spot.");
