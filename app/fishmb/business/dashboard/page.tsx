@@ -1,4 +1,4 @@
-// Business dashboard — rentals, business page, tournaments, bookings, ads.
+// Business dashboard — listings, business page, tournaments, bookings, ads.
 // Business accounts only; personal accounts are redirected to their profile.
 
 "use client";
@@ -10,10 +10,9 @@ import { useFishAuth } from "../../_components/FishAuth";
 import { fishFetch } from "../../_components/fishFetch";
 import { compressImage } from "../../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
-import MyRentals from "../../profile/_components/MyRentals";
-import { catMeta } from "../../rentals/_meta";
+import MyListings from "../../profile/_components/MyListings";
 
-type Tab = "rentals" | "business" | "tournaments" | "bookings" | "advertise";
+type Tab = "listings" | "business" | "tournaments" | "bookings" | "advertise";
 
 interface DashboardData {
   business: {
@@ -74,7 +73,7 @@ interface AdRow {
 }
 
 const TABS: { id: Tab; label: string }[] = [
-  { id: "rentals", label: "🏠 Rentals" },
+  { id: "listings", label: "🏷️ Listings" },
   { id: "business", label: "🏢 Business page" },
   { id: "tournaments", label: "🏆 Tournaments" },
   { id: "bookings", label: "📊 Bookings" },
@@ -111,7 +110,7 @@ function fmtDate(iso: string) {
 export default function BusinessDashboardPage() {
   const { user, loading, openLogin } = useFishAuth();
   const router = useRouter();
-  const [tab, setTab] = useState<Tab>("rentals");
+  const [tab, setTab] = useState<Tab>("listings");
   const [data, setData] = useState<DashboardData | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -150,7 +149,7 @@ export default function BusinessDashboardPage() {
         <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide mb-4">
           Business dashboard
         </h1>
-        <p className="text-pine/60 mb-6">Log in with your business account to manage rentals, bookings, tournaments and ads.</p>
+        <p className="text-pine/60 mb-6">Log in with your business account to manage listings, bookings, tournaments and ads.</p>
         <button
           onClick={openLogin}
           className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-8 py-3.5 rounded-full"
@@ -212,14 +211,14 @@ export default function BusinessDashboardPage() {
         </p>
       )}
 
-      {data && tab === "rentals" && (
+      {data && tab === "listings" && (
         <section>
-          <MyRentals />
+          <MyListings />
           <Link
-            href="/fishmb/rentals"
+            href="/fishmb/classifieds/new"
             className="mt-4 inline-block bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
           >
-            + List another rental
+            + List something
           </Link>
         </section>
       )}
@@ -333,16 +332,13 @@ export default function BusinessDashboardPage() {
             ) : (
               <div className="space-y-2.5">
                 {data.bookingStats.perRental.map((r) => {
-                  const meta = catMeta(
-                    data.rentals.find((x) => x.id === r.rental_id)?.category ?? ""
-                  );
                   return (
                     <Link
                       key={r.rental_id}
                       href={`/fishmb/rentals/${r.rental_id}`}
                       className="flex items-center gap-3 bg-white border border-pine/10 rounded-2xl p-4 hover:border-gold/40 transition-colors"
                     >
-                      <span className="text-2xl">{meta.emoji}</span>
+                      <span className="text-2xl">🛖</span>
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-pine truncate">{r.title}</p>
                         <p className="text-xs text-pine/55 mt-0.5">

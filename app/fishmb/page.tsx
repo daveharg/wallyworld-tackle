@@ -18,6 +18,7 @@ import {
 } from "@/lib/fishmb";
 import { getSpeciesAdvice } from "@/lib/fishmb-species";
 import { FISHMB_CTA_PHOTO } from "@/lib/fishmb-constants";
+import { listClassifieds, formatPrice } from "@/lib/fish/classifieds";
 
 export const revalidate = 3600;
 
@@ -36,7 +37,7 @@ function toCardLake(l: ReturnType<typeof getLakesForSpecies>[number]) {
   };
 }
 
-export default function FishMBHome() {
+export default async function FishMBHome() {
   const hot = getHotLakes();
   const lodges = getLodges().slice(0, 12);
   const zones = getZones();
@@ -44,6 +45,8 @@ export default function FishMBHome() {
   const { tournaments, updated: tourneyUpdated } = getTournaments();
   const lakeCount = getLakes().length;
   const lodgeCount = getLodges().length;
+  // Latest classifieds for the homepage preview (empty on build without DB).
+  const classifieds = await listClassifieds({ limit: 6 }).catch(() => []);
 
   const speciesTabs: SpeciesTab[] = getSpeciesAdvice().map((a) => ({
     species: a.species,
@@ -245,41 +248,69 @@ export default function FishMBHome() {
         </HSlider>
       </section>
 
-      {/* Rentals — ice shacks, tents, equipment, guide services */}
+      {/* Classifieds — community buy & sell */}
       <section className="max-w-7xl mx-auto px-4 mt-12 md:mt-16">
-        <div className="bg-gold/15 border border-gold/40 rounded-[2rem] p-8 md:p-10">
-          <p className="text-signal-dark font-bold uppercase tracking-[0.28em] text-sm mb-3">
-            Rentals
-          </p>
-          <h2 className="font-display font-bold uppercase text-pine text-3xl md:text-4xl tracking-wide mb-4">
-            Need a shack for the weekend?
-          </h2>
-          <p className="text-pine/70 max-w-2xl mb-6">
-            Rent ice shacks, tents, fishing equipment and guide services straight
-            from local Manitoba owners. Owners mark their available days on a
-            calendar — you book only the days that are open, and the owner calls
-            you to close the deal. No middleman, no platform cut.
-          </p>
-          <div className="flex flex-wrap gap-2.5 mb-7">
-            {["🛖 Ice shacks", "⛺ Tents", "🎿 Equipment", "🎣 Guide services"].map((c) => (
-              <span key={c} className="bg-white/70 border border-pine/10 text-pine text-sm font-bold px-4 py-2 rounded-full">
-                {c}
-              </span>
-            ))}
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/fishmb/rentals"
-              className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors"
-            >
-              Browse rentals
-            </Link>
-            <Link
-              href="/fishmb/rentals"
-              className="border border-pine/25 text-pine hover:bg-pine/5 font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors"
-            >
-              List your rental
-            </Link>
+        <div className="bg-pine rounded-[2rem] p-8 md:p-10 overflow-hidden relative">
+          <div className="relative">
+            <p className="text-gold font-bold uppercase tracking-[0.28em] text-sm mb-3">
+              Classifieds
+            </p>
+            <div className="md:flex md:items-center md:justify-between gap-8">
+              <div>
+                <h2 className="font-display font-bold uppercase text-white text-3xl md:text-4xl tracking-wide mb-3">
+                  Buy &amp; sell with local anglers.
+                </h2>
+                <p className="text-white/70 max-w-xl">
+                  Rods, tackle, boats, ice gear, electronics, guide services —
+                  list whatever you want, or grab a deal from someone nearby.
+                  Deals happen in FishMB chat. No middleman, no platform cut.
+                </p>
+              </div>
+              <div className="mt-6 md:mt-0 shrink-0 flex flex-col sm:flex-row md:flex-col gap-3">
+                <Link
+                  href="/fishmb/classifieds"
+                  className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-8 py-4 rounded-full transition-colors text-center"
+                >
+                  Browse classifieds
+                </Link>
+                <Link
+                  href="/fishmb/classifieds/new"
+                  className="border border-white/40 text-white hover:bg-white/10 font-bold uppercase tracking-wider text-sm px-8 py-4 rounded-full transition-colors text-center"
+                >
+                  + List something
+                </Link>
+              </div>
+            </div>
+            {classifieds.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-7">
+                {classifieds.map((c) => (
+                  <Link
+                    key={c.id}
+                    href={`/fishmb/classifieds/${c.id}`}
+                    className="bg-white/10 hover:bg-white/15 border border-white/15 rounded-2xl p-3 flex items-center gap-3 transition-colors"
+                  >
+                    {c.photos[0] ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={c.photos[0]}
+                        alt=""
+                        className="w-14 h-14 rounded-xl object-cover shrink-0"
+                      />
+                    ) : (
+                      <span className="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center text-2xl shrink-0">
+                        🏷️
+                      </span>
+                    )}
+                    <span className="min-w-0">
+                      <span className="block font-black text-white leading-tight">
+                        {formatPrice(c.price_cents)}
+                      </span>
+                      <span className="block text-white/70 text-xs truncate">{c.title}</span>
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>

@@ -1,18 +1,33 @@
-// /api/fishmb/classifieds — guide + ice-shack classifieds.
-// GET ?category=guide|shack — public listing. POST — new listing (auth).
+// /api/fishmb/classifieds — Kijiji-style community classifieds.
+// GET: public listing (?category=, ?q=, ?mine=1 with auth). POST: new listing (auth).
 
 import { NextRequest, NextResponse } from "next/server";
 import { fishUserFromRequest, unauthorized, badRequest } from "@/lib/fish/auth";
-import { listClassifieds, createClassified } from "@/lib/fish/classifieds";
+import {
+  listClassifieds,
+  createClassified,
+  isClassifiedCategoryKey,
+} from "@/lib/fish/classifieds";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const category = searchParams.get("category");
-  if (category !== "guide" && category !== "shack") {
-    return badRequest("category must be 'guide' or 'shack'.");
+  const category = searchParams.get("category") || undefined;
+  if (category && !isClassifiedCategoryKey(category)) {
+    return badRequest("Unknown category.");
   }
-  const items = await listClassifieds(category);
+  const q = (searchParams.get("q") || "").trim().slice(0, 80) || undefined;
+  let userId: string | undefined;
+  if (searchParams.get("mine") === "1") {
+    const me = await fishUserFromRequest(req).catch(() => null);
+    if (!me) return unauthorized();
+    userId = me.id;
+  }
+  const items = await listClassifieds({ category, q, userId });
   return NextResponse.json({ items });
+}
+
+function cleanUrl(v: unknown): string | null {
+  return typeof v === "string" && /^https?:\/\//.test(v) ? v : null;
 }
 
 export async function POST(req: NextRequest) {
@@ -24,20 +39,30 @@ export async function POST(req: NextRequest) {
   } catch {
     return badRequest("Invalid JSON body.");
   }
-  const category = body.category;
-  if (category !== "guide" && category !== "shack") {
-    return badRequest("category must be 'guide' or 'shack'.");
-  }
+  const category = typeof body.category === "string" ? body.category : "";
+  if (!isClassifiedCategoryKey(category)) return badRequest("Pick a category.");
   const title = typeof body.title === "string" ? body.title.trim().slice(0, 100) : "";
-  const text = typeof body.body === "string" ? body.body.trim().slice(0, 2000) : "";
-  const contact = typeof body.contact === "string" ? body.contact.trim().slice(0, 200) : "";
   if (!title) return badRequest("Give your listing a title.");
-  if (!text) return badRequest("Describe your service.");
-  if (!contact) return badRequest("Add a way for people to reach you (phone or email).");
-  const price =
-    typeof body.price_text === "string" && body.price_text.trim()
-      ? body.price_text.trim().slice(0, 100)
-      : null;
+  const description =
+    typeof body.description === "string" ? body.description.trim().slice(0, 2000) : "";
+  if (!description) return badRequest("Describe what you're listing.");
+  // Price: dollars as a number/string, or omitted/"contact" for no fixed price.
+  let price_cents: number | null = null;
+  const rawPrice = body.price_cents ?? body.price;
+  if (typeof rawPrice === "number" && Number.isFinite(rawPrice) && rawPrice >= 0) {
+    price_cents = Math.round(rawPrice * 100);
+  } else if (typeof rawPrice === "string" && rawPrice.trim() !== "") {
+    const n = Number(rawPrice.replace(/[$,\s]/g, ""));
+    if (!Number.isFinite(n) || n < 0) return badRequest("That price doesn't look right.");
+    price_cents = Math.round(n * 100);
+  }
+  if (price_cents !== null && price_cents > 100_000_000) {
+    return badRequest("That price looks too high.");
+  }
+  const photos = (Array.isArray(body.photos) ? body.photos : [])
+    .map(cleanUrl)
+    .filter((u): u is string => u !== null)
+    .slice(0, 4);
   const location =
     typeof body.location === "string" && body.location.trim()
       ? body.location.trim().slice(0, 100)
@@ -45,11 +70,10 @@ export async function POST(req: NextRequest) {
   const item = await createClassified(me.id, {
     category,
     title,
-    body: text,
-    price_text: price,
-    contact,
+    description,
+    price_cents,
+    photos,
     location,
-    offers: typeof body.offers === "string" ? body.offers : undefined,
   });
   return NextResponse.json({ item }, { status: 201 });
 }

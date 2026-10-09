@@ -72,7 +72,7 @@ export default function Classifieds({ category }: { category: Category }) {
       : items;
 
   const load = () =>
-    fishFetch(`/api/fishmb/classifieds?category=${category}`)
+    fishFetch(`/api/fishmb/guide-classifieds?category=${category}`)
       .then((d) => setItems(d.items ?? []))
       .catch(() => {});
 
@@ -90,7 +90,7 @@ export default function Classifieds({ category }: { category: Category }) {
     setPosting(true);
     setNote(null);
     try {
-      const d = await fishFetch("/api/fishmb/classifieds", {
+      const d = await fishFetch("/api/fishmb/guide-classifieds", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -123,7 +123,7 @@ export default function Classifieds({ category }: { category: Category }) {
   const remove = async (id: string) => {
     if (!confirm("Remove this listing?")) return;
     try {
-      await fishFetch(`/api/fishmb/classifieds/${id}`, { method: "DELETE" });
+      await fishFetch(`/api/fishmb/guide-classifieds/${id}`, { method: "DELETE" });
       setItems(items.filter((i) => i.id !== id));
     } catch {
       /* non-fatal */

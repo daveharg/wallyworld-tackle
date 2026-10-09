@@ -9,7 +9,7 @@ import Link from "next/link";
 import { fishFetch } from "../../_components/fishFetch";
 import { useFishAuth } from "../../_components/FishAuth";
 import FishingStats from "./FishingStats";
-import MyRentals from "./MyRentals";
+import MyListings from "./MyListings";
 
 interface ProfilePhoto {
   url: string;
@@ -190,7 +190,7 @@ export default function ProfileView({
         </div>
       )}
 
-      {data.is_self && <MyRentals />}
+      {data.is_self && <MyListings />}
 
       {/* Tabs */}
       <div className="flex gap-2 border-b border-pine/10 mb-6">

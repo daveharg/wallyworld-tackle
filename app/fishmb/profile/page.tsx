@@ -46,7 +46,7 @@ export default function ProfilePage() {
                 💼 Business dashboard
               </p>
               <p className="text-white/70 text-sm mt-1">
-                Rentals, booking requests, tournaments, business page & ads —
+                Classified listings, booking requests, tournaments, business page & ads —
                 all in one place.
               </p>
             </div>

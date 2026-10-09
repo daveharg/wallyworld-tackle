@@ -22,14 +22,6 @@ interface FavLake {
   lng: number | null;
 }
 
-interface LakeResult {
-  id: string;
-  name: string;
-  region?: string;
-  lat: number | null;
-  lng: number | null;
-}
-
 interface Trail {
   id: string;
   name: string;
@@ -174,9 +166,9 @@ export default function FishingSpots() {
 
   // Favorite lakes + map focus
   const [favs, setFavs] = useState<FavLake[]>([]);
-  const [lakeQuery, setLakeQuery] = useState("");
-  const [lakeResults, setLakeResults] = useState<LakeResult[]>([]);
-  const [searching, setSearching] = useState(false);
+  const [allLakes, setAllLakes] = useState<{ id: string; name: string; region?: string }[]>([]);
+  const [addLakeId, setAddLakeId] = useState("");
+  const [addingLake, setAddingLake] = useState(false);
   const [focus, setFocus] = useState<{ lat: number; lng: number; key: string } | null>(null);
   const [selectedFav, setSelectedFav] = useState("");
   const autoLoadedFav = useRef(false);
@@ -241,42 +233,49 @@ export default function FishingSpots() {
     }
   };
 
-  // Debounced lake search.
+  // Full lake directory for the add-lake dropdown (no text search needed).
   useEffect(() => {
-    const q = lakeQuery.trim();
-    if (q.length < 2) {
-      setLakeResults([]);
-      return;
-    }
-    setSearching(true);
-    const t = setTimeout(async () => {
+    (async () => {
       try {
-        const d = await fishFetch(`/api/fishmb/search?q=${encodeURIComponent(q)}`);
-        setLakeResults((d.lakes ?? []) as LakeResult[]);
+        const r = await fetch("/fish-manitoba/data.json");
+        const d = await r.json();
+        const lakes = (d.lakes ?? [])
+          .map((l: { id: string; name: string; region?: string }) => ({
+            id: l.id,
+            name: l.name,
+            region: l.region,
+          }))
+          .sort((a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name));
+        setAllLakes(lakes);
       } catch {
-        setLakeResults([]);
-      } finally {
-        setSearching(false);
+        setAllLakes([]);
       }
-    }, 250);
-    return () => clearTimeout(t);
-  }, [lakeQuery]);
+    })();
+  }, []);
 
   const favIds = new Set(favs.map((f) => f.id));
 
-  const addFav = async (lake: LakeResult) => {
-    if (favIds.has(lake.id)) return;
+  const addFavLake = async () => {
+    if (!addLakeId || addingLake) return;
+    if (favIds.has(addLakeId)) {
+      setAddLakeId("");
+      return;
+    }
+    setAddingLake(true);
     try {
       await fishFetch("/api/fishmb/favorite-lakes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lake_id: lake.id }),
+        body: JSON.stringify({ lake_id: addLakeId }),
       });
-      setFavs([...favs, { id: lake.id, name: lake.name, region: lake.region, lat: lake.lat, lng: lake.lng }]);
-      setLakeQuery("");
-      setLakeResults([]);
+      // Re-fetch so the new lake has full details (coords for map focus).
+      const f = await fishFetch("/api/fishmb/favorite-lakes");
+      setFavs((f.lakes ?? []) as FavLake[]);
+      setAddLakeId("");
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not save the lake.");
+    } finally {
+      setAddingLake(false);
     }
   };
 
@@ -587,42 +586,138 @@ export default function FishingSpots() {
             )}
           </div>
         ) : (
-          <p className="text-pine/40 text-xs mb-3">No saved lakes yet — search below to add some.</p>
+          <p className="text-pine/40 text-xs mb-3">No saved lakes yet — choose below to add one.</p>
         )}
-        <input
-          value={lakeQuery}
-          onChange={(e) => setLakeQuery(e.target.value)}
-          placeholder="Search lakes to add…"
-          className={inputCls}
-        />
-        {searching && <p className="text-pine/50 text-xs mt-2">Searching…</p>}
-        {!searching && lakeResults.length > 0 && (
-          <div className="mt-2 bg-paper-deep border border-pine/10 rounded-2xl overflow-hidden">
-            {lakeResults.map((l) => (
+        <div className="flex gap-2">
+          <select
+            value={addLakeId}
+            onChange={(e) => setAddLakeId(e.target.value)}
+            aria-label="Choose a lake to save"
+            className="flex-1 min-w-0 bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold focus:outline-none focus:border-signal"
+          >
+            <option value="">Add a lake…</option>
+            {allLakes
+              .filter((l) => !favIds.has(l.id))
+              .map((l) => (
+                <option key={l.id} value={l.id}>
+                  {l.name}
+                  {l.region ? ` — ${l.region}` : ""}
+                </option>
+              ))}
+          </select>
+          <button
+            type="button"
+            onClick={addFavLake}
+            disabled={!addLakeId || addingLake}
+            className="shrink-0 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-5 rounded-2xl disabled:opacity-40 transition-colors"
+          >
+            {addingLake ? "Adding…" : "★ Add"}
+          </button>
+        </div>
+      </div>
+
+      {/* Saved spots — right under saved locations */}
+      {spots.length > 0 && (
+        <div className="bg-white border border-pine/10 rounded-3xl p-6 mt-4">
+          <h3 className="font-display font-bold uppercase text-pine text-lg tracking-wide mb-1">
+            📍 Saved spots
+          </h3>
+          <p className="text-pine/55 text-xs mb-3">
+            Tap a spot to jump the map to it.
+          </p>
+          <div className="space-y-2">
+            {spots.map((s) => (
               <div
-                key={l.id}
-                className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-pine/5 last:border-0"
+                key={s.id}
+                className="bg-paper-deep border border-pine/10 rounded-2xl p-4"
               >
-                <div className="min-w-0">
-                  <p className="text-pine text-sm font-bold truncate">{l.name}</p>
-                  {l.region && <p className="text-pine/50 text-xs">{l.region}</p>}
-                </div>
-                {favIds.has(l.id) ? (
-                  <span className="text-gold text-xs font-bold shrink-0">★ Saved</span>
+                {editingId === s.id ? (
+                  <div className="space-y-2">
+                    <input
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      maxLength={80}
+                      className={inputCls}
+                    />
+                    <input
+                      value={editNotes}
+                      onChange={(e) => setEditNotes(e.target.value)}
+                      maxLength={500}
+                      placeholder="Notes (optional)"
+                      className={inputCls}
+                    />
+                    <IconPicker value={editIcon} onChange={setEditIcon} />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => saveEdit(s.id)}
+                        className="bg-pine text-white text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="text-pine/60 text-xs font-bold uppercase tracking-wider px-4 py-2"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => addFav(l)}
-                    className="text-xs font-bold uppercase tracking-wider text-pine border border-pine/20 rounded-full px-3 py-1.5 hover:border-gold hover:text-gold-dark shrink-0"
-                  >
-                    ★ Save
-                  </button>
+                  <div className="flex items-start justify-between gap-3">
+                    <button
+                      type="button"
+                      onClick={() => focusOn(Number(s.lat), Number(s.lng), `spot:${s.id}`)}
+                      className="min-w-0 text-left flex-1"
+                      title="Show on map"
+                    >
+                      <p className="font-bold text-pine truncate hover:text-gold-dark">
+                        {spotEmoji(s.icon)} {s.name || "Fishing spot"}
+                      </p>
+                      <p className="text-xs text-pine/50 mt-0.5">
+                        {fmtDate(s.created_at)} ·{" "}
+                        <span className="tabular-nums">
+                          {Number(s.lat).toFixed(5)}, {Number(s.lng).toFixed(5)}
+                        </span>
+                      </p>
+                      {s.notes && <p className="text-sm text-pine/70 mt-1">{s.notes}</p>}
+                    </button>
+                    <div className="flex gap-1 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setGoTo(s);
+                          focusOn(Number(s.lat), Number(s.lng), `spot:${s.id}`);
+                        }}
+                        aria-label={`Navigate to ${s.name}`}
+                        title="Navigate to this spot"
+                        className="text-pine/50 hover:text-pine px-2 py-1 text-sm font-bold"
+                      >
+                        🧭
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => startEdit(s)}
+                        aria-label="Edit spot"
+                        className="text-pine/50 hover:text-pine px-2 py-1 text-sm font-bold"
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeSpot(s.id)}
+                        aria-label="Delete spot"
+                        className="text-pine/50 hover:text-signal-dark px-2 py-1 text-sm font-bold"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Recorded boat trails — overlay one to retrace your route */}
       <div className="bg-white border border-pine/10 rounded-3xl p-6 mt-4">
@@ -739,97 +834,6 @@ export default function FishingSpots() {
         </div>
       </div>
 
-      {/* Spot list */}
-      {spots.length > 0 && (
-        <div className="mt-4 space-y-2">
-          {spots.map((s) => (
-            <div
-              key={s.id}
-              className="bg-white border border-pine/10 rounded-2xl p-4"
-            >
-              {editingId === s.id ? (
-                <div className="space-y-2">
-                  <input
-                    value={editName}
-                    onChange={(e) => setEditName(e.target.value)}
-                    maxLength={80}
-                    className={inputCls}
-                  />
-                  <input
-                    value={editNotes}
-                    onChange={(e) => setEditNotes(e.target.value)}
-                    maxLength={500}
-                    placeholder="Notes (optional)"
-                    className={inputCls}
-                  />
-                  <IconPicker value={editIcon} onChange={setEditIcon} />
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => saveEdit(s.id)}
-                      className="bg-pine text-white text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full"
-                    >
-                      Save
-                    </button>
-                    <button
-                      onClick={() => setEditingId(null)}
-                      className="text-pine/60 text-xs font-bold uppercase tracking-wider px-4 py-2"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-start justify-between gap-3">
-                  <button
-                    type="button"
-                    onClick={() => focusOn(Number(s.lat), Number(s.lng), `spot:${s.id}`)}
-                    className="min-w-0 text-left flex-1"
-                    title="Show on map"
-                  >
-                    <p className="font-bold text-pine truncate hover:text-gold-dark">
-                      {spotEmoji(s.icon)} {s.name || "Fishing spot"}
-                    </p>
-                    <p className="text-xs text-pine/50 mt-0.5">
-                      {fmtDate(s.created_at)} ·{" "}
-                      <span className="tabular-nums">
-                        {Number(s.lat).toFixed(5)}, {Number(s.lng).toFixed(5)}
-                      </span>
-                    </p>
-                    {s.notes && <p className="text-sm text-pine/70 mt-1">{s.notes}</p>}
-                  </button>
-                  <div className="flex gap-1 shrink-0">
-                    <button
-                      onClick={() => {
-                        setGoTo(s);
-                        focusOn(Number(s.lat), Number(s.lng), `spot:${s.id}`);
-                      }}
-                      aria-label={`Navigate to ${s.name}`}
-                      title="Navigate to this spot"
-                      className="text-pine/50 hover:text-pine text-sm font-bold px-2 py-1"
-                    >
-                      🧭
-                    </button>
-                    <button
-                      onClick={() => startEdit(s)}
-                      aria-label={`Rename ${s.name}`}
-                      className="text-pine/50 hover:text-pine text-sm font-bold px-2 py-1"
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      onClick={() => removeSpot(s.id)}
-                      aria-label={`Delete ${s.name}`}
-                      className="text-pine/50 hover:text-signal-dark text-sm font-bold px-2 py-1"
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
     </section>
   );
 }

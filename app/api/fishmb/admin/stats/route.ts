@@ -3,7 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fishUserFromRequest, unauthorized, forbidden } from "@/lib/fish/auth";
 import { ensureBusinessTables, isAdminEmail } from "@/lib/fish/business";
-import { ensureClassifiedsTable } from "@/lib/fish/classifieds";
+import { ensureGuideClassifiedsTable } from "@/lib/fish/guide-classifieds";
 import { ensureTournamentTables } from "@/lib/fish/tournaments";
 import { queryOne } from "@/lib/fish/db";
 
@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   if (!me) return unauthorized();
   if (!isAdminEmail(me.email)) return forbidden("Admin only.");
   await ensureBusinessTables();
-  await ensureClassifiedsTable();
+  await ensureGuideClassifiedsTable();
   await ensureTournamentTables();
 
   const users = await queryOne<{ c: string }>(`SELECT COUNT(*)::text AS c FROM fm_users`);
