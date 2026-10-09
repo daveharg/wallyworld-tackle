@@ -38,9 +38,9 @@ export const metadata: Metadata = {
     url: "https://www.fishmb.ca/fishmb",
     images: [
       {
-        url: "https://www.fishmb.ca/fishmb/icon-512.png",
-        width: 512,
-        height: 512,
+        url: "https://www.fishmb.ca/fishmb/og-share.png",
+        width: 1200,
+        height: 630,
         alt: "FishMB — Manitoba fishing",
       },
     ],

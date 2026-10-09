@@ -22,6 +22,7 @@ import CatchesTab from "./CatchesTab";
 import SpotsTab, { type Spot } from "./SpotsTab";
 import LakesTab from "./LakesTab";
 import SettingsTab from "./SettingsTab";
+import MapSearch from "./MapSearch";
 import WindWidget from "./WindWidget";
 import type { MapCatch, SavedLake } from "./types";
 
@@ -421,6 +422,16 @@ export default function MapsHub() {
 
       {/* Wind overlay */}
       {windOn && <WindWidget lat={mapCenter.lat} lng={mapCenter.lng} />}
+
+      {/* Lake / town / city search */}
+      <MapSearch
+        onSelect={(lat, lng, label) => {
+          setMapCenter({ lat, lng });
+          setFocus({ lat, lng, key: `search:${label}:${Date.now()}`, zoom: 11 });
+          setNote(`Showing ${label}`);
+          setTimeout(() => setNote(null), 2500);
+        }}
+      />
 
       {/* Manual locate button */}
       <button
