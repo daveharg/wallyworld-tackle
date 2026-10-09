@@ -59,10 +59,12 @@ export default function MapSheet({
   const onTouchStart = (e: TouchEvent) => {
     startY.current = e.touches[0].clientY;
     dragTarget.current = null;
-    // Touches starting on the grabber/header always drag the sheet,
-    // regardless of the content's scroll position.
+    // Touches starting on the grabber/header — or on a detail title marked
+    // with data-sheet-drag — always drag the sheet, never scroll the content.
+    const target = e.target as HTMLElement;
     fromHeader.current = !!(
-      headerRef.current && headerRef.current.contains(e.target as Node)
+      (headerRef.current && headerRef.current.contains(target)) ||
+      target.closest("[data-sheet-drag]")
     );
     setDragging(true);
   };
@@ -137,7 +139,7 @@ export default function MapSheet({
       onTouchEnd={onTouchEnd}
     >
       {/* Grabber + header zone — always drags the sheet */}
-      <div ref={headerRef}>
+      <div ref={headerRef} style={{ touchAction: "pan-x" }}>
       <div className="shrink-0 pt-2.5 pb-1 flex justify-center">
         <div className="w-10 h-1.5 rounded-full bg-pine/20" />
       </div>

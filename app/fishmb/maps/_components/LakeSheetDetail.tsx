@@ -199,8 +199,8 @@ export default function LakeSheetDetail({ lake, spots, onBack, onSelectSpot }: P
 
   return (
     <div className="pb-6">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-4">
+      {/* Header — drag handle: pulling here expands the sheet, never scrolls */}
+      <div data-sheet-drag style={{ touchAction: "pan-x" }} className="flex items-center gap-3 mb-4">
         <button
           type="button"
           onClick={onBack}
