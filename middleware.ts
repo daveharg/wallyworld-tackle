@@ -16,7 +16,7 @@ export function middleware(req: NextRequest) {
     return NextResponse.rewrite(new URL("/fishmb-coming-soon", req.url));
   }
   if (pathname === "/demo" || pathname.startsWith("/demo/")) {
-    const rest = pathname === "/demo" ? "" : pathname.slice("/demo".length);
+    const rest = pathname === "/demo" ? "/feed" : pathname.slice("/demo".length);
     const url = req.nextUrl.clone();
     url.pathname = `/fishmb${rest}`;
     return NextResponse.rewrite(url);
