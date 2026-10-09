@@ -544,6 +544,9 @@ export default function FishingSpots() {
             onTrailSaved={loadTrails}
           />
           </div>
+          <p className="text-center text-pine/50 text-xs mt-2 mb-1">
+            💡 Tip: <strong>press and hold</strong> anywhere on the map to drop a pin and save a spot there.
+          </p>
         </>
       )}
 
