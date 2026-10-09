@@ -6,6 +6,7 @@
 //       still joins only once).
 
 import { NextRequest, NextResponse } from "next/server";
+import { query } from "@/lib/fish/db";
 import {
   fishUserFromRequest,
   unauthorized,
@@ -80,4 +81,35 @@ export async function POST(
   }
   const keys = await generateTournamentKeys(tid, { count });
   return NextResponse.json({ keys }, { status: 201 });
+}
+
+/** PATCH: { key_id, label } → rename a key's label (organizer only). */
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const res = await organizerOr(req, params.id);
+  if (res instanceof NextResponse) return res;
+
+  let body: Record<string, unknown> = {};
+  try {
+    body = await req.json();
+  } catch {
+    return badRequest("Invalid JSON body.");
+  }
+  const keyId = typeof body.key_id === "string" ? body.key_id : "";
+  if (!keyId) return badRequest("key_id is required.");
+  const label =
+    body.label === null
+      ? null
+      : typeof body.label === "string"
+        ? body.label.trim().slice(0, 80) || null
+        : undefined;
+  if (label === undefined) return badRequest("label is required.");
+  const rows = await query<{ id: string }>(
+    `UPDATE fm_tournament_keys SET label = $2 WHERE id = $1 AND tournament_id = $3 RETURNING id`,
+    [keyId, label, params.id]
+  );
+  if (rows.length === 0) return notFound("Key not found.");
+  return NextResponse.json({ ok: true });
 }

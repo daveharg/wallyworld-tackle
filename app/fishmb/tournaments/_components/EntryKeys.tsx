@@ -38,6 +38,8 @@ export function EntryKeys({ tournamentId }: { tournamentId: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editLabel, setEditLabel] = useState("");
 
   const load = useCallback(async () => {
     try {
@@ -89,6 +91,25 @@ export function EntryKeys({ tournamentId }: { tournamentId: string }) {
 
   const createShared = () => {
     void post({ shared: true });
+  };
+
+  const saveLabel = async (keyId: string) => {
+    setBusy(true);
+    setError(null);
+    try {
+      await fishFetch(`/api/fishmb/tournaments/${tournamentId}/keys`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key_id: keyId, label: editLabel.trim() || null }),
+      });
+      setEditingId(null);
+      setEditLabel("");
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not save the name.");
+    } finally {
+      setBusy(false);
+    }
   };
 
   const copy = (code: string) => {
@@ -249,18 +270,64 @@ export function EntryKeys({ tournamentId }: { tournamentId: string }) {
                     </button>
                   )}
                 </div>
-                {(k.label || redeemerNames.length > 0) && (
-                  <p className="text-xs text-pine/55 mt-1 truncate">
-                    {k.label && (
-                      <span className="font-bold text-pine/75">{k.label}</span>
+                {(k.label || redeemerNames.length > 0 || editingId === k.id) && (
+                  <div className="mt-1">
+                    {editingId === k.id ? (
+                      <div className="flex items-center gap-2">
+                        <input
+                          value={editLabel}
+                          onChange={(e) => setEditLabel(e.target.value)}
+                          placeholder="Angler name…"
+                          maxLength={80}
+                          autoFocus
+                          className="flex-1 min-w-0 bg-white border border-signal rounded-full px-3 py-1.5 text-xs text-pine placeholder:text-pine/40 focus:outline-none"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") saveLabel(k.id);
+                            if (e.key === "Escape") setEditingId(null);
+                          }}
+                        />
+                        <button
+                          onClick={() => saveLabel(k.id)}
+                          disabled={busy}
+                          className="text-xs font-bold uppercase tracking-wider text-signal-dark hover:underline disabled:opacity-50"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => setEditingId(null)}
+                          className="text-xs font-bold uppercase tracking-wider text-pine/50 hover:underline"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-pine/55 truncate flex items-center gap-2">
+                        <span className="flex-1 min-w-0 truncate">
+                          {k.label && (
+                            <span className="font-bold text-pine/75">{k.label}</span>
+                          )}
+                          {k.label && redeemerNames.length > 0 && " · "}
+                          {redeemerNames.length > 0 && (
+                            <span title={redeemerNames.join(", ")}>
+                              Joined: {redeemerNames.join(", ")}
+                            </span>
+                          )}
+                          {!k.label && redeemerNames.length === 0 && (
+                            <span className="italic">No name</span>
+                          )}
+                        </span>
+                        <button
+                          onClick={() => {
+                            setEditingId(k.id);
+                            setEditLabel(k.label ?? "");
+                          }}
+                          className="shrink-0 text-[11px] font-bold uppercase tracking-wider text-signal-dark hover:underline"
+                        >
+                          {k.label ? "Rename" : "＋ Name"}
+                        </button>
+                      </p>
                     )}
-                    {k.label && redeemerNames.length > 0 && " · "}
-                    {redeemerNames.length > 0 && (
-                      <span title={redeemerNames.join(", ")}>
-                        Joined: {redeemerNames.join(", ")}
-                      </span>
-                    )}
-                  </p>
+                  </div>
                 )}
               </div>
             );
