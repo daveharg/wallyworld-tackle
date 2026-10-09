@@ -7,7 +7,7 @@ export { LAKE_REGIONS } from "./fishmb-constants";
 /**
  * FishMB website data access. Single source of truth is the same
  * public/fish-manitoba/data.json bundle the FishMB app consumes —
- * 271 lakes, 127 lodges/guides, 2026 Anglers' Guide regulations,
+ * 272 lakes, 132 lodges/guides, 2026 Anglers' Guide regulations,
  * stocking history, hot-lake reports, towns index.
  */
 

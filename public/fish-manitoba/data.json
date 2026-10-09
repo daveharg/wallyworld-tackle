@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-07",
+  "updated": "2026-10-09",
   "regulations": {
     "zones": [
       {
@@ -1298,30 +1298,39 @@
     },
     {
       "id": "lake-of-the-woods",
-      "name": "Lake of the Woods (Manitoba portion)",
+      "name": "Lake of the Woods",
       "region": "Eastern",
       "photo": "https://picsum.photos/seed/mb-lake-of-the-woods/1200/800",
       "species": [
         "Walleye",
-        "Smallmouth Bass",
         "Northern Pike",
+        "Yellow Perch",
+        "Sauger",
+        "Lake Sturgeon",
+        "Burbot",
+        "Smallmouth Bass",
+        "Largemouth Bass",
         "Muskellunge",
         "Lake Trout",
-        "Yellow Perch",
         "Black Crappie",
-        "Lake Sturgeon"
+        "Lake Whitefish"
       ],
-      "size_text": "",
+      "size_text": "~105 km north-south x ~90 km east-west, 14,000+ islands (Ontario's second-largest inland lake)",
       "max_depth_text": "",
-      "description": "A vast multi-jurisdictional lake spanning Ontario, Manitoba and Minnesota, Lake of the Woods is one of North America's top multi-species fisheries. Manitoba's share lies in the lake's northwest reaches, reached via the Whiteshell-Kenora corridor. Anglers target walleye, smallmouth bass, northern pike and muskie, with lake trout in deep areas like Clearwater Bay.",
+      "description": "One of North America's great multi-species fisheries, Lake of the Woods spans Ontario, Manitoba and Minnesota. The Manitoba share is Buffalo Bay in the lake's southwest corner, in extreme southeast Manitoba on the Canada-U.S. border (about 160 km southeast of Winnipeg) — Hunt Fish Manitoba calls Buffalo Point Resort Manitoba's only access point on the lake, and Buffalo Bay is considered by many the best walleye water on Lake of the Woods. The vast majority of the Canadian side is in Ontario's Kenora District, reached through Kenora, Sioux Narrows and Nestor Falls. Manitoba waters hold walleye, northern pike, yellow perch, sauger, lake sturgeon and burbot; smallmouth and largemouth bass, muskellunge, lake trout, black crappie and lake whitefish are Ontario-side species. No provincial stocking records exist for either portion — the fishery is naturally reproducing.",
       "depth_map_url": null,
       "stocked": false,
       "stocked_species": [],
       "towns": [
         {
+          "name": "Buffalo Point, MB",
+          "description": "Resort community on the Buffalo Point peninsula in extreme southeast Manitoba — Manitoba's only access point on Lake of the Woods (Buffalo Bay).",
+          "distance": "on the Manitoba portion (Buffalo Bay)"
+        },
+        {
           "name": "Kenora, ON",
-          "description": "The major city on Lake of the Woods, with marinas, bait shops, launches and full services — the natural base for reaching the lake's Manitoba portion by water.",
-          "distance": "east of the Manitoba portion via the Trans-Canada Highway (in Ontario)"
+          "description": "The major city at the north end of Lake of the Woods, with marinas, bait shops, launches and full services.",
+          "distance": "northeast of the Manitoba portion via the Trans-Canada Highway (in Ontario)"
         },
         {
           "name": "Sioux Narrows, ON",
@@ -1333,14 +1342,22 @@
         "division": "Southern Division",
         "division_approximate": false,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
-        "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
+        "note": "Manitoba waters (Buffalo Bay): no waterbody-specific rules listed — general Southern Division limits apply: walleye & sauger combined 4/day, none over 55 cm; northern pike 4/day, none over 75 cm. Ontario waters: Fisheries Management Zone 5 with Lake of the Woods exceptions — walleye & sauger combined, 43-70 cm protected slot (residents: sport 4 / conservation 2); northern pike sport 4 / conservation 2, none over 75 cm. An Ontario licence is required the moment you cross into Ontario water — there is no Manitoba/Ontario licence reciprocity on this lake.",
+        "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf); 2026 Ontario Fishing Regulations Summary, FMZ 5 (ontario.ca)"
       },
-      "lodging": [],
+      "lodging": [
+        {
+          "name": "Buffalo Point Resort",
+          "detail": "http://www.buffalopoint.ca/ — year-round resort on Buffalo Bay; cabins, marina, guided fishing, ice fishing. +1 204-437-2777"
+        }
+      ],
       "restaurants": [],
       "boat_rentals": [],
       "limits_zone": "southern",
-      "limits_approximate": false
+      "limits_approximate": false,
+      "aliases": [
+        "Lake of the Woods (Manitoba portion)"
+      ]
     },
     {
       "id": "laurie-lake",
@@ -22365,6 +22382,157 @@
       "ice_fishing_details": "",
       "established": null,
       "access": "fly-in"
+    },
+    {
+      "id": "buffalo-point-resort",
+      "name": "Buffalo Point Resort",
+      "location": "Buffalo Point, Manitoba",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Yellow Perch",
+        "Sauger",
+        "Lake Sturgeon",
+        "Burbot"
+      ],
+      "description": "Year-round resort on Buffalo Bay — Manitoba's only access point on Lake of the Woods, on the Buffalo Point peninsula in extreme southeast Manitoba (developed by Buffalo Point First Nation). Cabins, RV campground, 320-slip marina, guided fishing, ice fishing and restaurant. Buffalo Bay is considered by many the best walleye fishing spot on Lake of the Woods.",
+      "website": "http://www.buffalopoint.ca/",
+      "phone": "+1 204-437-2777",
+      "email": null,
+      "address": "20 Buffalo Point Rd, Division No. 1, MB",
+      "amenities": [
+        "Cabins and RV campground",
+        "320-slip marina",
+        "Guided fishing",
+        "Ice fishing",
+        "Restaurant"
+      ],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-to, ~160 km southeast of Winnipeg"
+    },
+    {
+      "id": "ash-rapids-lodge",
+      "name": "Ash Rapids Lodge",
+      "location": "Lake of the Woods, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Lake Trout",
+        "Yellow Perch",
+        "Black Crappie"
+      ],
+      "description": "Fishing and hunting lodge on Lake of the Woods in the Kenora District (Ash Bay), in the Shoal Lake area. Ontario waters — Ontario licence required.",
+      "website": "https://ashrapidslodge.ca/",
+      "phone": "+1 800-465-1095",
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Kenora District, Ontario"
+    },
+    {
+      "id": "muskie-bay-resort",
+      "name": "Muskie Bay Resort",
+      "location": "Sioux Narrows-Nestor Falls, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Muskellunge",
+        "Northern Pike",
+        "Walleye",
+        "Lake Trout",
+        "Smallmouth Bass",
+        "Lake Whitefish",
+        "Yellow Perch",
+        "Black Crappie"
+      ],
+      "description": "Family-run lodge on Lake of the Woods near Sioux Narrows (also fishes nearby Crow Lake). Advertises trophy muskie, pike, walleye, lake trout, smallmouth bass, whitefish, perch and crappies. Ontario waters — Ontario licence required.",
+      "website": "http://muskiebayresort.com/",
+      "phone": "+1 807-271-3015",
+      "email": null,
+      "address": "2740 Muskie Bay Road, Sioux Narrows-Nestor Falls, ON",
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-to, ~49 km southeast of Kenora, Ontario"
+    },
+    {
+      "id": "lake-of-the-woods-lodge",
+      "name": "Lake of the Woods Lodge",
+      "location": "Nestor Falls, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Muskellunge",
+        "Northern Pike",
+        "Lake Trout",
+        "Yellow Perch"
+      ],
+      "description": "Rustic cabins on a private 35-acre island in Sabaskong Bay, Lake of the Woods. Boat rentals; American or housekeeping plans. Ontario waters — Ontario licence required.",
+      "website": null,
+      "phone": null,
+      "email": null,
+      "address": "Nestor Falls, ON",
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Boat-in island in Sabaskong Bay, ~65 miles from the Canada-U.S. border"
+    },
+    {
+      "id": "witch-bay-canadian-camps",
+      "name": "Witch Bay Canadian Camps",
+      "location": "Lake of the Woods, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass"
+      ],
+      "description": "Drive-to lodge on Lake of the Woods, Ontario. American plan (3 meals daily) with boat rentals. Ontario waters — Ontario licence required.",
+      "website": null,
+      "phone": null,
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-to, Lake of the Woods, Ontario"
     }
   ],
   "ice_fishing": {
