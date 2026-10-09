@@ -443,7 +443,7 @@ export default function FishingSpots() {
 
   const [sharingSpot, setSharingSpot] = useState<string | null>(null);
   const shareSpot = async (id: string) => {
-    if (!window.confirm("Share this spot to the community feed? Everyone will see its location.")) return;
+    if (!window.confirm("Share this spot with your friends on the feed? They\u2019ll see its location.")) return;
     setSharingSpot(id);
     try {
       await fishFetch(`/api/fishmb/spots/${id}/share`, { method: "POST" });

@@ -39,7 +39,7 @@ export async function POST(
 
   const rows = await query(
     `INSERT INTO fm_discussions (user_id, body, kind, visibility, spot_share)
-     VALUES ($1, $2, 'post', 'public', $3::jsonb)
+     VALUES ($1, $2, 'post', 'friends', $3::jsonb)
      RETURNING id`,
     [me.id, body, JSON.stringify(spotShare)]
   );
