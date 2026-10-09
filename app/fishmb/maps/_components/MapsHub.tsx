@@ -69,7 +69,24 @@ export default function MapsHub() {
     zoom?: number;
     offsetY?: number;
   } | null>(null);
-  const [basemap, setBasemap] = useState<BasemapId>("streets");
+  const [basemap, setBasemap] = useState<BasemapId>(() => {
+    try {
+      const saved = localStorage.getItem("fishmb-basemap");
+      if (saved === "streets" || saved === "satellite") return saved;
+    } catch {
+      // Storage unavailable — fall through to default.
+    }
+    return "satellite";
+  });
+
+  const handleBasemapChange = (b: BasemapId) => {
+    setBasemap(b);
+    try {
+      localStorage.setItem("fishmb-basemap", b);
+    } catch {
+      // Storage unavailable — non-fatal.
+    }
+  };
   const [windOn, setWindOn] = useState(false);
   const centeredOnGps = useRef(false);
   const urlPlaced = useRef(false);
@@ -672,7 +689,7 @@ export default function MapsHub() {
         {tab === "settings" && (
           <SettingsTab
             basemap={basemap}
-            onBasemapChange={setBasemap}
+            onBasemapChange={handleBasemapChange}
             windOn={windOn}
             onWindChange={setWindOn}
             trails={trails}
