@@ -27,7 +27,7 @@ export function FishChrome({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-paper font-body text-pine">
       <FishHeader />
-      <main className="min-h-[70vh] pb-28 md:pb-0">{children}</main>
+      <main className="min-h-[70vh] pb-28 md:pb-32">{children}</main>
       {!hideFooter && <FishFooter />}
       <FishBottomBar />
     </div>

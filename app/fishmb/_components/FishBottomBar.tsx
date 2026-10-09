@@ -189,10 +189,10 @@ function Bar() {
   };
 
   return (
-    <nav aria-label="FishMB sections" className="md:hidden fixed z-40 bottom-0 inset-x-0">
+    <nav aria-label="FishMB sections" className="fixed z-40 bottom-0 inset-x-0 md:bottom-5 flex justify-center pointer-events-none">
       {/* + popup menu */}
       {menuOpen && (
-        <div className="fixed inset-0 z-50" onClick={() => setMenuOpen(false)}>
+        <div className="fixed inset-0 z-50 pointer-events-auto" onClick={() => setMenuOpen(false)}>
           <div
             ref={sheetRef}
             onClick={(e) => e.stopPropagation()}
@@ -219,7 +219,7 @@ function Bar() {
       )}
 
       <div
-        className="relative bg-white/95 backdrop-blur border-t border-pine/10 px-2 pt-2 shadow-[0_-8px_30px_rgba(0,0,0,0.08)]"
+        className="pointer-events-auto w-full md:w-[38rem] md:max-w-[calc(100vw-2rem)] relative bg-white/95 backdrop-blur border-t md:border border-pine/10 md:rounded-3xl px-2 pt-2 shadow-[0_-8px_30px_rgba(0,0,0,0.08)]"
         style={{ paddingBottom: "calc(1.1rem + env(safe-area-inset-bottom))" }}
       >
         <div className="flex items-center">
@@ -241,7 +241,7 @@ function Bar() {
 
       {/* Logged-out + tap: explain posting, then sign up */}
       {postGateOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center pointer-events-auto">
           <div className="absolute inset-0 bg-pine-deep/60" onClick={() => setPostGateOpen(false)} />
           <div className="relative bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-6 text-center max-h-[92vh] overflow-y-auto">
             <div className="text-5xl mb-3">🎣</div>
