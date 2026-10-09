@@ -103,8 +103,9 @@ const RIGHT: Item[] = [
 function Bar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { user } = useFishAuth();
+  const { user, openLogin } = useFishAuth();
   const [unread, setUnread] = useState(0);
+  const [postGateOpen, setPostGateOpen] = useState(false);
 
   useEffect(() => {
     let stop = false;
@@ -171,15 +172,28 @@ function Bar() {
             </div>
           ))}
           <div className="flex-1 flex justify-center">
-            <Link
-              href="/fishmb/feed?compose=1"
-              aria-label="New post"
-              className="-mt-8 w-14 h-14 rounded-full bg-signal hover:bg-signal-dark text-white shadow-[0_8px_24px_rgba(0,0,0,0.25)] border-4 border-white flex items-center justify-center transition-colors"
-            >
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-            </Link>
+            {user && !user.is_anonymous ? (
+              <Link
+                href="/fishmb/feed?compose=1"
+                aria-label="New post"
+                className="-mt-8 w-14 h-14 rounded-full bg-signal hover:bg-signal-dark text-white shadow-[0_8px_24px_rgba(0,0,0,0.25)] border-4 border-white flex items-center justify-center transition-colors"
+              >
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setPostGateOpen(true)}
+                aria-label="New post"
+                className="-mt-8 w-14 h-14 rounded-full bg-signal hover:bg-signal-dark text-white shadow-[0_8px_24px_rgba(0,0,0,0.25)] border-4 border-white flex items-center justify-center transition-colors"
+              >
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </button>
+            )}
           </div>
           {RIGHT.map((item) => (
             <div key={item.href} className="flex-1 flex justify-center">
@@ -188,6 +202,54 @@ function Bar() {
           ))}
         </div>
       </div>
+      {/* Logged-out + tap: explain posting, then sign up */}
+      {postGateOpen && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-pine-deep/60" onClick={() => setPostGateOpen(false)} />
+          <div className="relative bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-6 text-center max-h-[92vh] overflow-y-auto">
+            <div className="text-5xl mb-3">🎣</div>
+            <h2 className="text-xl font-black text-pine tracking-tight mb-2">
+              This is where you post
+            </h2>
+            <p className="text-pine/65 text-sm mb-5">
+              The <span className="font-bold text-pine">+</span> button is your
+              way to share with the Manitoba fishing community — and to get
+              your fish on the board in tournaments:
+            </p>
+            <div className="flex flex-col gap-3 text-left mb-6">
+              {[
+                ["🐟", "Log a catch", "Species, length, weight, photo and GPS — building your personal catch history."],
+                ["📸", "Share a post", "Up to 4 photos or a 60-second video, with reactions and comments from other anglers."],
+                ["🏆", "Submit tournament catches", "In a tournament? Your catch photos go straight to the live leaderboard with GPS and time stamps."],
+              ].map(([icon, title, body]) => (
+                <div key={title} className="flex items-start gap-3 bg-pine/5 rounded-2xl px-4 py-3">
+                  <span className="text-2xl shrink-0">{icon}</span>
+                  <span>
+                    <span className="block text-sm font-black text-pine">{title}</span>
+                    <span className="block text-xs text-pine/65 leading-snug mt-0.5">{body}</span>
+                  </span>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={() => {
+                setPostGateOpen(false);
+                openLogin();
+              }}
+              className="w-full bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-8 py-4 rounded-full transition-colors mb-3"
+            >
+              Join free to start posting
+            </button>
+            <button
+              onClick={() => setPostGateOpen(false)}
+              className="text-pine/50 text-sm font-bold"
+            >
+              Maybe later
+            </button>
+            <p className="text-[11px] text-pine/40 mt-4">Anglers 13+ only.</p>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
