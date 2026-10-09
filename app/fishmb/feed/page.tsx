@@ -14,7 +14,7 @@ import { JoinByCode } from "../tournaments/_components/JoinByCode";
 
 /** Tournament tab inside the + composer: build one here or join with a code. */
 function TournamentPanel() {
-  const [sub, setSub] = useState<"build" | "join">("build");
+  const [sub, setSub] = useState<"build" | "join">("join");
   const [lakes, setLakes] = useState<{ id: string; name: string; region: string }[]>([]);
   useEffect(() => {
     let stop = false;
