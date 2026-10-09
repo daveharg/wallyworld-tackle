@@ -330,10 +330,13 @@ export default function FishingSpots() {
       return;
     }
     setFocus({ lat, lng, key, zoom });
+    // Bring the map back into view — the spot list sits below it.
+    mapRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   // Deep link from a shared spot in the feed: ?spot=lat,lng&name=…
   const searchParams = useSearchParams();
+  const mapRef = useRef<HTMLDivElement>(null);
   const [sharedSpot, setSharedSpot] = useState<SpotPin | null>(null);
   useEffect(() => {
     const raw = searchParams.get("spot");
@@ -503,6 +506,7 @@ export default function FishingSpots() {
               </button>
             </div>
           )}
+          <div ref={mapRef} className="scroll-mt-4">
           <SpotMap
             spots={sharedSpot ? [...spots, sharedSpot] : spots}
             picking={picking}
@@ -527,6 +531,7 @@ export default function FishingSpots() {
             goTo={goTo ? { lat: Number(goTo.lat), lng: Number(goTo.lng) } : null}
             onTrailSaved={loadTrails}
           />
+          </div>
         </>
       )}
 
