@@ -460,13 +460,25 @@ export default function FishingSpots() {
 
   return (
     <section className="max-w-3xl mx-auto px-4 mt-10">
-      <h2 className="font-display font-bold uppercase text-pine text-2xl md:text-3xl tracking-wide mb-1">
-        📍 My fishing spots
-      </h2>
-      <p className="text-pine/60 text-sm mb-4">
-        Your private GPS spots — only you can see them. Save one from a catch
-        or add one below.
-      </p>
+      <div className="text-center mb-5">
+        <h2 className="font-display font-bold uppercase text-pine text-2xl md:text-3xl tracking-wide">
+          📍 My fishing spots
+        </h2>
+        <p className="text-pine/60 text-sm mt-1.5 mb-4">
+          Your private GPS spots — only you can see them.
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            useCurrentLocation();
+            document.getElementById("add-spot-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }}
+          disabled={locating}
+          className="bg-signal hover:bg-signal-dark text-white text-sm font-bold uppercase tracking-wider px-8 py-3.5 rounded-full disabled:opacity-50 transition-colors shadow-lg"
+        >
+          {locating ? "Getting location…" : "📍 Mark my current location"}
+        </button>
+      </div>
       {note && (
         <p className="text-sm text-signal-dark bg-signal/10 border border-signal/30 rounded-2xl px-4 py-3 mb-4">
           {note}
@@ -835,7 +847,7 @@ export default function FishingSpots() {
       </div>
 
       {/* Manual add */}
-      <div className="bg-white border border-pine/10 rounded-3xl p-6 mt-4">
+      <div id="add-spot-form" className="bg-white border border-pine/10 rounded-3xl p-6 mt-4 scroll-mt-24">
         <h3 className="font-display font-bold uppercase text-pine text-lg tracking-wide mb-4">
           Add a spot manually
         </h3>
