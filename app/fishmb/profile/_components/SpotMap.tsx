@@ -184,10 +184,6 @@ export default function SpotMap({
         const c = m.getCenter();
         onMoveEndRef.current?.({ lat: c.lat, lng: c.lng }, m.getZoom());
       });
-      // A manual drag means the user's view wins over auto-fit from now on.
-      m.on("dragstart", () => {
-        mapPlacedRef.current = true;
-      });
       m.on("focus", () => m.scrollWheelZoom.enable());
       m.on("blur", () => m.scrollWheelZoom.disable());
       m.on("click", (e: { latlng: { lat: number; lng: number } }) => {
@@ -355,15 +351,10 @@ export default function SpotMap({
       }
       layer.addTo(map);
       layerRef.current = layer;
-      // Only auto-fit when nothing has placed the map yet (no GPS focus,
-      // no lake/spot selection, no manual drag) — otherwise the user's view wins.
-      if (bounds.length > 0 && !mapPlacedRef.current) {
-        if (bounds.length === 1) {
-          map.setView(bounds[0], 12, { animate: true });
-        } else {
-          map.fitBounds(L.latLngBounds(bounds).pad(0.15), { animate: true });
-        }
-      }
+      // No auto-fit: the map's initial position is controlled by MapsHub
+      // (GPS current location, or the last remembered map position).
+      // Auto-fitting to spots here caused the map to jump to a seemingly
+      // random spot before GPS had a chance to centre it.
     })();
   }, [spots, pendingPin, map]);
 
@@ -615,13 +606,10 @@ export default function SpotMap({
 
   // External recenter requests (favorite lake or spot clicked).
   const lastFocusKey = useRef<string | null>(null);
-  // Set when a focus request flies the map, or the user drags it themselves —
-  // either one wins over the automatic fit-to-spots below.
-  const mapPlacedRef = useRef(false);
+  // A focus request flies the map to a specific place.
   useEffect(() => {
     if (!map || !focus || focus.key === lastFocusKey.current) return;
     lastFocusKey.current = focus.key;
-    mapPlacedRef.current = true;
     const zoom = focus.zoom ?? 11;
     const offsetY = (focus as { offsetY?: number }).offsetY;
     if (offsetY) {
