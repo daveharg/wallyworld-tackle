@@ -49,7 +49,7 @@ export default function WindWidget({ lat, lng }: { lat: number; lng: number }) {
   if (!wind) return null;
 
   return (
-    <div className="absolute top-14 left-3 z-[500] bg-white/95 backdrop-blur border border-pine/15 rounded-full pl-2.5 pr-3.5 py-2 shadow-lg flex items-center gap-2">
+    <div className="absolute top-14 left-3 z-20 bg-white/95 backdrop-blur border border-pine/15 rounded-full pl-2.5 pr-3.5 py-2 shadow-lg flex items-center gap-2">
       <span
         className="text-pine text-base inline-block transition-transform"
         style={{ transform: `rotate(${wind.dir + 180}deg)` }}

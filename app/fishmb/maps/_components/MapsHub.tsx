@@ -413,7 +413,7 @@ export default function MapsHub() {
         onClick={locateMe}
         aria-label="Center on my location"
         title="Center on my location"
-        className="absolute top-14 right-3 z-[500] w-11 h-11 rounded-full bg-white/95 backdrop-blur border border-pine/15 shadow-lg text-pine text-xl flex items-center justify-center active:scale-95 transition-transform"
+        className="absolute top-14 right-3 z-20 w-11 h-11 rounded-full bg-white/95 backdrop-blur border border-pine/15 shadow-lg text-pine text-xl flex items-center justify-center active:scale-95 transition-transform"
       >
         {locating ? (
           <span className="w-5 h-5 border-2 border-pine/30 border-t-pine rounded-full animate-spin" />
@@ -427,7 +427,7 @@ export default function MapsHub() {
         <button
           type="button"
           onClick={() => setPicking(false)}
-          className="absolute top-3 left-1/2 -translate-x-1/2 z-[500] bg-pine-deep/90 text-white text-xs font-bold rounded-full px-4 py-2.5 shadow-lg whitespace-nowrap"
+          className="absolute top-3 left-1/2 -translate-x-1/2 z-20 bg-pine-deep/90 text-white text-xs font-bold rounded-full px-4 py-2.5 shadow-lg whitespace-nowrap"
         >
           Tap the map to drop your pin · tap here to cancel
         </button>
@@ -435,7 +435,7 @@ export default function MapsHub() {
 
       {/* Go-to navigation bar */}
       {goTo && (
-        <div className="absolute top-3 left-3 right-3 z-[500] flex items-center gap-3 bg-pine text-white rounded-2xl px-4 py-3 shadow-xl">
+        <div className="absolute top-3 left-3 right-3 z-20 flex items-center gap-3 bg-pine text-white rounded-2xl px-4 py-3 shadow-xl">
           <span className="text-xl shrink-0">🧭</span>
           <div className="flex-1 min-w-0">
             <p className="font-bold text-sm truncate">{goTo.name || "Fishing spot"}</p>
@@ -462,7 +462,7 @@ export default function MapsHub() {
 
       {/* Toast */}
       {note && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-[500] max-w-[90vw]">
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-20 max-w-[90vw]">
           <p className="text-sm text-signal-dark bg-white border border-signal/30 rounded-2xl px-4 py-2.5 shadow-xl whitespace-nowrap overflow-hidden text-ellipsis">
             {note}
             <button

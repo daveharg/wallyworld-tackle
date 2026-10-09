@@ -744,7 +744,7 @@ export default function SpotMap({
     <div
       className={
         fill
-          ? "relative h-full w-full overflow-hidden"
+          ? "relative h-full w-full overflow-hidden isolate"
           : expanded
             ? "fixed inset-0 z-[900] bg-white"
             : "-mx-8 md:mx-0 md:rounded-3xl md:overflow-hidden md:border md:border-pine/10 md:shadow-sm relative"

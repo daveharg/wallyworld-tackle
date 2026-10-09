@@ -69,8 +69,8 @@ export default function MapSheet({
     <div
       className="fixed inset-x-3 z-50 bg-paper rounded-3xl shadow-2xl border border-pine/10 flex flex-col overflow-hidden"
       style={{
-        top: expanded ? 68 : "calc(100dvh - 196px)",
-        bottom: expanded ? 8 : 118,
+        top: expanded ? 68 : "calc(100dvh - 256px)",
+        bottom: expanded ? 8 : 176,
         transform: dragDy !== 0 ? `translateY(${dragDy}px)` : undefined,
         transition: dragging ? "none" : "top 0.3s ease, bottom 0.3s ease",
       }}
