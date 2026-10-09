@@ -114,6 +114,14 @@ export async function POST(
       : "");
   if (!photoUrl) return badRequest("A photo is required for every catch.");
   if (photoUrls.length === 0) photoUrls = [photoUrl];
+  // Strict camera-only tournaments: the web can't prove a photo came from a
+  // camera, so web-style submissions (photo_urls array) are rejected. The
+  // FishMB app sends a lone photo_url from its in-app camera.
+  if (t.photo_mode === "strict" && Array.isArray(body.photo_urls)) {
+    return badRequest(
+      "Strict tournaments accept entries from the FishMB app only — photos must be taken with the in-app camera."
+    );
+  }
   const species = typeof body.species === "string" ? body.species.trim().slice(0, 60) : "";
   if (!species) return badRequest("Species is required.");
   const lengthIn =

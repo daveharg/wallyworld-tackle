@@ -27,6 +27,22 @@ export function SubmitEntry({
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
 
+  // Strict tournaments only accept in-app-camera entries — the web can't prove
+  // camera origin, so the form is replaced with a pointer to the app.
+  if (photoMode === "strict") {
+    return (
+      <div className="bg-white border border-pine/15 rounded-3xl p-6">
+        <h3 className="font-display font-bold uppercase text-pine text-lg tracking-wide mb-2">
+          Log a catch
+        </h3>
+        <p className="text-sm text-pine/70">
+          🔒 This is a strict camera-only tournament. Entries must be taken with the FishMB
+          app&apos;s in-app camera — please log your catch from the app.
+        </p>
+      </div>
+    );
+  }
+
   const addFiles = (picked: FileList | null) => {
     if (!picked) return;
     const next = [...files, ...Array.from(picked)].slice(0, 4);

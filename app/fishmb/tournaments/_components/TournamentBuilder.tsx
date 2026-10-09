@@ -256,7 +256,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
           </div>
           <div>
             <label className={labelCls}>Catch photos</label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 gap-2">
               <button
                 type="button"
                 onClick={() => setPhotoMode("standard")}
@@ -275,6 +275,16 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
                 📏 Measure only
                 <span className={`block text-xs font-normal mt-1 ${photoMode === "measure_only" ? "text-white/85" : "text-pine/50"}`}>
                   Just the fish on the board — no posed photo needed
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setPhotoMode("strict")}
+                className={`py-3 px-3 rounded-2xl text-sm font-bold transition-colors text-left ${photoMode === "strict" ? "bg-signal text-white" : "bg-white border border-pine/20 text-pine/70"}`}
+              >
+                🔒 Strict — app camera only
+                <span className={`block text-xs font-normal mt-1 ${photoMode === "strict" ? "text-white/85" : "text-pine/50"}`}>
+                  For real-money events: entries only from the FishMB app&apos;s in-app camera. Web entries are rejected.
                 </span>
               </button>
             </div>

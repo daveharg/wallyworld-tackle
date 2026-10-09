@@ -270,7 +270,7 @@ const FEATURE_PROMOS = [
   },
   {
     img: "/fishmb/promos/weather.jpg",
-    badge: "🌦️ AI fish forecast",
+    badge: "🌦️ Fish-activity forecast",
     title: "Is the weather in your favour?",
     body: "Barometric pressure gauge with the ideal bite range, wind, cloud cover and storm-front tracking — plus a live wind map. Know before you go.",
     cta: "Check the forecast",
@@ -442,8 +442,8 @@ function FeedSignupWall({ onJoin }: { onJoin: () => void }) {
     },
     {
       icon: "🌤️",
-      title: "AI fish-activity forecast",
-      text: "Live conditions, wind and pressure trends, with AI predicting how active the fish are on Manitoba lakes — so you fish when they're biting.",
+      title: "Fish-activity forecast",
+      text: "Live conditions, wind and pressure trends, with a forecast of how active the fish are on Manitoba lakes — so you fish when they're biting.",
     },
   ];
   return (
