@@ -704,6 +704,29 @@ function FeedPageInner() {
     setVideoPhase("uploading");
     setVideoProgress(0);
     setVideoPlayback(null);
+    // If Mux reports the file arrived damaged (usually a cut-off upload),
+    // retry once automatically with a fresh upload URL.
+    let attempts = 0;
+    while (attempts < 2) {
+      attempts++;
+      try {
+        await uploadVideoAttempt(file);
+        return;
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : "Video upload failed.";
+        const damaged = /not a valid video|damaged|corrupt/i.test(msg);
+        if (damaged && attempts < 2) {
+          setVideoProgress(0);
+          continue;
+        }
+        setVideoPhase("error");
+        setVideoErr(msg);
+        return;
+      }
+    }
+  };
+
+  const uploadVideoAttempt = async (file: File): Promise<void> => {
     try {
       const { upload_id, upload_url } = (await fishFetch("/api/fish/video/upload-url", {
         method: "POST",
@@ -717,8 +740,11 @@ function FeedPageInner() {
         xhr.onload = () =>
           xhr.status >= 200 && xhr.status < 300
             ? resolve()
-            : reject(new Error("Video upload failed."));
-        xhr.onerror = () => reject(new Error("Video upload failed."));
+            : reject(new Error(`Video upload failed (network ${xhr.status}).`));
+        xhr.onerror = () => reject(new Error("Video upload failed — check your connection and try again."));
+        xhr.onabort = () => reject(new Error("Video upload was interrupted — try again."));
+        xhr.ontimeout = () => reject(new Error("Video upload timed out — try again on Wi-Fi."));
+        xhr.timeout = 10 * 60 * 1000;
         xhr.send(file);
       });
       setVideoPhase("processing");
@@ -727,18 +753,22 @@ function FeedPageInner() {
         await new Promise((r) => setTimeout(r, 5000));
         const s = (await fishFetch(
           `/api/fish/video/status?upload_id=${encodeURIComponent(upload_id)}`
-        )) as { status: string; playback_id?: string; duration?: number | null };
+        )) as { status: string; playback_id?: string; duration?: number | null; error?: string };
         if (s.status === "ready" && s.playback_id) {
           setVideoPlayback({ playback_id: s.playback_id, duration: s.duration ?? null });
           setVideoPhase("ready");
           return;
         }
-        if (s.status === "errored") throw new Error("Video processing failed.");
+        if (s.status === "errored")
+          throw new Error(
+            s.error
+              ? `The video arrived damaged (${s.error}). Try again.`
+              : "The video arrived damaged and couldn't be processed. Try again."
+          );
       }
       throw new Error("Video is taking too long — try again.");
     } catch (e) {
-      setVideoPhase("error");
-      setVideoErr(e instanceof Error ? e.message : "Video upload failed.");
+      throw e;
     }
   };
 

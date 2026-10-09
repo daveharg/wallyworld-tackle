@@ -16,6 +16,8 @@ export async function GET(req: NextRequest) {
         playback_id: s.playbackId,
         duration: s.duration,
       });
+    if (s.state === "errored")
+      return NextResponse.json({ status: "errored", error: s.error ?? null });
     return NextResponse.json({ status: s.state });
   } catch (e) {
     return NextResponse.json(

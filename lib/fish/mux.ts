@@ -46,16 +46,21 @@ export async function createDirectUpload(corsOrigin: string): Promise<{
 export type UploadStatus =
   | { state: "waiting" }
   | { state: "ready"; playbackId: string; duration: number | null }
-  | { state: "errored" };
+  | { state: "errored"; error?: string };
 
 /** Resolve an upload to its asset's public playback id (poll until ready). */
 export async function getUploadStatus(uploadId: string): Promise<UploadStatus> {
   const up = await mux(`/uploads/${uploadId}`);
-  if (up.status === "errored") return { state: "errored" };
+  if (up.status === "errored")
+    return { state: "errored", error: up.error?.messages?.join("; ") || up.error?.type };
   const assetId = up.asset_id as string | undefined;
   if (!assetId) return { state: "waiting" };
   const asset = await mux(`/assets/${assetId}`);
-  if (asset.status === "errored") return { state: "errored" };
+  if (asset.status === "errored")
+    return {
+      state: "errored",
+      error: asset.errors?.messages?.join("; ") || asset.errors?.type,
+    };
   if (asset.status !== "ready") return { state: "waiting" };
   const pb = (asset.playback_ids ?? []).find((p: any) => p.policy === "public") ?? asset.playback_ids?.[0];
   if (!pb?.id) return { state: "waiting" };
