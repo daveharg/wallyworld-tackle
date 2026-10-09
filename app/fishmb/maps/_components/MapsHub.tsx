@@ -94,6 +94,7 @@ export default function MapsHub() {
   // Spots: picking + quick add
   const [picking, setPicking] = useState(false);
   const [quickAdd, setQuickAdd] = useState<{ lat: number; lng: number } | null>(null);
+  const [quickMode, setQuickMode] = useState<"choose" | "mark">("choose");
   const [quickName, setQuickName] = useState("");
   const [quickNotes, setQuickNotes] = useState("");
   const [quickIcon, setQuickIcon] = useState("pin");
@@ -334,6 +335,7 @@ export default function MapsHub() {
     setQuickName("");
     setQuickNotes("");
     setQuickIcon("pin");
+    setQuickMode("choose");
     setQuickAdd({ lat, lng });
   };
 
@@ -367,16 +369,6 @@ export default function MapsHub() {
     } finally {
       setQuickSaving(false);
     }
-  };
-
-  /** Save the spot, then jump to the feed's catch composer with this
-   *  spot's location pre-filled. */
-  const saveAndLogCatch = async () => {
-    if (!quickAdd || quickSaving) return;
-    const lat = quickAdd.lat;
-    const lng = quickAdd.lng;
-    const ok = await saveQuickAdd();
-    if (ok) router.push(`/fishmb/feed?log=catch&lat=${lat}&lng=${lng}`);
   };
 
   const editSpot = async (
@@ -708,18 +700,58 @@ export default function MapsHub() {
       {quickAdd && (
         <div
           className="fixed inset-0 z-[1200] flex items-center justify-center p-4 bg-pine-deep/60 backdrop-blur-sm"
-          onClick={() => setQuickAdd(null)}
+          onClick={() => {
+            setQuickAdd(null);
+            setQuickMode("choose");
+          }}
         >
           <div
             className="bg-paper rounded-3xl p-6 w-full max-w-sm shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-1">
- Mark this spot
-            </h3>
-            <p className="text-pine/50 text-xs mb-4 tabular-nums">
+            <p className="text-pine/50 text-xs mb-4 tabular-nums text-center">
               {quickAdd.lat.toFixed(5)}, {quickAdd.lng.toFixed(5)}
             </p>
+            {quickMode === "choose" ? (
+              <>
+                <div className="flex flex-col gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const lat = quickAdd.lat;
+                      const lng = quickAdd.lng;
+                      setQuickAdd(null);
+                      setQuickMode("choose");
+                      router.push(`/fishmb/feed?log=catch&lat=${lat}&lng=${lng}`);
+                    }}
+                    className="w-full bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-4 rounded-2xl transition-colors"
+                  >
+                    Log a catch here
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setQuickMode("mark")}
+                    className="w-full bg-pine text-white font-bold uppercase tracking-wider text-sm px-6 py-4 rounded-2xl transition-colors"
+                  >
+                    Mark this spot
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuickAdd(null);
+                    setQuickMode("choose");
+                  }}
+                  className="w-full mt-3 text-pine/60 font-bold uppercase tracking-wider text-xs py-2"
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <>
+                <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
+                  Mark this spot
+                </h3>
             <input
               value={quickName}
               onChange={(e) => setQuickName(e.target.value)}
@@ -758,33 +790,25 @@ export default function MapsHub() {
                 ))}
               </div>
             </div>
-            <div className="flex flex-col gap-2 mt-4">
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setQuickAdd(null)}
-                  className="flex-1 bg-pine/10 hover:bg-pine/20 text-pine font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={saveQuickAdd}
-                  disabled={quickSaving}
-                  className="flex-1 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full disabled:opacity-50 transition-colors"
-                >
-                  {quickSaving ? "Saving…" : "Save spot"}
-                </button>
-              </div>
+            <div className="flex gap-2 mt-4">
               <button
                 type="button"
-                onClick={saveAndLogCatch}
-                disabled={quickSaving}
-                className="w-full bg-pine text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full disabled:opacity-50 transition-colors"
+                onClick={() => setQuickMode("choose")}
+                className="flex-1 bg-pine/10 hover:bg-pine/20 text-pine font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
               >
-                Save spot & log a catch here
+                Back
+              </button>
+              <button
+                type="button"
+                onClick={saveQuickAdd}
+                disabled={quickSaving}
+                className="flex-1 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full disabled:opacity-50 transition-colors"
+              >
+                {quickSaving ? "Saving…" : "Save spot"}
               </button>
             </div>
+              </>
+            )}
           </div>
         </div>
       )}
