@@ -53,11 +53,52 @@ const ICONS = {
 };
 
 /** Actions in the + popup menu. */
+const ACTION_ICON_PROPS = {
+  width: 30,
+  height: 30,
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "#12322b",
+  strokeWidth: 1.8,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+};
+
+const ACTION_ICONS = {
+  catch: (
+    <svg {...ACTION_ICON_PROPS}>
+      <path d="M5.5 12c2.6-3.8 6.2-5.7 10.3-5.7 3 0 5.4 2.4 6 5.7-.6 3.3-3 5.7-6 5.7-4.1 0-7.7-1.9-10.3-5.7Z" />
+      <path d="M5.5 12 2.5 9.2v5.6L5.5 12Z" />
+      <circle cx="16.8" cy="11" r="0.9" fill="#12322b" stroke="none" />
+    </svg>
+  ),
+  post: (
+    <svg {...ACTION_ICON_PROPS}>
+      <rect x="3" y="7.5" width="18" height="12.5" rx="2.5" />
+      <path d="M8.5 7.5 10 5h4l1.5 2.5" />
+      <circle cx="12" cy="13.5" r="3.5" />
+    </svg>
+  ),
+  dashboard: (
+    <svg {...ACTION_ICON_PROPS}>
+      <path d="M4 4v16h16" />
+      <path d="M8.5 16v-4.5M13 16V8M17.5 16v-2.5" />
+    </svg>
+  ),
+  trophy: (
+    <svg {...ACTION_ICON_PROPS}>
+      <path d="M8 4h8v4.5a4 4 0 0 1-8 0V4Z" />
+      <path d="M8 5.5H5a3.5 3.5 0 0 0 3.7 3.5M16 5.5h3a3.5 3.5 0 0 1-3.7 3.5" />
+      <path d="M12 12.5v3M8.8 20h6.4M10 15.5h4" />
+    </svg>
+  ),
+};
+
 const PLUS_ACTIONS = [
-  { href: "/fishmb/feed?log=catch", icon: "🐟", label: "Log a catch" },
-  { href: "/fishmb/feed?compose=1", icon: "📸", label: "Share a post" },
-  { href: "/fishmb/dashboard", icon: "📊", label: "Dashboard" },
-  { href: "/fishmb/tournaments", icon: "🏆", label: "Tournaments" },
+  { href: "/fishmb/feed?log=catch", icon: ACTION_ICONS.catch, label: "Log a catch" },
+  { href: "/fishmb/feed?compose=1", icon: ACTION_ICONS.post, label: "Share a post" },
+  { href: "/fishmb/dashboard", icon: ACTION_ICONS.dashboard, label: "Dashboard" },
+  { href: "/fishmb/tournaments", icon: ACTION_ICONS.trophy, label: "Tournaments" },
 ];
 
 const LEFT: Item[] = [
@@ -180,16 +221,22 @@ function Bar() {
   };
 
   return (
-    <nav aria-label="FishMB sections" className="fixed z-40 bottom-0 inset-x-0 flex justify-center pointer-events-none">
+    <nav
+      aria-label="FishMB sections"
+      className={`fixed bottom-0 inset-x-0 flex justify-center pointer-events-none ${
+        menuOpen ? "z-[1100]" : "z-40"
+      }`}
+    >
       <style>{`@keyframes fmb-rise { from { opacity: 0; transform: translateY(14px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }`}</style>
-      {/* + menu: shade out the background, floating circular action buttons */}
+      {/* + menu: shade out the background, circular action buttons stacked
+          from just above the bar, circles centred on the + button */}
       {menuOpen && (
         <div
-          className="fixed inset-0 z-40 pointer-events-auto bg-pine-deep/70 backdrop-blur-[2px]"
+          className="fixed inset-0 pointer-events-auto bg-pine-deep/70 backdrop-blur-[2px]"
           onClick={() => setMenuOpen(false)}
         >
           <div
-            className="absolute inset-0 flex flex-col items-center justify-center gap-7 pb-28"
+            className="absolute inset-x-0 bottom-32 flex flex-col items-center gap-6"
             onClick={(e) => e.stopPropagation()}
           >
             {PLUS_ACTIONS.map((a, i) => (
@@ -197,13 +244,15 @@ function Bar() {
                 key={a.href}
                 href={a.href}
                 onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-5 w-64"
+                className="relative flex justify-center"
                 style={{ animation: "fmb-rise 0.25s ease-out both", animationDelay: `${i * 60}ms` }}
               >
-                <span className="w-16 h-16 shrink-0 rounded-full bg-white shadow-2xl flex items-center justify-center text-3xl">
+                <span className="w-16 h-16 shrink-0 rounded-full bg-white shadow-2xl flex items-center justify-center">
                   {a.icon}
                 </span>
-                <span className="text-white text-2xl font-bold tracking-tight">{a.label}</span>
+                <span className="absolute left-[calc(50%+2.75rem)] top-1/2 -translate-y-1/2 whitespace-nowrap text-white text-2xl font-bold tracking-tight">
+                  {a.label}
+                </span>
               </Link>
             ))}
           </div>
