@@ -117,15 +117,10 @@ export default function MapSheet({
     fromHeader.current = false;
   };
 
+  // Tapping a tab only switches the tab — the sheet itself only moves
+  // when the user slides/drags it.
   const tapTab = (id: SheetTab) => {
-    if (snap === "collapsed") {
-      onTabChange(id);
-      onSnapChange("full");
-    } else if (id === tab && !detailMode) {
-      onSnapChange("collapsed");
-    } else {
-      onTabChange(id);
-    }
+    onTabChange(id);
   };
 
   return (
