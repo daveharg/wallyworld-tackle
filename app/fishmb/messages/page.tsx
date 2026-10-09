@@ -3,7 +3,8 @@
 
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
 import ThreadView, { type ThreadPeer } from "./_components/ThreadView";
@@ -71,8 +72,9 @@ function avatarBg(name: string): string {
   return colors[h % colors.length];
 }
 
-export default function MessagesPage() {
+function MessagesPageInner() {
   const { user, openLogin } = useFishAuth();
+  const searchParams = useSearchParams();
   const [setup, setSetup] = useState<"checking" | "needed" | "ready">("checking");
   const [enabling, setEnabling] = useState(false);
   const [keypair, setKeypair] = useState<MsgKeypair | null>(null);
@@ -134,7 +136,16 @@ export default function MessagesPage() {
   const loadConvos = async () => {
     try {
       const d = await fishFetch("/api/fishmb/msg/conversations");
-      setConvos((d.conversations ?? []) as Convo[]);
+      const list = (d.conversations ?? []) as Convo[];
+      setConvos(list);
+      // Deep link: /fishmb/messages?convo=<id> opens that thread directly.
+      const target = searchParams.get("convo");
+      if (target) {
+        const hit = list.find((c) => c.id === target);
+        if (hit) {
+          setSelected({ id: hit.id, name: hit.name, is_group: hit.is_group, members: hit.members });
+        }
+      }
     } catch {
       // list stays as-is
     }
@@ -698,5 +709,13 @@ export default function MessagesPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function MessagesPage() {
+  return (
+    <Suspense>
+      <MessagesPageInner />
+    </Suspense>
   );
 }

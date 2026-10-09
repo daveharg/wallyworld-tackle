@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
 
@@ -34,11 +35,31 @@ function Avatar({ p, size = 44 }: { p: Person; size?: number }) {
 
 export default function FriendsPage() {
   const { user, openLogin } = useFishAuth();
+  const router = useRouter();
   const [bundle, setBundle] = useState<FriendsBundle | null>(null);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Person[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
+  const [actionFriend, setActionFriend] = useState<Person | null>(null);
+
+  const messageFriend = async (p: Person) => {
+    setBusy(p.id);
+    setNote(null);
+    try {
+      const d = await fishFetch("/api/fishmb/msg/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ other_user_id: p.id }),
+      });
+      setActionFriend(null);
+      router.push(`/fishmb/messages?convo=${d.id}`);
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Could not start conversation.");
+    } finally {
+      setBusy(null);
+    }
+  };
 
   const load = useCallback(async () => {
     try {
@@ -183,16 +204,57 @@ export default function FriendsPage() {
           <ul className="divide-y divide-pine/10">
             {bundle!.friends.map((p) => (
               <li key={p.id} className="flex items-center gap-3 py-2.5">
-                <Link href={`/fishmb/anglers/${p.id}`} className="flex items-center gap-3 flex-1 min-w-0">
+                <button
+                  onClick={() => setActionFriend(p)}
+                  className="flex items-center gap-3 flex-1 min-w-0 text-left"
+                >
                   <Avatar p={p} size={40} />
                   <span className="flex-1 font-bold text-pine truncate">{p.name}</span>
-                </Link>
+                </button>
                 <button onClick={() => remove(p.id)} disabled={busy === p.id} className="text-xs font-bold text-pine/45 uppercase tracking-wider disabled:opacity-50">Remove</button>
               </li>
             ))}
           </ul>
         )}
       </div>
+
+      {/* Friend action sheet — message or view profile */}
+      {actionFriend && (
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-pine-deep/60 p-4"
+          onClick={() => setActionFriend(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${actionFriend.name} options`}
+        >
+          <div
+            className="bg-paper rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Avatar p={actionFriend} size={64} />
+            <p className="font-bold text-pine text-lg mt-3 mb-5">{actionFriend.name}</p>
+            <button
+              onClick={() => messageFriend(actionFriend)}
+              disabled={busy === actionFriend.id}
+              className="w-full bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3.5 rounded-full mb-3 disabled:opacity-50 transition-colors"
+            >
+              {busy === actionFriend.id ? "Opening…" : "💬 Message"}
+            </button>
+            <Link
+              href={`/fishmb/anglers/${actionFriend.id}`}
+              className="block w-full bg-pine/10 hover:bg-pine/15 text-pine font-bold uppercase tracking-wider text-sm px-6 py-3.5 rounded-full mb-3 transition-colors"
+            >
+              👤 View profile
+            </Link>
+            <button
+              onClick={() => setActionFriend(null)}
+              className="text-sm font-bold uppercase tracking-wider text-pine/50 hover:text-pine"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
