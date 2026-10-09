@@ -50,7 +50,6 @@ export default function LakesTab({
   const [cards, setCards] = useState<LakeCardData[]>([]);
   const [addLakeId, setAddLakeId] = useState("");
   const [adding, setAdding] = useState(false);
-  const [selectedId, setSelectedId] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -134,28 +133,9 @@ export default function LakesTab({
     }
   };
 
-  const chooseLake = (id: string) => {
-    setSelectedId(id);
-    if (!id) return;
-    const lake = favs.find((f) => f.id === id);
-    if (lake && lake.lat !== null && lake.lng !== null) onSelectLake(lake);
-  };
-
   return (
     <div className="pt-1 pb-2">
-      {/* Saved-lakes dropdown + add */}
-      <select
-        value={selectedId}
-        onChange={(e) => chooseLake(e.target.value)}
-        className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3 text-[15px] font-bold text-pine mb-2"
-      >
-        <option value="">Jump to a saved lake…</option>
-        {favs.map((f) => (
-          <option key={f.id} value={f.id}>
-            {f.name}
-          </option>
-        ))}
-      </select>
+      {/* Add a lake */}
       <div className="flex gap-2 mb-4">
         <select
           value={addLakeId}
