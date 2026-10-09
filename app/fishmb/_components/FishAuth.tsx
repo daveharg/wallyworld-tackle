@@ -336,7 +336,28 @@ function AccountTypeChooser({ user, onDone }: { user: FishAuthUser; onDone: (u: 
 export function FishLoginButton() {
   const { user, loading, openLogin, logout } = useFishAuth();
   const [menu, setMenu] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
+
+  // Pending friend requests — drives the alert badge on the user button.
+  useEffect(() => {
+    if (!user) {
+      setPendingCount(0);
+      return;
+    }
+    let cancelled = false;
+    fetch("/api/fish/friends", {
+      headers: { Authorization: `Bearer ${localStorage.getItem(FISHMB_TOKEN_KEY) ?? ""}` },
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!cancelled && d) setPendingCount((d.pending_incoming ?? []).length);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   // Close the menu on any outside tap. (A fixed overlay div can't do this job:
   // the header's backdrop-blur makes it a containing block, clipping the overlay
@@ -376,7 +397,7 @@ export function FishLoginButton() {
     <div className="relative block" ref={ref}>
       <button
         onClick={() => setMenu((m) => !m)}
-        className="inline-flex items-center gap-2 bg-pine/5 hover:bg-pine/10 rounded-full pl-1 pr-4 py-1 transition-colors"
+        className="relative inline-flex items-center gap-2 bg-pine/5 hover:bg-pine/10 rounded-full pl-1 pr-4 py-1 transition-colors"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         {user.avatar_url ? (
@@ -387,6 +408,11 @@ export function FishLoginButton() {
           </span>
         )}
         <span className="text-sm font-bold text-pine max-w-[120px] truncate">{user.name}</span>
+        {pendingCount > 0 && (
+          <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 rounded-full bg-signal text-white text-[11px] font-black flex items-center justify-center shadow">
+            {pendingCount > 9 ? "9+" : pendingCount}
+          </span>
+        )}
       </button>
       {menu && (
         <div
@@ -413,6 +439,18 @@ export function FishLoginButton() {
               className="block px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70 hover:text-signal hover:bg-pine/5"
             >
               Friends
+            </Link>
+            <Link
+              href="/fishmb/friends"
+              onClick={() => setMenu(false)}
+              className="flex items-center justify-between px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70 hover:text-signal hover:bg-pine/5"
+            >
+              <span>🙋 Friend requests</span>
+              {pendingCount > 0 && (
+                <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-signal text-white text-[11px] font-black flex items-center justify-center">
+                  {pendingCount > 9 ? "9+" : pendingCount}
+                </span>
+              )}
             </Link>
             <button
               onClick={() => {
