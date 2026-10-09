@@ -441,11 +441,27 @@ export function FishLoginButton() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setMenu(false);
     };
+    // Swipe up on the menu dismisses it.
+    let startY: number | null = null;
+    const onTouchStart = (e: TouchEvent) => {
+      startY = e.touches[0]?.clientY ?? null;
+    };
+    const onTouchEnd = (e: TouchEvent) => {
+      if (startY === null) return;
+      const endY = e.changedTouches[0]?.clientY ?? startY;
+      if (startY - endY > 40) setMenu(false);
+      startY = null;
+    };
+    const menuEl = ref.current?.querySelector("[data-menu-panel]");
     document.addEventListener("pointerdown", close);
     document.addEventListener("keydown", onKey);
+    menuEl?.addEventListener("touchstart", onTouchStart, { passive: true });
+    menuEl?.addEventListener("touchend", onTouchEnd, { passive: true });
     return () => {
       document.removeEventListener("pointerdown", close);
       document.removeEventListener("keydown", onKey);
+      menuEl?.removeEventListener("touchstart", onTouchStart);
+      menuEl?.removeEventListener("touchend", onTouchEnd);
     };
   }, [menu ]);
 
@@ -487,6 +503,7 @@ export function FishLoginButton() {
       </button>
       {menu && (
         <div
+          data-menu-panel
           className="absolute right-0 mt-2 z-20 bg-paper border border-pine/10 rounded-2xl shadow-xl py-2 w-44"
           onClick={() => setMenu(false)}
         >
