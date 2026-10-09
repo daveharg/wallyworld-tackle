@@ -803,25 +803,25 @@ export default function SpotMap({
         <div
           className="absolute z-[1002] pointer-events-none"
           style={{
-            left: pressRing.x - 24,
-            top: pressRing.y - 24,
-            width: 48,
-            height: 48,
+            left: pressRing.x - 48,
+            top: pressRing.y - 48,
+            width: 96,
+            height: 96,
           }}
         >
-          <svg width="48" height="48" viewBox="0 0 48 48">
-            <circle cx="24" cy="24" r="20" fill="rgba(255,255,255,0.85)" />
+          <svg width="96" height="96" viewBox="0 0 96 96">
+            <circle cx="48" cy="48" r="42" fill="rgba(255,255,255,0.85)" />
             <circle
-              cx="24"
-              cy="24"
-              r="20"
+              cx="48"
+              cy="48"
+              r="42"
               fill="none"
               stroke="#1d4d2b"
-              strokeWidth="4"
+              strokeWidth="7"
               strokeLinecap="round"
-              strokeDasharray={2 * Math.PI * 20}
-              strokeDashoffset={2 * Math.PI * 20 * (1 - pressRing.p)}
-              transform="rotate(-90 24 24)"
+              strokeDasharray={2 * Math.PI * 42}
+              strokeDashoffset={2 * Math.PI * 42 * (1 - pressRing.p)}
+              transform="rotate(-90 48 48)"
             />
           </svg>
         </div>
