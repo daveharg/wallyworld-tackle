@@ -39,11 +39,11 @@ async function ensureFishMBUser() {
   return r[0].id;
 }
 
-async function alreadyPosted(userId, likePattern) {
+async function alreadyPosted(userId, likePattern, days = 7) {
   const r = await sql`
     SELECT id FROM fm_discussions
      WHERE user_id = ${userId} AND body LIKE ${likePattern}
-       AND created_at > now() - interval '7 days'
+       AND created_at > now() - (${days} || ' days')::interval
      LIMIT 1`;
   return r.length > 0;
 }
@@ -61,21 +61,22 @@ async function post(userId, body, photoUrl = null) {
 }
 
 const weekNo = Math.floor(Date.now() / (7 * 24 * 3600 * 1000));
+const dayNo = Math.floor(Date.now() / (24 * 3600 * 1000));
 
 async function youtubePost(userId) {
   if (SHOWS.length === 0) return;
-  if (await alreadyPosted(userId, "%Manitoba Fishing Video of the Week%")) {
-    console.log("YouTube weekly post: already posted this week, skipping.");
+  if (await alreadyPosted(userId, "%Manitoba Fishing Video of the Day%", 1)) {
+    console.log("YouTube daily post: already posted in the last 24h, skipping.");
     return;
   }
-  const show = SHOWS[weekNo % SHOWS.length];
+  const show = SHOWS[dayNo % SHOWS.length];
   const video = await latestVideo(show);
   const videoLine = video
     ? `🎥 Watch: ${video.title}\nhttps://www.youtube.com/watch?v=${video.id}`
     : `Give them a watch: ${show.url}`;
   const body =
-    `🎬 Manitoba Fishing Video of the Week\n\n` +
-    `This week's pick: ${show.name} — some of the best Manitoba fishing content on YouTube.\n\n` +
+    `🎬 Manitoba Fishing Video of the Day\n\n` +
+    `Today's pick: ${show.name} — some of the best Manitoba fishing content on YouTube.\n\n` +
     `${videoLine}\n\n` +
     `Know a Manitoba fishing channel we should feature? Drop it in the comments! 👇`;
   await post(userId, body);
@@ -222,7 +223,11 @@ async function contentPosts(userId) {
 }
 
 const userId = await ensureFishMBUser();
-await youtubePost(userId);
-await adPosts(userId);
-await contentPosts(userId);
+const YOUTUBE_ONLY = process.argv.includes("--youtube-only");
+const NO_YOUTUBE = process.argv.includes("--no-youtube");
+if (!NO_YOUTUBE) await youtubePost(userId);
+if (!YOUTUBE_ONLY) {
+  await adPosts(userId);
+  await contentPosts(userId);
+}
 console.log(DRY ? "Dry run complete." : "Auto-post batch complete.");
