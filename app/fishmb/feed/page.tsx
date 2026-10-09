@@ -195,23 +195,33 @@ function timeAgo(iso: string): string {
 
 /** Render URLs in post text as clickable links. */
 function linkify(text: string): React.ReactNode[] {
+  // On fishmb.ca, rewrite wallyworldtackle.ca/fishmb/* links to stay on fishmb.ca
+  const isFishMb =
+    typeof window !== "undefined" &&
+    (window.location.host === "fishmb.ca" || window.location.host === "www.fishmb.ca");
   const parts = text.split(/(https?:\/\/[^\s]+)/g);
-  return parts.map((part, i) =>
-    /^https?:\/\//.test(part) ? (
+  return parts.map((part, i) => {
+    if (!/^https?:\/\//.test(part)) return <span key={i}>{part}</span>;
+    let href = part;
+    if (isFishMb) {
+      href = href.replace(
+        /^https:\/\/(www\.)?wallyworldtackle\.ca\/fishmb\//,
+        "https://www.fishmb.ca/fishmb/"
+      );
+    }
+    return (
       <a
         key={i}
-        href={part}
-        target={part.includes("wallyworldtackle.ca") ? undefined : "_blank"}
+        href={href}
+        target={href.includes("wallyworldtackle.ca") || href.includes("fishmb.ca") ? undefined : "_blank"}
         rel="noopener"
         className="text-signal-dark font-bold hover:underline break-all"
         onClick={(e) => e.stopPropagation()}
       >
-        {part.replace(/^https?:\/\/(www\.)?/, "")}
+        {href.replace(/^https?:\/\/(www\.)?/, "")}
       </a>
-    ) : (
-      <span key={i}>{part}</span>
-    )
-  );
+    );
+  });
 }
 
 function Avatar({ name, url, small }: { name: string; url: string | null; small?: boolean }) {
