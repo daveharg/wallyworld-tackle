@@ -459,7 +459,7 @@ export default function FishingSpots() {
     "w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal";
 
   return (
-    <section className="max-w-3xl mx-auto px-4 mt-10">
+    <section className="max-w-3xl mx-auto px-4 mt-2">
       <div className="text-center mb-5">
         <h2 className="font-display font-bold uppercase text-pine text-2xl md:text-3xl tracking-wide">
           📍 My fishing spots
