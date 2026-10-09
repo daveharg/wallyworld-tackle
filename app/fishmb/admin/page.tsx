@@ -82,6 +82,30 @@ interface ContactMsg {
   created_at: string;
 }
 
+interface ManagedUser {
+  id: string;
+  name: string;
+  email: string | null;
+  avatar_url: string | null;
+  created_at: string;
+  suspended: boolean;
+  suspended_reason: string;
+  post_count: string;
+  catch_count: string;
+}
+
+interface GrowthDay {
+  day: string;
+  signups: number;
+  posts: number;
+  catches: number;
+}
+
+interface GrowthData {
+  days: GrowthDay[];
+  totals: { users: number; posts: number; catches: number; tournaments: number };
+}
+
 function timeAgo(iso: string) {
   const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
   if (s < 3600) return `${Math.max(1, Math.floor(s / 60))}m ago`;
@@ -180,6 +204,171 @@ function AnglerStatsTable({
   );
 }
 
+/** User management table: search, view activity, suspend/unsuspend. */
+function UsersTable({
+  users,
+  search,
+  onSearch,
+  onToggleSuspend,
+  acting,
+}: {
+  users: ManagedUser[];
+  search: string;
+  onSearch: (v: string) => void;
+  onToggleSuspend: (u: ManagedUser) => void;
+  acting: string | null;
+}) {
+  const q = search.trim().toLowerCase();
+  const rows = q
+    ? users.filter(
+        (u) =>
+          u.name.toLowerCase().includes(q) ||
+          (u.email ?? "").toLowerCase().includes(q)
+      )
+    : users;
+  return (
+    <div>
+      <input
+        value={search}
+        onChange={(e) => onSearch(e.target.value)}
+        placeholder="Search by name or email…"
+        className="w-full max-w-md bg-white border border-pine/15 rounded-full px-5 py-3 text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal mb-4"
+      />
+      {rows.length === 0 ? (
+        <div className="bg-white border border-pine/10 rounded-3xl p-10 text-center">
+          <p className="text-pine/60">No users found.</p>
+        </div>
+      ) : (
+        <div className="bg-white border border-pine/10 rounded-3xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[720px]">
+              <thead>
+                <tr className="border-b border-pine/10 text-left">
+                  <th className="py-3 px-4 text-xs font-bold uppercase tracking-wider text-pine/55">User</th>
+                  <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider text-pine/55 text-center">Joined</th>
+                  <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider text-pine/55 text-center">Posts</th>
+                  <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider text-pine/55 text-center">Catches</th>
+                  <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider text-pine/55 text-center">Status</th>
+                  <th className="py-3 px-4 text-xs font-bold uppercase tracking-wider text-pine/55 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((u) => (
+                  <tr key={u.id} className={`border-b border-pine/5 last:border-0 ${u.suspended ? "bg-red-50/50" : ""}`}>
+                    <td className="py-3 px-4">
+                      <div className="flex items-center gap-3">
+                        {u.avatar_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={u.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover" />
+                        ) : (
+                          <span className="w-9 h-9 rounded-full bg-signal text-white flex items-center justify-center font-bold text-sm">
+                            {u.name.charAt(0).toUpperCase()}
+                          </span>
+                        )}
+                        <div className="min-w-0">
+                          <p className="font-bold text-pine truncate">{u.name}</p>
+                          <p className="text-xs text-pine/50 truncate">{u.email ?? "no email"}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-3 px-3 text-center text-pine/60 text-xs">
+                      {new Date(u.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="py-3 px-3 text-center font-bold text-pine">{u.post_count}</td>
+                    <td className="py-3 px-3 text-center text-pine/75">{u.catch_count}</td>
+                    <td className="py-3 px-3 text-center">
+                      {u.suspended ? (
+                        <span className="inline-block bg-red-100 text-red-800 text-[11px] font-bold uppercase tracking-wider rounded-full px-3 py-1" title={u.suspended_reason}>
+                          Suspended
+                        </span>
+                      ) : (
+                        <span className="inline-block bg-green-100 text-green-800 text-[11px] font-bold uppercase tracking-wider rounded-full px-3 py-1">
+                          Active
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      <button
+                        onClick={() => onToggleSuspend(u)}
+                        disabled={acting === u.id}
+                        className={`text-xs font-bold uppercase tracking-wider rounded-full px-4 py-2 transition-colors disabled:opacity-40 ${
+                          u.suspended
+                            ? "bg-green-700 hover:bg-green-800 text-white"
+                            : "bg-red-50 hover:bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {acting === u.id ? "…" : u.suspended ? "Reinstate" : "Suspend"}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** 30-day growth chart: signups, posts, catches per day (CSS bars). */
+function GrowthChart({ data }: { data: GrowthData | null }) {
+  if (!data) {
+    return <p className="text-pine/50 text-sm">Loading growth data…</p>;
+  }
+  const max = Math.max(1, ...data.days.map((d) => Math.max(d.signups, d.posts, d.catches)));
+  const bar = (v: number, color: string) => (
+    <div className="flex-1 flex flex-col justify-end h-24">
+      <div className={`${color} rounded-t`} style={{ height: `${Math.max(4, (v / max) * 100)}%` }} title={`${v}`} />
+    </div>
+  );
+  const last7 = data.days.slice(-7);
+  const signups7 = last7.reduce((s, d) => s + d.signups, 0);
+  const posts7 = last7.reduce((s, d) => s + d.posts, 0);
+  return (
+    <div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+        {[
+          ["👥 Total users", data.totals.users],
+          ["📝 Total posts", data.totals.posts],
+          ["🐟 Total catches", data.totals.catches],
+          ["🏆 Tournaments", data.totals.tournaments],
+        ].map(([label, v]) => (
+          <div key={label as string} className="bg-white border border-pine/10 rounded-2xl p-4 text-center">
+            <p className="font-display font-bold text-pine text-3xl">{v as number}</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-pine/55 mt-1">{label as string}</p>
+          </div>
+        ))}
+      </div>
+      <div className="bg-white border border-pine/10 rounded-3xl p-6 mb-6">
+        <h3 className="font-bold text-pine uppercase tracking-wider text-sm mb-1">Last 7 days</h3>
+        <p className="text-pine/55 text-sm mb-4">
+          {signups7} new users · {posts7} posts
+        </p>
+        <div className="flex items-end gap-1 mb-2">
+          {data.days.slice(-14).map((d) => (
+            <div key={d.day} className="flex-1 flex flex-col items-center gap-1">
+              <div className="w-full flex items-end gap-[2px] h-24">
+                {bar(d.signups, "bg-signal flex-1")}
+                {bar(d.posts, "bg-pine flex-1")}
+                {bar(d.catches, "bg-gold flex-1")}
+              </div>
+              <span className="text-[10px] text-pine/40 rotate-0">
+                {new Date(d.day + "T12:00:00").toLocaleDateString(undefined, { month: "numeric", day: "numeric" })}
+              </span>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-4 text-xs text-pine/60">
+          <span><span className="inline-block w-3 h-3 bg-signal rounded-sm mr-1" />Signups</span>
+          <span><span className="inline-block w-3 h-3 bg-pine rounded-sm mr-1" />Posts</span>
+          <span><span className="inline-block w-3 h-3 bg-gold rounded-sm mr-1" />Catches</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const { user } = useFishAuth();
   const [stats, setStats] = useState<Stats | null>(null);
@@ -189,7 +378,10 @@ export default function AdminPage() {
   const [messages, setMessages] = useState<ContactMsg[]>([]);
   const [anglerStats, setAnglerStats] = useState<AnglerStatsRow[]>([]);
   const [anglerSearch, setAnglerSearch] = useState("");
-  const [tab, setTab] = useState<"claims" | "ads" | "tournaments" | "messages" | "anglers">("claims");
+  const [allUsers, setAllUsers] = useState<ManagedUser[]>([]);
+  const [userSearch, setUserSearch] = useState("");
+  const [growth, setGrowth] = useState<GrowthData | null>(null);
+  const [tab, setTab] = useState<"claims" | "ads" | "tournaments" | "messages" | "anglers" | "users" | "growth">("claims");
   const [denied, setDenied] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [acting, setActing] = useState<string | null>(null);
@@ -213,6 +405,12 @@ export default function AdminPage() {
     fishFetch("/api/fishmb/admin/user-stats")
       .then((d) => setAnglerStats(d.users ?? []))
       .catch(() => setDenied(true));
+    fishFetch("/api/fishmb/admin/users")
+      .then((d) => setAllUsers(d.users ?? []))
+      .catch(() => {});
+    fishFetch("/api/fishmb/admin/growth")
+      .then((d) => setGrowth(d as GrowthData))
+      .catch(() => {});
   };
 
   useEffect(() => {
@@ -231,6 +429,32 @@ export default function AdminPage() {
       });
       setNote(kind === "ads" && status === "active" ? "Ad approved — running for 7 days. 🎣" : "Done.");
       load();
+    } catch {
+      setNote("Action failed.");
+    } finally {
+      setActing(null);
+    }
+  };
+
+  const toggleSuspend = async (u: ManagedUser) => {
+    const action = u.suspended ? "reinstate" : "suspend";
+    let reason = "";
+    if (!u.suspended) {
+      reason = window.prompt(`Suspend ${u.name}? Give a reason (shown to them):`) ?? "";
+      if (reason === null) return;
+    } else if (!window.confirm(`Reinstate ${u.name}?`)) {
+      return;
+    }
+    setActing(u.id);
+    try {
+      await fishFetch("/api/fishmb/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: u.id, suspended: !u.suspended, reason }),
+      });
+      setNote(`${u.name} ${action === "suspend" ? "suspended." : "reinstated."}`);
+      const d = await fishFetch("/api/fishmb/admin/users");
+      setAllUsers(d.users ?? []);
     } catch {
       setNote("Action failed.");
     } finally {
@@ -314,6 +538,8 @@ export default function AdminPage() {
             ["tournaments", `🏆 Tournament suggestions (${suggestions.length})`],
             ["messages", `✉️ Messages (${messages.length})`],
             ["anglers", `📊 Angler stats (${anglerStats.length})`],
+            ["users", `👥 Users (${allUsers.length})`],
+            ["growth", `📈 Growth`],
           ] as const
         ).map(([v, label]) => (
           <button
@@ -454,6 +680,16 @@ export default function AdminPage() {
         )
       ) : tab === "anglers" ? (
         <AnglerStatsTable rows={anglerStats} search={anglerSearch} onSearch={setAnglerSearch} />
+      ) : tab === "users" ? (
+        <UsersTable
+          users={allUsers}
+          search={userSearch}
+          onSearch={setUserSearch}
+          onToggleSuspend={toggleSuspend}
+          acting={acting}
+        />
+      ) : tab === "growth" ? (
+        <GrowthChart data={growth} />
       ) : ads.length === 0 ? (
         <div className="bg-white border border-pine/10 rounded-3xl p-10 text-center">
           <p className="text-4xl mb-3">🎉</p>

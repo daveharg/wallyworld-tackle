@@ -18,6 +18,7 @@ import {
   unauthorized,
   badRequest,
   notFound,
+  suspendedCheck,
 } from "@/lib/fish/auth";
 import {
   getTournament,
@@ -55,6 +56,8 @@ export async function POST(
 ) {
   const me = await fishUserFromRequest(req);
   if (!me) return unauthorized();
+  const susp = suspendedCheck(me);
+  if (susp) return susp;
   const t = await getTournament(params.id);
   if (!t) return notFound("Tournament not found.");
   if (!(await isParticipant(t.id, me.id))) {

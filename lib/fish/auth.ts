@@ -20,6 +20,19 @@ export interface FishUser {
   bio: string;
   account_type: string;
   created_at: string;
+  suspended?: boolean;
+}
+
+/** Returns a 403 response if the user is suspended, null otherwise. Call in
+ *  write paths (posts, comments, messages, entries) to enforce suspensions. */
+export function suspendedCheck(user: FishUser | null) {
+  if (user?.suspended) {
+    return NextResponse.json(
+      { error: "Your account has been suspended. Contact FishMB support." },
+      { status: 403 }
+    );
+  }
+  return null;
 }
 
 export interface PublicUser {
@@ -46,6 +59,10 @@ export async function ensureProfileColumns(): Promise<void> {
   await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS age_confirmed boolean NOT NULL DEFAULT false`);
   // Terms acceptance recorded at signup.
   await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS terms_accepted boolean NOT NULL DEFAULT false`);
+  // Admin moderation: suspended users can't post, comment, or message.
+  await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS suspended boolean NOT NULL DEFAULT false`);
+  await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS suspended_at timestamptz`);
+  await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS suspended_reason text NOT NULL DEFAULT ''`);
   profileColsEnsured = true;
 }
 

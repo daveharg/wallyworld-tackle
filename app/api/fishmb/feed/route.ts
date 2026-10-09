@@ -4,7 +4,7 @@
 // POST: new discussion (auth), optional visibility + species_tag + up to 4 photos.
 
 import { NextRequest, NextResponse } from "next/server";
-import { fishUserFromRequest, isAnonymousUser, unauthorized, badRequest } from "@/lib/fish/auth";
+import { fishUserFromRequest, isAnonymousUser, unauthorized, badRequest, suspendedCheck } from "@/lib/fish/auth";
 import { getFeed, createPost } from "@/lib/fish/feed";
 
 export async function GET(req: NextRequest) {
@@ -55,6 +55,8 @@ function cleanUrl(v: unknown): string | null {
 export async function POST(req: NextRequest) {
   const me = await fishUserFromRequest(req);
   if (!me) return unauthorized();
+  const susp = suspendedCheck(me);
+  if (susp) return susp;
   let body: Record<string, unknown>;
   try {
     body = await req.json();

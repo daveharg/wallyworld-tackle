@@ -1,7 +1,7 @@
 // /api/fishmb/feed/[id]/comments — GET comments / POST a comment (auth).
 
 import { NextRequest, NextResponse } from "next/server";
-import { fishUserFromRequest, unauthorized, badRequest } from "@/lib/fish/auth";
+import { fishUserFromRequest, unauthorized, badRequest, suspendedCheck } from "@/lib/fish/auth";
 import { getComments, addComment } from "@/lib/fish/feed";
 
 export async function GET(
@@ -18,6 +18,8 @@ export async function POST(
 ) {
   const me = await fishUserFromRequest(req);
   if (!me) return unauthorized();
+  const susp = suspendedCheck(me);
+  if (susp) return susp;
   let body: Record<string, unknown>;
   try {
     body = await req.json();
