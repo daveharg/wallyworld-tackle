@@ -12,7 +12,10 @@ import CartDrawer from "./CartDrawer";
  */
 export default function Chrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  if (pathname?.startsWith("/fishmb")) {
+  if (
+    pathname?.startsWith("/fishmb") ||
+    pathname?.startsWith("/fishmb-coming-soon")
+  ) {
     return <>{children}</>;
   }
   return (
