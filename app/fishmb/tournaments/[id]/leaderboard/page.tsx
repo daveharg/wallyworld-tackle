@@ -63,34 +63,36 @@ export default function LeaderboardDisplayPage({ params }: { params: { id: strin
   return (
     <div className="min-h-screen bg-pine-deep text-white flex flex-col">
       {/* Header */}
-      <header className="flex items-center justify-between px-6 md:px-12 pt-6 md:pt-8 pb-4">
-        <div>
-          <p className="text-gold font-bold uppercase tracking-[0.28em] text-sm mb-1">
-            FishMB tournament {board ? `· ${board.tournament.status}` : ""}
-          </p>
-          <h1 className="font-display font-bold uppercase tracking-wide text-3xl md:text-5xl">
-            {board?.tournament.name ?? "Loading…"}
-          </h1>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="hidden md:inline text-white/40 text-xs uppercase tracking-wider">
-            {updatedAt ? `Updated ${updatedAt.toLocaleTimeString()}` : ""}
-          </span>
+      <header className="px-6 md:px-12 pt-6 md:pt-8 pb-4">
+        <div className="flex items-center justify-between mb-4">
+          {board ? (
+            <Link
+              href={`/fishmb/tournaments/${board.tournament.id}`}
+              className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-bold transition-colors"
+            >
+              ← Back
+            </Link>
+          ) : (
+            <span />
+          )}
           <button
             onClick={goFullscreen}
-            className="bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-wider px-5 py-3 rounded-full transition-colors"
+            className="text-white/50 hover:text-white text-xs font-bold uppercase tracking-wider transition-colors"
           >
             ⛶ Full screen
           </button>
-          {board && (
-            <Link
-              href={`/fishmb/tournaments/${board.tournament.id}`}
-              className="bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-wider px-5 py-3 rounded-full transition-colors"
-            >
-              ← Tournament
-            </Link>
-          )}
         </div>
+        <p className="text-gold font-bold uppercase tracking-[0.28em] text-sm mb-1">
+          FishMB tournament {board ? `· ${board.tournament.status}` : ""}
+        </p>
+        <h1 className="font-display font-bold uppercase tracking-wide text-3xl md:text-5xl">
+          {board?.tournament.name ?? "Loading…"}
+        </h1>
+        {updatedAt && (
+          <p className="text-white/40 text-xs uppercase tracking-wider mt-2">
+            Updated {updatedAt.toLocaleTimeString()}
+          </p>
+        )}
       </header>
 
       {/* Board */}
