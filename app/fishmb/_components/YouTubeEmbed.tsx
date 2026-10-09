@@ -27,7 +27,7 @@ export default function YouTubeEmbed({ videoId }: { videoId: string }) {
     if (!el) return;
     const obs = new IntersectionObserver(
       (entries) => setInView(entries[0]?.isIntersecting ?? false),
-      { threshold: 0.45 }
+      { threshold: 0.75 }
     );
     obs.observe(el);
     return () => obs.disconnect();
