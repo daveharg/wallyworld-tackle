@@ -133,6 +133,27 @@ export default function SettingsTab({
   return (
     <div className="pt-1 space-y-4">
  <Section icon="" title="Map options" sub="Tune the map to how you fish.">
+        <button
+          type="button"
+          onClick={() => onWindChange(!windOn)}
+          className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3 mb-3"
+        >
+          <span className="text-sm font-bold text-pine">Wind overlay</span>
+          <span
+            className={`w-12 h-7 rounded-full p-1 transition-colors ${
+              windOn ? "bg-signal" : "bg-pine/15"
+            }`}
+          >
+            <span
+              className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                windOn ? "translate-x-5" : ""
+              }`}
+            />
+          </span>
+        </button>
+        <p className="text-[11px] text-pine/45 -mt-1 mb-3">
+          Shows live wind speed and direction at the centre of your map.
+        </p>
         <div className="flex bg-pine/5 rounded-full p-1 mb-3">
           {(
             [
@@ -152,27 +173,6 @@ export default function SettingsTab({
             </button>
           ))}
         </div>
-        <button
-          type="button"
-          onClick={() => onWindChange(!windOn)}
-          className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3"
-        >
-          <span className="text-sm font-bold text-pine">Wind overlay</span>
-          <span
-            className={`w-12 h-7 rounded-full p-1 transition-colors ${
-              windOn ? "bg-signal" : "bg-pine/15"
-            }`}
-          >
-            <span
-              className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
-                windOn ? "translate-x-5" : ""
-              }`}
-            />
-          </span>
-        </button>
-        <p className="text-[11px] text-pine/45 mt-2">
-          Shows live wind speed and direction at the centre of your map.
-        </p>
       </Section>
 
  <Section icon="" title="Saved lakes" sub="Jump the map straight to a saved lake.">
