@@ -7,11 +7,11 @@ export const metadata: Metadata = {
   // absolute bypasses the root layout's "%s | Wallyworld Tackle" title template
   title: { absolute: "FishMB — Coming Soon" },
   description:
-    "FishMB — Manitoba's fishing community. Tournaments, private maps with Garmin Navionics contours, encrypted messaging and bite weather. Coming soon.",
+    "FishMB — Manitoba's fishing community. Tournaments, private maps with Garmin Navionics contours, encrypted messaging and an AI fish-activity forecast. Coming soon.",
   openGraph: {
     title: "FishMB — Coming Soon",
     description:
-      "Manitoba's fishing community — tournaments, private maps, encrypted messaging and bite weather.",
+      "Manitoba's fishing community — tournaments, private maps, encrypted messaging and an AI fish-activity forecast.",
     url: "https://www.fishmb.ca",
     siteName: "FishMB",
   },
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: "FishMB — Coming Soon",
     description:
-      "Manitoba's fishing community — tournaments, private maps, encrypted messaging and bite weather.",
+      "Manitoba's fishing community — tournaments, private maps, encrypted messaging and an AI fish-activity forecast.",
   },
 };
 
@@ -41,8 +41,8 @@ const SECTIONS = [
   },
   {
     icon: "🌦️",
-    title: "Bite Weather",
-    text: "Manitoba fishing weather that actually helps you decide. Barometric pressure gauge, wind map, and a bite outlook for your lakes. Check the pressure trend before you hook up the boat.",
+    title: "AI Fish Forecast",
+    text: "A weather app with AI that predicts how active the fish are. Barometric pressure gauge, wind map and storm-front tracking for Manitoba lakes — check the pressure trend before you hook up the boat.",
   },
   {
     icon: "🔒",
@@ -84,7 +84,7 @@ export default function FishMBComingSoon() {
         </h1>
         <p className="text-white/70 text-lg md:text-xl max-w-xl mx-auto mb-8">
           Manitoba&apos;s fishing community — tournaments, private maps with
-          Garmin Navionics contours, encrypted messaging and bite weather.
+          Garmin Navionics contours, encrypted messaging and an AI fish-activity forecast.
           Built by anglers, for anglers.
         </p>
         <Link

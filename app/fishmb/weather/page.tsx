@@ -355,12 +355,12 @@ export default function WeatherPage() {
                 </div>
               </div>
 
-              {/* Bite outlook banner */}
+              {/* Fish activity banner */}
               <div className="mt-5 rounded-3xl bg-white/[0.07] border border-white/10 p-4 flex items-center gap-3">
                 <span className="w-3 h-3 rounded-full shrink-0" style={{ background: derived.outlook.color }} />
                 <div>
                   <p className="text-sm font-black">
-                    Bite outlook: <span style={{ color: derived.outlook.color }}>{derived.outlook.label}</span>
+                    Fish activity: <span style={{ color: derived.outlook.color }}>{derived.outlook.label}</span>
                   </p>
                   <p className="text-xs text-white/60 mt-0.5">{derived.outlook.note}</p>
                 </div>
