@@ -5,6 +5,7 @@
 
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
 import ThreadView, { type ThreadPeer } from "./_components/ThreadView";
@@ -577,7 +578,10 @@ function MessagesPageInner() {
             </div>
             {friends.length === 0 ? (
               <p className="text-pine/60 text-sm">
-                You need friends to message. Find friends first.
+                You need friends to message.{" "}
+                <Link href="/fishmb/friends" className="text-signal font-bold underline">
+                  Find friends first →
+                </Link>
               </p>
             ) : newMode === "dm" ? (
               <div className="space-y-1">

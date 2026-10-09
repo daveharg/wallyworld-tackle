@@ -113,7 +113,7 @@ export default function FishMBComingSoon() {
           Built by anglers, for anglers.
         </p>
         <Link
-          href="/fishmb/feed"
+          href="/fishmb/lakes"
           className="inline-block bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-10 py-4 rounded-full transition-colors mb-4"
         >
           🎣 Try the live demo

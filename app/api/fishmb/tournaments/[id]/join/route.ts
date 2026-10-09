@@ -23,6 +23,9 @@ export async function POST(
   if (susp) return susp;
   const t = await getTournament(params.id);
   if (!t) return notFound("Tournament not found.");
+  if (t.status === "ended" || (t.ends_at && new Date(t.ends_at).getTime() < Date.now())) {
+    return badRequest("This tournament has ended.");
+  }
   if (await isParticipant(t.id, me.id)) {
     return NextResponse.json({ joined: true });
   }

@@ -335,7 +335,7 @@ export default function BusinessDashboardPage() {
                   return (
                     <Link
                       key={r.rental_id}
-                      href={`/fishmb/rentals/${r.rental_id}`}
+                      href={`/fishmb/classifieds/${r.rental_id}`}
                       className="flex items-center gap-3 bg-white border border-pine/10 rounded-2xl p-4 hover:border-gold/40 transition-colors"
                     >
                       <span className="text-2xl">🛖</span>
@@ -368,7 +368,7 @@ export default function BusinessDashboardPage() {
                 {data.bookings.slice(0, 10).map((b) => (
                   <Link
                     key={b.id}
-                    href={`/fishmb/rentals/${b.rental_id}`}
+                    href={`/fishmb/classifieds/${b.rental_id}`}
                     className="flex items-center gap-3 bg-white border border-pine/10 rounded-2xl p-4 hover:border-gold/40 transition-colors"
                   >
                     {b.renter_avatar_url ? (

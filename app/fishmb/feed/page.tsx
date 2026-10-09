@@ -352,9 +352,11 @@ function SpotShareCard({
 }) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const saveSpot = async () => {
     if (saving || saved) return;
     setSaving(true);
+    setSaveError(null);
     try {
       const d = await fishFetch("/api/fishmb/spots", {
         method: "POST",
@@ -367,8 +369,9 @@ function SpotShareCard({
         }),
       });
       if (d?.spot) setSaved(true);
+      else setSaveError("Couldn't save that spot — try again.");
     } catch {
-      // non-fatal
+      setSaveError("Couldn't save that spot — check your connection and try again.");
     } finally {
       setSaving(false);
     }
@@ -404,6 +407,7 @@ function SpotShareCard({
           </button>
         )}
       </div>
+      {saveError && <p className="text-xs text-red-600 mt-2">{saveError}</p>}
     </div>
   );
 }
@@ -938,10 +942,14 @@ function FeedPageInner() {
       : searchParams.get("compose") === "1" ? "compose"
       : null;
     const actionKey = action ? `${action}:${searchParams.toString()}` : null;
-    if (action && user && lastActionRef.current !== actionKey) {
+    if (action && lastActionRef.current !== actionKey) {
       lastActionRef.current = actionKey;
-      setMode(action === "log" ? "catch" : "post");
-      setComposerOpen(true);
+      if (!user) {
+        openLogin();
+      } else {
+        setMode(action === "log" ? "catch" : "post");
+        setComposerOpen(true);
+      }
     }
     if (!action) lastActionRef.current = null;
   }, [searchParams, user, load]);
@@ -1297,6 +1305,8 @@ function FeedPageInner() {
             length_inches: lengthIn,
             notes: draft.trim(),
             captured_at: new Date().toISOString(),
+            latitude: catchLat,
+            longitude: catchLng,
           }),
         });
         setCatchNote("Catch logged — and sent to your tournament for review! 🎣");

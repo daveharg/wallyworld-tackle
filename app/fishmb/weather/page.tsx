@@ -301,6 +301,16 @@ export default function WeatherPage() {
 
   const derived = useMemo(() => {
     if (!data) return null;    const c = data.current;
+    // Index of the current hour / current day inside the series (past_days=7
+    // means hourly[0] and daily[0] are 7 days ago, NOT now).
+    const nowHourIdx = (() => {
+      const i = data.hourly.time.findIndex((t) => t >= c.time.slice(0, 13));
+      return i > 0 ? i : data.hourly.time.length - 1;
+    })();
+    const todayIdx = (() => {
+      const i = data.daily.time.findIndex((t) => t >= c.time.slice(0, 10));
+      return i >= 0 ? i : data.daily.time.length - 1;
+    })();
     // 3-hour pressure trend from hourly series (find current hour index)
     let trend = 0;
     try {
@@ -344,7 +354,7 @@ export default function WeatherPage() {
           : frontAgoH !== null && frontAgoH < 72
             ? { label: "Post-front", color: "#f59e0b", icon: "🧊" }
             : { label: "Stable", color: "#22c55e", icon: "✅" };
-    return { c, trend, outlook, front, frontAgoH, frontDrop, wmo: wmo(c.weather_code) };
+    return { c, trend, outlook, front, frontAgoH, frontDrop, wmo: wmo(c.weather_code), nowHourIdx, todayIdx };
   }, [data]);
 
   const moon = useMemo(() => moonPhase(), []);
@@ -404,8 +414,8 @@ export default function WeatherPage() {
                   </p>
                 </div>
                 <div className="text-right text-xs text-emerald-100/70 space-y-1">
-                  <p>H {data ? Math.round(data.daily.temperature_2m_max[1] ?? data.daily.temperature_2m_max[0]) : "—"}°</p>
-                  <p>L {data ? Math.round(data.daily.temperature_2m_min[1] ?? data.daily.temperature_2m_min[0]) : "—"}°</p>
+                  <p>H {data && derived ? Math.round(data.daily.temperature_2m_max[derived.todayIdx] ?? 0) : "—"}°</p>
+                  <p>L {data && derived ? Math.round(data.daily.temperature_2m_min[derived.todayIdx] ?? 0) : "—"}°</p>
                   <p>💧 {derived.c.relative_humidity_2m}%</p>
                 </div>
               </div>
@@ -534,14 +544,15 @@ export default function WeatherPage() {
           <section className="rounded-3xl bg-white/[0.05] border border-white/10 p-4">
             <h2 className="text-sm font-black mb-3">Next 24 hours</h2>
             <div className="flex gap-4 overflow-x-auto pb-1 -mx-1 px-1">
-              {data.hourly.time.slice(0, 24).map((t, i) => {
+              {data.hourly.time.slice(derived.nowHourIdx, derived.nowHourIdx + 24).map((t, i) => {
                 const hr = parseInt(t.slice(11, 13), 10);
+                const gi = derived.nowHourIdx + i;
                 return (
                   <div key={t} className="flex flex-col items-center gap-1 min-w-12 text-center">
                     <span className="text-[10px] text-white/50 font-bold">{i === 0 ? "Now" : `${hr}:00`}</span>
-                    <span className="text-lg">{wmo(data.hourly.weather_code[i] ?? 0).icon}</span>
-                    <span className="text-xs font-black">{Math.round(data.hourly.temperature_2m[i])}°</span>
-                    <span className="text-[10px] text-sky-300/80">{Math.round(data.hourly.precipitation_probability[i] ?? 0)}%</span>
+                    <span className="text-lg">{wmo(data.hourly.weather_code[gi] ?? 0).icon}</span>
+                    <span className="text-xs font-black">{Math.round(data.hourly.temperature_2m[gi])}°</span>
+                    <span className="text-[10px] text-sky-300/80">{Math.round(data.hourly.precipitation_probability[gi] ?? 0)}%</span>
                   </div>
                 );
               })}
@@ -551,17 +562,18 @@ export default function WeatherPage() {
           {/* 7-day */}
           <section className="rounded-3xl bg-white/[0.05] border border-white/10 p-4">
             <h2 className="text-sm font-black mb-2">7-day</h2>
-            {data.daily.time.map((t, i) => {
+            {data.daily.time.slice(derived.todayIdx, derived.todayIdx + 7).map((t, i) => {
+              const gi = derived.todayIdx + i;
               const d = new Date(t + "T12:00:00");
               const day = i === 0 ? "Today" : d.toLocaleDateString("en-CA", { weekday: "short" });
-              const w = wmo(data.daily.weather_code[i]);
+              const w = wmo(data.daily.weather_code[gi]);
               return (
                 <div key={t} className="flex items-center gap-3 py-2.5 border-b border-white/5 last:border-0">
                   <span className="w-16 text-xs font-bold text-white/70">{day}</span>
                   <span className="text-lg">{w.icon}</span>
                   <span className="flex-1 text-[11px] text-white/50">{w.label}</span>
-                  <span className="text-xs text-white/50">{Math.round(data.daily.temperature_2m_min[i])}°</span>
-                  <span className="text-xs font-black w-10 text-right">{Math.round(data.daily.temperature_2m_max[i])}°</span>
+                  <span className="text-xs text-white/50">{Math.round(data.daily.temperature_2m_min[gi])}°</span>
+                  <span className="text-xs font-black w-10 text-right">{Math.round(data.daily.temperature_2m_max[gi])}°</span>
                 </div>
               );
             })}
