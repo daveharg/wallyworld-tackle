@@ -47,6 +47,10 @@ export default function FishFooter() {
       <div className="border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/40">
           <span>© 2026 FishMB. Fish hard, release harder.</span>
+          <span className="flex items-center gap-4">
+            <Link href="/fishmb/terms" className="hover:text-white">Terms of Service</Link>
+            <Link href="/fishmb/privacy" className="hover:text-white">Privacy Policy</Link>
+          </span>
         </div>
       </div>
     </footer>

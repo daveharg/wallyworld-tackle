@@ -44,6 +44,8 @@ export async function ensureProfileColumns(): Promise<void> {
   // Age gate: user confirmed they are 13+ at signup (OPC guidance: under-13s
   // need a parent/guardian to consent, so signup requires 13+).
   await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS age_confirmed boolean NOT NULL DEFAULT false`);
+  // Terms acceptance recorded at signup.
+  await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS terms_accepted boolean NOT NULL DEFAULT false`);
   profileColsEnsured = true;
 }
 

@@ -121,11 +121,13 @@ function LoginModal({ onClose, onDone }: { onClose: () => void; onDone: (u: Fish
   const btnRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  // 13+ self-declaration — required before the Google button activates.
+  // 13+ self-declaration + terms acceptance — both required before Google activates.
   const [ageOk, setAgeOk] = useState(false);
+  const [termsOk, setTermsOk] = useState(false);
+  const canContinue = ageOk && termsOk;
 
   useEffect(() => {
-    if (!ageOk) return;
+    if (!canContinue) return;
     let cancelled = false;
     const init = () => {
       if (cancelled || !window.google || !btnRef.current) return;
@@ -138,7 +140,7 @@ function LoginModal({ onClose, onDone }: { onClose: () => void; onDone: (u: Fish
             const res = await fetch("/api/fish/auth/google", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ id_token: resp.credential, age_confirmed: true }),
+              body: JSON.stringify({ id_token: resp.credential, age_confirmed: true, terms_accepted: true }),
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || "Sign-in failed.");
@@ -171,7 +173,7 @@ function LoginModal({ onClose, onDone }: { onClose: () => void; onDone: (u: Fish
     return () => {
       cancelled = true;
     };
-  }, [onDone, ageOk]);
+  }, [onDone, canContinue]);
 
   return (
     <div
@@ -192,7 +194,7 @@ function LoginModal({ onClose, onDone }: { onClose: () => void; onDone: (u: Fish
         <p className="text-pine/70 text-sm mb-5">
           Log in with Google — the same account as the FishMB app. Your catches and profile follow you.
         </p>
-        <label className="flex items-start gap-2.5 text-left bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 mb-5 cursor-pointer">
+        <label className="flex items-start gap-2.5 text-left bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 mb-3 cursor-pointer">
           <input
             type="checkbox"
             checked={ageOk}
@@ -204,11 +206,30 @@ function LoginModal({ onClose, onDone }: { onClose: () => void; onDone: (u: Fish
             community for anglers 13+.
           </span>
         </label>
-        {ageOk ? (
+        <label className="flex items-start gap-2.5 text-left bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 mb-5 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={termsOk}
+            onChange={(e) => setTermsOk(e.target.checked)}
+            className="mt-0.5 w-4 h-4 accent-[#2f6b3a]"
+          />
+          <span className="text-xs text-pine/80 leading-snug">
+            I agree to the{" "}
+            <a href="/fishmb/terms" target="_blank" rel="noopener" className="font-bold text-signal-dark hover:underline" onClick={(e) => e.stopPropagation()}>
+              Terms of Service
+            </a>{" "}
+            and{" "}
+            <a href="/fishmb/privacy" target="_blank" rel="noopener" className="font-bold text-signal-dark hover:underline" onClick={(e) => e.stopPropagation()}>
+              Privacy Policy
+            </a>
+            .
+          </span>
+        </label>
+        {canContinue ? (
           <div ref={btnRef} className="flex justify-center min-h-[44px]" />
         ) : (
           <p className="text-xs text-pine/50 mb-2">
-            Check the box above to continue with Google.
+            Check both boxes above to continue with Google.
           </p>
         )}
         {busy && <p className="text-sm text-pine/60 mt-4">Signing you in…</p>}
