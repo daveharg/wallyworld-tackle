@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     template: "%s | FishMB",
   },
   description:
-    "Search 272 Manitoba lakes and 132 lodges & guides. Look up 2026 fishing regulations, stocking history, and what's biting right now.",
+    "Search 272 Manitoba lakes and 175 lodges & guides. Look up 2026 fishing regulations, stocking history, and what's biting right now.",
   keywords: [
     "Manitoba fishing",
     "Manitoba lakes",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     siteName: "FishMB",
     title: "FishMB — Manitoba fishing lakes, lodges & regulations",
     description:
-      "Search 272 Manitoba lakes and 132 lodges & guides. Look up 2026 fishing regulations, stocking history, and what's biting right now.",
+      "Search 272 Manitoba lakes and 175 lodges & guides. Look up 2026 fishing regulations, stocking history, and what's biting right now.",
     url: "https://www.wallyworldtackle.ca/fishmb",
     images: [
       {
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: "FishMB — Manitoba fishing lakes, lodges & regulations",
     description:
-      "Search 272 Manitoba lakes and 132 lodges & guides. Look up 2026 fishing regulations, stocking history, and what's biting right now.",
+      "Search 272 Manitoba lakes and 175 lodges & guides. Look up 2026 fishing regulations, stocking history, and what's biting right now.",
     images: ["https://www.wallyworldtackle.ca/fishmb/icon-512.png"],
   },
   manifest: "/fishmb/manifest.json",

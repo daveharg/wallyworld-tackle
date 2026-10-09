@@ -1348,7 +1348,203 @@
       "lodging": [
         {
           "name": "Buffalo Point Resort",
-          "detail": "http://www.buffalopoint.ca/ — year-round resort on Buffalo Bay; cabins, marina, guided fishing, ice fishing. +1 204-437-2777"
+          "detail": "/fishmb/lodges/buffalo-point-resort"
+        },
+        {
+          "name": "Ash Rapids Lodge",
+          "detail": "/fishmb/lodges/ash-rapids-lodge"
+        },
+        {
+          "name": "Ballard's Black Island",
+          "detail": "/fishmb/lodges/ballards-black-island"
+        },
+        {
+          "name": "Bruin Outfitting",
+          "detail": "/fishmb/lodges/bruin-outfitting"
+        },
+        {
+          "name": "Buena Vista Resort",
+          "detail": "/fishmb/lodges/buena-vista-resort"
+        },
+        {
+          "name": "CatDaddy Fishing Guide Service",
+          "detail": "/fishmb/lodges/catdaddy-fishing-guide-service"
+        },
+        {
+          "name": "Clarke & Crombie Camp",
+          "detail": "/fishmb/lodges/clarke-crombie-camp"
+        },
+        {
+          "name": "Clipper Bay Camp",
+          "detail": "/fishmb/lodges/clipper-bay-camp"
+        },
+        {
+          "name": "Crawford's Camp",
+          "detail": "/fishmb/lodges/crawfords-camp"
+        },
+        {
+          "name": "Crow Rock Lodge",
+          "detail": "/fishmb/lodges/crow-rock-lodge"
+        },
+        {
+          "name": "Crystal Harbour Resort Hotel",
+          "detail": "/fishmb/lodges/crystal-harbour-resort"
+        },
+        {
+          "name": "Duck Bay Lodge",
+          "detail": "/fishmb/lodges/duck-bay-lodge"
+        },
+        {
+          "name": "Epic Narrows Musky Lodge",
+          "detail": "/fishmb/lodges/epic-narrows-musky-lodge"
+        },
+        {
+          "name": "Floating Lodges of Sioux Narrows",
+          "detail": "/fishmb/lodges/floating-lodges-sioux-narrows"
+        },
+        {
+          "name": "Grassy Narrows Lodge",
+          "detail": "/fishmb/lodges/grassy-narrows-lodge"
+        },
+        {
+          "name": "Hanson's King Island Lodge",
+          "detail": "/fishmb/lodges/hansons-king-island-lodge"
+        },
+        {
+          "name": "Harris Hill Resort",
+          "detail": "/fishmb/lodges/harris-hill-resort"
+        },
+        {
+          "name": "Helliar's Resort Ltd",
+          "detail": "/fishmb/lodges/helliars-resort"
+        },
+        {
+          "name": "Houseboat Adventures Inc.",
+          "detail": "/fishmb/lodges/houseboat-adventures"
+        },
+        {
+          "name": "Indianhead Lodge",
+          "detail": "/fishmb/lodges/indianhead-lodge"
+        },
+        {
+          "name": "Lake of the Woods Lodge",
+          "detail": "/fishmb/lodges/lake-of-the-woods-lodge"
+        },
+        {
+          "name": "Laughing Water Lodge",
+          "detail": "/fishmb/lodges/laughing-water-lodge"
+        },
+        {
+          "name": "Lebron's Long Bay Camp",
+          "detail": "/fishmb/lodges/lebrons-long-bay-camp"
+        },
+        {
+          "name": "Little Bear Island Camp",
+          "detail": "/fishmb/lodges/little-bear-island-camp"
+        },
+        {
+          "name": "Moore Bay Lodge",
+          "detail": "/fishmb/lodges/moore-bay-lodge"
+        },
+        {
+          "name": "Muskie Bay Resort",
+          "detail": "/fishmb/lodges/muskie-bay-resort"
+        },
+        {
+          "name": "Mylie's Place Resort",
+          "detail": "/fishmb/lodges/mylies-place-resort"
+        },
+        {
+          "name": "New Moon Landing",
+          "detail": "/fishmb/lodges/new-moon-landing"
+        },
+        {
+          "name": "New Moon Lodge",
+          "detail": "/fishmb/lodges/new-moon-lodge"
+        },
+        {
+          "name": "Obabikon Bay Camp",
+          "detail": "/fishmb/lodges/obabikon-bay-camp"
+        },
+        {
+          "name": "Ontario Wilderness Houseboat Rentals",
+          "detail": "/fishmb/lodges/ontario-wilderness-houseboat-rentals"
+        },
+        {
+          "name": "Pipestone Point Resort",
+          "detail": "/fishmb/lodges/pipestone-point-resort"
+        },
+        {
+          "name": "Red Wing Lodge",
+          "detail": "/fishmb/lodges/red-wing-lodge"
+        },
+        {
+          "name": "Regina Bay Resort",
+          "detail": "/fishmb/lodges/regina-bay-resort"
+        },
+        {
+          "name": "Rex Tolton's Miles Bay Camp",
+          "detail": "/fishmb/lodges/rex-toltons-miles-bay-camp"
+        },
+        {
+          "name": "Rod and Reel Resort",
+          "detail": "/fishmb/lodges/rod-and-reel-resort"
+        },
+        {
+          "name": "Saarela's Moonlite Bay",
+          "detail": "/fishmb/lodges/saarelas-moonlite-bay"
+        },
+        {
+          "name": "Sabaskong Bay Lodge",
+          "detail": "/fishmb/lodges/sabaskong-bay-lodge"
+        },
+        {
+          "name": "Shady Roost Fishing Lodge",
+          "detail": "/fishmb/lodges/shady-roost-fishing-lodge"
+        },
+        {
+          "name": "Smith Camps",
+          "detail": "/fishmb/lodges/smith-camps"
+        },
+        {
+          "name": "Spruce Island Camp",
+          "detail": "/fishmb/lodges/spruce-island-camp"
+        },
+        {
+          "name": "Sunset Cove Resort",
+          "detail": "/fishmb/lodges/sunset-cove-resort"
+        },
+        {
+          "name": "Tetu Island Lodge",
+          "detail": "/fishmb/lodges/tetu-island-lodge"
+        },
+        {
+          "name": "Thompson's Lodge",
+          "detail": "/fishmb/lodges/thompsons-lodge"
+        },
+        {
+          "name": "Tomahawk Resort",
+          "detail": "/fishmb/lodges/tomahawk-resort"
+        },
+        {
+          "name": "Totem Resorts",
+          "detail": "/fishmb/lodges/totem-resorts"
+        },
+        {
+          "name": "White Birch Lodge",
+          "detail": "/fishmb/lodges/white-birch-lodge"
+        },
+        {
+          "name": "White Pine Lodge",
+          "detail": "/fishmb/lodges/white-pine-lodge"
+        },
+        {
+          "name": "Witch Bay Canadian Camps",
+          "detail": "/fishmb/lodges/witch-bay-canadian-camps"
+        },
+        {
+          "name": "Young's Wilderness Camp",
+          "detail": "/fishmb/lodges/youngs-wilderness-camp"
         }
       ],
       "restaurants": [],
@@ -22482,7 +22678,7 @@
     {
       "id": "lake-of-the-woods-lodge",
       "name": "Lake of the Woods Lodge",
-      "location": "Nestor Falls, Ontario",
+      "location": "Sabaskong Bay, Nestor Falls, Ontario",
       "kind": "lodge",
       "species": [
         "Walleye",
@@ -22491,9 +22687,9 @@
         "Lake Trout",
         "Yellow Perch"
       ],
-      "description": "Rustic cabins on a private 35-acre island in Sabaskong Bay, Lake of the Woods. Boat rentals; American or housekeeping plans. Ontario waters — Ontario licence required.",
-      "website": null,
-      "phone": null,
+      "description": "Historic lodge (est. 1920s) on a private 35-acre island in Sabaskong Bay, about 5 miles from Nestor Falls; American Plan plus housekeeping cabins; boat-in; also guided whitetail and waterfowl hunting. Ontario waters — Ontario licence required.",
+      "website": "https://www.lakeofthewoodslodge.com/",
+      "phone": "1-888-484-2686",
       "email": null,
       "address": "Nestor Falls, ON",
       "amenities": [],
@@ -22505,12 +22701,12 @@
       "ice_fishing": false,
       "ice_fishing_details": null,
       "established": null,
-      "access": "Boat-in island in Sabaskong Bay, ~65 miles from the Canada-U.S. border"
+      "access": "Boat-in island, Sabaskong Bay"
     },
     {
       "id": "witch-bay-canadian-camps",
       "name": "Witch Bay Canadian Camps",
-      "location": "Lake of the Woods, Ontario",
+      "location": "Witch Bay, Lake of the Woods, Ontario",
       "kind": "lodge",
       "species": [
         "Walleye",
@@ -22518,7 +22714,64 @@
         "Muskellunge",
         "Smallmouth Bass"
       ],
-      "description": "Drive-to lodge on Lake of the Woods, Ontario. American plan (3 meals daily) with boat rentals. Ontario waters — Ontario licence required.",
+      "description": "Secluded drive-in camp on Witch Bay near Kenora; full American Plan plus free on-water fishing help; May-September. Ontario waters — Ontario licence required.",
+      "website": "https://witchbay.com",
+      "phone": "807-548-3076",
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-in near Kenora"
+    },
+    {
+      "id": "pipestone-point-resort",
+      "name": "Pipestone Point Resort",
+      "location": "Kenora, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Drive-to resort on a peninsula near Kenora; housekeeping cabins with American Plan options plus a general store.",
+      "website": "https://pipestonepointresort.com",
+      "phone": "807-543-4004",
+      "email": null,
+      "address": "1500 Hwy 17 E, Kenora, ON",
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-to near Kenora"
+    },
+    {
+      "id": "tetu-island-lodge",
+      "name": "Tetu Island Lodge",
+      "location": "Lake of the Woods, Ontario (island near Kenora)",
+      "kind": "lodge",
+      "species": [
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Walleye"
+      ],
+      "description": "Island lodge on Lake of the Woods near Kenora; trophy pike, muskie, smallmouth and walleye. (Website/phone unverified — listed via resortsandlodges.com.)",
       "website": null,
       "phone": null,
       "email": null,
@@ -22532,7 +22785,1186 @@
       "ice_fishing": false,
       "ice_fishing_details": null,
       "established": null,
-      "access": "Drive-to, Lake of the Woods, Ontario"
+      "access": "Island near Kenora"
+    },
+    {
+      "id": "houseboat-adventures",
+      "name": "Houseboat Adventures Inc.",
+      "location": "Kenora, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Houseboat rentals (up to 68 ft) cruising the islands and channels of Lake of the Woods since about 1981. Departs from Kenora downtown docks.",
+      "website": "https://houseboatadventures.com",
+      "phone": "1-800-253-6672",
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Kenora downtown docks"
+    },
+    {
+      "id": "crow-rock-lodge",
+      "name": "Crow Rock Lodge",
+      "location": "Lake of the Woods, Ontario (south of Kenora)",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Boat-in multi-species island lodge about 17 miles south of Kenora (departs from Longbow Lake dock); American Plan plus housekeeping and outpost camps, with exclusive back-lake access.",
+      "website": "https://crowrock.com",
+      "phone": "1-800-547-3474",
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Boat-in from Longbow Lake departure dock"
+    },
+    {
+      "id": "smith-camps",
+      "name": "Smith Camps",
+      "location": "Lake of the Woods, Ontario (near Kenora)",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Drive-in housekeeping cabin rentals in a private cove on the northeast shores of Lake of the Woods near Kenora; May-October.",
+      "website": "https://smithcamps.com",
+      "phone": "807-548-5764",
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-in near Kenora"
+    },
+    {
+      "id": "epic-narrows-musky-lodge",
+      "name": "Epic Narrows Musky Lodge",
+      "location": "Lake of the Woods, Ontario (remote island near Kenora)",
+      "kind": "lodge",
+      "species": [
+        "Muskellunge",
+        "Northern Pike",
+        "Smallmouth Bass"
+      ],
+      "description": "Boat-in lodge on a remote private island near Kenora — the only fly-fishing lodge on Lake of the Woods; fully guided American Plan (6 guests per week), June-August.",
+      "website": "https://epicwatersangling.com",
+      "phone": "877-846-9153",
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Boat-in, remote island near Kenora"
+    },
+    {
+      "id": "moore-bay-lodge",
+      "name": "Moore Bay Lodge",
+      "location": "Pipestone Peninsula, Ontario (~8 mi south of Kenora)",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "8 modern self-catering cabins on the Pipestone Peninsula; boat, hovercraft and float-plane access with 3 outpost locations. Note: adjacent Moore Bay acreage has been listed for sale — confirm the lodge is operating before booking.",
+      "website": "https://moorebaylodge.com",
+      "phone": "807-464-1051",
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Boat/hovercraft/float-plane, ~8 mi south of Kenora"
+    },
+    {
+      "id": "spruce-island-camp",
+      "name": "Spruce Island Camp",
+      "location": "Spruce Island, Lake of the Woods, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Muskellunge",
+        "Northern Pike",
+        "Smallmouth Bass"
+      ],
+      "description": "Remote boat-in island camp on Spruce Island in central Lake of the Woods; housekeeping cabins; walleye, musky, pike and bass.",
+      "website": "https://spruceislandcamp.com",
+      "phone": "952-479-0299",
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Boat-in, Spruce Island"
+    },
+    {
+      "id": "tomahawk-resort",
+      "name": "Tomahawk Resort",
+      "location": "Sioux Narrows, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Drive-to family resort established 1946; housekeeping cabins, 50-ft houseboat rental, RV sites and guided fishing.",
+      "website": "https://www.tomahawkresort.com/",
+      "phone": "1-800-465-1091",
+      "email": null,
+      "address": "111 Tomahawk Rd, Sioux Narrows, ON",
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": "1946",
+      "access": "Drive-to, Sioux Narrows"
+    },
+    {
+      "id": "totem-resorts",
+      "name": "Totem Resorts",
+      "location": "Sioux Narrows, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Muskellunge",
+        "Walleye",
+        "Northern Pike",
+        "Smallmouth Bass"
+      ],
+      "description": "Family-run for 40+ years; 4 properties under one operator: Totem Lodge (drive-in, American Plan), Yellowbird Lodge & Chalet (drive-in, year-round), Wiley Point Lodge (boat-in) and French Portage Outpost (boat-in island). Muskie/walleye focus; hunting too.",
+      "website": "https://totemresorts.com",
+      "phone": "1-800-66-TOTEM",
+      "email": null,
+      "address": "120 Totem Rd, Sioux Narrows, ON",
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-to and boat-in properties"
+    },
+    {
+      "id": "white-birch-lodge",
+      "name": "White Birch Lodge",
+      "location": "Sioux Narrows, Ontario (Regina Bay)",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Lakefront cabins on Regina Bay with all-inclusive plans, restaurant/bar and guided fishing. Note: a 2023 report said bookings were cancelled and the property was under renovation/for sale — confirm it is operating before booking.",
+      "website": "http://whitebirchlodge.ca/",
+      "phone": "1-807-444-2212",
+      "email": null,
+      "address": "30 Skyers Rd, Sioux Narrows, ON",
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-to, Regina Bay"
+    },
+    {
+      "id": "rod-and-reel-resort",
+      "name": "Rod and Reel Resort",
+      "location": "Sioux Narrows, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Established 1944 — one of Sioux Narrows' oldest resorts; family-run housekeeping cabins, guided fishing and restaurant.",
+      "website": "http://rodandreelresort.com/",
+      "phone": "807-226-5240",
+      "email": null,
+      "address": "ON-71, Sioux Narrows, ON",
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": "1944",
+      "access": "Drive-to, Sioux Narrows"
+    },
+    {
+      "id": "regina-bay-resort",
+      "name": "Regina Bay Resort",
+      "location": "Sioux Narrows, Ontario (Regina Bay)",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Drive-to housekeeping cottages on Regina Bay (also listed as Regina Bay Lodge — same business).",
+      "website": "https://reginabaylodge.net/",
+      "phone": "807-407-0802",
+      "email": null,
+      "address": "Hagens Rd, Sioux Narrows, ON",
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-to, Regina Bay"
+    },
+    {
+      "id": "laughing-water-lodge",
+      "name": "Laughing Water Lodge",
+      "location": "Sioux Narrows, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Family-oriented housekeeping cottages with boat/motor rentals and dock facilities.",
+      "website": "http://www.laughingwaterlodge.com/",
+      "phone": "807-407-4818",
+      "email": null,
+      "address": "120 Laughing Water Rd, Sioux Narrows, ON",
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-to, Sioux Narrows"
+    },
+    {
+      "id": "floating-lodges-sioux-narrows",
+      "name": "Floating Lodges of Sioux Narrows",
+      "location": "Sioux Narrows, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Self-drive houseboat rentals on Lake of the Woods.",
+      "website": "http://www.floatinglodges.com/",
+      "phone": "1-800-743-5171",
+      "email": null,
+      "address": "19 Millers Rd, Sioux Narrows, ON",
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Sioux Narrows"
+    },
+    {
+      "id": "crawfords-camp",
+      "name": "Crawford's Camp",
+      "location": "Sioux Narrows, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Drive-in cabin rentals with boat rentals and guide service; year-round.",
+      "website": "https://crawfordscamp.com",
+      "phone": "807-226-5646",
+      "email": null,
+      "address": "5821 ON-71, Sioux Narrows, ON",
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-to, Sioux Narrows"
+    },
+    {
+      "id": "crystal-harbour-resort",
+      "name": "Crystal Harbour Resort Hotel",
+      "location": "Sioux Narrows, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Drive-in hotel-style resort with restaurant, gas station and boat launch; year-round.",
+      "website": "https://crystalharbour.com",
+      "phone": "807-226-5233",
+      "email": null,
+      "address": "5340 Hwy 71, Sioux Narrows, ON",
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-to, Sioux Narrows"
+    },
+    {
+      "id": "indianhead-lodge",
+      "name": "Indianhead Lodge",
+      "location": "Sioux Narrows, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Drive-in deluxe 2-3 bedroom cabins with American Plan option; family-run 25+ years.",
+      "website": "https://indianheadlodge.com",
+      "phone": "1-800-954-8246",
+      "email": null,
+      "address": "Indianhead Rd, Sioux Narrows, ON",
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-to, Sioux Narrows"
+    },
+    {
+      "id": "white-pine-lodge",
+      "name": "White Pine Lodge",
+      "location": "Sioux Narrows, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Drive-to lodge with 10 cabins, full-service marina and bait shop; American Plan or modified meal plans; guided fishing and fly-out day trips. (Website/phone unverified — listed via resortsandlodges.com.)",
+      "website": null,
+      "phone": null,
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-to, Sioux Narrows"
+    },
+    {
+      "id": "clipper-bay-camp",
+      "name": "Clipper Bay Camp",
+      "location": "Calvert Island, Whitefish Bay, Ontario (near Sioux Narrows)",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Boat-access island cabin rentals on Calvert Island in Whitefish Bay (self-catering, weekly) — cabin rentals rather than a full-service fishing lodge.",
+      "website": "https://clipperbaycamp.com",
+      "phone": null,
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Boat-access, Calvert Island"
+    },
+    {
+      "id": "lebrons-long-bay-camp",
+      "name": "Lebron's Long Bay Camp",
+      "location": "Long Bay, Lake of the Woods, Ontario (near Sioux Narrows)",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Modern housekeeping cabins plus American Plan; fishing and hunting. (Website/phone unverified — listed via resortsandlodges.com.)",
+      "website": null,
+      "phone": null,
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Long Bay near Sioux Narrows"
+    },
+    {
+      "id": "thompsons-lodge",
+      "name": "Thompson's Lodge",
+      "location": "Nestor Falls, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Lakeside cabins on Lake of the Woods (formerly Meline's) plus a restaurant/bar open daily.",
+      "website": "https://thompsonslodge.com/",
+      "phone": "218-669-1425",
+      "email": null,
+      "address": "20 Dock Rd N, Nestor Falls, ON",
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-to, Nestor Falls"
+    },
+    {
+      "id": "sunset-cove-resort",
+      "name": "Sunset Cove Resort",
+      "location": "Nestor Falls, Ontario (Sabaskong Bay)",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Smallmouth Bass",
+        "Yellow Perch"
+      ],
+      "description": "Four-season drive-to housekeeping cabins (7) on Sabaskong Bay with guide service and Gate's Bait shop.",
+      "website": "http://www.sunsetcoveresort.net/",
+      "phone": "1-888-484-2192",
+      "email": null,
+      "address": "1503 ON-71, Nestor Falls, ON",
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-to, Sabaskong Bay"
+    },
+    {
+      "id": "shady-roost-fishing-lodge",
+      "name": "Shady Roost Fishing Lodge",
+      "location": "Nestor Falls, Ontario (Sabaskong Bay island)",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Muskellunge",
+        "Northern Pike",
+        "Smallmouth Bass"
+      ],
+      "description": "All-inclusive island resort on Sabaskong Bay; 2-5 day guided packages (meals, boats, guides, shore lunch); conference facility. (Website unverified.)",
+      "website": null,
+      "phone": "807-484-2193",
+      "email": null,
+      "address": "42 Sabaskong Bay Island 15, Nestor Falls, ON",
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Island, Sabaskong Bay"
+    },
+    {
+      "id": "helliars-resort",
+      "name": "Helliar's Resort Ltd",
+      "location": "Nestor Falls, Ontario (Sabaskong Bay)",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Drive-in housekeeping cabins plus hotel rooms, gift shop and marina services; May-November.",
+      "website": "https://helliars.com",
+      "phone": "807-484-2400",
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-to, Sabaskong Bay"
+    },
+    {
+      "id": "hansons-king-island-lodge",
+      "name": "Hanson's King Island Lodge",
+      "location": "Sabaskong Bay, Ontario (island)",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Muskellunge",
+        "Northern Pike",
+        "Smallmouth Bass"
+      ],
+      "description": "Boat-in island lodge founded 1926, same family ever since; housekeeping plus modified American Plan; May-October. About a 12-mile boat ride from Nestor Falls (9 miles from Morson).",
+      "website": "https://kingislandlodge.com",
+      "phone": "807-275-9560",
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": "1926",
+      "access": "Boat-in, Sabaskong Bay island"
+    },
+    {
+      "id": "clarke-crombie-camp",
+      "name": "Clarke & Crombie Camp",
+      "location": "Nestor Falls, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Drive-in motel plus housekeeping cabins and a 30-site RV park on the southeast shores of Lake of the Woods; year-round.",
+      "website": "https://clarkeandcrombie.com",
+      "phone": "807-484-2114",
+      "email": null,
+      "address": "33 Dock Rd, Nestor Falls, ON",
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-to near Nestor Falls"
+    },
+    {
+      "id": "duck-bay-lodge",
+      "name": "Duck Bay Lodge",
+      "location": "Hay Island, Sabaskong Bay, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Muskellunge",
+        "Northern Pike"
+      ],
+      "description": "American Plan lodge with 6 lakefront cabins on Hay Island in Sabaskong Bay; boat-in and fly-in access. Note: sources conflict on the current owners/contact — confirm details before booking.",
+      "website": "https://duckbaylodge.com",
+      "phone": null,
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Boat-in/fly-in, Hay Island"
+    },
+    {
+      "id": "little-bear-island-camp",
+      "name": "Little Bear Island Camp",
+      "location": "Sabaskong Bay, Ontario (private island)",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Family-run housekeeping camp on a 3-acre private island in Sabaskong Bay, 6 miles east of Morson; May-November plus January-March ice fishing.",
+      "website": "https://littlebearislandcamp.com",
+      "phone": "218-242-3617",
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Boat-in, Sabaskong Bay island"
+    },
+    {
+      "id": "sabaskong-bay-lodge",
+      "name": "Sabaskong Bay Lodge",
+      "location": "Cedar Island, Sabaskong Bay, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Muskellunge",
+        "Northern Pike",
+        "Smallmouth Bass"
+      ],
+      "description": "Boat-in island resort on Cedar Island in Sabaskong Bay since the 1920s; American Plan plus housekeeping cabins. About a 6-mile boat ride from the Morson landing.",
+      "website": "https://www.sabaskongbaylodge.com/",
+      "phone": null,
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Boat-in, Cedar Island"
+    },
+    {
+      "id": "youngs-wilderness-camp",
+      "name": "Young's Wilderness Camp",
+      "location": "Nestor Falls, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Boat-in island resort in a secluded spawning bay near Nestor Falls; American Plan plus housekeeping and fly-in/fly-out outpost cabins.",
+      "website": "https://youngswildernesscamp.com",
+      "phone": "807-484-2930",
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Boat-in island near Nestor Falls"
+    },
+    {
+      "id": "rex-toltons-miles-bay-camp",
+      "name": "Rex Tolton's Miles Bay Camp",
+      "location": "Miles Bay, Ontario (island, 13 mi north of Morson)",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Smallmouth Bass"
+      ],
+      "description": "Rustic housekeeping cabins (8) on a secluded island in Miles Bay; family-run since 1951. Note: no current website found — confirm it is still operating before booking.",
+      "website": null,
+      "phone": "807-486-0299",
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": "1951",
+      "access": "Island, Miles Bay"
+    },
+    {
+      "id": "red-wing-lodge",
+      "name": "Red Wing Lodge",
+      "location": "Morson, Ontario (Sabaskong Bay)",
+      "kind": "lodge",
+      "species": [
+        "Muskellunge",
+        "Walleye",
+        "Northern Pike",
+        "Smallmouth Bass"
+      ],
+      "description": "Family-run muskie/walleye cottages, homesteaded 1964; drive-to. (Not redwinglodge.com — that is a different business on Leech Lake, Minnesota.)",
+      "website": "http://www.redwinglodge.net",
+      "phone": "1-807-488-5601",
+      "email": null,
+      "address": "341 Red Wing Rd, Morson, ON",
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": "1964",
+      "access": "Drive-to, Morson"
+    },
+    {
+      "id": "new-moon-lodge",
+      "name": "New Moon Lodge",
+      "location": "Lake of the Woods, Ontario (private island NW of Morson)",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Muskellunge",
+        "Northern Pike"
+      ],
+      "description": "Boat-in American-plan lodge on a private 4.5-acre island about 12 miles northwest of Morson; guided fishing and shore lunch; mid-May-October.",
+      "website": "http://www.newmoonlodge.ca",
+      "phone": "807-488-5611",
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Boat-in island NW of Morson"
+    },
+    {
+      "id": "new-moon-landing",
+      "name": "New Moon Landing",
+      "location": "Morson, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Drive-to resort/lodge on Lake of the Woods at Morson. (Similar name to New Moon Lodge but a distinct listing — relationship unconfirmed.)",
+      "website": "http://www.newmoonlanding.ca",
+      "phone": "807-488-5654",
+      "email": null,
+      "address": "10141 Hwy 621, Morson, ON",
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-to, Morson"
+    },
+    {
+      "id": "obabikon-bay-camp",
+      "name": "Obabikon Bay Camp",
+      "location": "Obabikon Bay, Ontario (~10 mi NNW of Morson)",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Muskellunge",
+        "Northern Pike",
+        "Lake Trout"
+      ],
+      "description": "Island resort (boat-in) on the Aulneau-area side; American Plan plus housekeeping; 8 cabins plus main lodge with island transport included.",
+      "website": "https://obabikon.com",
+      "phone": null,
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Boat-in island, Obabikon Bay"
+    },
+    {
+      "id": "buena-vista-resort",
+      "name": "Buena Vista Resort",
+      "location": "Morson, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Drive-in resort with rustic cabins, American-plan meals, shore lunch and charter launch fishing; campground.",
+      "website": "http://www.buenavistaresort.com",
+      "phone": "807-488-5652",
+      "email": null,
+      "address": "166 Buenavista Drive, Morson, ON",
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-to, Morson"
+    },
+    {
+      "id": "grassy-narrows-lodge",
+      "name": "Grassy Narrows Lodge",
+      "location": "Aulneau Peninsula, Ontario (Miles Bay; shuttle from Morson)",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Muskellunge",
+        "Northern Pike"
+      ],
+      "description": "Boat-in lodge since 1938 on the Aulneau Peninsula in Miles Bay (boat shuttle from Morson); American Plan plus housekeeping; walleye/muskie fishing and fall duck, deer and bear hunting.",
+      "website": "http://www.grassynarrowslodge.com",
+      "phone": "1-800-589-2214",
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": "1938",
+      "access": "Boat shuttle from Morson"
+    },
+    {
+      "id": "ontario-wilderness-houseboat-rentals",
+      "name": "Ontario Wilderness Houseboat Rentals",
+      "location": "Morson, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Houseboat rentals (9 houseboats) on Lake of the Woods, departing from Gill's Morson Marina.",
+      "website": "https://wildernesshouseboats.com",
+      "phone": "1-800-359-6199",
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Morson marina"
+    },
+    {
+      "id": "saarelas-moonlite-bay",
+      "name": "Saarela's Moonlite Bay",
+      "location": "Little Raspberry Island, Ontario (near Morson)",
+      "kind": "lodge",
+      "species": [
+        "Muskellunge",
+        "Walleye",
+        "Northern Pike"
+      ],
+      "description": "Family-run boat-in island resort on Little Raspberry Island in Sabaskong Bay; 5 cabins; musky/walleye guided trips.",
+      "website": "https://saarelas.com",
+      "phone": "807-631-9169",
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Boat-in island near Morson"
+    },
+    {
+      "id": "ballards-black-island",
+      "name": "Ballard's Black Island",
+      "location": "Lake of the Woods (private island near Morson)",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Muskellunge",
+        "Northern Pike",
+        "Smallmouth Bass"
+      ],
+      "description": "Boat-in American Plan resort on a private island; family tradition since 1961. Note: listed under Ontario by Sunset Country but uses a Minnesota (218) area code — confirm the operation is on the Canadian side before booking.",
+      "website": "https://blackisland.com",
+      "phone": "218-634-1996",
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": "1961",
+      "access": "Boat-in private island"
+    },
+    {
+      "id": "mylies-place-resort",
+      "name": "Mylie's Place Resort",
+      "location": "Morson, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Drive-in resort with light housekeeping cabins plus RV/campsites; May-October.",
+      "website": "https://myliesplaceresort.com",
+      "phone": "807-488-5616",
+      "email": null,
+      "address": null,
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-to near Morson"
+    },
+    {
+      "id": "harris-hill-resort",
+      "name": "Harris Hill Resort",
+      "location": "Morson, Ontario",
+      "kind": "lodge",
+      "species": [
+        "Walleye",
+        "Northern Pike",
+        "Muskellunge",
+        "Smallmouth Bass",
+        "Yellow Perch",
+        "Lake Trout",
+        "Black Crappie"
+      ],
+      "description": "Drive-in resort with American Plan plus housekeeping options and RV sites.",
+      "website": "https://harrishillresort.com",
+      "phone": "855-488-1116",
+      "email": null,
+      "address": "5209 Fishery Road (off Hwy 600), Morson, ON",
+      "amenities": [],
+      "packages": [],
+      "rates_note": null,
+      "fishing_waters": [
+        "Lake of the Woods"
+      ],
+      "ice_fishing": false,
+      "ice_fishing_details": null,
+      "established": null,
+      "access": "Drive-to near Morson"
     }
   ],
   "ice_fishing": {

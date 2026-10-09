@@ -89,7 +89,7 @@ export default function SearchHero() {
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search 272 lakes or 132 lodges — try “Winnipeg”, “walleye”…"
+              placeholder="Search 272 lakes or 175 lodges — try “Winnipeg”, “walleye”…"
               className="flex-1 bg-transparent outline-none px-3 py-2.5 text-pine placeholder:text-pine/40 text-base md:text-lg"
               aria-label="Search lakes and lodges"
             />

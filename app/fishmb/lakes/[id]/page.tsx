@@ -453,9 +453,15 @@ export default function LakeDetailPage({ params }: { params: { id: string } }) {
                 {lake.lodging.map((l, i) => (
                   <li key={i}>
                     {l.detail ? (
-                      <a href={l.detail} target="_blank" rel="noreferrer" className="text-signal font-bold hover:underline">
-                        {l.name} →
-                      </a>
+                      l.detail.startsWith("/") ? (
+                        <Link href={l.detail} className="text-signal font-bold hover:underline">
+                          {l.name} →
+                        </Link>
+                      ) : (
+                        <a href={l.detail} target="_blank" rel="noreferrer" className="text-signal font-bold hover:underline">
+                          {l.name} →
+                        </a>
+                      )
                     ) : (
                       <span className="text-pine/80">{l.name}</span>
                     )}
