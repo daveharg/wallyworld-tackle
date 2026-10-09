@@ -37,7 +37,31 @@ function weatherEmoji(code: number | null): string {
  return "";
 }
 
-/** Lakes tab — saved lakes as full-width cards with weather, catches, species. */
+interface LakeUsage {
+  count: number;
+  last: number;
+}
+
+function getUsage(): Record<string, LakeUsage> {
+  try {
+    return JSON.parse(localStorage.getItem("fishmb-lake-usage") ?? "{}");
+  } catch {
+    return {};
+  }
+}
+
+function recordUsage(lakeId: string) {
+  try {
+    const u = getUsage();
+    const prev = u[lakeId] ?? { count: 0, last: 0 };
+    u[lakeId] = { count: prev.count + 1, last: Date.now() };
+    localStorage.setItem("fishmb-lake-usage", JSON.stringify(u));
+  } catch {
+    // Usage tracking is best-effort.
+  }
+}
+
+/** Lakes tab — saved lakes as full-width cards, most-used first. */
 export default function LakesTab({
   onFlyToLake,
   onSelectLake,
@@ -45,11 +69,7 @@ export default function LakesTab({
   onFlyToLake: (lake: SavedLake) => void;
   onSelectLake: (lake: SavedLake) => void;
 }) {
-  const [favs, setFavs] = useState<SavedLake[]>([]);
-  const [allLakes, setAllLakes] = useState<LakeMeta[]>([]);
   const [cards, setCards] = useState<LakeCardData[]>([]);
-  const [addLakeId, setAddLakeId] = useState("");
-  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -64,16 +84,24 @@ export default function LakesTab({
       try {
         const r = await fetch("/fish-manitoba/data.json");
         const d = await r.json();
-        meta = ((d.lakes ?? []) as LakeMeta[])
-          .map((l) => ({ id: l.id, name: l.name, region: l.region, species: l.species ?? [] }))
-          .sort((a, b) => a.name.localeCompare(b.name));
+        meta = ((d.lakes ?? []) as LakeMeta[]).map((l) => ({
+          id: l.id,
+          name: l.name,
+          region: l.region,
+          species: l.species ?? [],
+        }));
       } catch {
         meta = [];
       }
-      setAllLakes(meta);
       const metaById = new Map(meta.map((m) => [m.id, m]));
-      const sorted = [...favList].sort((a, b) => a.name.localeCompare(b.name));
-      setFavs(sorted);
+      // Most-used first (open count, then recency); never-opened lakes last.
+      const usage = getUsage();
+      const sorted = [...favList].sort((a, b) => {
+        const ua = usage[a.id] ?? { count: 0, last: 0 };
+        const ub = usage[b.id] ?? { count: 0, last: 0 };
+        if (ub.count !== ua.count) return ub.count - ua.count;
+        return ub.last - ua.last;
+      });
 
       // Enrich each lake with weather + catch count in parallel.
       const enriched = await Promise.all(
@@ -109,80 +137,34 @@ export default function LakesTab({
     })();
   }, []);
 
-  const favIds = new Set(favs.map((f) => f.id));
-
-  const addLake = async () => {
-    if (!addLakeId || adding || favIds.has(addLakeId)) return;
-    setAdding(true);
-    try {
-      await fishFetch("/api/fishmb/favorite-lakes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lake_id: addLakeId }),
-      });
-      const f = await fishFetch("/api/fishmb/favorite-lakes");
-      const sorted = ((f.lakes ?? []) as SavedLake[]).sort((a, b) =>
-        a.name.localeCompare(b.name)
-      );
-      setFavs(sorted);
-      setAddLakeId("");
-      // Re-enrich — simplest is a reload of this tab's data.
-      window.location.reload();
-    } finally {
-      setAdding(false);
-    }
+  const handleSelect = (lake: SavedLake) => {
+    recordUsage(lake.id);
+    onSelectLake(lake);
   };
 
   return (
     <div className="pt-1 pb-2">
-      {/* Add a lake */}
-      <div className="flex gap-2 mb-4">
-        <select
-          value={addLakeId}
-          onChange={(e) => setAddLakeId(e.target.value)}
-          className="flex-1 bg-white border border-pine/15 rounded-2xl px-4 py-3 text-[15px] font-semibold text-pine/80"
-        >
-          <option value="">Add a new lake…</option>
-          {allLakes
-            .filter((l) => !favIds.has(l.id))
-            .map((l) => (
-              <option key={l.id} value={l.id}>
-                {l.name}
-                {l.region ? ` — ${l.region}` : ""}
-              </option>
-            ))}
-        </select>
-        <button
-          type="button"
-          onClick={addLake}
-          disabled={!addLakeId || adding}
-          className="shrink-0 bg-pine text-white font-bold rounded-2xl px-5 text-[15px] disabled:opacity-40"
-        >
-          {adding ? "…" : "Add"}
-        </button>
-      </div>
-
-      {/* Lake cards — full width */}
+      {/* Lake cards — full width, most-used on top */}
       {cards.length === 0 ? (
         <p className="text-center text-pine/50 text-sm py-8">
-          No saved lakes yet — add one above to get started.
+          No saved lakes yet.
         </p>
       ) : (
-        <div className="-mx-4 space-y-3">
+        <div className="-mx-4 space-y-2.5">
           {cards.map((lake) => (
             <button
               key={lake.id}
               type="button"
-              onClick={() => onSelectLake(lake)}
-              className="w-full text-left bg-white border-y border-pine/10 px-5 py-4 active:bg-pine/5"
+              onClick={() => handleSelect(lake)}
+              className="w-full text-left bg-white border-y border-pine/10 px-5 py-3 active:bg-pine/5"
             >
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="font-extrabold text-pine text-[17px] leading-tight">
+                  <p className="font-extrabold text-pine text-[16px] leading-tight truncate">
                     {lake.name}
                   </p>
                   {lake.region && (
-                    <p className="text-xs text-pine/50 font-semibold mt-0.5">
+                    <p className="text-[11px] text-pine/50 font-semibold mt-0.5">
                       {lake.region}
                     </p>
                   )}
@@ -195,29 +177,18 @@ export default function LakesTab({
                   ) : (
                     <p className="text-[15px] font-extrabold text-pine/30">—</p>
                   )}
-                  {lake.catchCount !== null && (
-                    <p className="text-xs font-bold text-pine/55 mt-0.5">
+                  {lake.catchCount !== null && lake.catchCount > 0 && (
+                    <p className="text-[11px] font-bold text-pine/55 mt-0.5">
  {lake.catchCount} {lake.catchCount === 1 ? "catch" : "catches"}
                     </p>
                   )}
                 </div>
               </div>
               {lake.species.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mt-2.5">
-                  {lake.species.slice(0, 6).map((s) => (
-                    <span
-                      key={s}
-                      className="text-[11px] font-bold bg-pine/8 text-pine/70 rounded-full px-2.5 py-1"
-                    >
-                      {s}
-                    </span>
-                  ))}
-                  {lake.species.length > 6 && (
-                    <span className="text-[11px] font-bold text-pine/40 px-1 py-1">
-                      +{lake.species.length - 6} more
-                    </span>
-                  )}
-                </div>
+                <p className="text-[11px] text-pine/55 font-semibold mt-1 truncate">
+                  {lake.species.slice(0, 4).join(" · ")}
+                  {lake.species.length > 4 ? ` · +${lake.species.length - 4}` : ""}
+                </p>
               )}
             </button>
           ))}
