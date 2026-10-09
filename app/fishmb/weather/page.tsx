@@ -26,6 +26,26 @@ function compass(deg: number): string {
   return dirs[Math.round(deg / 22.5) % 16];
 }
 
+/* Moon phase — computed from the synodic cycle (no API needed) */
+function moonPhase(date = new Date()): { name: string; icon: string; illum: number; idx: number } {
+  const ref = Date.UTC(2000, 0, 6, 18, 14) / 86400000; // known new moon
+  const now = date.getTime() / 86400000;
+  const age = ((((now - ref) % 29.53058867) + 29.53058867) % 29.53058867);
+  const illum = Math.round(((1 - Math.cos((age / 29.53058867) * 2 * Math.PI)) / 2) * 100);
+  const idx = Math.floor((age / 29.53058867) * 8 + 0.5) % 8;
+  const phases = [
+    { name: "New Moon", icon: "🌑" },
+    { name: "Waxing Crescent", icon: "🌒" },
+    { name: "First Quarter", icon: "🌓" },
+    { name: "Waxing Gibbous", icon: "🌔" },
+    { name: "Full Moon", icon: "🌕" },
+    { name: "Waning Gibbous", icon: "🌖" },
+    { name: "Last Quarter", icon: "🌗" },
+    { name: "Waning Crescent", icon: "🌘" },
+  ];
+  return { ...phases[idx], illum, idx };
+}
+
 type Current = {
   temperature_2m: number;
   apparent_temperature: number;
@@ -76,7 +96,7 @@ function PressureGauge({ value }: { value: number }) {
   const MIN = 980, MAX = 1040;
   const frac = Math.min(1, Math.max(0, (value - MIN) / (MAX - MIN)));
   const angle = 180 - frac * 180; // 180 (left) → 0 (right)
-  const cx = 100, cy = 95, r = 78;
+  const cx = 100, cy = 105, r = 80;
   const rad = (a: number) => (a * Math.PI) / 180;
   const pt = (a: number, rr = r) => `${cx + rr * Math.cos(rad(a))},${cy - rr * Math.sin(rad(a))}`;
   const arc = (a0: number, a1: number, rr = r) =>
@@ -90,22 +110,47 @@ function PressureGauge({ value }: { value: number }) {
     [1022, 1030, "#f59e0b"],
     [1030, MAX, "#f97316"],
   ];
+  const ticks: number[] = [];
+  for (let p = MIN; p <= MAX; p += 10) ticks.push(p);
   return (
-    <svg viewBox="0 0 200 140" className="w-full">
+    <svg viewBox="0 0 200 155" className="w-full">
       {zones.map(([p0, p1, c], i) => (
-        <path key={i} d={arc(ang(p0), ang(p1))} stroke={c} strokeWidth="13" fill="none" strokeLinecap="butt" />
+        <path key={i} d={arc(ang(p0), ang(p1))} stroke={c} strokeWidth="12" fill="none" strokeLinecap="butt" />
       ))}
-      {/* Ideal band label */}
-      <text x={cx + 62 * Math.cos(rad(ang(1015.5)))} y={cy - 62 * Math.sin(rad(ang(1015.5))) - 12} textAnchor="middle" fontSize="9" fontWeight="800" fill="#4ade80">
+      {/* Tick marks + small numbers */}
+      {ticks.map((p) => {
+        const a = ang(p);
+        const x1 = cx + 70 * Math.cos(rad(a)), y1 = cy - 70 * Math.sin(rad(a));
+        const x2 = cx + 76 * Math.cos(rad(a)), y2 = cy - 76 * Math.sin(rad(a));
+        const lx = cx + 58 * Math.cos(rad(a)), ly = cy - 58 * Math.sin(rad(a));
+        return (
+          <g key={p}>
+            <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#ffffff" strokeOpacity="0.45" strokeWidth="1.5" />
+            <text x={lx} y={ly} textAnchor="middle" dominantBaseline="central" fontSize="8.5" fill="#ffffff" opacity="0.6">
+              {p}
+            </text>
+          </g>
+        );
+      })}
+      {/* Ideal band label, centered on the green band */}
+      <text
+        x={cx + 80 * Math.cos(rad(ang(1015.5)))}
+        y={cy - 80 * Math.sin(rad(ang(1015.5)))}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontSize="7.5"
+        fontWeight="800"
+        fill="#ffffff"
+      >
         IDEAL
       </text>
       {/* Needle */}
-      <line x1={cx} y1={cy} x2={pt(angle, 72)} stroke="#ffffff" strokeWidth="4" strokeLinecap="round" />
-      <circle cx={cx} cy={cy} r="7" fill="#ffffff" />
-      <text x={cx} y={cy + 24} textAnchor="middle" fontSize="17" fontWeight="900" fill="#ffffff">
+      <line x1={cx} y1={cy} x2={cx + 64 * Math.cos(rad(angle))} y2={cy - 64 * Math.sin(rad(angle))} stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx={cx} cy={cy} r="5" fill="#ffffff" />
+      <text x={cx} y={cy + 28} textAnchor="middle" fontSize="16" fontWeight="900" fill="#ffffff">
         {value.toFixed(1)}
       </text>
-      <text x={cx} y={cy + 37} textAnchor="middle" fontSize="9" fill="#ffffff" opacity="0.65">
+      <text x={cx} y={cy + 41} textAnchor="middle" fontSize="8.5" fill="#ffffff" opacity="0.65">
         hPa
       </text>
     </svg>
@@ -180,6 +225,15 @@ const EXPLAINERS: Record<string, { title: string; body: string[] }> = {
       "After the front passes, high pressure settles in and fishing can stay tough for 24–48 hours. Fish slow, small and deep until pressure stabilizes.",
     ],
   },
+  moon: {
+    title: "Moon phase",
+    body: [
+      "Many anglers plan around solunar theory: the major feeding windows line up with moonrise and moonset, and they run strongest around the full and new moons.",
+      "Full moon: bright nights can push the feed after dark — the daytime bite often comes early or late. Fish the low-light windows hard.",
+      "New moon: darkest nights, and often the best daytime bite of the lunar cycle.",
+      "Treat the moon as one more clue stacked with pressure, wind and light — not gospel on its own.",
+    ],
+  },
 };
 
 function biteOutlook(p: number, trend: number, cloud: number, wind: number): { label: string; color: string; note: string } {
@@ -246,8 +300,7 @@ export default function WeatherPage() {
   }, [coords]);
 
   const derived = useMemo(() => {
-    if (!data) return null;
-    const c = data.current;
+    if (!data) return null;    const c = data.current;
     // 3-hour pressure trend from hourly series (find current hour index)
     let trend = 0;
     try {
@@ -293,6 +346,8 @@ export default function WeatherPage() {
             : { label: "Stable", color: "#22c55e", icon: "✅" };
     return { c, trend, outlook, front, frontAgoH, frontDrop, wmo: wmo(c.weather_code) };
   }, [data]);
+
+  const moon = useMemo(() => moonPhase(), []);
 
   const windySrc = useMemo(() => {
     const lat = coords.lat.toFixed(2);
@@ -410,6 +465,21 @@ export default function WeatherPage() {
               <p className="text-3xl font-black mt-2">{derived.c.cloud_cover}<span className="text-sm font-bold text-white/50">%</span></p>
               <p className="text-[11px] text-white/60 mt-1">
                 {derived.c.cloud_cover >= 70 ? "Overcast — prime low light" : derived.c.cloud_cover >= 30 ? "Partly cloudy — watch the sun breaks" : "Clear — fish shade and depth"}
+              </p>
+              <p className="text-[10px] text-emerald-200/50 mt-1 underline underline-offset-2">How to read it for fishing</p>
+            </button>
+
+            <button onClick={() => setExplainer("moon")} className="text-left rounded-3xl bg-white/[0.07] border border-white/10 p-4 active:scale-[0.98] transition">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-white/50">Moon</p>
+              <div className="flex items-center gap-3 mt-2">
+                <p className="text-4xl">{moon.icon}</p>
+                <div>
+                  <p className="text-sm font-black">{moon.name}</p>
+                  <p className="text-[11px] text-white/60">{moon.illum}% lit</p>
+                </div>
+              </div>
+              <p className="text-[11px] text-white/60 mt-1">
+                {moon.idx === 4 ? "Full moon — strongest solunar feed windows" : moon.idx === 0 ? "New moon — often the best daytime bite" : "Feed windows peak near full & new moons"}
               </p>
               <p className="text-[10px] text-emerald-200/50 mt-1 underline underline-offset-2">How to read it for fishing</p>
             </button>
