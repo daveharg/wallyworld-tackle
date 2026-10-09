@@ -731,21 +731,46 @@ function FeedPageInner() {
       const { upload_id, upload_url } = (await fishFetch("/api/fish/video/upload-url", {
         method: "POST",
       })) as { upload_id: string; upload_url: string };
+      // Read the whole file into memory first. On iOS, XHR can silently send
+      // an empty body for photo-library videos; reading it here fails fast
+      // with a clear error instead of uploading zero bytes.
+      let payload: ArrayBuffer;
+      try {
+        payload = await file.arrayBuffer();
+      } catch {
+        throw new Error("Couldn't read that video file — try saving it to the Files app first, then upload it.");
+      }
+      if (!payload.byteLength) {
+        throw new Error("That video file looks empty — try saving it to the Files app first, then upload it.");
+      }
+      let sentBytes = 0;
       await new Promise<void>((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open("PUT", upload_url);
         xhr.upload.onprogress = (e) => {
-          if (e.lengthComputable) setVideoProgress(e.loaded / e.total);
+          if (e.lengthComputable) {
+            sentBytes = e.loaded;
+            setVideoProgress(e.loaded / e.total);
+          }
         };
-        xhr.onload = () =>
-          xhr.status >= 200 && xhr.status < 300
-            ? resolve()
-            : reject(new Error(`Video upload failed (network ${xhr.status}).`));
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            // Guard against the silent-empty-upload bug: the bytes actually
+            // sent must match the file size.
+            if (sentBytes > 0 && sentBytes < payload.byteLength * 0.99) {
+              reject(new Error("Video upload was cut off — try again on Wi-Fi."));
+              return;
+            }
+            resolve();
+          } else {
+            reject(new Error(`Video upload failed (network ${xhr.status}).`));
+          }
+        };
         xhr.onerror = () => reject(new Error("Video upload failed — check your connection and try again."));
         xhr.onabort = () => reject(new Error("Video upload was interrupted — try again."));
         xhr.ontimeout = () => reject(new Error("Video upload timed out — try again on Wi-Fi."));
         xhr.timeout = 10 * 60 * 1000;
-        xhr.send(file);
+        xhr.send(payload);
       });
       setVideoPhase("processing");
       // Poll Mux until the video is converted and playable.
