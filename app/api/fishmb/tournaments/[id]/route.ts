@@ -81,6 +81,7 @@ export async function PATCH(
   if (typeof body.scoring === "string" && SCORING.includes(body.scoring)) set("scoring", body.scoring);
   if (typeof body.photo_mode === "string" && ["standard", "measure_only"].includes(body.photo_mode))
     set("photo_mode", body.photo_mode);
+  if (typeof body.hide_locations === "boolean") set("hide_locations", body.hide_locations);
   if (typeof body.status === "string" && ["upcoming", "live", "ended"].includes(body.status))
     set("status", body.status);
   let newStart: string | null = null;

@@ -13,6 +13,7 @@ interface Entry {
   user_name: string;
   status: string;
   created_at: string;
+  location_verified?: boolean;
 }
 
 /** Catches grid: approved for everyone, plus your own pending entries with a badge. */
@@ -76,6 +77,11 @@ export function CatchesGrid({ tournamentId }: { tournamentId: string }) {
             <p className="text-pine/55 text-xs mt-1">
               {e.user_name} · {formatDateTime(e.created_at)}
             </p>
+            {e.location_verified && (
+              <p className="text-accentTeal text-[11px] font-bold mt-1">
+                ✓ Location verified in tournament waters
+              </p>
+            )}
           </div>
         </div>
       ))}

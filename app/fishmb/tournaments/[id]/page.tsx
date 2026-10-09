@@ -166,6 +166,12 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
       <h2 className="font-display font-bold uppercase text-pine text-2xl md:text-3xl tracking-wide mt-12 mb-4">
         Catches
       </h2>
+      {t.hide_locations && (
+        <p className="text-pine/60 text-sm mb-4 bg-pine/5 border border-pine/10 rounded-2xl px-4 py-3">
+          🔒 Catch spots are private in this tournament — the app confirms each catch is inside
+          the tournament waters, but exact locations are never shown to other anglers.
+        </p>
+      )}
       <CatchesGrid tournamentId={t.id} />
     </div>
   );

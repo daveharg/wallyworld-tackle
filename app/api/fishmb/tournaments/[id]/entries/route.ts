@@ -45,7 +45,7 @@ export async function GET(
   // pending ones (so a submission never feels like it vanished).
   const entries = organizer
     ? await getEntries(t.id, ["pending", "approved", "rejected"])
-    : await getEntriesForViewer(t.id, me ? me.id : null);
+    : await getEntriesForViewer(t.id, me ? me.id : null, !!t.hide_locations);
   return NextResponse.json({ tournament: t, entries, is_organizer: organizer });
 }
 

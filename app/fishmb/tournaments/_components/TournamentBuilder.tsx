@@ -37,6 +37,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
   const [entryFee, setEntryFee] = useState("");
   const [payouts, setPayouts] = useState<PayoutTier[]>([]);
   const [autoApprove, setAutoApprove] = useState(false);
+  const [hideLocations, setHideLocations] = useState(false);
   const [photoMode, setPhotoMode] = useState("standard");
   const [coverPhotoUrl, setCoverPhotoUrl] = useState<string | null>(null);
   const [venueName, setVenueName] = useState("");
@@ -103,6 +104,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
           payouts,
           auto_approve_entries: autoApprove,
           photo_mode: photoMode,
+          hide_locations: hideLocations,
           cover_photo_url: coverPhotoUrl,
           venue_name: venueName.trim() || null,
           venue_address: venueAddress.trim() || null,
@@ -294,6 +296,23 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
               <span className="block text-pine/55 text-xs mt-1">
                 For friendly and demo tournaments — catches hit the leaderboard instantly. Leave off
                 for competitive tournaments so you review every catch first.
+              </span>
+            </label>
+          </div>
+          <div className="flex items-start gap-3 bg-white border border-pine/15 rounded-2xl p-4">
+            <input
+              type="checkbox"
+              id="hideLocations"
+              checked={hideLocations}
+              onChange={(e) => setHideLocations(e.target.checked)}
+              className="mt-1 w-4 h-4 accent-[#C2410C]"
+            />
+            <label htmlFor="hideLocations" className="text-sm text-pine">
+              <span className="font-bold">Keep catch spots private</span>
+              <span className="block text-pine/55 text-xs mt-1">
+                For friendly tournaments with strangers — the app still confirms each catch is
+                inside the tournament waters, but other anglers never see anyone&apos;s exact spot.
+                You (the organizer) still see locations for verification.
               </span>
             </label>
           </div>

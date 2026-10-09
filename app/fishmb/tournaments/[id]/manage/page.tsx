@@ -53,6 +53,7 @@ interface Detail {
     payouts: PayoutTier[];
     auto_approve_entries: boolean;
     photo_mode?: string | null;
+    hide_locations?: boolean | null;
     cover_photo_url: string | null;
     venue_name: string | null;
     venue_address: string | null;
@@ -169,6 +170,7 @@ function EditTournament({ tournament, onSaved }: { tournament: Detail["tournamen
   const [payouts, setPayouts] = useState<PayoutTier[]>(tournament.payouts ?? []);
   const [autoApprove, setAutoApprove] = useState(!!tournament.auto_approve_entries);
   const [photoMode, setPhotoMode] = useState(tournament.photo_mode === "measure_only" ? "measure_only" : "standard");
+  const [hideLocations, setHideLocations] = useState(!!tournament.hide_locations);
   const [cover, setCover] = useState<string | null>(tournament.cover_photo_url ?? null);
   const [venueName, setVenueName] = useState(tournament.venue_name ?? "");
   const [venueAddress, setVenueAddress] = useState(tournament.venue_address ?? "");
@@ -238,6 +240,7 @@ function EditTournament({ tournament, onSaved }: { tournament: Detail["tournamen
           payouts,
           auto_approve_entries: autoApprove,
           photo_mode: photoMode,
+          hide_locations: hideLocations,
           cover_photo_url: cover ?? "",
           venue_name: venueName,
           venue_address: venueAddress,
@@ -372,6 +375,20 @@ function EditTournament({ tournament, onSaved }: { tournament: Detail["tournamen
               Auto-approve catches{" "}
               <span className="font-normal text-pine/55">
                 (entries hit the leaderboard instantly, no review)
+              </span>
+            </span>
+          </label>
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={hideLocations}
+              onChange={(e) => setHideLocations(e.target.checked)}
+              className="w-5 h-5 accent-[#1d4d2b]"
+            />
+            <span className="text-pine text-sm font-bold">
+              Keep catch spots private{" "}
+              <span className="font-normal text-pine/55">
+                (app confirms catches are in-bounds; other anglers never see exact spots)
               </span>
             </span>
           </label>

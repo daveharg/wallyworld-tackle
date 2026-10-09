@@ -110,12 +110,13 @@ export async function POST(req: NextRequest) {
   const venueName = typeof body.venue_name === "string" ? body.venue_name.trim().slice(0, 120) : null;
   const venueAddress = typeof body.venue_address === "string" ? body.venue_address.trim().slice(0, 200) : null;
   const photoMode = body.photo_mode === "measure_only" ? "measure_only" : "standard";
+  const hideLocations = body.hide_locations === true;
   const created = await queryOne<{ id: string }>(
     `INSERT INTO fm_tournaments
-       (name, description, organizer_id, lake_ids, species, starts_at, ends_at, rules, scoring, invite_code, max_participants, entry_fee_cents, payouts, auto_approve_entries, cover_photo_url, venue_name, venue_address, photo_mode)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
+       (name, description, organizer_id, lake_ids, species, starts_at, ends_at, rules, scoring, invite_code, max_participants, entry_fee_cents, payouts, auto_approve_entries, cover_photo_url, venue_name, venue_address, photo_mode, hide_locations)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
      RETURNING id`,
-    [name, description, me.id, lakeIds, species, start.toISOString(), end.toISOString(), rules, scoring, inviteCode, maxParticipants, entryFeeCents, JSON.stringify(payouts), body.auto_approve_entries === true, coverPhotoUrl, venueName, venueAddress, photoMode]
+    [name, description, me.id, lakeIds, species, start.toISOString(), end.toISOString(), rules, scoring, inviteCode, maxParticipants, entryFeeCents, JSON.stringify(payouts), body.auto_approve_entries === true, coverPhotoUrl, venueName, venueAddress, photoMode, hideLocations]
   );
   // The organizer is automatically a participant.
   await queryOne(

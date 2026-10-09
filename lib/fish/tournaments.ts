@@ -91,6 +91,7 @@ export interface Tournament {
   payouts: PayoutTier[];
   auto_approve_entries: boolean;
   photo_mode: string;
+  hide_locations: boolean;
   cover_photo_url: string | null;
   venue_name: string | null;
   venue_address: string | null;
@@ -124,6 +125,8 @@ export interface TournamentEntry {
   time_flag: string | null;
   lake_distance_km: number | null;
   location_flag: string | null;
+  /** Present when locations are hidden: confirms the catch was GPS-verified in-area. */
+  location_verified?: boolean;
 }
 
 let ensured = false;
@@ -234,6 +237,10 @@ export async function ensureTournamentTables(): Promise<void> {
   // (friendly tournaments — just the fish on the measuring board, no posed
   // photo with the fish required; extra photos stay optional).
   await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS photo_mode text NOT NULL DEFAULT 'standard'`);
+  // Location privacy: when true, exact catch GPS is hidden from other anglers
+  // (organizer still sees it for verification); everyone else only sees that
+  // the catch was confirmed inside the tournament area.
+  await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS hide_locations boolean NOT NULL DEFAULT false`);
   // One-time repair: the seeded demo's posted rules say entries are
   // auto-approved, so honor that and clear the stuck "pending" backlog.
   // (Organizer ownership is left alone — it isn't needed for this fix.)
@@ -604,13 +611,16 @@ export async function getEntries(tournamentId: string, statuses: string[]): Prom
   );
 }
 
-/** What a non-organizer may see: approved entries plus their own pending ones. */
+/** What a non-organizer may see: approved entries plus their own pending ones.
+ *  When the tournament hides locations, exact GPS is stripped for everyone
+ *  except the entry's owner — others only see the in-area verification. */
 export async function getEntriesForViewer(
   tournamentId: string,
-  viewerId: string | null
+  viewerId: string | null,
+  hideLocations = false
 ): Promise<TournamentEntry[]> {
   await ensureTournamentTables();
-  return query<TournamentEntry>(
+  const rows = await query<TournamentEntry>(
     `SELECT e.*, u.name AS user_name, u.avatar_url,
        (SELECT d.id FROM fm_tournament_entries d
          WHERE d.tournament_id = e.tournament_id AND d.photo_hash = e.photo_hash
@@ -623,6 +633,19 @@ export async function getEntriesForViewer(
      ORDER BY e.created_at DESC`,
     [tournamentId, viewerId]
   );
+  if (!hideLocations) return rows;
+  // Strip exact GPS for other anglers' entries; keep the area confirmation.
+  return rows.map((r) => {
+    const own = viewerId !== null && r.user_id === viewerId;
+    if (own) return r;
+    return {
+      ...r,
+      latitude: null,
+      longitude: null,
+      gps_accuracy: null,
+      location_verified: r.latitude !== null && r.longitude !== null,
+    } as TournamentEntry;
+  });
 }
 
 export interface LeaderboardRow {
