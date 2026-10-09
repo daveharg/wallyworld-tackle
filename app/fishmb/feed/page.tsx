@@ -102,6 +102,27 @@ function timeAgo(iso: string): string {
   return `${Math.floor(s / 86400)}d ago`;
 }
 
+/** Render URLs in post text as clickable links. */
+function linkify(text: string): React.ReactNode[] {
+  const parts = text.split(/(https?:\/\/[^\s]+)/g);
+  return parts.map((part, i) =>
+    /^https?:\/\//.test(part) ? (
+      <a
+        key={i}
+        href={part}
+        target={part.includes("wallyworldtackle.ca") ? undefined : "_blank"}
+        rel="noopener"
+        className="text-signal-dark font-bold hover:underline break-all"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {part.replace(/^https?:\/\/(www\.)?/, "")}
+      </a>
+    ) : (
+      <span key={i}>{part}</span>
+    )
+  );
+}
+
 function Avatar({ name, url, small }: { name: string; url: string | null; small?: boolean }) {
   const cls = small ? "w-9 h-9" : "w-10 h-10";
   if (url) {
@@ -1254,7 +1275,7 @@ function FeedPageInner() {
                     : item.body;
                   return (
                     <>
-                      {text && <p className="text-pine/80 text-sm whitespace-pre-line">{text}</p>}
+                      {text && <p className="text-pine/80 text-sm whitespace-pre-line">{linkify(text)}</p>}
                       {item.spot_share && (
                         <SpotShareCard
                           spot={item.spot_share}
