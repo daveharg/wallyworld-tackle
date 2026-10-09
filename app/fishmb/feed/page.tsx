@@ -242,10 +242,36 @@ function SpotShareCard({
 /** What signed-out visitors see instead of the feed — the pitch, not the posts. */
 function FeedSignupWall({ onJoin }: { onJoin: () => void }) {
   const perks = [
-    { icon: "🐟", text: "Share catches with photos & video" },
-    { icon: "🏆", text: "Join real tournaments" },
-    { icon: "🗺️", text: "Private maps, spots & lake notes" },
-    { icon: "💬", text: "Encrypted chats with fishing friends" },
+    {
+      icon: "🐟",
+      title: "Log every catch",
+      text: "Species, length, weight, photo and GPS spot — kept in your personal catch history with running stats and personal bests.",
+    },
+    {
+      icon: "📸",
+      title: "Posts, photos & video",
+      text: "Share up to 4 photos per post or a 60-second video, get reactions and comments from Manitoba anglers.",
+    },
+    {
+      icon: "🏆",
+      title: "Real tournaments",
+      text: "Create catch-photo-release tournaments with invite codes and live leaderboards, or join ones running right now.",
+    },
+    {
+      icon: "🗺️",
+      title: "Private maps & spots",
+      text: "Save your secret spots on the map with lake contours. They stay private unless you share them with friends.",
+    },
+    {
+      icon: "💬",
+      title: "Encrypted messaging",
+      text: "One-on-one and group chats with photo and spot sharing. End-to-end encrypted — only you and your crew can read them.",
+    },
+    {
+      icon: "🌤️",
+      title: "Bite outlook & weather",
+      text: "Live conditions, wind, pressure trends and a bite prediction for Manitoba lakes, so you fish when they're biting.",
+    },
   ];
   return (
     <div className="text-center pt-10 pb-16 px-2">
@@ -263,14 +289,17 @@ function FeedSignupWall({ onJoin }: { onJoin: () => void }) {
       >
         Join FishMB — it's free
       </button>
-      <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto text-left">
+      <div className="flex flex-col gap-3 max-w-md mx-auto text-left">
         {perks.map((p) => (
           <div
-            key={p.text}
-            className="bg-white border border-pine/10 rounded-2xl px-4 py-3 flex items-center gap-2.5"
+            key={p.title}
+            className="bg-white border border-pine/10 rounded-2xl px-4 py-3.5 flex items-start gap-3"
           >
-            <span className="text-xl">{p.icon}</span>
-            <span className="text-xs font-bold text-pine/80 leading-snug">{p.text}</span>
+            <span className="text-2xl shrink-0">{p.icon}</span>
+            <span>
+              <span className="block text-sm font-black text-pine">{p.title}</span>
+              <span className="block text-xs text-pine/65 leading-snug mt-0.5">{p.text}</span>
+            </span>
           </div>
         ))}
       </div>

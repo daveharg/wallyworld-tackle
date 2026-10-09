@@ -245,20 +245,58 @@ export default function MessagesPage() {
   };
 
   if (!user) {
+    const perks = [
+      {
+        icon: "🔒",
+        title: "End-to-end encrypted",
+        text: "Only you and the people you're talking to can read your messages. Not even FishMB can see them.",
+      },
+      {
+        icon: "👥",
+        title: "One-on-one & group chats",
+        text: "Message a buddy or round up the whole crew to plan the next trip together.",
+      },
+      {
+        icon: "📸",
+        title: "Photos & spots in chat",
+        text: "Send catch photos and drop your saved fishing spots right into the conversation.",
+      },
+      {
+        icon: "📌",
+        title: "Pins & unread badges",
+        text: "Pin important chats to the top and see at a glance which conversations need you.",
+      },
+    ];
     return (
-      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide mb-4">
-          Messages
+      <div className="max-w-md mx-auto px-4 py-16 text-center">
+        <div className="text-6xl mb-4">💬</div>
+        <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide mb-3">
+          Talk fishing, privately
         </h1>
-        <p className="text-pine/60 mb-6">
-          Log in to send end-to-end encrypted messages.
+        <p className="text-pine/60 text-sm mb-6">
+          Built-in messaging for Manitoba anglers — plan trips, share spots
+          and brag about the big one, all without leaving FishMB.
         </p>
         <button
           onClick={openLogin}
-          className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-8 py-3.5 rounded-full"
+          className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-8 py-3.5 rounded-full mb-8"
         >
-          Log in
+          Log in — it's free
         </button>
+        <div className="flex flex-col gap-3 text-left">
+          {perks.map((p) => (
+            <div
+              key={p.title}
+              className="bg-white border border-pine/10 rounded-2xl px-4 py-3.5 flex items-start gap-3"
+            >
+              <span className="text-2xl shrink-0">{p.icon}</span>
+              <span>
+                <span className="block text-sm font-black text-pine">{p.title}</span>
+                <span className="block text-xs text-pine/65 leading-snug mt-0.5">{p.text}</span>
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
