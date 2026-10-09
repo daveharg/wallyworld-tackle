@@ -27,6 +27,8 @@ export interface CatchRow {
   note: string | null;
   caught_at: string;
   created_at: string;
+  lat: number | null;
+  lng: number | null;
   name: string;
   avatar_url: string | null;
 }
@@ -44,6 +46,8 @@ function toItem(c: CatchRow) {
     note: c.note,
     caught_at: c.caught_at,
     created_at: c.created_at,
+    lat: c.lat,
+    lng: c.lng,
     user: { id: c.user_id, name: c.name, avatar_url: c.avatar_url },
   };
 }
@@ -145,8 +149,19 @@ export async function POST(req: NextRequest) {
   }
 
   // Optional GPS coords saved from the catch composer.
-  const rawLat = body.lat === undefined || body.lat === null ? null : Number(body.lat);
-  const rawLng = body.lng === undefined || body.lng === null ? null : Number(body.lng);
+  // (The feed composer sends latitude/longitude; the app sends lat/lng.)
+  const rawLat =
+    body.lat === undefined || body.lat === null
+      ? body.latitude === undefined || body.latitude === null
+        ? null
+        : Number(body.latitude)
+      : Number(body.lat);
+  const rawLng =
+    body.lng === undefined || body.lng === null
+      ? body.longitude === undefined || body.longitude === null
+        ? null
+        : Number(body.longitude)
+      : Number(body.lng);
   const lat =
     rawLat === null ? null : Number.isFinite(rawLat) && rawLat >= -90 && rawLat <= 90 ? rawLat : null;
   const lng =

@@ -2,12 +2,11 @@
 
 import { Suspense } from "react";
 import { useFishAuth } from "../_components/FishAuth";
-import FishingSpots from "../profile/_components/FishingSpots";
-import LakeNotes from "../dashboard/_components/LakeNotes";
+import MapsHub from "./_components/MapsHub";
 
 /**
- * /fishmb/maps — the angler's personal maps hub (separate from the public
- * lake directory): the regular FishMB map with all saved spots and lake notes.
+ * /fishmb/maps — fullscreen map hub. Signed-in anglers get the full-screen
+ * map with the peeking bottom sheet (Catches / Saved spots / Settings).
  */
 export default function MyMapsPage() {
   const { user, openLogin } = useFishAuth();
@@ -20,24 +19,24 @@ export default function MyMapsPage() {
         text: "Save GPS fishing spots with one tap — mark your current location or press and hold anywhere on the map to drop a pin.",
       },
       {
+        icon: "🎣",
+        title: "Your catches on the map",
+        text: "Every catch you log with GPS shows up as a pin — plus public catches from other anglers on the same lake.",
+      },
+      {
         icon: "🔒",
         title: "100% private",
         text: "Your spots are yours alone. Nobody sees them unless you deliberately share one with friends.",
       },
       {
-        icon: "📝",
-        title: "Lake notes",
-        text: "Keep notes on depths, structure and what's biting at each lake — your personal playbook, always with you.",
+        icon: "💨",
+        title: "Wind + satellite views",
+        text: "Flip on live wind at your map's centre or switch to satellite view to read the water before you launch.",
       },
       {
-        icon: "🗺️",
-        title: "Depth contours",
-        text: "Flip on depth contour maps to read the underwater structure before you even launch the boat.",
-      },
-      {
-        icon: "🧭",
-        title: "Navigate back",
-        text: "Tap any saved spot to get distance and compass bearing from your current GPS position.",
+        icon: "📥",
+        title: "Garmin import",
+        text: "Bring in tracks and waypoints from your Garmin with one GPX upload.",
       },
     ];
     return (
@@ -47,8 +46,8 @@ export default function MyMapsPage() {
           Your private fishing maps
         </h1>
         <p className="text-pine/60 text-sm mb-6">
-          Save secret spots, keep lake notes and read depth contours — all
-          on your own personal map.
+          Full-screen map, GPS catches, secret spots and lake notes — all in
+          one place.
         </p>
         <button
           onClick={openLogin}
@@ -75,18 +74,8 @@ export default function MyMapsPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 pt-4 md:pt-6 pb-32">
-      <div className="space-y-8">
-        <section>
-          <Suspense>
-            <FishingSpots />
-          </Suspense>
-        </section>
-        <section>
-          <h2 className="text-base font-black text-pine mb-3">📝 Lake notes</h2>
-          <LakeNotes />
-        </section>
-      </div>
-    </div>
+    <Suspense>
+      <MapsHub />
+    </Suspense>
   );
 }

@@ -22,6 +22,17 @@ export interface TrailPoint {
   t?: number;
 }
 
+export interface CatchPin {
+  id: string;
+  lat: number;
+  lng: number;
+  species: string;
+  length_in: number | null;
+  mine: boolean;
+}
+
+export type BasemapId = "streets" | "satellite";
+
 interface SpotMapProps {
   spots: SpotPin[];
   /** When true, clicking the map drops a pin and calls onPick. */
@@ -41,6 +52,15 @@ interface SpotMapProps {
   goTo?: { lat: number; lng: number } | null;
   /** Fired after a recorded trail is saved, so the parent can refresh. */
   onTrailSaved?: () => void;
+  /** GPS catch pins rendered on the map. */
+  catchPins?: CatchPin[];
+  /** Base map style. */
+  basemap?: BasemapId;
+  /** Fired (debounced by Leaflet) whenever the map stops moving. */
+  onMoveEnd?: (center: { lat: number; lng: number }, zoom: number) => void;
+  /** Fill the parent container (used by the fullscreen maps page) —
+      disables the tap-to-expand behaviour. */
+  fill?: boolean;
 }
 
 function fmtDate(iso: string): string {
@@ -90,6 +110,10 @@ export default function SpotMap({
   overlayTrail,
   goTo,
   onTrailSaved,
+  catchPins,
+  basemap = "streets",
+  onMoveEnd,
+  fill = false,
 }: SpotMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<any>(null);
@@ -100,6 +124,14 @@ export default function SpotMap({
   onLongPressRef.current = onLongPress;
   const pickingRef = useRef(picking);
   pickingRef.current = picking;
+  const onMoveEndRef = useRef(onMoveEnd);
+  onMoveEndRef.current = onMoveEnd;
+  const basemapRef = useRef<BasemapId>(basemap);
+  basemapRef.current = basemap;
+  // Tile layers for the two basemaps (created once the map exists).
+  const baseLayersRef = useRef<{ streets: any; satellite: any } | null>(null);
+  const fillRef = useRef(fill);
+  fillRef.current = fill;
 
   // Trail recording state.
   const [recording, setRecording] = useState(false);
@@ -131,11 +163,25 @@ export default function SpotMap({
         [53.5, -96.5],
         5
       );
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      const streets = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        maxZoom: 16,
-      }).addTo(m);
+        maxZoom: 19,
+      });
+      const satellite = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        {
+          attribution:
+            "Imagery &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics",
+          maxZoom: 19,
+        }
+      );
+      (basemapRef.current === "satellite" ? satellite : streets).addTo(m);
+      baseLayersRef.current = { streets, satellite };
+      m.on("moveend", () => {
+        const c = m.getCenter();
+        onMoveEndRef.current?.({ lat: c.lat, lng: c.lng }, m.getZoom());
+      });
       m.on("focus", () => m.scrollWheelZoom.enable());
       m.on("blur", () => m.scrollWheelZoom.disable());
       m.on("click", (e: { latlng: { lat: number; lng: number } }) => {
@@ -290,6 +336,54 @@ export default function SpotMap({
       }
     })();
   }, [spots, pendingPin, map]);
+
+  // Basemap switching (streets ⇄ satellite).
+  useEffect(() => {
+    if (!map || !baseLayersRef.current) return;
+    const { streets, satellite } = baseLayersRef.current;
+    if (basemap === "satellite") {
+      if (!map.hasLayer(satellite)) {
+        map.removeLayer(streets);
+        satellite.addTo(map);
+      }
+    } else {
+      if (!map.hasLayer(streets)) {
+        map.removeLayer(satellite);
+        streets.addTo(map);
+      }
+    }
+  }, [basemap, map]);
+
+  // GPS catch pins — your catches in signal orange, others' in pine.
+  const catchLayerRef = useRef<any>(null);
+  useEffect(() => {
+    if (!map) return;
+    (async () => {
+      const L = (await import("leaflet")).default;
+      catchLayerRef.current?.remove();
+      const pins = catchPins ?? [];
+      if (pins.length === 0) return;
+      const layer = L.layerGroup();
+      for (const c of pins) {
+        const color = c.mine ? "#e4572e" : "#12322b";
+        const icon = L.divIcon({
+          className: "",
+          html: `<div style="width:30px;height:30px;border-radius:50%;background:${color};border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:15px;">🐟</div>`,
+          iconSize: [30, 30],
+          iconAnchor: [15, 15],
+        });
+        L.marker([c.lat, c.lng], { icon })
+          .bindPopup(
+            `<strong>${escapeHtml(c.species)}</strong>${
+              c.length_in ? `<br/>${c.length_in}&Prime;` : ""
+            }`
+          )
+          .addTo(layer);
+      }
+      layer.addTo(map);
+      catchLayerRef.current = layer;
+    })();
+  }, [catchPins, map]);
 
   // Live GPS person marker — follows you whenever we have a fix.
   const personLayerRef = useRef<any>(null);
@@ -525,6 +619,7 @@ export default function SpotMap({
       if (!tracking) return;
       tracking = false;
       if (
+        !fillRef.current &&
         !pickingRef.current &&
         !measureModeRef.current &&
         Date.now() - st < 350 &&
@@ -638,9 +733,11 @@ export default function SpotMap({
   return (
     <div
       className={
-        expanded
-          ? "fixed inset-0 z-[900] bg-white"
-          : "-mx-8 md:mx-0 md:rounded-3xl md:overflow-hidden md:border md:border-pine/10 md:shadow-sm relative"
+        fill
+          ? "relative h-full w-full overflow-hidden"
+          : expanded
+            ? "fixed inset-0 z-[900] bg-white"
+            : "-mx-8 md:mx-0 md:rounded-3xl md:overflow-hidden md:border md:border-pine/10 md:shadow-sm relative"
       }
     >
       {expanded && (
@@ -660,7 +757,7 @@ export default function SpotMap({
         `leaflet-container` class L.map() adds, which blanks every tile
         (all Leaflet tile CSS is scoped under .leaflet-container).
       */}
-      <div className={expanded ? "h-full w-full" : "h-[300px] md:h-[380px] w-full z-0"}>
+      <div className={expanded || fill ? "h-full w-full" : "h-[300px] md:h-[380px] w-full z-0"}>
         <div ref={containerRef} className="h-full w-full" />
       </div>
 
@@ -704,10 +801,10 @@ export default function SpotMap({
         </button>
       )}
 
-      {/* Map toolbar: record trail + measure. Overlaid only in fullscreen;
-          otherwise it sits in normal flow right under the map so nothing
-          on the map can cover the buttons. */}
-      {expanded && (
+      {/* Map toolbar: record trail + measure. Overlaid in fullscreen/fill
+          modes; otherwise it sits in normal flow right under the map so
+          nothing on the map can cover the buttons. */}
+      {(expanded || fill) && (
         <div className="absolute bottom-9 left-3 right-3 z-[600] flex gap-2">
           {recordButton}
           {measureButton}
@@ -760,7 +857,7 @@ export default function SpotMap({
         </div>
       )}
 
-      {!expanded && (
+      {!expanded && !fill && (
         <div className="flex gap-2 px-4 py-3 bg-white border-t border-pine/10">
           {recordButton}
           {measureButton}
