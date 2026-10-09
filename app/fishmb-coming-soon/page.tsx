@@ -1,13 +1,13 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 
-/** fishmb.ca root — coming soon page with features list. */
+/** fishmb.ca root — coming soon page with detailed feature explanations. */
 
 export const metadata: Metadata = {
   // absolute bypasses the root layout's "%s | Wallyworld Tackle" title template
   title: { absolute: "FishMB — Coming Soon" },
   description:
-    "FishMB — Manitoba's fishing community. Tournaments, private maps, encrypted messaging and bite weather. Coming soon.",
+    "FishMB — Manitoba's fishing community. Tournaments, private maps with Garmin Navionics contours, encrypted messaging and bite weather. Coming soon.",
   openGraph: {
     title: "FishMB — Coming Soon",
     description:
@@ -23,36 +23,51 @@ export const metadata: Metadata = {
   },
 };
 
-const FEATURES = [
+const SECTIONS = [
   {
-    icon: "🏆",
-    title: "Tournaments",
-    text: "Run your own catch-photo-release tournaments. Invite codes, live leaderboards, GPS-verified catches and anti-cheat built in.",
+    icon: "📰",
+    title: "The Feed",
+    text: "An Instagram-style feed for Manitoba anglers. Share catches with up to 4 photos, videos, lake reports and fishing tips. React, comment, and follow the anglers you fish with. No two posts of the same type back to back — every scroll stays fresh.",
   },
   {
     icon: "🗺️",
-    title: "Private maps & spots",
-    text: "Save your secret honey holes on a private GPS map. Only you see them — unless you choose to share with friends.",
+    title: "Maps & Spots",
+    text: "Your private GPS map. Mark honey holes with a press-and-hold, save spots from your current location, and add lake notes. Your spots are private by default — share them with friends only when you choose to. And when the FishMB mobile app lands, flip any map to Garmin Navionics depth contours: bring your own Navionics account, toggle the contour layer over the FishMB base map, and your spots and catches render on both. You pay Garmin directly — FishMB never touches chart money.",
   },
   {
-    icon: "🔒",
-    title: "Encrypted messaging",
-    text: "End-to-end encrypted chats with your fishing buddies. Plan trips and share spots — not even FishMB can read them.",
+    icon: "🏆",
+    title: "Tournaments",
+    text: "Run your own catch-photo-release tournaments. Build one in three steps — basics, waters & species, review — then share the invite code. Live leaderboards, GPS-verified catches, photo anti-cheat, and entry fees with prize payouts. Organizers get join alerts and a full manage page. Strict camera-only fresh photos keep real-money events honest.",
   },
   {
     icon: "🌦️",
-    title: "Bite weather",
-    text: "Barometric pressure, wind and bite outlook for Manitoba lakes. Know before you go.",
+    title: "Bite Weather",
+    text: "Manitoba fishing weather that actually helps you decide. Barometric pressure gauge, wind map, and a bite outlook for your lakes. Check the pressure trend before you hook up the boat.",
+  },
+  {
+    icon: "🔒",
+    title: "Messages",
+    text: "End-to-end encrypted chats with your fishing buddies. Plan trips, share spots, send photos — not even FishMB can read them. Unread badges keep you in the loop.",
   },
   {
     icon: "🐟",
-    title: "Catch logging",
-    text: "Log every catch with photos, lengths and GPS. Build your lifetime record on the water.",
+    title: "Catch Logging",
+    text: "Log every catch with photos, lengths and GPS. Build your lifetime record — species counts, biggest fish, tournament catches — with stat pages and a you-vs-friends leaderboard for every stat.",
   },
   {
     icon: "📖",
-    title: "Regulations & lakes",
-    text: "271 Manitoba lakes with 2026 regulations, verified lodging and real angler info.",
+    title: "Lakes & Regulations",
+    text: "271 Manitoba lakes with 2026 regulations, verified lodging, and Master Angler trophy records. Every lake page shows what's biting, where to stay, and the official rules — no guessing.",
+  },
+  {
+    icon: "👥",
+    title: "Friends",
+    text: "Find anglers, send friend requests, and build your crew. Friends-only posts, shared spots, and head-to-head stat comparisons. Your fishing circle, in one place.",
+  },
+  {
+    icon: "🏷️",
+    title: "Classifieds",
+    text: "Buy and sell gear Manitoba-angler to Manitoba-angler. Rods, reels, ice shacks, boats — list it, share it to the feed, and message the seller directly.",
   },
 ];
 
@@ -68,8 +83,9 @@ export default function FishMBComingSoon() {
           <span className="text-signal">MB</span>
         </h1>
         <p className="text-white/70 text-lg md:text-xl max-w-xl mx-auto mb-8">
-          Manitoba&apos;s fishing community — tournaments, private maps,
-          encrypted messaging and bite weather. Built by anglers, for anglers.
+          Manitoba&apos;s fishing community — tournaments, private maps with
+          Garmin Navionics contours, encrypted messaging and bite weather.
+          Built by anglers, for anglers.
         </p>
         <Link
           href="/demo"
@@ -81,18 +97,23 @@ export default function FishMBComingSoon() {
           The full app, running right now — no signup needed to look around.
         </p>
 
-        <h2 className="font-display font-bold uppercase tracking-wide text-2xl md:text-3xl mb-8 text-left">
+        <h2 className="font-display font-bold uppercase tracking-wide text-2xl md:text-3xl mb-4 text-left">
           What&apos;s coming
         </h2>
-        <div className="grid sm:grid-cols-2 gap-4 text-left">
-          {FEATURES.map((f) => (
+        <p className="text-white/50 text-sm text-left mb-8">
+          Every section of the app, explained.
+        </p>
+        <div className="flex flex-col gap-4 text-left">
+          {SECTIONS.map((s) => (
             <div
-              key={f.title}
+              key={s.title}
               className="bg-white/5 border border-white/10 rounded-3xl p-6"
             >
-              <div className="text-3xl mb-3">{f.icon}</div>
-              <p className="font-bold text-lg mb-1">{f.title}</p>
-              <p className="text-white/60 text-sm leading-relaxed">{f.text}</p>
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-3xl">{s.icon}</span>
+                <p className="font-bold text-lg">{s.title}</p>
+              </div>
+              <p className="text-white/60 text-sm leading-relaxed">{s.text}</p>
             </div>
           ))}
         </div>
