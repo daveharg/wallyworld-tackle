@@ -62,6 +62,11 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
               📏 Measure-only photos — no posed photo with the fish needed
             </p>
           )}
+          {t.photo_mode === "strict" && (
+            <p className="mt-3 inline-block text-xs font-bold uppercase tracking-wider text-pine bg-pine/10 rounded-full px-4 py-2">
+              🔒 Strict camera-only — entries must be taken with the FishMB app&apos;s in-app camera
+            </p>
+          )}
         </div>
         <TournamentActions tournamentId={t.id} />
       </div>

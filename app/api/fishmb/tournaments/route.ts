@@ -109,7 +109,10 @@ export async function POST(req: NextRequest) {
       : null;
   const venueName = typeof body.venue_name === "string" ? body.venue_name.trim().slice(0, 120) : null;
   const venueAddress = typeof body.venue_address === "string" ? body.venue_address.trim().slice(0, 200) : null;
-  const photoMode = body.photo_mode === "measure_only" ? "measure_only" : "standard";
+  const photoMode =
+    typeof body.photo_mode === "string" && ["measure_only", "strict"].includes(body.photo_mode)
+      ? body.photo_mode
+      : "standard";
   const hideLocations = body.hide_locations === true;
   const created = await queryOne<{ id: string }>(
     `INSERT INTO fm_tournaments
