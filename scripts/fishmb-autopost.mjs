@@ -192,6 +192,7 @@ async function contentPosts(userId) {
   // Lakes with real verified photos get the rich treatment.
   const photoLakes = LAKES.filter((l) => WEEKLY_PHOTOS[l.id]);
   const walleyeLakes = LAKES.filter((l) => (l.species ?? []).some((s) => /walleye/i.test(s)));
+  let lakeOfWeek = null;
   if (walleyeLakes.length > 0) {
     if (await alreadyPosted(userId, "%🌊 Lake of the Week%")) {
       console.log("Lake post: already posted this week, skipping.");
@@ -199,20 +200,25 @@ async function contentPosts(userId) {
       // Prefer a lake with a real photo; fall back to rotation.
       const withPhoto = walleyeLakes.filter((l) => WEEKLY_PHOTOS[l.id]);
       const pool = withPhoto.length > 0 ? withPhoto : walleyeLakes;
-      const lake = pool[weekNo % pool.length];
+      lakeOfWeek = pool[weekNo % pool.length];
       await post(
         userId,
-        `🌊 Lake of the Week: ${lake.name}\n\n${lakeBlurb(lake)}\n\nSee the full lake page for 2026 regulations, stocking history, and lodging — then get out there! 🎣`,
-        WEEKLY_PHOTOS[lake.id] ?? null
+        `🌊 Lake of the Week: ${lakeOfWeek.name}\n\n${lakeBlurb(lakeOfWeek)}\n\nSee the full lake page for 2026 regulations, stocking history, and lodging — then get out there! 🎣`,
+        WEEKLY_PHOTOS[lakeOfWeek.id] ?? null
       );
     }
   }
   // Hot Spot of the Week — a featured fishing spot with a real photo.
+  // Never the same lake as this week's Lake of the Week.
   if (photoLakes.length > 0) {
     if (await alreadyPosted(userId, "%🔥 Hot Spot of the Week%")) {
       console.log("Hot spot post: already posted this week, skipping.");
     } else {
-      const lake = photoLakes[weekNo % photoLakes.length];
+      const hotPool = lakeOfWeek
+        ? photoLakes.filter((l) => l.id !== lakeOfWeek.id)
+        : photoLakes;
+      const pool2 = hotPool.length > 0 ? hotPool : photoLakes;
+      const lake = pool2[(weekNo + Math.floor(pool2.length / 2)) % pool2.length];
       await post(
         userId,
         `🔥 Hot Spot of the Week: ${lake.name}\n\n${lakeBlurb(lake)}\n\nOne of Manitoba's premier fishing destinations — who's been out here lately? Drop your reports! 🎣`,
