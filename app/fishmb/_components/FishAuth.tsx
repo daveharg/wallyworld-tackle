@@ -126,6 +126,18 @@ function LoginModal({ onClose, onDone }: { onClose: () => void; onDone: (u: Fish
   const [termsOk, setTermsOk] = useState(false);
   const canContinue = ageOk && termsOk;
 
+  // Remember a previous acceptance so returning users don't check twice.
+  useEffect(() => {
+    try {
+      if (localStorage.getItem("fishmb-terms-ok") === "1") {
+        setAgeOk(true);
+        setTermsOk(true);
+      }
+    } catch {
+      // storage unavailable — non-fatal
+    }
+  }, []);
+
   useEffect(() => {
     if (!canContinue) return;
     let cancelled = false;
@@ -144,7 +156,12 @@ function LoginModal({ onClose, onDone }: { onClose: () => void; onDone: (u: Fish
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || "Sign-in failed.");
-            localStorage.setItem(FISHMB_TOKEN_KEY, data.token);
+            try {
+              localStorage.setItem(FISHMB_TOKEN_KEY, data.token);
+              localStorage.setItem("fishmb-terms-ok", "1");
+            } catch {
+              // storage unavailable — non-fatal
+            }
             onDone(data.user, data.is_new_user === true);
           } catch (e) {
             setError(e instanceof Error ? e.message : "Sign-in failed.");
