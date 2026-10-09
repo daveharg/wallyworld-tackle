@@ -79,7 +79,7 @@ export default function LeaderboardDisplayPage({ params }: { params: { id: strin
             onClick={goFullscreen}
             className="text-white/50 hover:text-white text-xs font-bold uppercase tracking-wider transition-colors"
           >
-            ⛶ Full screen
+ Full screen
           </button>
         </div>
         <p className="text-gold font-bold uppercase tracking-[0.28em] text-sm mb-1">

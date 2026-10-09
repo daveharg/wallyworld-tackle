@@ -111,7 +111,7 @@ export function SpeciesLakes({
               : "bg-gold/25 text-pine hover:bg-gold/40"
           }`}
         >
-          {locating ? "Locating…" : nearby ? "✕ Clear" : "📍 Closest to you"}
+ {locating ? "Locating…" : nearby ? " Clear" : " Closest to you"}
         </button>
         {tabs.map((t, i) => (
           <button

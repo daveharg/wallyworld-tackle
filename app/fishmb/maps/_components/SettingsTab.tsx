@@ -132,12 +132,12 @@ export default function SettingsTab({
 
   return (
     <div className="pt-1 space-y-4">
-      <Section icon="🗺️" title="Map options" sub="Tune the map to how you fish.">
+ <Section icon="" title="Map options" sub="Tune the map to how you fish.">
         <div className="flex bg-pine/5 rounded-full p-1 mb-3">
           {(
             [
-              { id: "streets", label: "🛣️ Streets" },
-              { id: "satellite", label: "🛰️ Satellite" },
+ { id: "streets", label: " Streets" },
+ { id: "satellite", label: " Satellite" },
             ] as const
           ).map((b) => (
             <button
@@ -157,7 +157,7 @@ export default function SettingsTab({
           onClick={() => onWindChange(!windOn)}
           className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3"
         >
-          <span className="text-sm font-bold text-pine">💨 Wind overlay</span>
+          <span className="text-sm font-bold text-pine">Wind overlay</span>
           <span
             className={`w-12 h-7 rounded-full p-1 transition-colors ${
               windOn ? "bg-signal" : "bg-pine/15"
@@ -175,7 +175,7 @@ export default function SettingsTab({
         </p>
       </Section>
 
-      <Section icon="⭐" title="Saved lakes" sub="Jump the map straight to a saved lake.">
+ <Section icon="" title="Saved lakes" sub="Jump the map straight to a saved lake.">
         <select
           value={selectedFav}
           onChange={(e) => {
@@ -194,7 +194,7 @@ export default function SettingsTab({
               {f.name}
             </option>
           ))}
-          <option value="__add__">➕ Add a new lake…</option>
+          <option value="__add__">Add a new lake…</option>
         </select>
         {selectedFav && selectedFav !== "__add__" && (
           <button
@@ -202,7 +202,7 @@ export default function SettingsTab({
             onClick={() => removeFav(selectedFav)}
             className="mt-2 w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-2.5 text-signal-dark text-xs font-bold uppercase tracking-wider"
           >
-            🗑️ Remove this lake
+ Remove this lake
           </button>
         )}
         {selectedFav === "__add__" && (
@@ -229,17 +229,17 @@ export default function SettingsTab({
               disabled={!addLakeId || addingLake}
               className="mt-2 w-full bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-5 py-3 rounded-2xl disabled:opacity-40 transition-colors"
             >
-              {addingLake ? "Adding…" : "★ Add this lake"}
+ {addingLake ? "Adding…" : " Add this lake"}
             </button>
           </div>
         )}
       </Section>
 
-      <Section icon="📝" title="Lake notes" sub="Your private notebook — depths, structure, what's biting.">
+ <Section icon="" title="Lake notes" sub="Your private notebook — depths, structure, what's biting.">
         <LakeNotes />
       </Section>
 
-      <Section icon="🛥️" title="My trails" sub="Overlay a recorded boat route to retrace it.">
+ <Section icon="" title="My trails" sub="Overlay a recorded boat route to retrace it.">
         {trails.length > 0 ? (
           <div className="flex gap-2">
             <select
@@ -262,7 +262,7 @@ export default function SettingsTab({
                 aria-label="Delete the selected trail"
                 className="shrink-0 bg-paper-deep border border-pine/15 rounded-2xl px-4 text-pine/50 hover:text-signal-dark text-sm font-bold"
               >
-                🗑️
+ 
               </button>
             )}
           </div>
@@ -273,7 +273,7 @@ export default function SettingsTab({
         )}
       </Section>
 
-      <Section icon="📥" title="Garmin import" sub="Bring in tracks and waypoints from your Garmin.">
+ <Section icon="" title="Garmin import" sub="Bring in tracks and waypoints from your Garmin.">
         <GpxImport onImported={onTrailsChanged} />
       </Section>
     </div>

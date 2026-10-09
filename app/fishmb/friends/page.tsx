@@ -109,7 +109,7 @@ export default function FriendsPage() {
     body: JSON.stringify(b),
   });
   const request = (id: string) =>
-    act(id, () => fishFetch("/api/fish/friends/request", json({ user_id: id })), "Friend request sent 🎣");
+ act(id, () => fishFetch("/api/fish/friends/request", json({ user_id: id })), "Friend request sent ");
   const accept = (id: string) =>
     act(id, () => fishFetch("/api/fish/friends/respond", json({ requester_id: id, accept: true })), "You're friends now!");
   const decline = (id: string) =>
@@ -250,13 +250,13 @@ export default function FriendsPage() {
               disabled={busy === actionFriend.id}
               className="w-full bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3.5 rounded-full mb-3 disabled:opacity-50 transition-colors"
             >
-              {busy === actionFriend.id ? "Opening…" : "💬 Message"}
+ {busy === actionFriend.id ? "Opening…" : " Message"}
             </button>
             <Link
               href={`/fishmb/anglers/${actionFriend.id}`}
               className="block w-full bg-pine/10 hover:bg-pine/15 text-pine font-bold uppercase tracking-wider text-sm px-6 py-3.5 rounded-full mb-3 transition-colors"
             >
-              👤 View profile
+ View profile
             </Link>
             <button
               onClick={() => setActionFriend(null)}

@@ -75,7 +75,7 @@ export default function LodgeDetailPage({ params }: { params: { id: string } }) 
                   : "bg-pine/10 text-pine/70"
               }`}
             >
-              {lodge.access.includes("fly-in") ? "✈️" : "🚗"} {lodge.access} lodge
+ {lodge.access.includes("fly-in") ? "" : ""} {lodge.access} lodge
             </span>
           </p>
         )}

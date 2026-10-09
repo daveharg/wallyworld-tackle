@@ -73,8 +73,8 @@ function ComposerSheet({
             {(
               [
                 ["post", "Share a post"],
-                ["catch", "🐟 Log a catch"],
-                ["tournament", "🏆 Tournament"],
+ ["catch", " Log a catch"],
+ ["tournament", " Tournament"],
               ] as const
             ).map(([v, label]) => (
               <button
@@ -117,8 +117,8 @@ function TournamentPanel() {
       <div className="flex gap-2 mb-5">
         {(
           [
-            ["build", "🏆 Build a tournament"],
-            ["join", "🔑 Join with a code"],
+ ["build", " Build a tournament"],
+ ["join", " Join with a code"],
           ] as const
         ).map(([v, label]) => (
           <button
@@ -146,7 +146,7 @@ function TournamentPanel() {
             href="/fishmb/tournaments"
             className="block text-center mt-5 text-sm font-bold uppercase tracking-wider text-signal-dark hover:underline"
           >
-            🏆 Browse all tournaments →
+ Browse all tournaments →
           </Link>
         </div>
       )}
@@ -246,7 +246,7 @@ interface FeedAd {
 const FEATURE_PROMOS = [
   {
     img: "/fishmb/promos/tournaments.jpg",
-    badge: "🏆 Tournaments",
+ badge: " Tournaments",
     title: "Run your own fishing tournament",
     body: "Challenge your friends to a month-long walleye showdown. Invite codes, live leaderboard, GPS-verified catches — FishMB never touches the money.",
     cta: "Start a tournament",
@@ -254,7 +254,7 @@ const FEATURE_PROMOS = [
   },
   {
     img: "/fishmb/promos/maps.jpg",
-    badge: "🗺️ My Maps",
+ badge: " My Maps",
     title: "Your secret spots, on your private map",
     body: "Mark honey holes with a long-press, keep lake notes on depths and patterns, and flip to depth contours when they land. Only you can see them.",
     cta: "Explore my maps",
@@ -262,7 +262,7 @@ const FEATURE_PROMOS = [
   },
   {
     img: "/fishmb/promos/messaging.jpg",
-    badge: "🔒 Encrypted messaging",
+ badge: " Encrypted messaging",
     title: "Chat with your fishing friends — privately",
     body: "End-to-end encrypted 1:1 and group chats. Plan the trip, share the photos, keep the spots secret. Not even FishMB can read them.",
     cta: "Start chatting",
@@ -270,7 +270,7 @@ const FEATURE_PROMOS = [
   },
   {
     img: "/fishmb/promos/weather.jpg",
-    badge: "🌦️ Fish-activity forecast",
+ badge: " Fish-activity forecast",
     title: "Is the weather in your favour?",
     body: "Barometric pressure gauge with the ideal bite range, wind, cloud cover and storm-front tracking — plus a live wind map. Know before you go.",
     cta: "Check the forecast",
@@ -285,7 +285,7 @@ function FeaturePromoCard({ promo }: { promo: (typeof FEATURE_PROMOS)[number] })
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={promo.img} alt={promo.title} loading="lazy" className="w-full max-h-72 object-cover" />
         <span className="absolute top-3 left-3 text-[10px] font-black uppercase tracking-[0.18em] bg-black/55 text-white px-3 py-1.5 rounded-full">
-          ✨ {promo.badge}
+ {promo.badge}
         </span>
       </div>
       <div className="p-5">
@@ -380,7 +380,6 @@ function SpotShareCard({
   return (
     <div className="mt-3 -mx-5 bg-pine/[0.04] border-y border-pine/10 px-5 py-4">
       <div className="flex items-center gap-2 mb-1">
-        <span className="text-xl">📍</span>
         <p className="font-bold text-pine truncate">{spot.name}</p>
       </div>
       {spot.notes ? (
@@ -394,7 +393,7 @@ function SpotShareCard({
           href={mapHref}
           className="flex-1 text-center bg-pine text-white font-bold uppercase tracking-wider text-xs px-4 py-3 rounded-2xl"
         >
-          🗺️ View on map
+ View on map
         </Link>
         {!own && (
           <button
@@ -403,7 +402,7 @@ function SpotShareCard({
             disabled={saving || saved}
             className="flex-1 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-4 py-3 rounded-2xl disabled:opacity-60 transition-colors"
           >
-            {saved ? "✓ Saved!" : saving ? "Saving…" : "💾 Save spot"}
+ {saved ? " Saved!" : saving ? "Saving…" : " Save spot"}
           </button>
         )}
       </div>
@@ -416,39 +415,38 @@ function SpotShareCard({
 function FeedSignupWall({ onJoin }: { onJoin: () => void }) {
   const perks = [
     {
-      icon: "🐟",
+ icon: "",
       title: "Log every catch",
       text: "Species, length, weight, photo and GPS spot — kept in your personal catch history with running stats and personal bests.",
     },
     {
-      icon: "📸",
+ icon: "",
       title: "Posts, photos & video",
       text: "Share up to 4 photos per post or a 60-second video, get reactions and comments from Manitoba anglers.",
     },
     {
-      icon: "🏆",
+ icon: "",
       title: "Real tournaments",
       text: "Create catch-photo-release tournaments with invite codes and live leaderboards, or join ones running right now.",
     },
     {
-      icon: "🗺️",
+ icon: "",
       title: "Private maps & spots",
       text: "Save your secret spots on the map with lake contours. They stay private unless you share them with friends.",
     },
     {
-      icon: "💬",
+ icon: "",
       title: "Encrypted messaging",
       text: "One-on-one and group chats with photo and spot sharing. End-to-end encrypted — only you and your crew can read them.",
     },
     {
-      icon: "🌤️",
+ icon: "",
       title: "Fish-activity forecast",
       text: "Live conditions, wind and pressure trends, with a forecast of how active the fish are on Manitoba lakes — so you fish when they're biting.",
     },
   ];
   return (
     <div className="text-center pt-10 pb-16 px-2">
-      <div className="text-6xl mb-4">🎣</div>
       <h1 className="text-2xl font-black text-pine tracking-tight mb-2">
         The bite is happening in here.
       </h1>
@@ -589,8 +587,8 @@ function Reactions({
 
   return (
     <div className="flex items-center gap-1">
-      {btn(1, "👍", item.like_count, "Like")}
-      {btn(-1, "👎", item.dislike_count, "Dislike")}
+ {btn(1, "", item.like_count, "Like")}
+ {btn(-1, "", item.dislike_count, "Dislike")}
     </div>
   );
 }
@@ -1309,9 +1307,9 @@ function FeedPageInner() {
             longitude: catchLng,
           }),
         });
-        setCatchNote("Catch logged — and sent to your tournament for review! 🎣");
+ setCatchNote("Catch logged — and sent to your tournament for review! ");
       } else {
-        setCatchNote("Catch logged! 🎣");
+ setCatchNote("Catch logged! ");
       }
       setCatchSpecies("");
       setCatchLength("");
@@ -1356,7 +1354,7 @@ function FeedPageInner() {
             aria-expanded={sectionMenuOpen}
             className="flex items-center gap-1.5 text-xl font-black text-pine tracking-tight"
           >
-            {friendsOnly ? (tab === "catch" ? "🎣 Friends Catches" : "👥 Friends") : tab === "catch" ? "🐟 Catches" : "🌊 Community"}
+ {friendsOnly ? (tab === "catch" ? " Friends Catches" : " Friends") : tab === "catch" ? " Catches" : " Community"}
             <span className="text-pine/40 text-sm">▾</span>
           </button>
           {sectionMenuOpen && (
@@ -1365,10 +1363,10 @@ function FeedPageInner() {
               <div role="menu" className="absolute z-50 mt-2 w-56 bg-white rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.18)] border border-pine/10 py-1.5">
                 {(
                   [
-                    ["community", "🌊 Community", "/fishmb/feed"],
-                    ["buddies", "👥 Friends", "/fishmb/feed?friends=1"],
-                    ["catches", "🐟 Catches", "/fishmb/feed?kind=catch"],
-                    ["friendcatches", "🎣 Friends Catches", "/fishmb/feed?kind=catch&friends=1"],
+ ["community", " Community", "/fishmb/feed"],
+ ["buddies", " Friends", "/fishmb/feed?friends=1"],
+ ["catches", " Catches", "/fishmb/feed?kind=catch"],
+ ["friendcatches", " Friends Catches", "/fishmb/feed?kind=catch&friends=1"],
                   ] as const
                 ).map(([id, label, href]) => {
                   const current =
@@ -1423,7 +1421,7 @@ function FeedPageInner() {
             onClick={clearSearch}
             className="text-xs font-bold text-signal-dark hover:underline"
           >
-            Clear ✕
+ Clear 
           </button>
         </div>
       )}
@@ -1457,13 +1455,13 @@ function FeedPageInner() {
                     </Link>
                     <p className="text-[11px] text-white/85 drop-shadow">
                       {timeAgo(item.created_at)}
-                      {item.visibility === "friends" && " · 👥 friends"}
+ {item.visibility === "friends" && " · friends"}
                     </p>
                   </div>
                 </div>
                 {item.kind === "catch" && (
                   <span className="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider bg-black/55 text-white px-3 py-1 rounded-full">
-                    🐟 Catch
+ Catch
                   </span>
                 )}
               </>
@@ -1494,7 +1492,7 @@ function FeedPageInner() {
                     </Link>
                     <p className="text-xs text-pine/45">
                       {timeAgo(item.created_at)}
-                      {item.visibility === "friends" && " · 👥 friends only"}
+ {item.visibility === "friends" && " · friends only"}
                     </p>
                   </div>
                   {item.kind === "catch" && (
@@ -1533,7 +1531,7 @@ function FeedPageInner() {
                     onClick={() => toggleComments(item.id)}
                     className="text-xs font-bold uppercase tracking-wider text-pine/50 hover:text-signal-dark"
                   >
-                    💬 {item.comment_count} {item.comment_count === 1 ? "comment" : "comments"}
+ {item.comment_count} {item.comment_count === 1 ? "comment" : "comments"}
                   </button>
                 </div>
               </div>
@@ -1567,7 +1565,7 @@ function FeedPageInner() {
             </div>
           )}
           {!loadingMore && !hasMore && (
-            <p className="text-pine/45 text-sm">You&apos;re all caught up 🎣</p>
+ <p className="text-pine/45 text-sm">You&apos;re all caught up </p>
           )}
         </div>
       )}
@@ -1603,7 +1601,7 @@ function FeedPageInner() {
                 aria-label="Close search"
                 className="text-pine/50 hover:text-pine font-bold px-2"
               >
-                ✕
+ 
               </button>
             </form>
           </div>
@@ -1629,13 +1627,13 @@ function FeedPageInner() {
                         key={i}
                         className="relative text-xs font-bold text-pine/70 bg-pine/5 rounded-full pl-3 pr-2 py-1.5"
                       >
-                        📷 {f.name.slice(0, 20)}
+ {f.name.slice(0, 20)}
                         <button
                           onClick={() => setPostPhotos(postPhotos.filter((_, j) => j !== i))}
                           aria-label={`Remove ${f.name}`}
                           className="ml-1.5 text-pine/50 hover:text-signal-dark font-bold"
                         >
-                          ✕
+ 
                         </button>
                       </span>
                     ))}
@@ -1645,8 +1643,8 @@ function FeedPageInner() {
                   <div className="flex items-center gap-3">
                     <label className="text-sm font-bold text-signal-dark cursor-pointer">
                       {postPhotos.length > 0
-                        ? `📷 ${postPhotos.length}/4 photos`
-                        : "📷 Add photos (up to 4)"}
+ ? ` ${postPhotos.length}/4 photos`
+ : " Add photos (up to 4)"}
                       <input
                         type="file"
                         accept="image/*"
@@ -1661,7 +1659,7 @@ function FeedPageInner() {
                     </label>
                     {!postVideo ? (
                       <label className="text-sm font-bold text-signal-dark cursor-pointer">
-                        🎬 Add video (60s)
+ Add video (60s)
                         <input
                           type="file"
                           accept="video/*"
@@ -1675,19 +1673,19 @@ function FeedPageInner() {
                       </label>
                     ) : (
                       <span className="relative text-xs font-bold text-pine/70 bg-pine/5 rounded-full pl-3 pr-2 py-1.5">
-                        🎬 {postVideo.name.slice(0, 18)}
+ {postVideo.name.slice(0, 18)}
                         {videoPhase === "uploading" && videoProgress !== null && (
                           <span className="text-pine/50"> · {Math.round(videoProgress * 100)}%</span>
                         )}
                         {videoPhase === "processing" && <span className="text-pine/50"> · processing…</span>}
-                        {videoPhase === "ready" && <span className="text-green-700"> · ready ✓</span>}
+ {videoPhase === "ready" && <span className="text-green-700"> · ready </span>}
                         {videoPhase === "error" && <span className="text-signal-dark"> · failed</span>}
                         <button
                           onClick={clearVideo}
                           aria-label="Remove video"
                           className="ml-1.5 text-pine/50 hover:text-signal-dark font-bold"
                         >
-                          ✕
+ 
                         </button>
                       </span>
                     )}
@@ -1699,8 +1697,8 @@ function FeedPageInner() {
                       className="bg-paper-deep border border-pine/15 rounded-full px-3 py-2 text-xs font-bold text-pine focus:outline-none"
                       aria-label="Who can see this"
                     >
-                      <option value="public">🌍 Everyone</option>
-                      <option value="friends">👥 Friends only</option>
+                      <option value="public">Everyone</option>
+                      <option value="friends">Friends only</option>
                     </select>
                     <button
                       onClick={post}
@@ -1745,13 +1743,13 @@ function FeedPageInner() {
                         key={i}
                         className="relative text-xs font-bold text-pine/70 bg-pine/5 rounded-full pl-3 pr-2 py-1.5"
                       >
-                        📷 {f.name.slice(0, 20)}
+ {f.name.slice(0, 20)}
                         <button
                           onClick={() => setCatchPhotos(catchPhotos.filter((_, j) => j !== i))}
                           aria-label={`Remove ${f.name}`}
                           className="ml-1.5 text-pine/50 hover:text-signal-dark font-bold"
                         >
-                          ✕
+ 
                         </button>
                       </span>
                     ))}
@@ -1760,8 +1758,8 @@ function FeedPageInner() {
                 <div className="flex items-center justify-between mt-3 gap-2 flex-wrap">
                   <label className="text-sm font-bold text-signal-dark cursor-pointer">
                     {catchPhotos.length > 0
-                      ? `📷 ${catchPhotos.length}/4 photos *`
-                      : "📷 Add photos (up to 4) *"}
+ ? ` ${catchPhotos.length}/4 photos *`
+ : " Add photos (up to 4) *"}
                     <input
                       type="file"
                       accept="image/*"
@@ -1780,7 +1778,7 @@ function FeedPageInner() {
                     disabled={locating}
                     className="text-sm font-bold text-signal-dark disabled:opacity-50"
                   >
-                    {locating ? "📍 Getting location…" : "📍 Save location"}
+ {locating ? " Getting location…" : " Save location"}
                   </button>
                   <select
                     value={visibility}
@@ -1788,15 +1786,15 @@ function FeedPageInner() {
                     className="bg-paper-deep border border-pine/15 rounded-full px-3 py-2 text-xs font-bold text-pine focus:outline-none"
                     aria-label="Who can see this"
                   >
-                    <option value="public">🌍 Everyone</option>
-                    <option value="friends">👥 Friends only</option>
-                    <option value="private">🔒 Only me</option>
+                    <option value="public">Everyone</option>
+                    <option value="friends">Friends only</option>
+                    <option value="private">Only me</option>
                   </select>
                 </div>
                 {catchLat !== null && catchLng !== null && (
                   <div className="flex items-center justify-between mt-2 bg-pine/5 border border-pine/10 rounded-2xl px-4 py-2.5">
                     <p className="text-sm text-pine font-bold">
-                      📍 Location saved
+ Location saved
                       <span className="font-normal text-pine/50 text-xs ml-2">
                         {catchLat.toFixed(5)}, {catchLng.toFixed(5)}
                       </span>
@@ -1869,7 +1867,7 @@ function FeedPageInner() {
           <div className="absolute inset-0 bg-pine-deep/60" onClick={() => setTournamentHelpOpen(false)} />
           <div className="relative bg-paper rounded-3xl p-6 w-full max-w-sm shadow-2xl max-h-[80dvh] overflow-y-auto">
             <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-3">
-              🏆 How tournaments work
+ How tournaments work
             </h3>
             <div className="space-y-3 text-sm text-pine/75 leading-relaxed">
               <p>

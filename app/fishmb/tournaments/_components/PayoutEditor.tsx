@@ -61,7 +61,7 @@ export function PayoutEditor({
             className="w-9 h-9 rounded-xl text-pine/50 hover:bg-signal/10 hover:text-signal-dark font-bold"
             aria-label="Remove payout"
           >
-            ✕
+ 
           </button>
         </div>
       ))}

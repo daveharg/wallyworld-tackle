@@ -55,7 +55,7 @@ export default function WindWidget({ lat, lng }: { lat: number; lng: number }) {
         style={{ transform: `rotate(${wind.dir + 180}deg)` }}
         aria-hidden
       >
-        ➤
+ 
       </span>
       <span className="text-xs font-black text-pine tabular-nums whitespace-nowrap">
         {wind.speed} km/h {compass16(wind.dir)}

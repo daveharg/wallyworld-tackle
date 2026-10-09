@@ -63,7 +63,6 @@ export function UserActivityMap({ cells }: { cells: MapCell[] }) {
   if (cells.length === 0) {
     return (
       <div className="bg-white border border-pine/10 rounded-3xl p-10 text-center">
-        <p className="text-4xl mb-3">🗺️</p>
         <p className="text-pine/60 text-sm">
           Not enough location data yet — once anglers save spots and log catches
           with GPS, activity areas will appear here.

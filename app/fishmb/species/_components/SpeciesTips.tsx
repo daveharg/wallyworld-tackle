@@ -45,7 +45,7 @@ export function SpeciesTips({ species }: { species: string }) {
       setDraft("");
       setShareInFeed(false);
       setOpen(false);
-      setNote(shareInFeed ? "Tip posted — it's in the community feed too! 🎣" : "Tip posted on this page! 🎣");
+ setNote(shareInFeed ? "Tip posted — it's in the community feed too! " : "Tip posted on this page! ");
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not post your tip.");
     } finally {

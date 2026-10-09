@@ -286,7 +286,6 @@ function Bar() {
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center pointer-events-auto">
           <div className="absolute inset-0 bg-pine-deep/60" onClick={() => setPostGateOpen(false)} />
           <div className="relative bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl p-6 text-center max-h-[92vh] overflow-y-auto">
-            <div className="text-5xl mb-3">🎣</div>
             <h2 className="text-xl font-black text-pine tracking-tight mb-2">
               This is where you post
             </h2>
@@ -297,9 +296,9 @@ function Bar() {
             </p>
             <div className="flex flex-col gap-3 text-left mb-6">
               {[
-                ["🐟", "Log a catch", "Species, length, weight, photo and GPS — building your personal catch history."],
-                ["📸", "Share a post", "Up to 4 photos or a 60-second video, with reactions and comments from other anglers."],
-                ["🏆", "Submit tournament catches", "In a tournament? Your catch photos go straight to the live leaderboard with GPS and time stamps."],
+ ["", "Log a catch", "Species, length, weight, photo and GPS — building your personal catch history."],
+ ["", "Share a post", "Up to 4 photos or a 60-second video, with reactions and comments from other anglers."],
+ ["", "Submit tournament catches", "In a tournament? Your catch photos go straight to the live leaderboard with GPS and time stamps."],
               ].map(([icon, title, body]) => (
                 <div key={title} className="flex items-start gap-3 bg-pine/5 rounded-2xl px-4 py-3">
                   <span className="text-2xl shrink-0">{icon}</span>

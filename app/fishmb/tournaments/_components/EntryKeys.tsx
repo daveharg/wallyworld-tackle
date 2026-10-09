@@ -132,7 +132,7 @@ export function EntryKeys({ tournamentId }: { tournamentId: string }) {
       const n = k.redeemers.length;
       return (
         <span className="text-[10px] font-bold uppercase tracking-wider bg-signal/15 text-signal-dark px-2.5 py-1 rounded-full">
-          🔗 Shared · {n} {n === 1 ? "angler" : "anglers"}
+ Shared · {n} {n === 1 ? "angler" : "anglers"}
         </span>
       );
     }
@@ -312,7 +312,7 @@ export function EntryKeys({ tournamentId }: { tournamentId: string }) {
                           onClick={() => setEditingId(null)}
                           className="text-xs font-bold uppercase tracking-wider text-pine/50 hover:underline"
                         >
-                          ✕
+ 
                         </button>
                       </div>
                     ) : (

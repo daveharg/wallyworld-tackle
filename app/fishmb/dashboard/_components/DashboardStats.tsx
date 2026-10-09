@@ -34,7 +34,7 @@ export default function DashboardStats() {
 
       <div>
         <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
-          👥 Friends' stats
+ Friends' stats
         </h2>
         {friends.length === 0 ? (
           <div className="bg-white border border-pine/10 rounded-3xl p-6 text-center">

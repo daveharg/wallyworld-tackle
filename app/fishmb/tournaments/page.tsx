@@ -122,7 +122,7 @@ export default async function TournamentsPage() {
       </div>
 
       <p className="text-center text-sm text-pine/50 mt-12 max-w-2xl mx-auto">
-        📱 The full FishMB app is coming soon — with tournaments that work
+ The full FishMB app is coming soon — with tournaments that work
         without cell service. For now this page works like an app on your phone:
         add it to your Home Screen (Share → Add to Home Screen on iPhone,
         Menu → Install app on Android).

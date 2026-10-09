@@ -74,7 +74,6 @@ export default function NewClassifiedPage() {
   if (!user) {
     return (
       <div className="max-w-2xl mx-auto px-4 pt-16 pb-32 text-center">
-        <p className="text-4xl mb-3">🏷️</p>
         <h1 className="text-xl font-black text-pine mb-2">List it on FishMB</h1>
         <p className="text-sm text-pine/60 mb-6">
           Log in to list your gear, boat, or service — it's free.
@@ -100,7 +99,7 @@ export default function NewClassifiedPage() {
       >
         ← Classifieds
       </Link>
-      <h1 className="text-xl font-black text-pine tracking-tight mb-5">🏷️ List something</h1>
+      <h1 className="text-xl font-black text-pine tracking-tight mb-5">List something</h1>
 
       <form onSubmit={submit} className="bg-white border border-pine/10 rounded-3xl p-5 space-y-4">
         <div>
@@ -201,21 +200,21 @@ export default function NewClassifiedPage() {
                   key={i}
                   className="relative text-xs font-bold text-pine/70 bg-pine/5 rounded-full pl-3 pr-2 py-1.5"
                 >
-                  📷 {f.name.slice(0, 18)}
+ {f.name.slice(0, 18)}
                   <button
                     type="button"
                     onClick={() => setPhotos(photos.filter((_, j) => j !== i))}
                     aria-label={`Remove ${f.name}`}
                     className="ml-1.5 text-pine/50 hover:text-signal-dark font-bold"
                   >
-                    ✕
+ 
                   </button>
                 </span>
               ))}
             </div>
           )}
           <label className="inline-block text-sm font-bold text-signal-dark cursor-pointer">
-            📷 {photos.length > 0 ? `Add more (${photos.length}/4)` : "Add photos"}
+ {photos.length > 0 ? `Add more (${photos.length}/4)` : "Add photos"}
             <input
               type="file"
               accept="image/*"

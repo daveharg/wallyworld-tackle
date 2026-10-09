@@ -357,7 +357,6 @@ function AccountTypeChooser({ user, onDone }: { user: FishAuthUser; onDone: (u: 
             disabled={saving}
             className="bg-white border-2 border-pine/15 hover:border-signal rounded-3xl p-5 text-left transition-colors disabled:opacity-50"
           >
-            <p className="text-3xl mb-2">🎣</p>
             <p className="font-bold text-pine">Personal</p>
             <p className="text-xs text-pine/60 mt-1">Fish, post, join tournaments.</p>
           </button>
@@ -366,7 +365,6 @@ function AccountTypeChooser({ user, onDone }: { user: FishAuthUser; onDone: (u: 
             disabled={saving}
             className="bg-white border-2 border-pine/15 hover:border-signal rounded-3xl p-5 text-left transition-colors disabled:opacity-50"
           >
-            <p className="text-3xl mb-2">🏢</p>
             <p className="font-bold text-pine">Business</p>
             <p className="text-xs text-pine/60 mt-1">Lodge, guide, shop — get a business page + ads.</p>
           </button>
@@ -512,7 +510,7 @@ export function FishLoginButton() {
               onClick={() => setMenu(false)}
               className="block px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70 hover:text-signal hover:bg-pine/5"
             >
-              📊 Dashboard
+ Dashboard
             </Link>
             <Link
               href="/fishmb/profile"
@@ -533,7 +531,7 @@ export function FishLoginButton() {
               onClick={() => setMenu(false)}
               className="flex items-center justify-between px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70 hover:text-signal hover:bg-pine/5"
             >
-              <span>🙋 Friend requests</span>
+              <span>Friend requests</span>
               {pendingCount > 0 && (
                 <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-signal text-white text-[11px] font-black flex items-center justify-center">
                   {pendingCount > 9 ? "9+" : pendingCount}
@@ -545,7 +543,7 @@ export function FishLoginButton() {
               onClick={() => setMenu(false)}
               className="flex items-center justify-between px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70 hover:text-signal hover:bg-pine/5"
             >
-              <span>🏆 Tournaments</span>
+              <span>Tournaments</span>
               {joinCount > 0 && (
                 <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-signal text-white text-[11px] font-black flex items-center justify-center">
                   {joinCount > 9 ? "9+" : joinCount}

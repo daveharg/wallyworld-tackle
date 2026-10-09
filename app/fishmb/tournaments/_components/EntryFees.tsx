@@ -82,7 +82,7 @@ export function EntryFees({
                   p.paid ? "bg-emerald-100 text-emerald-800" : "bg-pine/10 text-pine/60"
                 }`}
               >
-                {p.paid ? "✓" : p.name.charAt(0).toUpperCase()}
+ {p.paid ? "" : p.name.charAt(0).toUpperCase()}
               </span>
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-pine text-sm truncate">{p.name}</p>

@@ -66,7 +66,7 @@ export default function MyListings() {
     <section className="mt-8 mb-8 bg-white border border-pine/10 rounded-3xl p-4 sm:p-5">
       <div className="flex items-center justify-between gap-2 flex-wrap mb-4 px-1">
         <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide">
-          🏷️ My listings
+ My listings
         </h2>
         <Link
           href="/fishmb/classifieds/new"
@@ -80,7 +80,6 @@ export default function MyListings() {
           href="/fishmb/classifieds/new"
           className="block text-center bg-paper-deep border border-dashed border-pine/20 rounded-2xl px-4 py-6 text-pine/60 hover:text-signal-dark hover:border-signal/40 transition-colors"
         >
-          <p className="text-2xl mb-1">🏷️</p>
           <p className="font-bold text-sm">Got gear, a boat, or a service to sell?</p>
           <p className="text-signal-dark font-bold text-sm mt-1">List it on classifieds →</p>
         </Link>
@@ -122,7 +121,7 @@ export default function MyListings() {
                       onClick={() => markSold(l.id)}
                       className="text-xs font-bold text-pine border border-pine/20 hover:bg-pine/5 px-3 py-1.5 rounded-full"
                     >
-                      ✓ Sold
+ Sold
                     </button>
                   )}
                   <button
@@ -130,7 +129,7 @@ export default function MyListings() {
                     className="text-xs font-bold text-signal-dark border border-signal/30 hover:bg-signal/10 px-3 py-1.5 rounded-full"
                     aria-label={`Delete ${l.title}`}
                   >
-                    ✕
+ 
                   </button>
                 </span>
               </li>

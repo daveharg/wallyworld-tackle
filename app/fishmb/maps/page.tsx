@@ -14,34 +14,33 @@ export default function MyMapsPage() {
   if (!user) {
     const perks = [
       {
-        icon: "📍",
+ icon: "",
         title: "Mark your honey holes",
         text: "Save GPS fishing spots with one tap — mark your current location or press and hold anywhere on the map to drop a pin.",
       },
       {
-        icon: "🎣",
+ icon: "",
         title: "Your catches on the map",
         text: "Every catch you log with GPS shows up as a pin — plus public catches from other anglers on the same lake.",
       },
       {
-        icon: "🔒",
+ icon: "",
         title: "100% private",
         text: "Your spots are yours alone. Nobody sees them unless you deliberately share one with friends.",
       },
       {
-        icon: "💨",
+ icon: "",
         title: "Wind + satellite views",
         text: "Flip on live wind at your map's centre or switch to satellite view to read the water before you launch.",
       },
       {
-        icon: "📥",
+ icon: "",
         title: "Garmin import",
         text: "Bring in tracks and waypoints from your Garmin with one GPX upload.",
       },
     ];
     return (
       <div className="max-w-md mx-auto px-4 py-16 text-center">
-        <div className="text-6xl mb-4">🗺️</div>
         <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide mb-3">
           Your private fishing maps
         </h1>

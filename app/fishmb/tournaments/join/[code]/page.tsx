@@ -59,9 +59,9 @@ export default async function JoinTournamentPage({ params }: { params: { code: s
       <div className="bg-white border border-pine/10 rounded-3xl p-6 mb-6 space-y-3">
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-pine text-sm">
           <span>
-            📅 <strong>{fmt(t.starts_at)}</strong> → <strong>{fmt(t.ends_at)}</strong>
+ <strong>{fmt(t.starts_at)}</strong> → <strong>{fmt(t.ends_at)}</strong>
           </span>
-          {t.venue_name && <span>📍 {t.venue_name}</span>}
+          {t.venue_name && <span>{t.venue_name}</span>}
         </div>
         {t.description && (
           <p className="text-pine/75 leading-relaxed whitespace-pre-line">{t.description}</p>
@@ -73,7 +73,7 @@ export default async function JoinTournamentPage({ params }: { params: { code: s
                 key={s}
                 className="bg-pine/5 border border-pine/15 text-pine text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full"
               >
-                🐟 {s}
+ {s}
               </span>
             ))}
           </div>

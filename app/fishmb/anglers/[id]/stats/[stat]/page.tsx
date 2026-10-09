@@ -9,12 +9,12 @@ import Link from "next/link";
 import { fishFetch } from "../../../../_components/fishFetch";
 
 const TITLES: Record<string, string> = {
-  catches: "🎣 Catches",
-  "tournament-catches": "🏆 Tournament catches",
-  species: "🐟 Species",
-  tournaments: "🏆 Tournaments",
-  wins: "🥇 Tournament wins",
-  posts: "💬 Posts",
+ catches: " Catches",
+ "tournament-catches": " Tournament catches",
+ species: " Species",
+ tournaments: " Tournaments",
+ wins: " Tournament wins",
+ posts: " Posts",
 };
 
 function fmtDate(iso: string | null): string {
@@ -102,7 +102,7 @@ export default function StatDetailPage({
       {failed ? (
         <p className="text-pine/60">Couldn&apos;t load these right now.</p>
       ) : isPrivate ? (
-        <p className="text-pine/60">🔒 {name || "This angler"} keeps this stat private.</p>
+        <p className="text-pine/60">{name || "This angler"} keeps this stat private.</p>
       ) : items === null ? (
         <div className="bg-pine/5 rounded-3xl h-32 animate-pulse" />
       ) : items.length === 0 ? (
@@ -226,7 +226,7 @@ export default function StatDetailPage({
       {board !== null && board.length > 1 && (
         <section className="mt-10">
           <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
-            🏆 You vs friends
+ You vs friends
           </h2>
           <div className="bg-white border border-pine/10 rounded-3xl overflow-hidden">
             <ul className="divide-y divide-pine/8">

@@ -73,11 +73,11 @@ interface AdRow {
 }
 
 const TABS: { id: Tab; label: string }[] = [
-  { id: "listings", label: "🏷️ Listings" },
-  { id: "business", label: "🏢 Business page" },
-  { id: "tournaments", label: "🏆 Tournaments" },
-  { id: "bookings", label: "📊 Bookings" },
-  { id: "advertise", label: "📣 Advertise" },
+ { id: "listings", label: " Listings" },
+ { id: "business", label: " Business page" },
+ { id: "tournaments", label: " Tournaments" },
+ { id: "bookings", label: " Bookings" },
+ { id: "advertise", label: " Advertise" },
 ];
 
 const AD_SLOTS = [
@@ -164,7 +164,7 @@ export default function BusinessDashboardPage() {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         <p className="text-pine/70 mb-4">
-          💼 The business dashboard is for business accounts — taking you back to your profile…
+ The business dashboard is for business accounts — taking you back to your profile…
         </p>
         <Link
           href="/fishmb/profile"
@@ -178,7 +178,7 @@ export default function BusinessDashboardPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 md:py-14">
-      <p className="text-gold font-bold uppercase tracking-[0.28em] text-sm mb-2">💼 Business</p>
+      <p className="text-gold font-bold uppercase tracking-[0.28em] text-sm mb-2">Business</p>
       <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide mb-8">
         Dashboard
       </h1>
@@ -233,7 +233,7 @@ export default function BusinessDashboardPage() {
                     {data.business.name}
                   </h2>
                   {data.business.location && (
-                    <p className="text-sm text-pine/55 mt-1">📍 {data.business.location}</p>
+                    <p className="text-sm text-pine/55 mt-1">{data.business.location}</p>
                   )}
                 </div>
                 <Link
@@ -247,7 +247,7 @@ export default function BusinessDashboardPage() {
                 <p className="text-pine/70 text-sm mt-4 leading-relaxed">{data.business.description}</p>
               )}
               {data.business.contact && (
-                <p className="text-sm text-pine/60 mt-3">📞 {data.business.contact}</p>
+                <p className="text-sm text-pine/60 mt-3">{data.business.contact}</p>
               )}
               {data.business.website && (
                 <a
@@ -262,7 +262,6 @@ export default function BusinessDashboardPage() {
             </div>
           ) : (
             <div className="bg-white border border-pine/10 rounded-3xl p-6 text-center">
-              <p className="text-3xl mb-3">🏢</p>
               <h2 className="font-bold text-pine text-lg mb-2">No business page yet</h2>
               <p className="text-sm text-pine/60 mb-6">
                 Create a page for your lodge, guide service, or shop — or claim it if it&apos;s already listed.
@@ -294,7 +293,7 @@ export default function BusinessDashboardPage() {
             empty="No active tournaments. Create one from the tournaments page."
           />
           <TournamentGroup
-            title="🏁 Past tournaments"
+ title=" Past tournaments"
             rows={data.tournaments.past}
             empty="No past tournaments yet."
           />
@@ -313,8 +312,8 @@ export default function BusinessDashboardPage() {
             {[
               ["Total requests", data.bookingStats.total],
               ["⏳ Pending", data.bookingStats.pending],
-              ["✅ Confirmed", data.bookingStats.confirmed],
-              ["❌ Cancelled", data.bookingStats.cancelled],
+ [" Confirmed", data.bookingStats.confirmed],
+ [" Cancelled", data.bookingStats.cancelled],
             ].map(([label, n]) => (
               <div key={label as string} className="bg-white border border-pine/10 rounded-2xl p-4 text-center">
                 <p className="font-display font-bold text-pine text-3xl">{n}</p>
@@ -338,7 +337,6 @@ export default function BusinessDashboardPage() {
                       href={`/fishmb/classifieds/${r.rental_id}`}
                       className="flex items-center gap-3 bg-white border border-pine/10 rounded-2xl p-4 hover:border-gold/40 transition-colors"
                     >
-                      <span className="text-2xl">🛖</span>
                       <div className="flex-1 min-w-0">
                         <p className="font-bold text-pine truncate">{r.title}</p>
                         <p className="text-xs text-pine/55 mt-0.5">
@@ -388,7 +386,7 @@ export default function BusinessDashboardPage() {
                         {b.renter_name} <span className="font-normal text-pine/55">· {b.rental_title}</span>
                       </p>
                       <p className="text-xs text-pine/55 mt-0.5">
-                        {fmtDate(b.start_date)} → {fmtDate(b.end_date)} · 📞 {b.renter_contact}
+ {fmtDate(b.start_date)} → {fmtDate(b.end_date)} · {b.renter_contact}
                       </p>
                     </div>
                     {statusBadge(b.status)}
@@ -431,7 +429,7 @@ function TournamentGroup({
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-pine truncate">{t.name}</p>
                 <p className="text-xs text-pine/55 mt-0.5">
-                  👥 {t.participant_count} angler{t.participant_count === 1 ? "" : "s"} ·{" "}
+ {t.participant_count} angler{t.participant_count === 1 ? "" : "s"} ·{" "}
                   {fmtDate(t.starts_at)} → {fmtDate(t.ends_at)}
                 </p>
               </div>
@@ -495,7 +493,7 @@ function AdSection({ ads, onSubmitted }: { ads: AdRow[]; onSubmitted: (ad: AdRow
       if ((d as { error?: string }).error) throw new Error((d as { error: string }).error);
       const ad = (d as { ad: AdRow }).ad;
       onSubmitted(ad);
-      setNote("Ad submitted! It goes live once approved — we'll be in touch about payment. 🎣");
+ setNote("Ad submitted! It goes live once approved — we'll be in touch about payment. ");
       setTitle("");
       setBody("");
       setLink("");
@@ -518,7 +516,7 @@ function AdSection({ ads, onSubmitted }: { ads: AdRow[]; onSubmitted: (ad: AdRow
           Ads run 7 days and go live after a quick review — we&apos;ll be in touch about payment.
         </p>
         <p className="text-sm text-pine/75 bg-gold/15 border border-gold/40 rounded-2xl px-4 py-3">
-          🎨 No design? No problem — <strong>we can create your ad banner or feed ad for you.</strong>{" "}
+ No design? No problem — <strong>we can create your ad banner or feed ad for you.</strong>{" "}
           Just fill in the details below and we&apos;ll handle the creative.
         </p>
         <div className="grid grid-cols-2 gap-3">
@@ -561,7 +559,7 @@ function AdSection({ ads, onSubmitted }: { ads: AdRow[]; onSubmitted: (ad: AdRow
           className={inputCls}
         />
         <label className="block bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-sm text-pine/70 cursor-pointer">
-          {file ? `📎 ${file.name.slice(0, 30)}` : "📎 Ad image or video (optional — we can make one for you)"}
+ {file ? ` ${file.name.slice(0, 30)}` : " Ad image or video (optional — we can make one for you)"}
           <input
             type="file"
             accept="image/*,video/mp4,video/webm"

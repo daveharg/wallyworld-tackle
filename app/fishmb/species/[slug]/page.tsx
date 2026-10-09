@@ -42,7 +42,7 @@ export default function SpeciesGuidePage({ params }: { params: { slug: string } 
         href={`/fishmb/lakes?q=${encodeURIComponent(advice.species)}`}
         className="inline-block bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors mb-10"
       >
-        🎣 Find {advice.species.toLowerCase()} lakes
+ Find {advice.species.toLowerCase()} lakes
       </Link>
 
       <div className="grid md:grid-cols-2 gap-5 mb-10">

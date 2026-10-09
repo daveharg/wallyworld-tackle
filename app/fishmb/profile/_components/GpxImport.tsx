@@ -119,7 +119,7 @@ export function GpxImport({ onImported }: { onImported: () => void }) {
           onClick={pickFile}
           className="text-xs font-bold uppercase tracking-wider text-pine/60 hover:text-pine border border-pine/20 hover:border-pine/40 rounded-full px-5 py-2.5 transition-colors"
         >
-          ⬆️ Import from Navionics (GPX)
+ Import from Navionics (GPX)
         </button>
       ) : (
         <div className="rounded-2xl border border-pine/15 bg-white p-4 text-left">
@@ -129,7 +129,7 @@ export function GpxImport({ onImported }: { onImported: () => void }) {
           <div className="max-h-40 overflow-y-auto rounded-xl bg-pine/5 divide-y divide-pine/10 mb-3">
             {preview.slice(0, 50).map((w, i) => (
               <p key={i} className="px-3 py-1.5 text-xs text-pine/70 truncate">
-                📍 {w.name}
+ {w.name}
               </p>
             ))}
             {preview.length > 50 && (

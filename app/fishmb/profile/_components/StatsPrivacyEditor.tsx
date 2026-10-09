@@ -69,7 +69,7 @@ export default function StatsPrivacyEditor({ userId }: { userId: string }) {
         onClick={() => setOpen((o) => !o)}
         className="w-full flex items-center justify-between px-5 py-4 text-left"
       >
-        <span className="font-bold text-pine text-sm">👁 Who sees your stats</span>
+        <span className="font-bold text-pine text-sm">Who sees your stats</span>
         <span className="text-pine/50 text-sm">{open ? "▲" : "▼"}</span>
       </button>
       {open && (

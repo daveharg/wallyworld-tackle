@@ -59,7 +59,7 @@ function ListingCard({ item }: { item: Listing }) {
           {item.title}
         </p>
         {item.location && (
-          <p className="text-xs text-pine/50 mt-1 truncate">📍 {item.location}</p>
+          <p className="text-xs text-pine/50 mt-1 truncate">{item.location}</p>
         )}
       </div>
     </Link>
@@ -111,7 +111,7 @@ export default function ClassifiedsPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 pt-4 md:pt-6 pb-32">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-black text-pine tracking-tight">🏷️ Classifieds</h1>
+        <h1 className="text-xl font-black text-pine tracking-tight">Classifieds</h1>
         <button
           onClick={listSomething}
           className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-5 py-2.5 rounded-full transition-colors"
@@ -123,7 +123,6 @@ export default function ClassifiedsPage() {
       {/* Search */}
       <form onSubmit={submitSearch} className="mb-4">
         <div className="flex items-center bg-white border border-pine/15 rounded-full px-5 py-3.5 shadow-sm focus-within:border-signal/60">
-          <span className="text-pine/40 text-lg mr-3">🔍</span>
           <input
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
@@ -141,7 +140,7 @@ export default function ClassifiedsPage() {
               className="text-pine/40 hover:text-pine font-bold px-2"
               aria-label="Clear search"
             >
-              ✕
+ 
             </button>
           )}
         </div>
@@ -149,7 +148,7 @@ export default function ClassifiedsPage() {
 
       {/* Category pills */}
       <div className="flex gap-2 overflow-x-auto pb-2 mb-5 -mx-4 px-4">
-        {[{ key: "all", emoji: "✨", label: "All" }, ...CLASSIFIED_CATEGORIES].map((c) => (
+ {[{ key: "all", emoji: "", label: "All" }, ...CLASSIFIED_CATEGORIES].map((c) => (
           <button
             key={c.key}
             onClick={() => setCat(c.key)}
@@ -205,7 +204,6 @@ export default function ClassifiedsPage() {
         </div>
       ) : items.length === 0 ? (
         <div className="text-center py-12 bg-white border border-pine/10 rounded-3xl">
-          <p className="text-4xl mb-3">🎣</p>
           <p className="font-bold text-pine mb-1">Nothing here yet</p>
           <p className="text-sm text-pine/55 mb-5 px-6">
             {q || cat !== "all"

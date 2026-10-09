@@ -102,7 +102,7 @@ export default function ProfileView({
         body: JSON.stringify({ user_id: userId }),
       });
       if ((d as { error?: string }).error) throw new Error((d as { error: string }).error);
-      setNote("Friend request sent 🎣");
+ setNote("Friend request sent ");
       const refreshed = await fishFetch(`/api/fishmb/users/${userId}`);
       setData(refreshed);
     } catch (e) {
@@ -142,13 +142,13 @@ export default function ProfileView({
                 href="/fishmb/profile/edit"
                 className="text-xs font-bold uppercase tracking-wider text-pine/60 hover:text-pine bg-pine/10 hover:bg-pine/15 rounded-full px-4 py-2 transition-colors"
               >
-                ✏️ Edit profile
+ Edit profile
               </Link>
             ) : (
             <>
               {data.friendship_status === "accepted" ? (
                   <span className="text-xs font-bold uppercase tracking-wider text-pine/50 bg-pine/10 rounded-full px-4 py-2">
-                    Friends ✓
+ Friends 
                   </span>
                 ) : data.friendship_status === "pending" ? (
                   <span className="text-xs font-bold uppercase tracking-wider text-pine/50 bg-pine/10 rounded-full px-4 py-2">
@@ -192,7 +192,7 @@ export default function ProfileView({
             href="/fishmb/feed?log=catch"
             className="inline-flex items-center gap-2 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-8 py-3.5 rounded-full transition-colors"
           >
-            🐟 Log a catch
+ Log a catch
           </Link>
         </div>
       )}
@@ -211,7 +211,7 @@ export default function ProfileView({
                 : "text-pine/45 hover:text-pine"
             }`}
           >
-            {t === "photos" ? `📸 Photos (${data.photos.length})` : `🎣 Friends (${data.friends.length})`}
+ {t === "photos" ? ` Photos (${data.photos.length})` : ` Friends (${data.friends.length})`}
           </button>
         ))}
       </div>

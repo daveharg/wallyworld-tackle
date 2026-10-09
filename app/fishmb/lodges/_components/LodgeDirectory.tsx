@@ -27,7 +27,7 @@ export function AccessBadge({ access }: { access?: string | null }) {
         fly ? "bg-sky-100 text-sky-800" : "bg-pine/10 text-pine/70"
       }`}
     >
-      {fly ? "✈️" : "🚗"} {access}
+ {fly ? "" : ""} {access}
     </span>
   );
 }
@@ -121,7 +121,7 @@ export default function LodgeDirectory({ lodges }: { lodges: SlimLodge[] }) {
               <AccessBadge access={l.access} />
               {l.ice_fishing && (
                 <span className="inline-flex items-center text-[11px] font-bold uppercase tracking-wider text-pine/60">
-                  ❄ Ice fishing
+ Ice fishing
                 </span>
               )}
             </div>

@@ -27,10 +27,10 @@ function timeAgo(iso: string): string {
 }
 
 const FEATURES = [
-  { icon: "🐟", title: "Share your catches", body: "Post photos with species and length — your personal fishing log." },
-  { icon: "💬", title: "Join the discussion", body: "Ask questions, swap spots and talk technique with Manitoba anglers." },
-  { icon: "💡", title: "Tips that travel", body: "Post tips on any species page — they land in the feed for everyone." },
-  { icon: "👥", title: "Fish with friends", body: "Add fishing friends and share catches with friends only." },
+ { icon: "", title: "Share your catches", body: "Post photos with species and length — your personal fishing log." },
+ { icon: "", title: "Join the discussion", body: "Ask questions, swap spots and talk technique with Manitoba anglers." },
+ { icon: "", title: "Tips that travel", body: "Post tips on any species page — they land in the feed for everyone." },
+ { icon: "", title: "Fish with friends", body: "Add fishing friends and share catches with friends only." },
 ];
 
 const photoOf = (it: FeedItem) => (it.photos?.length > 0 ? it.photos[0] : it.photo_url);
@@ -108,7 +108,7 @@ export function CommunityBox() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-pine-deep/95 via-pine-deep/20 to-transparent" />
                     <span className="absolute top-4 left-4 md:left-6 bg-gold text-pine text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">
-                      📸 Latest catch
+ Latest catch
                     </span>
                     <div className="absolute bottom-0 inset-x-0 p-5 md:p-7">
                       <p className="text-white font-bold">

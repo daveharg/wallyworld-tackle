@@ -160,7 +160,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
               </div>
             ) : (
               <label className="flex items-center justify-center gap-2 bg-white border border-dashed border-pine/30 rounded-2xl px-4 py-6 text-sm text-pine/60 cursor-pointer hover:border-signal transition-colors">
-                {uploadingCover ? "Uploading…" : "📷 Upload a cover photo for the tournament page"}
+ {uploadingCover ? "Uploading…" : " Upload a cover photo for the tournament page"}
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
@@ -262,7 +262,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
                 onClick={() => setPhotoMode("standard")}
                 className={`py-3 px-3 rounded-2xl text-sm font-bold transition-colors text-left ${photoMode === "standard" ? "bg-signal text-white" : "bg-white border border-pine/20 text-pine/70"}`}
               >
-                📸 Standard
+ Standard
                 <span className={`block text-xs font-normal mt-1 ${photoMode === "standard" ? "text-white/85" : "text-pine/50"}`}>
                   Your rules decide — hero shots welcome
                 </span>
@@ -272,7 +272,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
                 onClick={() => setPhotoMode("measure_only")}
                 className={`py-3 px-3 rounded-2xl text-sm font-bold transition-colors text-left ${photoMode === "measure_only" ? "bg-signal text-white" : "bg-white border border-pine/20 text-pine/70"}`}
               >
-                📏 Measure only
+ Measure only
                 <span className={`block text-xs font-normal mt-1 ${photoMode === "measure_only" ? "text-white/85" : "text-pine/50"}`}>
                   Just the fish on the board — no posed photo needed
                 </span>
@@ -282,7 +282,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
                 onClick={() => setPhotoMode("strict")}
                 className={`py-3 px-3 rounded-2xl text-sm font-bold transition-colors text-left ${photoMode === "strict" ? "bg-signal text-white" : "bg-white border border-pine/20 text-pine/70"}`}
               >
-                🔒 Strict — app camera only
+ Strict — app camera only
                 <span className={`block text-xs font-normal mt-1 ${photoMode === "strict" ? "text-white/85" : "text-pine/50"}`}>
                   For real-money events: entries only from the FishMB app&apos;s in-app camera. Web entries are rejected.
                 </span>

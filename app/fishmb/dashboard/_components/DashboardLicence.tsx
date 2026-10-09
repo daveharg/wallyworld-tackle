@@ -44,7 +44,6 @@ export default function DashboardLicence() {
         className="w-full flex items-center justify-between gap-3 bg-white border border-pine/10 rounded-3xl px-5 py-4 hover:border-signal/40 transition-colors"
       >
         <span className="flex items-center gap-3 min-w-0">
-          <span className="text-2xl">🎣</span>
           <span className="text-left">
             <span className="block font-display font-bold uppercase text-pine tracking-wide">
               Fishing licence

@@ -116,7 +116,7 @@ function LakePicker({
             className="bg-pine/10 text-pine text-xs font-bold px-3 py-1.5 rounded-full hover:bg-signal/10 hover:text-signal-dark"
             title="Remove"
           >
-            {l.name} ✕
+ {l.name} 
           </button>
         ))}
       </div>
@@ -351,8 +351,8 @@ function EditTournament({ tournament, onSaved }: { tournament: Detail["tournamen
           <label className={labelCls}>Catch photos</label>
           <div className="grid grid-cols-2 gap-2">
             {[
-              ["standard", "📸 Standard", "Your rules decide — hero shots welcome"],
-              ["measure_only", "📏 Measure only", "Just the fish on the board — no posed photo needed"],
+ ["standard", " Standard", "Your rules decide — hero shots welcome"],
+ ["measure_only", " Measure only", "Just the fish on the board — no posed photo needed"],
             ].map(([v, l, d]) => (
               <button
                 key={v}
@@ -413,7 +413,7 @@ function EditTournament({ tournament, onSaved }: { tournament: Detail["tournamen
             </div>
           ) : (
             <label className="flex items-center justify-center gap-2 bg-paper-deep border border-dashed border-pine/30 rounded-2xl px-4 py-8 text-sm text-pine/60 cursor-pointer hover:border-signal transition-colors">
-              {uploading ? "Uploading…" : "📷 Upload a cover photo"}
+ {uploading ? "Uploading…" : " Upload a cover photo"}
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
@@ -576,14 +576,14 @@ function AnglersDashboard({ tournamentId, inviteCode, entryFeeCents }: { tournam
     <section className="bg-white border border-pine/10 rounded-3xl p-6 md:p-8 mb-8">
       <div className="flex flex-wrap items-center justify-between gap-3 mb-1">
         <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide">
-          🎣 Anglers {anglers.length > 0 && <span className="text-pine/50">({anglers.length})</span>}
+ Anglers {anglers.length > 0 && <span className="text-pine/50">({anglers.length})</span>}
         </h2>
         {anglers.length > 0 && (
           <button
             onClick={exportCsv}
             className="text-xs font-bold uppercase tracking-wider text-pine/60 hover:text-signal border border-pine/20 rounded-full px-4 py-2 transition-colors"
           >
-            ⬇ Export CSV
+ Export CSV
           </button>
         )}
       </div>
@@ -669,7 +669,7 @@ function AnglersDashboard({ tournamentId, inviteCode, entryFeeCents }: { tournam
                       title="Remove angler"
                       className="text-pine/30 hover:text-red-600 text-lg px-2 transition-colors"
                     >
-                      ✕
+ 
                     </button>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 mt-3">
@@ -680,7 +680,7 @@ function AnglersDashboard({ tournamentId, inviteCode, entryFeeCents }: { tournam
                         a.paid ? "bg-green-700 text-white" : "bg-paper-deep text-pine/60 hover:text-pine"
                       }`}
                     >
-                      {a.paid ? "✓ Paid" : "Mark paid"}
+ {a.paid ? " Paid" : "Mark paid"}
                     </button>
                     <button
                       onClick={() => patch(a.user_id, { checked_in: !a.checked_in })}
@@ -689,7 +689,7 @@ function AnglersDashboard({ tournamentId, inviteCode, entryFeeCents }: { tournam
                         a.checked_in ? "bg-pine text-white" : "bg-paper-deep text-pine/60 hover:text-pine"
                       }`}
                     >
-                      {a.checked_in ? "✓ Checked in" : "Check in"}
+ {a.checked_in ? " Checked in" : "Check in"}
                     </button>
                   </div>
                   <div className="flex gap-2 mt-3">
@@ -812,7 +812,7 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
           href={`/fishmb/tournaments/${t.id}/leaderboard`}
           className="bg-pine-deep text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full hover:bg-pine transition-colors"
         >
-          ⛶ Full-screen board
+ Full-screen board
         </Link>
       </div>
 
@@ -867,7 +867,7 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
             }}
             className="bg-white/15 hover:bg-white/25 text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
           >
-            📤 Share
+ Share
           </button>
         </div>
       </section>
@@ -914,7 +914,7 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
                 <p className="font-bold text-pine">{e.species}{e.length_inches ? ` · ${Number(e.length_inches).toFixed(1)}"` : ""}</p>
                 <p className="text-pine/55 text-xs mt-1">{e.user_name}</p>
                 <p className="text-pine/70 text-xs mt-1">
-                  📸 Caught:{" "}
+ Caught:{" "}
                   {e.captured_at ? (
                     <span className="font-bold text-pine">{formatDateTime(e.captured_at)}</span>
                   ) : (
@@ -932,11 +932,11 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
                       c <= new Date(t.ends_at).getTime();
                     return inside ? (
                       <p className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 mt-2">
-                        ✓ Inside tournament window
+ Inside tournament window
                       </p>
                     ) : (
                       <p className="text-xs font-bold text-signal-dark bg-signal/10 rounded-xl px-3 py-2 mt-2">
-                        ⚠ Outside tournament window — verify before approving.
+ Outside tournament window — verify before approving.
                       </p>
                     );
                   })()
@@ -952,50 +952,50 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
                     rel="noopener noreferrer"
                     className="text-signal-dark text-xs font-bold underline"
                   >
-                    📍 {e.latitude.toFixed(4)}, {e.longitude.toFixed(4)}{e.gps_accuracy ? ` (±${Math.round(e.gps_accuracy)}m)` : ""}
+ {e.latitude.toFixed(4)}, {e.longitude.toFixed(4)}{e.gps_accuracy ? ` (±${Math.round(e.gps_accuracy)}m)` : ""}
                   </a>
                 ) : (
                   <p className="text-xs text-pine/45">No GPS attached</p>
                 )}
                 {e.duplicate_of && (
                   <p className="text-xs font-bold text-signal-dark bg-signal/10 rounded-xl px-3 py-2 mt-2">
-                    ⚠ Duplicate photo — this exact image was already submitted in this tournament.
+ Duplicate photo — this exact image was already submitted in this tournament.
                   </p>
                 )}
                 {e.similar_photo_of && (
                   <p className="text-xs font-bold text-signal-dark bg-signal/10 rounded-xl px-3 py-2 mt-2">
-                    ⚠ Possible same fish — this photo looks very similar to another entry&apos;s
+ Possible same fish — this photo looks very similar to another entry&apos;s
                     photo. Could be two pictures of one fish. Compare before approving.
                   </p>
                 )}
                 {e.similar_catch_of && (
                   <p className="text-xs font-bold text-gold-dark bg-gold/15 border border-gold/40 rounded-xl px-3 py-2 mt-2">
-                    🐟 Possible duplicate catch — same angler, same species, nearly the same
+ Possible duplicate catch — same angler, same species, nearly the same
                     length, caught within 30 minutes of another entry. Verify it&apos;s a
                     different fish before approving.
                   </p>
                 )}
                 {e.time_flag === "future_timestamp" && (
                   <p className="text-xs font-bold text-signal-dark bg-signal/10 rounded-xl px-3 py-2 mt-2">
-                    ⚠ Clock flag — the phone claimed a capture time in the future. Verify before approving.
+ Clock flag — the phone claimed a capture time in the future. Verify before approving.
                   </p>
                 )}
                 {e.location_flag === "outside-lake" && (
                   <p className="text-xs font-bold text-signal-dark bg-signal/10 rounded-xl px-3 py-2 mt-2">
-                    ⚠ Outside tournament waters — caught{" "}
+ Outside tournament waters — caught{" "}
                     {e.lake_distance_km !== null ? `${Number(e.lake_distance_km).toFixed(0)} km ` : ""}from the
                     nearest chosen lake. Verify before approving.
                   </p>
                 )}
                 {e.location_flag === "no-gps" && (
                   <p className="text-xs font-bold text-gold-dark bg-gold/15 border border-gold/40 rounded-xl px-3 py-2 mt-2">
-                    📍 No location to verify — this catch has no GPS, so it couldn&apos;t be checked
+ No location to verify — this catch has no GPS, so it couldn&apos;t be checked
                     against the tournament waters.
                   </p>
                 )}
                 {e.lake_distance_km !== null && e.location_flag !== "outside-lake" && (
                   <p className="text-xs text-pine/55 mt-2">
-                    ✓ {Number(e.lake_distance_km).toFixed(1)} km from tournament waters
+ {Number(e.lake_distance_km).toFixed(1)} km from tournament waters
                   </p>
                 )}
                 {e.notes && <p className="text-xs text-pine/60 mt-2">“{e.notes}”</p>}

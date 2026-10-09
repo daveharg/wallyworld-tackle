@@ -1,3 +1,5 @@
+export type SheetTab = "catches" | "spots" | "lakes" | "settings";
+
 export interface MapCatch {
   id: string;
   species: string;

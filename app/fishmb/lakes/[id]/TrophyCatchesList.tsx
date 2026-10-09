@@ -29,7 +29,7 @@ export function TrophyCatchesList({ catches }: { catches: TrophyCatch[] }) {
     <section>
       <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
         <h2 className="font-display font-bold uppercase text-2xl text-pine tracking-wide">
-          🏆 Trophy catches <span className="text-pine/40 text-lg">({sorted.length})</span>
+ Trophy catches <span className="text-pine/40 text-lg">({sorted.length})</span>
         </h2>
         <div className="flex gap-1.5">
           {(["size", "date", "species"] as const).map((s) => (

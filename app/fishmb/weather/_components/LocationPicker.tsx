@@ -165,7 +165,7 @@ export default function LocationPicker({
       <div className="relative w-full sm:max-w-md bg-[#10231c] border border-white/10 rounded-t-3xl sm:rounded-3xl p-5 max-h-[85vh] overflow-y-auto">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h3 className="text-lg font-black">📍 Weather location</h3>
+            <h3 className="text-lg font-black">Weather location</h3>
             <p className="text-xs text-white/55 mt-1">
               Showing weather for: <span className="font-bold text-emerald-200">{current.name}</span>
             </p>
@@ -175,7 +175,7 @@ export default function LocationPicker({
             aria-label="Close"
             className="w-9 h-9 shrink-0 rounded-full bg-white/10 flex items-center justify-center text-lg"
           >
-            ✕
+ 
           </button>
         </div>
 
@@ -200,13 +200,13 @@ export default function LocationPicker({
                       {l.lat.toFixed(2)}, {l.lon.toFixed(2)}
                     </span>
                   </button>
-                  {l.name === current.name && <span className="text-emerald-300 text-sm">✓</span>}
+                  {l.name === current.name && <span className="text-emerald-300 text-sm"></span>}
                   <button
                     onClick={() => remove(l.name)}
                     aria-label={`Remove ${l.name}`}
                     className="w-8 h-8 rounded-full bg-white/10 text-white/60 text-sm"
                   >
-                    ✕
+ 
                   </button>
                 </div>
               ))}
@@ -217,7 +217,7 @@ export default function LocationPicker({
                 disabled={locating}
                 className="rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-sm font-bold disabled:opacity-50"
               >
-                {locating ? "Locating…" : "📍 Use my GPS"}
+ {locating ? "Locating…" : " Use my GPS"}
               </button>
               <button
                 onClick={() => setMode("add")}
@@ -251,7 +251,7 @@ export default function LocationPicker({
                 >
                   <span className="text-sm font-bold">{l.name}</span>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-white/40 shrink-0">
-                    {l.kind === "town" ? "🏠 Town" : "🌊 Lake"}
+ {l.kind === "town" ? " Town" : " Lake"}
                   </span>
                 </button>
               ))}

@@ -84,7 +84,7 @@ export function LicenceNotice({
       }`}
     >
       <p className="font-bold text-pine uppercase tracking-wider text-xs mb-1.5">
-        {big ? "⚠️ Tournament licence required" : "Know the law"}
+ {big ? " Tournament licence required" : "Know the law"}
       </p>
       <p className="text-pine/70">
         In Manitoba, fishing tournaments with <strong>more than 25 participants</strong> need a

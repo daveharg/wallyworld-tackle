@@ -43,7 +43,7 @@ export default function ProfilePage() {
           >
             <div>
               <p className="font-display font-bold uppercase text-xl tracking-wide">
-                💼 Business dashboard
+ Business dashboard
               </p>
               <p className="text-white/70 text-sm mt-1">
                 Classified listings, booking requests, tournaments, business page & ads —
@@ -61,7 +61,7 @@ export default function ProfilePage() {
         >
           <div>
             <p className="font-display font-bold uppercase text-xl tracking-wide">
-              📊 My dashboard
+ My dashboard
             </p>
             <p className="text-white/80 text-sm mt-1">
               Stats, spots, lake notes and settings — your private fishing HQ.

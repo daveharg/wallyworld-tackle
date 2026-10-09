@@ -90,7 +90,7 @@ export default function FishHeader() {
               href="/fishmb/app"
               className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-pine/70 hover:text-signal border border-pine/20 hover:border-signal rounded-full px-4 py-2 transition-colors"
             >
-              📱 Get the app
+ Get the app
             </Link>
             <FishLoginButton />
             <button
@@ -129,14 +129,14 @@ export default function FishHeader() {
                 onClick={() => setOpen(false)}
                 className="py-2.5 text-sm font-bold uppercase tracking-wider text-signal"
               >
-                📊 Dashboard
+ Dashboard
               </Link>
               <Link
                 href="/fishmb/profile"
                 onClick={() => setOpen(false)}
                 className="py-2.5 text-sm font-bold uppercase tracking-wider text-signal"
               >
-                👤 My profile
+ My profile
               </Link>
               <Link
                 href="/fishmb/friends"
@@ -150,7 +150,7 @@ export default function FishHeader() {
                 onClick={() => setOpen(false)}
                 className="py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70"
               >
-                💬 Messages
+ Messages
               </Link>
               <button
                 onClick={() => {
@@ -178,10 +178,10 @@ export default function FishHeader() {
             onClick={() => setOpen(false)}
             className="py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70"
           >
-            📱 Get the app
+ Get the app
           </Link>
           <div className="mt-3 mb-2 bg-gold/15 border border-gold/40 rounded-2xl p-4">
-            <p className="text-sm font-bold text-pine">🧪 FishMB is in beta</p>
+            <p className="text-sm font-bold text-pine">FishMB is in beta</p>
             <p className="text-xs text-pine/65 mt-1 leading-relaxed">
               We&apos;re still building — things might break or look rough around the edges.
               Got an idea for a feature or spotted a bug? Tell us and we&apos;ll take a look.

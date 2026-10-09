@@ -69,7 +69,7 @@ export default function AdvertisePage() {
       });
       if ((d as { error?: string }).error) throw new Error((d as { error: string }).error);
       setNote(
-        "Ad submitted! It goes live once approved — we'll be in touch about payment. 🎣"
+ "Ad submitted! It goes live once approved — we'll be in touch about payment. "
       );
       setTitle("");
       setBody("");
@@ -131,7 +131,7 @@ export default function AdvertisePage() {
           <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={3} maxLength={300} placeholder="Short description (optional)" className={`${inputCls} text-sm resize-none`} />
           <input value={link} onChange={(e) => setLink(e.target.value)} maxLength={500} placeholder="Link (https://…)" className={inputCls} />
           <label className="block bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-sm text-pine/70 cursor-pointer">
-            {file ? `📎 ${file.name.slice(0, 30)}` : "📎 Ad image or video *"}
+ {file ? ` ${file.name.slice(0, 30)}` : " Ad image or video *"}
             <input
               type="file"
               accept="image/*,video/mp4,video/webm"

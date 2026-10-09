@@ -14,12 +14,21 @@ export const metadata: Metadata = {
       "Manitoba's fishing community — tournaments, private maps, encrypted messaging and an Fish-activity forecast.",
     url: "https://www.fishmb.ca",
     siteName: "FishMB",
+    images: [
+      {
+        url: "https://www.fishmb.ca/fishmb/icon-512.png",
+        width: 512,
+        height: 512,
+        alt: "FishMB — Manitoba's fishing community",
+      },
+    ],
   },
   twitter: {
     card: "summary",
     title: "FishMB — Coming Soon",
     description:
       "Manitoba's fishing community — tournaments, private maps, encrypted messaging and an Fish-activity forecast.",
+    images: ["https://www.fishmb.ca/fishmb/icon-512.png"],
   },
 };
 

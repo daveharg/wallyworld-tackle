@@ -5,6 +5,7 @@ import { getLake, getLakes, getZone, getGuideUrl, getStockingHistory, getTrophyC
 import { slugifySpecies, getSpeciesAdvice } from "@/lib/fishmb-species";
 import { lakePhotoUrl, hasRealLakePhoto, lakePhotoCredit } from "@/lib/fishmb-constants";
 import { LakeMap } from "../_components/LakeMap";
+import { LakeSpotsSection } from "../_components/LakeSpotsSection";
 import { TrophyCatchesList } from "./TrophyCatchesList";
 import coordsJson from "@/public/fishmb/lake-coords.json";
 
@@ -272,12 +273,22 @@ export default function LakeDetailPage({ params }: { params: { id: string } }) {
             </section>
           )}
 
+          {/* Your saved spots on this lake */}
+          {coords && (
+            <LakeSpotsSection
+              lakeId={lake.id}
+              lakeName={lake.name}
+              lat={coords.lat}
+              lng={coords.lng}
+            />
+          )}
+
           {/* Regulations */}
           <section className="bg-white rounded-3xl border border-pine/10 p-6 md:p-8">
             {lake.id === "clear-lake" && (
               <div className="bg-pine text-white rounded-2xl p-5 md:p-6 mb-6">
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-gold mb-2">
-                  🏛️ National park water — different rules
+ National park water — different rules
                 </p>
                 <p className="text-white/90 text-sm leading-relaxed mb-3">
                   Clear Lake is inside Riding Mountain National Park, so the

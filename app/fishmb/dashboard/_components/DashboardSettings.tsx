@@ -82,7 +82,7 @@ export default function DashboardSettings({ afterSaveHref }: { afterSaveHref?: s
   return (
     <div className="bg-white border border-pine/10 rounded-3xl p-6 space-y-5">
       <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide">
-        ⚙️ Settings
+ Settings
       </h2>
       {note && (
         <p className="text-sm text-pine bg-gold/20 border border-gold/50 rounded-2xl px-4 py-3">
@@ -138,8 +138,8 @@ export default function DashboardSettings({ afterSaveHref }: { afterSaveHref?: s
           onChange={(e) => setAccountType(e.target.value)}
           className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine focus:outline-none focus:border-signal"
         >
-          <option value="personal">🎣 Personal</option>
-          <option value="business">🏢 Business</option>
+          <option value="personal">Personal</option>
+          <option value="business">Business</option>
         </select>
         <p className="text-xs text-pine/45 mt-1">
           Business accounts can list a business page and advertise.

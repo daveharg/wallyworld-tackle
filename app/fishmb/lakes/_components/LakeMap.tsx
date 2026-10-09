@@ -81,7 +81,7 @@ export function LakeMap({ lakes }: { lakes: MapLake[] }) {
       <p className="text-xs text-pine/50 px-4 py-2.5 bg-white">
         {lakes.length === 1 ? (
           <>
-            📍 {lakes[0].name} · {lakes[0].region}
+ {lakes[0].name} · {lakes[0].region}
           </>
         ) : (
           <>

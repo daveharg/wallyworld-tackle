@@ -205,7 +205,6 @@ export default function LakeNotes() {
         <div className="h-32 bg-pine/10 rounded-3xl animate-pulse" />
       ) : notes.length === 0 ? (
         <div className="bg-white border border-pine/10 rounded-3xl p-8 text-center">
-          <p className="text-4xl mb-3">📓</p>
           <p className="text-pine/70 font-bold">No lake notes yet</p>
           <p className="text-pine/50 text-sm mt-1">
             Search a lake above and jot down what works there.
@@ -224,7 +223,7 @@ export default function LakeNotes() {
                     href={`/fishmb/lakes/${n.lake_id}`}
                     className="font-bold text-pine hover:text-signal-dark"
                   >
-                    📓 {n.lake_name}
+ {n.lake_name}
                   </Link>
                   <p className="text-xs text-pine/50 mt-0.5">
                     Updated {fmtDate(n.updated_at)}
@@ -242,7 +241,7 @@ export default function LakeNotes() {
                     aria-label={`Edit notes for ${n.lake_name}`}
                     className="text-pine/50 hover:text-pine text-sm font-bold px-2 py-1"
                   >
-                    ✏️
+ 
                   </button>
                   <button
                     type="button"
@@ -250,7 +249,7 @@ export default function LakeNotes() {
                     aria-label={`Delete notes for ${n.lake_name}`}
                     className="text-pine/50 hover:text-signal-dark text-sm font-bold px-2 py-1"
                   >
-                    🗑️
+ 
                   </button>
                 </div>
               </div>

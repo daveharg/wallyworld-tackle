@@ -20,6 +20,7 @@ import {
 import MapSheet, { type SheetTab } from "./MapSheet";
 import CatchesTab from "./CatchesTab";
 import SpotsTab, { type Spot } from "./SpotsTab";
+import LakesTab from "./LakesTab";
 import SettingsTab from "./SettingsTab";
 import WindWidget from "./WindWidget";
 import type { MapCatch, SavedLake } from "./types";
@@ -60,6 +61,7 @@ export default function MapsHub() {
   const [basemap, setBasemap] = useState<BasemapId>("streets");
   const [windOn, setWindOn] = useState(false);
   const centeredOnGps = useRef(false);
+  const urlPlaced = useRef(false);
 
   // Spots: picking + quick add
   const [picking, setPicking] = useState(false);
@@ -109,7 +111,8 @@ export default function MapsHub() {
     }
   };
 
-  // Live GPS — the map opens on your current location.
+  // Live GPS — the map opens on your current location (unless a URL
+  // deep-link already placed it).
   useEffect(() => {
     if (!("geolocation" in navigator)) return;
     const id = navigator.geolocation.watchPosition(
@@ -120,14 +123,14 @@ export default function MapsHub() {
           speed: pos.coords.speed,
         };
         setMyLoc(loc);
-        if (!centeredOnGps.current) {
+        if (!centeredOnGps.current && !urlPlaced.current) {
           centeredOnGps.current = true;
           setFocus({ lat: loc.lat, lng: loc.lng, key: `gps:init`, zoom: 11 });
           setMapCenter({ lat: loc.lat, lng: loc.lng });
         }
       },
       () => {
-        // Permission denied — map stays on Manitoba.
+        // Permission denied — map stays where it is.
       },
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 30000 }
     );
@@ -161,23 +164,35 @@ export default function MapsHub() {
   };
 
   // Deep link from a shared spot in the feed: ?spot=lat,lng&name=…
+  // Also supports ?lat=&lng=&z= for "open large map" links (e.g. lake pages).
   useEffect(() => {
     const raw = searchParams.get("spot");
-    if (!raw) return;
-    const [la, ln] = raw.split(",").map(Number);
-    if (!Number.isFinite(la) || !Number.isFinite(ln)) return;
-    const name = searchParams.get("name") || "Shared spot";
-    const pin: SpotPin = {
-      id: `shared:${la},${ln}`,
-      name,
-      lat: la,
-      lng: ln,
-      notes: "Shared from the feed",
-      icon: "pin",
-      created_at: new Date().toISOString(),
-    };
-    setSharedSpot(pin);
-    setFocus({ lat: la, lng: ln, key: pin.id, zoom: 15 });
+    if (raw) {
+      const [la, ln] = raw.split(",").map(Number);
+      if (!Number.isFinite(la) || !Number.isFinite(ln)) return;
+      const name = searchParams.get("name") || "Shared spot";
+      const pin: SpotPin = {
+        id: `shared:${la},${ln}`,
+        name,
+        lat: la,
+        lng: ln,
+        notes: "Shared from the feed",
+        icon: "pin",
+        created_at: new Date().toISOString(),
+      };
+      setSharedSpot(pin);
+      urlPlaced.current = true;
+      setFocus({ lat: la, lng: ln, key: pin.id, zoom: 15 });
+      return;
+    }
+    const qLat = Number(searchParams.get("lat"));
+    const qLng = Number(searchParams.get("lng"));
+    if (Number.isFinite(qLat) && Number.isFinite(qLng)) {
+      const qZoom = Math.min(Math.max(Number(searchParams.get("z")) || 11, 3), 18);
+      urlPlaced.current = true;
+      setFocus({ lat: qLat, lng: qLng, key: `url:${qLat},${qLng}`, zoom: qZoom });
+      setMapCenter({ lat: qLat, lng: qLng });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -289,7 +304,7 @@ export default function MapsHub() {
       setQuickName("");
       setQuickNotes("");
       setQuickIcon("pin");
-      setNote("Spot saved! 🎣");
+ setNote("Spot saved! ");
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not save the spot.");
     } finally {
@@ -335,7 +350,7 @@ export default function MapsHub() {
     setSharingId(id);
     try {
       await fishFetch(`/api/fishmb/spots/${id}/share`, { method: "POST" });
-      setNote("Spot shared to the feed! 🎣");
+ setNote("Spot shared to the feed! ");
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not share the spot.");
     } finally {
@@ -365,7 +380,7 @@ export default function MapsHub() {
   };
 
   return (
-    <div className="fixed inset-0 top-16 bottom-0 overflow-hidden bg-paper">
+    <div className="fixed inset-0 top-0 md:top-16 bottom-0 overflow-hidden bg-paper">
       <div className="absolute inset-0">
         {/* Its own Suspense boundary so a slow map chunk never blanks the sheet */}
         <Suspense
@@ -422,6 +437,23 @@ export default function MapsHub() {
         )}
       </button>
 
+      {/* Map settings — opens the sheet's Settings tab */}
+      <button
+        type="button"
+        onClick={() => {
+          setTab("settings");
+          setExpanded(true);
+        }}
+        aria-label="Map settings"
+        title="Map settings"
+        className="absolute top-[7.5rem] right-3 z-20 w-11 h-11 rounded-full bg-white/95 backdrop-blur border border-pine/15 shadow-lg text-pine flex items-center justify-center active:scale-95 transition-transform"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+        </svg>
+      </button>
+
       {/* Picking banner */}
       {picking && (
         <button
@@ -436,7 +468,6 @@ export default function MapsHub() {
       {/* Go-to navigation bar */}
       {goTo && (
         <div className="absolute top-3 left-3 right-3 z-20 flex items-center gap-3 bg-pine text-white rounded-2xl px-4 py-3 shadow-xl">
-          <span className="text-xl shrink-0">🧭</span>
           <div className="flex-1 min-w-0">
             <p className="font-bold text-sm truncate">{goTo.name || "Fishing spot"}</p>
             <p className="text-xs text-white/70 tabular-nums">
@@ -455,7 +486,7 @@ export default function MapsHub() {
             aria-label="Stop navigating"
             className="text-white/70 hover:text-white font-black px-1"
           >
-            ✕
+ 
           </button>
         </div>
       )}
@@ -471,7 +502,7 @@ export default function MapsHub() {
               className="ml-3 font-black text-pine/40"
               aria-label="Dismiss"
             >
-              ✕
+ 
             </button>
           </p>
         </div>
@@ -511,11 +542,12 @@ export default function MapsHub() {
             onAddSpot={() => {
               setExpanded(false);
               setPicking(true);
-              setNote("Tap the map to drop your pin 📍");
+ setNote("Tap the map to drop your pin ");
               setTimeout(() => setNote(null), 3500);
             }}
           />
         )}
+        {tab === "lakes" && <LakesTab onFlyToLake={flyToLake} />}
         {tab === "settings" && (
           <SettingsTab
             basemap={basemap}
@@ -535,7 +567,7 @@ export default function MapsHub() {
       {/* Quick-add modal after a map long-press / tap-to-drop */}
       {quickAdd && (
         <div
-          className="fixed inset-0 z-[1200] flex items-end sm:items-center justify-center p-4 bg-pine-deep/60 backdrop-blur-sm"
+          className="fixed inset-0 z-[1200] flex items-center justify-center p-4 bg-pine-deep/60 backdrop-blur-sm"
           onClick={() => setQuickAdd(null)}
         >
           <div
@@ -543,7 +575,7 @@ export default function MapsHub() {
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-1">
-              📍 Mark this spot
+ Mark this spot
             </h3>
             <p className="text-pine/50 text-xs mb-4 tabular-nums">
               {quickAdd.lat.toFixed(5)}, {quickAdd.lng.toFixed(5)}

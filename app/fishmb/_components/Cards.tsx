@@ -75,7 +75,7 @@ export function LodgeCard({ lodge }: { lodge: Lodge }) {
         <SpeciesLine species={lodge.species} />
         {lodge.ice_fishing && (
           <p className="text-[11px] font-bold uppercase tracking-wider text-pine/60 mt-3">
-            ❄ Ice fishing available
+ Ice fishing available
           </p>
         )}
       </div>

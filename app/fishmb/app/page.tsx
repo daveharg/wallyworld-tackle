@@ -6,7 +6,6 @@ import Link from "next/link";
 export default function FishMBAppPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-10 md:py-14 text-center">
-      <p className="text-5xl mb-5">📱</p>
       <p className="text-gold font-bold uppercase tracking-[0.28em] text-sm mb-3">
         The FishMB app
       </p>

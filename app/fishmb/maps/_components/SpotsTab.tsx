@@ -23,7 +23,7 @@ interface SpotsTabProps {
 }
 
 function spotEmoji(icon: string | null | undefined): string {
-  return SPOT_ICON_CHOICES.find((c) => c.id === icon)?.emoji ?? "📍";
+ return SPOT_ICON_CHOICES.find((c) => c.id === icon)?.emoji ?? "";
 }
 
 function fmtDate(iso: string): string {
@@ -90,12 +90,11 @@ export default function SpotsTab({
         onClick={onAddSpot}
         className="w-full mb-4 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3.5 rounded-full transition-colors shadow-lg"
       >
-        📍 Add a spot — tap the map
+ Add a spot — tap the map
       </button>
 
       {spots.length === 0 ? (
         <div className="text-center py-10">
-          <p className="text-4xl mb-3">📍</p>
           <p className="font-bold text-pine">No saved spots yet</p>
           <p className="text-pine/55 text-sm mt-1 max-w-xs mx-auto">
             Press and hold anywhere on the map to drop a pin and save your first spot.
@@ -200,14 +199,14 @@ export default function SpotsTab({
                           onClick={() => onNavigate(s)}
                           className="flex-1 bg-pine text-white text-[11px] font-bold uppercase tracking-wider px-2 py-2 rounded-xl"
                         >
-                          🧭 Go
+ Go
                         </button>
                         <button
                           type="button"
                           onClick={() => startEdit(s)}
                           className="flex-1 bg-pine/5 text-pine text-[11px] font-bold uppercase tracking-wider px-2 py-2 rounded-xl"
                         >
-                          ✏️ Edit
+ Edit
                         </button>
                         <button
                           type="button"
@@ -215,14 +214,14 @@ export default function SpotsTab({
                           disabled={sharingId === s.id}
                           className="flex-1 bg-pine/5 text-pine text-[11px] font-bold uppercase tracking-wider px-2 py-2 rounded-xl disabled:opacity-40"
                         >
-                          {sharingId === s.id ? "…" : "📤 Share"}
+ {sharingId === s.id ? "…" : " Share"}
                         </button>
                         <button
                           type="button"
                           onClick={() => onDelete(s.id)}
                           className="flex-1 bg-pine/5 text-signal-dark text-[11px] font-bold uppercase tracking-wider px-2 py-2 rounded-xl"
                         >
-                          🗑️
+ 
                         </button>
                       </div>
                     </div>

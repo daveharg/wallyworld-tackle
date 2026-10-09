@@ -23,10 +23,14 @@ export function FishChrome({ children }: { children: React.ReactNode }) {
   const hideFooter =
     bare ||
     NO_FOOTER_PREFIXES.some((p) => (pathname ?? "").startsWith(p));
+  // Top bar only on feed for phones; everywhere on desktop.
+  const showHeader = (pathname ?? "").startsWith("/fishmb/feed");
   if (bare) return <>{children}</>;
   return (
     <div className="min-h-screen bg-paper font-body text-pine">
-      <FishHeader />
+      <div className={showHeader ? "" : "hidden md:block"}>
+        <FishHeader />
+      </div>
       <main className="min-h-[70vh] pb-28 md:pb-32">{children}</main>
       {!hideFooter && <FishFooter />}
       <FishBottomBar />

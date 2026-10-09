@@ -79,7 +79,7 @@ export function CatchesGrid({ tournamentId }: { tournamentId: string }) {
             </p>
             {e.location_verified && (
               <p className="text-accentTeal text-[11px] font-bold mt-1">
-                ✓ Location verified in tournament waters
+ Location verified in tournament waters
               </p>
             )}
           </div>

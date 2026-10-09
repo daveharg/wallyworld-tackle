@@ -259,29 +259,28 @@ function MessagesPageInner() {
   if (!user) {
     const perks = [
       {
-        icon: "🔒",
+ icon: "",
         title: "End-to-end encrypted",
         text: "Only you and the people you're talking to can read your messages. Not even FishMB can see them.",
       },
       {
-        icon: "👥",
+ icon: "",
         title: "One-on-one & group chats",
         text: "Message a buddy or round up the whole crew to plan the next trip together.",
       },
       {
-        icon: "📸",
+ icon: "",
         title: "Photos & spots in chat",
         text: "Send catch photos and drop your saved fishing spots right into the conversation.",
       },
       {
-        icon: "📌",
+ icon: "",
         title: "Pins & unread badges",
         text: "Pin important chats to the top and see at a glance which conversations need you.",
       },
     ];
     return (
       <div className="max-w-md mx-auto px-4 py-16 text-center">
-        <div className="text-6xl mb-4">💬</div>
         <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide mb-3">
           Talk fishing, privately
         </h1>
@@ -324,7 +323,6 @@ function MessagesPageInner() {
   if (setup === "needed" || !keypair) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <p className="text-5xl mb-4">🔒</p>
         <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide mb-4">
           Encrypted messages
         </h1>
@@ -346,7 +344,7 @@ function MessagesPageInner() {
           disabled={enabling}
           className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-8 py-3.5 rounded-full disabled:opacity-50 transition-colors"
         >
-          {enabling ? "Setting up…" : "🔒 Enable encrypted messaging"}
+ {enabling ? "Setting up…" : " Enable encrypted messaging"}
         </button>
       </div>
     );
@@ -359,7 +357,7 @@ function MessagesPageInner() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <p className="text-signal font-bold uppercase tracking-[0.28em] text-sm mb-2">
-            🔒 Encrypted
+ Encrypted
           </p>
           <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide">
             Messages
@@ -370,7 +368,7 @@ function MessagesPageInner() {
           onClick={() => setNewOpen(true)}
           className="bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-xs px-5 py-3 rounded-full transition-colors"
         >
-          ✏️ New
+ New
         </button>
       </div>
 
@@ -385,7 +383,6 @@ function MessagesPageInner() {
         <div className={peer ? "hidden md:block" : ""}>
           {convos.length === 0 ? (
             <div className="bg-white border border-pine/10 rounded-3xl p-8 text-center">
-              <p className="text-4xl mb-3">💬</p>
               <p className="text-pine/70 font-bold">No conversations yet</p>
               <p className="text-pine/50 text-sm mt-1 mb-4">
                 Start one with a fishing friend.
@@ -410,7 +407,7 @@ function MessagesPageInner() {
                   if (c.is_group)
                     return (
                       <span className={`${size} rounded-full bg-pine/15 text-pine flex items-center justify-center shrink-0 ${text}`}>
-                        👥
+ 
                       </span>
                     );
                   if (other?.avatar_url)
@@ -458,7 +455,7 @@ function MessagesPageInner() {
                                 )}
                               </span>
                               <span className="text-[11px] text-pine/70 font-medium truncate w-full text-center leading-tight">
-                                📌 {title}
+ {title}
                               </span>
                             </button>
                           );
@@ -489,7 +486,7 @@ function MessagesPageInner() {
                                 </span>
                                 <span className="flex items-center justify-between gap-2 mt-0.5">
                                   <span className="text-[15px] text-pine/50 truncate">
-                                    {c.last_at ? "🔒 Encrypted message" : "Say hey 👋"}
+ {c.last_at ? " Encrypted message" : "Say hey "}
                                   </span>
                                   <span className="flex items-center gap-1.5 shrink-0">
                                     {c.unread > 0 && (
@@ -529,7 +526,6 @@ function MessagesPageInner() {
           ) : (
             <div className="hidden md:flex bg-white border border-pine/10 rounded-3xl p-12 items-center justify-center text-center h-full min-h-[420px]">
               <div>
-                <p className="text-4xl mb-3">🔒</p>
                 <p className="text-pine/60 font-bold">
                   Pick a conversation to start messaging
                 </p>
@@ -573,7 +569,7 @@ function MessagesPageInner() {
                   newMode === "group" ? "bg-pine text-white" : "bg-pine/10 text-pine/60"
                 }`}
               >
-                👥 Group
+ Group
               </button>
             </div>
             {friends.length === 0 ? (
@@ -650,7 +646,7 @@ function MessagesPageInner() {
                         )}
                         <span className="font-bold text-pine text-sm flex-1">{f.name}</span>
                         <span className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-white text-xs ${picked ? "bg-signal border-signal" : "border-pine/25"}`}>
-                          {picked ? "✓" : ""}
+ {picked ? "" : ""}
                         </span>
                       </button>
                     );
@@ -682,7 +678,7 @@ function MessagesPageInner() {
       )}
 
       <p className="text-center text-pine/40 text-xs mt-8 max-w-md mx-auto">
-        🔒 End-to-end encrypted: messages are scrambled on your device and only
+ End-to-end encrypted: messages are scrambled on your device and only
         unscrambled on your friend's. Your encryption key never leaves this
         device.
       </p>
@@ -700,7 +696,7 @@ function MessagesPageInner() {
               onClick={() => togglePin(sheetConvo)}
               className="w-full bg-pine/10 hover:bg-pine/20 text-pine font-bold text-[17px] px-6 py-3.5 rounded-2xl transition-colors"
             >
-              📌 {sheetConvo.pinned_at ? "Unpin from top" : "Pin to top"}
+ {sheetConvo.pinned_at ? "Unpin from top" : "Pin to top"}
             </button>
             <button
               type="button"

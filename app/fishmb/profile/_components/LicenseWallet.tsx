@@ -162,7 +162,7 @@ export default function LicenseWallet({ embedded = false }: { embedded?: boolean
   return (
     <section className={embedded ? "" : "max-w-3xl mx-auto px-4 mt-10"}>
       <h2 className="font-display font-bold uppercase text-pine text-2xl md:text-3xl tracking-wide mb-1">
-        🎣 Fishing licence
+ Fishing licence
       </h2>
       <p className="text-pine/60 text-sm mb-4">
         Your digital licence, one tap away — works even with no signal.
@@ -236,7 +236,7 @@ export default function LicenseWallet({ embedded = false }: { embedded?: boolean
               onClick={openViewer}
               className="w-full bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-base px-6 py-5 rounded-3xl transition-colors"
             >
-              🪪 Show my licence
+ Show my licence
             </button>
           )}
           <p className="text-xs text-pine/45 mt-3">
@@ -302,7 +302,7 @@ export default function LicenseWallet({ embedded = false }: { embedded?: boolean
               }}
               className="text-white text-sm font-bold uppercase tracking-wider bg-white/15 rounded-full px-5 py-2.5"
             >
-              ✕ Close
+ Close
             </button>
           </div>
           <div className="flex-1 overflow-auto flex items-center justify-center p-2">

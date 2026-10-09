@@ -26,7 +26,7 @@ interface Listing {
 
 const COPY: Record<Category, { title: string; blurb: string; cta: string; titlePh: string; bodyPh: string }> = {
   guide: {
-    title: "🎣 Guide classifieds",
+ title: " Guide classifieds",
     blurb:
       "Hire a local angler — from weekend warriors who'll hop on your boat to full-time guides with their own rig. Rates are set by the poster; FishMB just makes the intro.",
     cta: "+ Post your guiding service",
@@ -35,7 +35,7 @@ const COPY: Record<Category, { title: string; blurb: string; cta: string; titleP
       "What you offer, your experience, what waters you fish, what's included (boat, gear, bait?)…",
   },
   shack: {
-    title: "🛖 Ice shack rentals",
+ title: " Ice shack rentals",
     blurb:
       "Rent out your ice fishing shack — or find one for the weekend. Post where it is, what it sleeps, and your price.",
     cta: "+ List your shack",
@@ -112,7 +112,7 @@ export default function Classifieds({ category }: { category: Category }) {
       setLocation("");
       setOffers("fishing");
       setOpen(false);
-      setNote("Your listing is live! 🎣");
+ setNote("Your listing is live! ");
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not post your listing.");
     } finally {
@@ -149,8 +149,8 @@ export default function Classifieds({ category }: { category: Category }) {
         <div className="flex gap-2 mb-5">
           {(
             [
-              ["fishing", "🎣 Fishing guides"],
-              ["hunting", "🦌 Hunting guides"],
+ ["fishing", " Fishing guides"],
+ ["hunting", " Hunting guides"],
             ] as const
           ).map(([v, label]) => (
             <button
@@ -218,9 +218,9 @@ export default function Classifieds({ category }: { category: Category }) {
               <div className="flex gap-2">
                 {(
                   [
-                    ["fishing", "🎣 Fishing"],
-                    ["hunting", "🦌 Hunting"],
-                    ["both", "🎣🦌 Both"],
+ ["fishing", " Fishing"],
+ ["hunting", " Hunting"],
+ ["both", " Both"],
                   ] as const
                 ).map(([v, label]) => (
                   <button
@@ -267,8 +267,8 @@ export default function Classifieds({ category }: { category: Category }) {
               </div>
               <p className="text-pine/75 text-sm whitespace-pre-line flex-1">{l.body}</p>
               <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 text-xs text-pine/55">
-                {l.location && <span>📍 {l.location}</span>}
-                <span>📞 {l.contact}</span>
+                {l.location && <span>{l.location}</span>}
+                <span>{l.contact}</span>
               </div>
               <div className="flex items-center justify-between mt-3 pt-3 border-t border-pine/10">
                 <Link

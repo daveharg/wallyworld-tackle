@@ -105,7 +105,7 @@ export default function NewBusinessPage() {
         </div>
         <input value={website} onChange={(e) => setWebsite(e.target.value)} maxLength={300} placeholder="Website (https://…)" className={inputCls} />
         <label className="block bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-sm text-pine/70 cursor-pointer">
-          {files.length > 0 ? `📷 ${files.length} photo(s) selected` : "📷 Add photos (up to 8)"}
+ {files.length > 0 ? ` ${files.length} photo(s) selected` : " Add photos (up to 8)"}
           <input
             type="file"
             accept="image/*"

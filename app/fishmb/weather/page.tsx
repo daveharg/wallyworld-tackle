@@ -7,18 +7,18 @@ import LocationPicker, { WxLoc } from "./_components/LocationPicker";
 /* WMO weather-code → label + emoji                                     */
 /* ------------------------------------------------------------------ */
 function wmo(code: number): { label: string; icon: string } {
-  if (code === 0) return { label: "Clear sky", icon: "☀️" };
-  if (code === 1) return { label: "Mostly clear", icon: "🌤️" };
-  if (code === 2) return { label: "Partly cloudy", icon: "⛅" };
-  if (code === 3) return { label: "Overcast", icon: "☁️" };
-  if (code === 45 || code === 48) return { label: "Fog", icon: "🌫️" };
-  if (code >= 51 && code <= 57) return { label: "Drizzle", icon: "🌦️" };
-  if (code >= 61 && code <= 67) return { label: "Rain", icon: "🌧️" };
-  if (code >= 71 && code <= 77) return { label: "Snow", icon: "🌨️" };
-  if (code >= 80 && code <= 82) return { label: "Showers", icon: "🌦️" };
-  if (code === 85 || code === 86) return { label: "Snow showers", icon: "🌨️" };
-  if (code >= 95) return { label: "Thunderstorm", icon: "⛈️" };
-  return { label: "—", icon: "🌡️" };
+ if (code === 0) return { label: "Clear sky", icon: "" };
+ if (code === 1) return { label: "Mostly clear", icon: "" };
+ if (code === 2) return { label: "Partly cloudy", icon: "" };
+ if (code === 3) return { label: "Overcast", icon: "" };
+ if (code === 45 || code === 48) return { label: "Fog", icon: "" };
+ if (code >= 51 && code <= 57) return { label: "Drizzle", icon: "" };
+ if (code >= 61 && code <= 67) return { label: "Rain", icon: "" };
+ if (code >= 71 && code <= 77) return { label: "Snow", icon: "" };
+ if (code >= 80 && code <= 82) return { label: "Showers", icon: "" };
+ if (code === 85 || code === 86) return { label: "Snow showers", icon: "" };
+ if (code >= 95) return { label: "Thunderstorm", icon: "" };
+ return { label: "—", icon: "" };
 }
 
 function compass(deg: number): string {
@@ -34,14 +34,14 @@ function moonPhase(date = new Date()): { name: string; icon: string; illum: numb
   const illum = Math.round(((1 - Math.cos((age / 29.53058867) * 2 * Math.PI)) / 2) * 100);
   const idx = Math.floor((age / 29.53058867) * 8 + 0.5) % 8;
   const phases = [
-    { name: "New Moon", icon: "🌑" },
-    { name: "Waxing Crescent", icon: "🌒" },
-    { name: "First Quarter", icon: "🌓" },
-    { name: "Waxing Gibbous", icon: "🌔" },
-    { name: "Full Moon", icon: "🌕" },
-    { name: "Waning Gibbous", icon: "🌖" },
-    { name: "Last Quarter", icon: "🌗" },
-    { name: "Waning Crescent", icon: "🌘" },
+ { name: "New Moon", icon: "" },
+ { name: "Waxing Crescent", icon: "" },
+ { name: "First Quarter", icon: "" },
+ { name: "Waxing Gibbous", icon: "" },
+ { name: "Full Moon", icon: "" },
+ { name: "Waning Gibbous", icon: "" },
+ { name: "Last Quarter", icon: "" },
+ { name: "Waning Crescent", icon: "" },
   ];
   return { ...phases[idx], illum, idx };
 }
@@ -348,12 +348,12 @@ export default function WeatherPage() {
     }
     const front =
       trend <= -2
-        ? { label: "Front approaching", color: "#ef4444", icon: "🌩️" }
+ ? { label: "Front approaching", color: "#ef4444", icon: "" }
         : trend >= 2
-          ? { label: "Front passing", color: "#f59e0b", icon: "🌤️" }
+ ? { label: "Front passing", color: "#f59e0b", icon: "" }
           : frontAgoH !== null && frontAgoH < 72
-            ? { label: "Post-front", color: "#f59e0b", icon: "🧊" }
-            : { label: "Stable", color: "#22c55e", icon: "✅" };
+ ? { label: "Post-front", color: "#f59e0b", icon: "" }
+ : { label: "Stable", color: "#22c55e", icon: "" };
     return { c, trend, outlook, front, frontAgoH, frontDrop, wmo: wmo(c.weather_code), nowHourIdx, todayIdx };
   }, [data]);
 
@@ -397,7 +397,7 @@ export default function WeatherPage() {
             <button onClick={() => setPickerOpen(true)} className="text-left group">
               <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-200/60">FishMB Weather</p>
               <h1 className="text-lg font-black">
-                📍 {coords.label} <span className="text-white/40 text-sm group-active:text-white/70">▾</span>
+ {coords.label} <span className="text-white/40 text-sm group-active:text-white/70">▾</span>
               </h1>
             </button>
           </div>
@@ -416,7 +416,7 @@ export default function WeatherPage() {
                 <div className="text-right text-xs text-emerald-100/70 space-y-1">
                   <p>H {data && derived ? Math.round(data.daily.temperature_2m_max[derived.todayIdx] ?? 0) : "—"}°</p>
                   <p>L {data && derived ? Math.round(data.daily.temperature_2m_min[derived.todayIdx] ?? 0) : "—"}°</p>
-                  <p>💧 {derived.c.relative_humidity_2m}%</p>
+                  <p>{derived.c.relative_humidity_2m}%</p>
                 </div>
               </div>
 
@@ -458,7 +458,6 @@ export default function WeatherPage() {
                     className="absolute inset-0 flex items-start justify-center text-lg"
                     style={{ transform: `rotate(${derived.c.wind_direction_10m}deg)` }}
                   >
-                    <span style={{ transform: "translateY(2px)" }}>➤</span>
                   </span>
                   <span className="absolute inset-0 flex items-center justify-center text-[10px] font-black">{compass(derived.c.wind_direction_10m)}</span>
                 </div>
@@ -505,7 +504,7 @@ export default function WeatherPage() {
               </div>
               {derived.frontAgoH !== null && (
                 <p className="text-[11px] text-white/70 mt-1">
-                  🧊 Cold front came through ~{derived.frontAgoH < 24 ? `${Math.round(derived.frontAgoH)}h` : `${Math.round(derived.frontAgoH / 24)}d`} ago
+ Cold front came through ~{derived.frontAgoH < 24 ? `${Math.round(derived.frontAgoH)}h` : `${Math.round(derived.frontAgoH / 24)}d`} ago
                   ({derived.frontDrop.toFixed(0)} hPa drop). Bite can stay off for days after — fish slow and deep.
                 </p>
               )}
@@ -517,7 +516,7 @@ export default function WeatherPage() {
           {/* Live wind map */}
           <section className="rounded-3xl overflow-hidden border border-white/10 bg-white/[0.05]">
             <div className="flex items-center justify-between px-4 pt-3 pb-2">
-              <h2 className="text-sm font-black">🌬️ Live wind map</h2>
+              <h2 className="text-sm font-black">Live wind map</h2>
               <span className="text-[10px] text-white/40">windy.com</span>
             </div>
             <button
@@ -532,7 +531,7 @@ export default function WeatherPage() {
                 loading="lazy"
               />
               <span className="absolute bottom-3 right-3 bg-black/60 text-white text-xs font-bold rounded-full px-3 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                ⛶ Full screen
+ Full screen
               </span>
             </button>
             <p className="px-4 py-2.5 text-[11px] text-white/50">
@@ -600,13 +599,13 @@ export default function WeatherPage() {
           <div className="absolute inset-0 bg-black/60" onClick={() => setExplainer(null)} />
           <div className="relative w-full max-w-md bg-[#10231c] border border-white/10 rounded-3xl p-6 max-h-[80vh] overflow-y-auto">
             <div className="flex items-start justify-between gap-3">
-              <h3 className="text-lg font-black">🎣 {EXPLAINERS[explainer].title}</h3>
+              <h3 className="text-lg font-black">{EXPLAINERS[explainer].title}</h3>
               <button
                 onClick={() => setExplainer(null)}
                 aria-label="Close"
                 className="w-9 h-9 shrink-0 rounded-full bg-white/10 flex items-center justify-center text-lg"
               >
-                ✕
+ 
               </button>
             </div>
             <div className="mt-3 space-y-3">

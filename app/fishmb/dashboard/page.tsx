@@ -11,10 +11,10 @@ import DashboardLicence from "./_components/DashboardLicence";
 import DashboardTournaments from "./_components/DashboardTournaments";
 
 const TABS = [
-  { id: "stats", label: "Stats", icon: "📊" },
-  { id: "tournaments", label: "Tournaments", icon: "🏆" },
-  { id: "licence", label: "Licence", icon: "🪪" },
-  { id: "settings", label: "Settings", icon: "⚙️" },
+ { id: "stats", label: "Stats", icon: "" },
+ { id: "tournaments", label: "Tournaments", icon: "" },
+ { id: "licence", label: "Licence", icon: "" },
+ { id: "settings", label: "Settings", icon: "" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -26,29 +26,28 @@ export default function DashboardPage() {
   if (!user) {
     const perks = [
       {
-        icon: "📊",
+ icon: "",
         title: "Your angler stats",
         text: "Total catches, species count, personal bests and how you stack up against friends — all tracked automatically from your catch log.",
       },
       {
-        icon: "🐟",
+ icon: "",
         title: "Catch history",
         text: "Every fish you've logged, with photos, lengths, locations and dates. Your lifetime record on the water.",
       },
       {
-        icon: "🏆",
+ icon: "",
         title: "Tournament record",
         text: "Events you've joined or organized, your finishes, and live leaderboards for tournaments running now.",
       },
       {
-        icon: "⚙️",
+ icon: "",
         title: "Profile & settings",
         text: "Your public angler profile, privacy controls, notification preferences and account settings live here.",
       },
     ];
     return (
       <div className="max-w-md mx-auto px-4 py-16 text-center">
-        <div className="text-6xl mb-4">📊</div>
         <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide mb-3">
           Your angler HQ
         </h1>

@@ -343,10 +343,10 @@ function GrowthChart({ data }: { data: GrowthData | null }) {
     <div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
         {[
-          ["👥 Total users", data.totals.users],
-          ["📝 Total posts", data.totals.posts],
-          ["🐟 Total catches", data.totals.catches],
-          ["🏆 Tournaments", data.totals.tournaments],
+ [" Total users", data.totals.users],
+ [" Total posts", data.totals.posts],
+ [" Total catches", data.totals.catches],
+ [" Tournaments", data.totals.tournaments],
         ].map(([label, v]) => (
           <div key={label as string} className="bg-white border border-pine/10 rounded-2xl p-4 text-center">
             <p className="font-display font-bold text-pine text-3xl">{v as number}</p>
@@ -445,7 +445,7 @@ export default function AdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, status }),
       });
-      setNote(kind === "ads" && status === "active" ? "Ad approved — running for 7 days. 🎣" : "Done.");
+ setNote(kind === "ads" && status === "active" ? "Ad approved — running for 7 days. " : "Done.");
       load();
     } catch {
       setNote("Action failed.");
@@ -495,13 +495,13 @@ export default function AdminPage() {
   }
 
   const statCards: [string, number, string][] = [
-    ["👥 Anglers", stats?.users ?? 0, "/fishmb/feed"],
-    ["🏢 Businesses", stats?.businesses ?? 0, "/fishmb/business"],
-    ["🏆 Tournaments", stats?.tournaments ?? 0, "/fishmb/tournaments"],
-    ["📋 Classifieds", stats?.classifieds ?? 0, "/fishmb/lodges"],
-    ["📨 Claims waiting", stats?.pendingClaims ?? 0, ""],
-    ["📢 Ads waiting", stats?.pendingAds ?? 0, ""],
-    ["✅ Ads running", stats?.activeAds ?? 0, ""],
+ [" Anglers", stats?.users ?? 0, "/fishmb/feed"],
+ [" Businesses", stats?.businesses ?? 0, "/fishmb/business"],
+ [" Tournaments", stats?.tournaments ?? 0, "/fishmb/tournaments"],
+ [" Classifieds", stats?.classifieds ?? 0, "/fishmb/lodges"],
+ [" Claims waiting", stats?.pendingClaims ?? 0, ""],
+ [" Ads waiting", stats?.pendingAds ?? 0, ""],
+ [" Ads running", stats?.activeAds ?? 0, ""],
   ];
 
   return (
@@ -551,14 +551,14 @@ export default function AdminPage() {
       <div className="flex flex-wrap gap-2 mb-6">
         {(
           [
-            ["claims", `📨 Business claims (${claims.length})`],
-            ["ads", `📢 Ad submissions (${ads.length})`],
-            ["tournaments", `🏆 Tournament suggestions (${suggestions.length})`],
-            ["messages", `✉️ Messages (${messages.length})`],
-            ["anglers", `📊 Angler stats (${anglerStats.length})`],
-            ["users", `👥 Users (${allUsers.length})`],
-            ["growth", `📈 Growth`],
-            ["map", `🗺️ Angler map`],
+ ["claims", ` Business claims (${claims.length})`],
+ ["ads", ` Ad submissions (${ads.length})`],
+ ["tournaments", ` Tournament suggestions (${suggestions.length})`],
+ ["messages", ` Messages (${messages.length})`],
+ ["anglers", ` Angler stats (${anglerStats.length})`],
+ ["users", ` Users (${allUsers.length})`],
+ ["growth", ` Growth`],
+ ["map", ` Angler map`],
           ] as const
         ).map(([v, label]) => (
           <button
@@ -576,7 +576,6 @@ export default function AdminPage() {
       {tab === "claims" ? (
         claims.length === 0 ? (
           <div className="bg-white border border-pine/10 rounded-3xl p-10 text-center">
-            <p className="text-4xl mb-3">🎉</p>
             <p className="text-pine/60">No pending claims. All caught up.</p>
           </div>
         ) : (
@@ -599,7 +598,7 @@ export default function AdminPage() {
                     disabled={acting === c.id}
                     className="bg-pine hover:bg-pine-deep text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full disabled:opacity-40 transition-colors"
                   >
-                    ✓ Approve
+ Approve
                   </button>
                   <button
                     onClick={() => act("claims", c.id, "rejected")}
@@ -616,7 +615,6 @@ export default function AdminPage() {
       ) : tab === "tournaments" ? (
         suggestions.length === 0 ? (
           <div className="bg-white border border-pine/10 rounded-3xl p-10 text-center">
-            <p className="text-4xl mb-3">🎉</p>
             <p className="text-pine/60">No pending tournament suggestions. All caught up.</p>
           </div>
         ) : (
@@ -641,7 +639,7 @@ export default function AdminPage() {
                     disabled={acting === s.id}
                     className="bg-pine hover:bg-pine-deep text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full disabled:opacity-40 transition-colors"
                   >
-                    ✓ Approve
+ Approve
                   </button>
                   <button
                     onClick={() => act("traditional", s.id, "rejected")}
@@ -658,7 +656,6 @@ export default function AdminPage() {
       ) : tab === "messages" ? (
         messages.length === 0 ? (
           <div className="bg-white border border-pine/10 rounded-3xl p-10 text-center">
-            <p className="text-4xl mb-3">🎉</p>
             <p className="text-pine/60">No new messages. All caught up.</p>
           </div>
         ) : (
@@ -683,7 +680,7 @@ export default function AdminPage() {
                     disabled={acting === m.id}
                     className="bg-pine hover:bg-pine-deep text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full disabled:opacity-40 transition-colors"
                   >
-                    ✓ Mark read
+ Mark read
                   </button>
                   <button
                     onClick={() => act("contact-messages", m.id, "archived")}
@@ -713,7 +710,7 @@ export default function AdminPage() {
         <div>
           <div className="bg-white border border-pine/10 rounded-3xl p-5 mb-4">
             <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-1">
-              🗺️ Where your anglers fish
+ Where your anglers fish
             </h3>
             <p className="text-sm text-pine/60 mb-1">
               Aggregated from saved spots and GPS-tagged catches. Areas only
@@ -732,7 +729,7 @@ export default function AdminPage() {
               {userMap.cells.length > 0 && (
                 <div className="bg-white border border-pine/10 rounded-3xl p-5 mt-4">
                   <h4 className="font-bold text-pine text-sm uppercase tracking-wider mb-3">
-                    🏆 Top areas by angler activity
+ Top areas by angler activity
                   </h4>
                   <div className="divide-y divide-pine/10">
                     {userMap.cells.slice(0, 10).map((c, i) => (
@@ -763,7 +760,6 @@ export default function AdminPage() {
         </div>
       ) : ads.length === 0 ? (
         <div className="bg-white border border-pine/10 rounded-3xl p-10 text-center">
-          <p className="text-4xl mb-3">🎉</p>
           <p className="text-pine/60">No pending ads. All caught up.</p>
         </div>
       ) : (
@@ -772,14 +768,14 @@ export default function AdminPage() {
             <div key={a.id} className="bg-white border-2 border-gold/40 rounded-3xl p-5">
               <div className="flex items-start justify-between gap-3 mb-1">
                 <p className="text-[11px] font-bold uppercase tracking-wider text-gold">
-                  {a.slot === "feed" ? "📄 Feed ad" : "🖼️ Homepage banner"} · ${(a.price_cents / 100).toFixed(0)}/week
+ {a.slot === "feed" ? " Feed ad" : " Homepage banner"} · ${(a.price_cents / 100).toFixed(0)}/week
                 </p>
                 <span className="text-xs text-pine/45 whitespace-nowrap">{timeAgo(a.created_at)}</span>
               </div>
               <p className="font-display font-bold text-pine text-xl uppercase tracking-wide mb-1">{a.title}</p>
               <p className="text-xs text-pine/55 mb-3">
                 by {a.user_name} · {a.user_email}
-                {a.business_name ? ` · 🏢 ${a.business_name}` : ""}
+ {a.business_name ? ` · ${a.business_name}` : ""}
               </p>
               {a.image_url && (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -787,14 +783,14 @@ export default function AdminPage() {
               )}
               {a.video_url && <video src={a.video_url} controls className="w-full max-h-64 rounded-2xl mb-3" />}
               {a.body && <p className="text-sm text-pine/70 mb-3">{a.body}</p>}
-              {a.link_url && <p className="text-xs text-signal-dark mb-4 break-all">🔗 {a.link_url}</p>}
+              {a.link_url && <p className="text-xs text-signal-dark mb-4 break-all">{a.link_url}</p>}
               <div className="flex gap-2">
                 <button
                   onClick={() => act("ads", a.id, "active")}
                   disabled={acting === a.id}
                   className="bg-signal hover:bg-signal-dark text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full disabled:opacity-40 transition-colors"
                 >
-                  ✓ Approve — run 7 days
+ Approve — run 7 days
                 </button>
                 <button
                   onClick={() => act("ads", a.id, "rejected")}

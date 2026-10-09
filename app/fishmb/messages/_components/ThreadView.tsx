@@ -285,7 +285,7 @@ export default function ThreadView({
   const peerAvatar = (size: string, textSize: string) =>
     peer.is_group ? (
       <span className={`${size} rounded-full bg-pine/15 text-pine flex items-center justify-center font-bold shrink-0`}>
-        👥
+ 
       </span>
     ) : others[0]?.avatar_url ? (
       // eslint-disable-next-line @next/next/no-img-element
@@ -357,7 +357,7 @@ export default function ThreadView({
             </span>
           </button>
           <p className="text-[11px] text-pine/45 mt-0.5">
-            🔒 End-to-end encrypted{peer.is_group ? ` · ${peer.members.length} members` : ""}
+ End-to-end encrypted{peer.is_group ? ` · ${peer.members.length} members` : ""}
           </p>
         </div>
         <span className="w-8 md:hidden shrink-0" />
@@ -390,7 +390,7 @@ export default function ThreadView({
       )}
       {missingNames.length > 0 && (
         <p className="text-sm text-pine bg-pine/5 border border-pine/15 rounded-2xl px-4 py-3 mt-3">
-          ⚠️ {missingNames.join(", ")} {missingNames.length === 1 ? "hasn't" : "haven't"} enabled
+ {missingNames.join(", ")} {missingNames.length === 1 ? "hasn't" : "haven't"} enabled
           encrypted messaging yet — they'll only see messages sent after they turn it on.
         </p>
       )}
@@ -398,7 +398,7 @@ export default function ThreadView({
       <div className="flex-1 min-h-0 overflow-y-auto py-4 space-y-1">
         {msgs.length === 0 && secrets && (
           <p className="text-center text-pine/45 text-sm mt-8">
-            No messages yet — say hey. 🔒
+ No messages yet — say hey. 
           </p>
         )}
         {msgs.map((m, i) => {
@@ -438,7 +438,7 @@ export default function ThreadView({
                   <img src={photo} alt="Shared photo" className="rounded-2xl max-h-64 object-cover" loading="lazy" />
                 ) : (
                   <p className="text-[17px] leading-snug whitespace-pre-wrap break-words">
-                    {m.text ?? "⚠️ Couldn't decrypt this message."}
+ {m.text ?? " Couldn't decrypt this message."}
                   </p>
                 )}
               </div>

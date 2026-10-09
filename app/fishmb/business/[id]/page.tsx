@@ -119,7 +119,7 @@ export default function BusinessPage({ params }: { params: { id: string } }) {
           <h1 className="font-display font-bold uppercase text-pine text-4xl md:text-5xl tracking-wide">
             {biz.name}
           </h1>
-          {biz.location && <p className="text-pine/60 mt-2">📍 {biz.location}</p>}
+          {biz.location && <p className="text-pine/60 mt-2">{biz.location}</p>}
         </div>
         {isOwner && (
           <button
@@ -141,7 +141,7 @@ export default function BusinessPage({ params }: { params: { id: string } }) {
           </div>
           <input value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} maxLength={300} placeholder="Website" className={inputCls} />
           <label className="block bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-sm text-pine/70 cursor-pointer">
-            {newFiles.length > 0 ? `📷 ${newFiles.length} new photo(s)` : "📷 Add more photos"}
+ {newFiles.length > 0 ? ` ${newFiles.length} new photo(s)` : " Add more photos"}
             <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => setNewFiles(Array.from(e.target.files ?? []))} />
           </label>
           <div className="flex justify-end">
@@ -158,10 +158,10 @@ export default function BusinessPage({ params }: { params: { id: string } }) {
             <p className="text-pine/50 text-sm">No description yet.</p>
           )}
           <div className="flex flex-wrap gap-x-6 gap-y-2 mt-5 text-sm">
-            {biz.contact && <span className="font-bold text-pine">📞 {biz.contact}</span>}
+            {biz.contact && <span className="font-bold text-pine">{biz.contact}</span>}
             {biz.website && (
               <a href={biz.website} target="_blank" rel="noopener noreferrer" className="font-bold text-signal-dark">
-                🌐 Website →
+ Website →
               </a>
             )}
           </div>

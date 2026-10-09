@@ -17,7 +17,7 @@ export default function ContoursToggle() {
         onClick={() => setOpen(true)}
         className="absolute top-3 right-3 z-[500] bg-white/95 backdrop-blur border border-pine/15 rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wider text-pine shadow-md hover:bg-white transition-colors"
       >
-        🗺️ Contours
+ Contours
       </button>
       {open && (
         <div
@@ -28,7 +28,6 @@ export default function ContoursToggle() {
             className="bg-paper rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="text-5xl mb-4">🗺️</p>
             <h3 className="font-display font-bold uppercase text-pine text-2xl tracking-wide mb-3">
               Depth contours coming soon
             </h3>

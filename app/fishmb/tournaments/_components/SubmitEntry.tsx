@@ -36,7 +36,7 @@ export function SubmitEntry({
           Log a catch
         </h3>
         <p className="text-sm text-pine/70">
-          🔒 This is a strict camera-only tournament. Entries must be taken with the FishMB
+ This is a strict camera-only tournament. Entries must be taken with the FishMB
           app&apos;s in-app camera — please log your catch from the app.
         </p>
       </div>
@@ -147,7 +147,7 @@ export function SubmitEntry({
         </label>
         {photoMode === "measure_only" && (
           <p className="text-xs text-pine/60 bg-pine/5 border border-pine/10 rounded-2xl px-3.5 py-2.5 mb-2">
-            📏 Just the fish on your measuring board — no posed photo with the fish needed. Extra
+ Just the fish on your measuring board — no posed photo with the fish needed. Extra
             photos are optional.
           </p>
         )}
@@ -173,7 +173,7 @@ export function SubmitEntry({
                   aria-label={`Remove photo ${i + 1}`}
                   className="absolute top-1 right-1 w-6 h-6 rounded-full bg-pine-deep/80 text-white text-xs font-bold leading-none"
                 >
-                  ✕
+ 
                 </button>
                 {i === 0 && (
                   <span className="absolute bottom-1 left-1 bg-gold text-pine-deep text-[10px] font-bold px-1.5 py-0.5 rounded">

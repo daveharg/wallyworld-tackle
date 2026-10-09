@@ -83,7 +83,7 @@ export default function YouTubeEmbed({ videoId }: { videoId: string }) {
           className="absolute inset-0 z-10 flex items-end justify-end p-3 bg-transparent"
         >
           <span className="rounded-full bg-black/65 text-white text-sm font-bold px-4 py-2 backdrop-blur-sm">
-            🔇 Tap for sound
+ Tap for sound
           </span>
         </button>
       )}
@@ -94,7 +94,7 @@ export default function YouTubeEmbed({ videoId }: { videoId: string }) {
           aria-label={muted ? "Unmute video" : "Mute video"}
           className="absolute bottom-3 right-3 z-10 rounded-full bg-black/65 text-white text-sm font-bold px-4 py-2 backdrop-blur-sm"
         >
-          {muted ? "🔇 Tap for sound" : "🔊"}
+ {muted ? " Tap for sound" : ""}
         </button>
       )}
     </div>

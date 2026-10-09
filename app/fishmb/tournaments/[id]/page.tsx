@@ -59,12 +59,12 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
           </p>
           {t.photo_mode === "measure_only" && (
             <p className="mt-3 inline-block text-xs font-bold uppercase tracking-wider text-pine bg-pine/10 rounded-full px-4 py-2">
-              📏 Measure-only photos — no posed photo with the fish needed
+ Measure-only photos — no posed photo with the fish needed
             </p>
           )}
           {t.photo_mode === "strict" && (
             <p className="mt-3 inline-block text-xs font-bold uppercase tracking-wider text-pine bg-pine/10 rounded-full px-4 py-2">
-              🔒 Strict camera-only — entries must be taken with the FishMB app&apos;s in-app camera
+ Strict camera-only — entries must be taken with the FishMB app&apos;s in-app camera
             </p>
           )}
         </div>
@@ -77,7 +77,7 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
       {(t.venue_name || t.venue_address) && (
         <div className="bg-white border border-pine/10 rounded-2xl p-6 mt-6 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-1.5">📍 Where</h3>
+            <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-1.5">Where</h3>
             {t.venue_name && <p className="text-pine font-bold text-lg">{t.venue_name}</p>}
             {t.venue_address && <p className="text-pine/60 text-sm">{t.venue_address}</p>}
           </div>
@@ -138,7 +138,7 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
           href={`/fishmb/tournaments/${t.id}/leaderboard`}
           className="bg-pine-deep text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full hover:bg-pine transition-colors"
         >
-          ⛶ Full-screen board
+ Full-screen board
         </Link>
       </div>
       {leaderboard.length === 0 ? (
@@ -174,7 +174,7 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
       </h2>
       {t.hide_locations && (
         <p className="text-pine/60 text-sm mb-4 bg-pine/5 border border-pine/10 rounded-2xl px-4 py-3">
-          🔒 Catch spots are private in this tournament — the app confirms each catch is inside
+ Catch spots are private in this tournament — the app confirms each catch is inside
           the tournament waters, but exact locations are never shown to other anglers.
         </p>
       )}

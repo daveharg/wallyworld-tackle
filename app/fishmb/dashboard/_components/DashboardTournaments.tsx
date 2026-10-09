@@ -55,7 +55,7 @@ export default function DashboardTournaments() {
         className="flex items-center gap-3 bg-white border border-pine/10 rounded-2xl p-4 hover:border-signal/40 transition-colors"
       >
         <span className="w-11 h-11 rounded-full bg-gold/15 border border-gold/40 flex items-center justify-center text-xl shrink-0">
-          🏆
+ 
         </span>
         <span className="min-w-0 flex-1">
           <span className="block font-bold text-pine truncate">{t.name}</span>
@@ -88,7 +88,6 @@ export default function DashboardTournaments() {
         <div className="h-32 bg-pine/10 rounded-3xl animate-pulse" />
       ) : tournaments.length === 0 ? (
         <div className="bg-white border border-pine/10 rounded-3xl p-8 text-center">
-          <p className="text-4xl mb-3">🏆</p>
           <p className="text-pine/70 font-bold">No tournaments yet</p>
           <p className="text-pine/50 text-sm mt-1 mb-4">
             Run your own or join one with an invite link.

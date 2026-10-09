@@ -63,7 +63,6 @@ export default function ContactPage() {
 
       {sent ? (
         <div className="bg-white border border-pine/10 rounded-3xl p-10 text-center">
-          <p className="text-4xl mb-3">📬</p>
           <p className="font-display font-bold uppercase text-pine text-2xl tracking-wide mb-2">
             Message sent
           </p>

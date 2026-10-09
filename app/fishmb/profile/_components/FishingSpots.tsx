@@ -32,7 +32,7 @@ interface Trail {
 }
 
 function spotEmoji(icon: string | null | undefined): string {
-  return SPOT_ICON_CHOICES.find((c) => c.id === icon)?.emoji ?? "📍";
+ return SPOT_ICON_CHOICES.find((c) => c.id === icon)?.emoji ?? "";
 }
 
 /** Row of icon choices for a spot (pin / fish / rock / weeds). */
@@ -455,7 +455,7 @@ export default function FishingSpots() {
     setSharingSpot(id);
     try {
       await fishFetch(`/api/fishmb/spots/${id}/share`, { method: "POST" });
-      setNote("Spot shared to the feed! 🎣");
+ setNote("Spot shared to the feed! ");
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not share the spot.");
     } finally {
@@ -470,7 +470,7 @@ export default function FishingSpots() {
     <section className="max-w-3xl mx-auto px-4 mt-2">
       <div className="text-center mb-5">
         <h2 className="font-display font-bold uppercase text-pine text-2xl md:text-3xl tracking-wide">
-          📍 My fishing spots
+ My fishing spots
         </h2>
         <p className="text-pine/60 text-sm mt-1.5 mb-4">
           Your private GPS spots — only you can see them.
@@ -484,7 +484,7 @@ export default function FishingSpots() {
           disabled={locating}
           className="bg-signal hover:bg-signal-dark text-white text-sm font-bold uppercase tracking-wider px-8 py-3.5 rounded-full disabled:opacity-50 transition-colors shadow-lg"
         >
-          {locating ? "Getting location…" : "📍 Mark my current location"}
+ {locating ? "Getting location…" : " Mark my current location"}
         </button>
         <GpxImport onImported={load} />
       </div>
@@ -500,13 +500,12 @@ export default function FishingSpots() {
         <>
           {spots.length === 0 && !picking && manualLat === null && (
             <p className="text-center text-pine/60 text-sm mb-3">
-              📍 No spots yet — <strong>hold your finger down</strong> on the
+ No spots yet — <strong>hold your finger down</strong> on the
               map to mark your first one.
             </p>
           )}
           {goTo && (
             <div className="flex items-center gap-3 bg-pine text-white rounded-2xl px-4 py-3 mb-3">
-              <span className="text-xl shrink-0">🧭</span>
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-sm truncate">
                   {goTo.name || "Fishing spot"}
@@ -523,7 +522,7 @@ export default function FishingSpots() {
                 aria-label="Stop navigating"
                 className="text-white/70 hover:text-white font-black px-1"
               >
-                ✕
+ 
               </button>
             </div>
           )}
@@ -554,7 +553,7 @@ export default function FishingSpots() {
           />
           </div>
           <p className="text-center text-pine/50 text-xs mt-2 mb-1">
-            💡 Tip: <strong>press and hold</strong> anywhere on the map to drop a pin and save a spot there.
+ Tip: <strong>press and hold</strong> anywhere on the map to drop a pin and save a spot there.
           </p>
         </>
       )}
@@ -570,7 +569,7 @@ export default function FishingSpots() {
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-1">
-              📍 Mark this spot
+ Mark this spot
             </h3>
             <p className="text-pine/50 text-xs mb-4 tabular-nums">
               {quickAdd.lat.toFixed(5)}, {quickAdd.lng.toFixed(5)}
@@ -620,7 +619,7 @@ export default function FishingSpots() {
       {/* Saved lakes — quick map navigation */}
       <div className="bg-white border border-pine/10 rounded-3xl p-6 mt-4">
         <h3 className="font-display font-bold uppercase text-pine text-lg tracking-wide mb-1">
-          ⭐ Saved lakes
+ Saved lakes
         </h3>
         <p className="text-pine/55 text-xs mb-3">
           Jump the map straight to a saved lake.
@@ -643,7 +642,7 @@ export default function FishingSpots() {
                   {f.name}
                 </option>
               ))}
-              <option value="__add__">➕ Add a new lake…</option>
+              <option value="__add__">Add a new lake…</option>
             </select>
             {selectedFav && selectedFav !== "__add__" && (
               <button
@@ -651,7 +650,7 @@ export default function FishingSpots() {
                 onClick={() => removeFav(selectedFav)}
                 className="mt-2 w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-2.5 text-signal-dark text-xs font-bold uppercase tracking-wider"
               >
-                🗑️ Remove this lake
+ Remove this lake
               </button>
             )}
           </div>
@@ -663,7 +662,7 @@ export default function FishingSpots() {
             className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold focus:outline-none focus:border-signal"
           >
             <option value="">No saved lakes yet…</option>
-            <option value="__add__">➕ Add a new lake…</option>
+            <option value="__add__">Add a new lake…</option>
           </select>
         )}
         {selectedFav === "__add__" && (
@@ -693,7 +692,7 @@ export default function FishingSpots() {
               disabled={!addLakeId || addingLake}
               className="mt-2 w-full bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-5 py-3 rounded-2xl disabled:opacity-40 transition-colors"
             >
-              {addingLake ? "Adding…" : "★ Add this lake"}
+ {addingLake ? "Adding…" : " Add this lake"}
             </button>
           </div>
         )}
@@ -702,7 +701,7 @@ export default function FishingSpots() {
       {/* Saved spots — dropdown, works just like saved lakes */}
       <div className="bg-white border border-pine/10 rounded-3xl p-6 mt-4">
         <h3 className="font-display font-bold uppercase text-pine text-lg tracking-wide mb-1">
-          📍 Saved spots
+ Saved spots
         </h3>
         <p className="text-pine/55 text-xs mb-3">
           Jump the map straight to a saved spot.
@@ -786,14 +785,14 @@ export default function FishingSpots() {
                     }}
                     className="flex-1 bg-pine text-white text-xs font-bold uppercase tracking-wider px-3 py-2.5 rounded-2xl"
                   >
-                    🧭 Navigate
+ Navigate
                   </button>
                   <button
                     type="button"
                     onClick={() => startEdit(selectedSpot)}
                     className="flex-1 bg-white border border-pine/15 text-pine text-xs font-bold uppercase tracking-wider px-3 py-2.5 rounded-2xl"
                   >
-                    ✏️ Edit
+ Edit
                   </button>
                   <button
                     type="button"
@@ -801,14 +800,14 @@ export default function FishingSpots() {
                     disabled={sharingSpot === selectedSpot.id}
                     className="flex-1 bg-white border border-pine/15 text-pine text-xs font-bold uppercase tracking-wider px-3 py-2.5 rounded-2xl disabled:opacity-40"
                   >
-                    {sharingSpot === selectedSpot.id ? "…" : "📤 Share"}
+ {sharingSpot === selectedSpot.id ? "…" : " Share"}
                   </button>
                   <button
                     type="button"
                     onClick={() => removeSpot(selectedSpot.id)}
                     className="flex-1 bg-white border border-pine/15 text-signal-dark text-xs font-bold uppercase tracking-wider px-3 py-2.5 rounded-2xl"
                   >
-                    🗑️ Delete
+ Delete
                   </button>
                 </div>
               </div>
@@ -820,7 +819,7 @@ export default function FishingSpots() {
       {/* Recorded boat trails — overlay one to retrace your route */}
       <div className="bg-white border border-pine/10 rounded-3xl p-6 mt-4">
         <h3 className="font-display font-bold uppercase text-pine text-lg tracking-wide mb-1">
-          🛥️ My trails
+ My trails
         </h3>
         <p className="text-pine/55 text-xs mb-3">
           Recorded boat routes — overlay one on the map to retrace it.
@@ -848,7 +847,7 @@ export default function FishingSpots() {
                 title="Delete the selected trail"
                 className="shrink-0 bg-paper-deep border border-pine/15 rounded-2xl px-4 text-pine/50 hover:text-signal-dark text-sm font-bold"
               >
-                🗑️
+ 
               </button>
             )}
           </div>
@@ -893,7 +892,7 @@ export default function FishingSpots() {
               disabled={locating}
               className="bg-pine hover:bg-pine-deep text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full disabled:opacity-50 transition-colors"
             >
-              {locating ? "Getting location…" : "📍 Use my current location"}
+ {locating ? "Getting location…" : " Use my current location"}
             </button>
             <button
               type="button"
@@ -904,7 +903,7 @@ export default function FishingSpots() {
                   : "bg-paper-deep border-pine/15 text-pine/70 hover:border-signal"
               }`}
             >
-              {picking ? "Tap the map… (tap again to cancel)" : "🗺️ Tap map to drop pin"}
+ {picking ? "Tap the map… (tap again to cancel)" : " Tap map to drop pin"}
             </button>
           </div>
           {manualLat !== null && manualLng !== null && (

@@ -1,27 +1,29 @@
 "use client";
 
-import { useRef, useState, type ReactNode, type TouchEvent } from "react";
+import { useRef, useState, type TouchEvent } from "react";
+import type { SheetTab } from "./types";
 
-export type SheetTab = "catches" | "spots" | "settings";
+export type { SheetTab };
 
-export const SHEET_TABS: { id: SheetTab; label: string; icon: string }[] = [
-  { id: "catches", label: "Catches", icon: "🎣" },
-  { id: "spots", label: "Saved spots", icon: "📍" },
-  { id: "settings", label: "Settings", icon: "⚙️" },
+const TABS: { id: SheetTab; label: string }[] = [
+  { id: "catches", label: "Catches" },
+  { id: "spots", label: "Saved spots" },
+  { id: "lakes", label: "Lakes" },
+  { id: "settings", label: "Settings" },
 ];
 
-interface MapSheetProps {
+interface Props {
   tab: SheetTab;
   onTabChange: (t: SheetTab) => void;
   expanded: boolean;
-  onExpandedChange: (e: boolean) => void;
-  children: ReactNode;
+  onExpandedChange: (v: boolean) => void;
+  children: React.ReactNode;
 }
 
 /**
- * Bottom sheet for the maps page. Peeks above the floating bottom bar showing
- * just the three tab headers; swipe up (or tap a tab) to expand fullscreen,
- * swipe down (or tap ✕) to collapse back to the peek.
+ * Bottom sheet styled like a full page sliding up from behind the bottom bar.
+ * Collapsed it peeks just above the bar (grabber + tab row visible); swipe up
+ * or tap a tab to open it fullscreen, swipe down anywhere to close it.
  */
 export default function MapSheet({
   tab,
@@ -29,29 +31,54 @@ export default function MapSheet({
   expanded,
   onExpandedChange,
   children,
-}: MapSheetProps) {
+}: Props) {
   const [dragDy, setDragDy] = useState(0);
   const [dragging, setDragging] = useState(false);
   const startY = useRef<number | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const dragMode = useRef<"expand" | "close" | null>(null);
 
   const onTouchStart = (e: TouchEvent) => {
-    startY.current = e.touches[0]?.clientY ?? null;
+    startY.current = e.touches[0].clientY;
+    dragMode.current = null;
     setDragging(true);
   };
+
   const onTouchMove = (e: TouchEvent) => {
     if (startY.current === null) return;
     const dy = e.touches[0].clientY - startY.current;
-    // Peek: allow dragging up (reveal) a bit and down a little.
-    // Full: only dragging down matters.
-    setDragDy(expanded ? Math.max(0, Math.min(dy, 320)) : Math.max(-260, Math.min(dy, 120)));
+    if (!expanded) {
+      // Collapsed: drag up to open the page.
+      if (dy < -8) {
+        dragMode.current = "expand";
+        setDragDy(dy);
+      } else {
+        setDragDy(0);
+      }
+    } else {
+      // Open: drag down anywhere to close — but only when the content
+      // is scrolled to the top, otherwise let the list scroll normally.
+      const scroller = scrollRef.current;
+      const atTop = !scroller || scroller.scrollTop <= 0;
+      if (dy > 8 && atTop) {
+        dragMode.current = "close";
+        setDragDy(dy);
+      } else if (dragMode.current !== "close") {
+        setDragDy(0);
+      }
+    }
   };
+
   const onTouchEnd = () => {
-    if (startY.current === null) return;
-    if (!expanded && dragDy < -60) onExpandedChange(true);
-    else if (expanded && dragDy > 60) onExpandedChange(false);
+    if (dragMode.current === "expand" && dragDy < -60) {
+      onExpandedChange(true);
+    } else if (dragMode.current === "close" && dragDy > 60) {
+      onExpandedChange(false);
+    }
     setDragDy(0);
     setDragging(false);
     startY.current = null;
+    dragMode.current = null;
   };
 
   const tapTab = (id: SheetTab) => {
@@ -67,56 +94,47 @@ export default function MapSheet({
 
   return (
     <div
-      className="fixed inset-x-3 z-50 bg-paper rounded-3xl shadow-2xl border border-pine/10 flex flex-col overflow-hidden"
+      className={`fixed inset-x-0 bg-paper rounded-t-3xl shadow-2xl border-t border-x border-pine/10 flex flex-col overflow-hidden ${
+        expanded ? "z-50 top-3 md:top-[68px]" : "z-30 top-[calc(100dvh-225px)]"
+      } bottom-0`}
       style={{
-        top: expanded ? 68 : "calc(100dvh - 256px)",
-        bottom: expanded ? 8 : 176,
         transform: dragDy !== 0 ? `translateY(${dragDy}px)` : undefined,
-        transition: dragging ? "none" : "top 0.3s ease, bottom 0.3s ease",
+        transition: dragging ? "none" : "top 0.32s ease, transform 0.32s ease",
       }}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
     >
-      {/* Header — the drag handle + tab switcher (always visible) */}
-      <div
-        className="shrink-0 pt-2 pb-1 px-2 touch-none select-none"
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
-      >
-        <div className="w-10 h-1 rounded-full bg-pine/20 mx-auto mb-1.5" />
-        <div className="flex items-center gap-1">
-          {SHEET_TABS.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => tapTab(t.id)}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-2xl text-[13px] font-bold transition-colors ${
-                tab === t.id
-                  ? "bg-pine text-white shadow"
-                  : "text-pine/50 hover:text-pine hover:bg-pine/5"
-              }`}
-            >
-              <span className="text-base">{t.icon}</span>
-              {t.label}
-            </button>
-          ))}
-          {expanded && (
-            <button
-              type="button"
-              onClick={() => onExpandedChange(false)}
-              aria-label="Collapse panel"
-              className="shrink-0 w-9 h-9 ml-1 rounded-full bg-pine/5 text-pine/60 font-black flex items-center justify-center"
-            >
-              ✕
-            </button>
-          )}
-        </div>
+      {/* Grabber */}
+      <div className="shrink-0 pt-2.5 pb-1 flex justify-center">
+        <div className="w-10 h-1.5 rounded-full bg-pine/20" />
       </div>
-      {/* Content — only rendered when expanded */}
-      {expanded && (
-        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 pb-8">
-          {children}
-        </div>
-      )}
+
+      {/* Tab headers — text only */}
+      <div className="shrink-0 px-7 pb-1 flex items-center justify-between">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            onClick={() => tapTab(t.id)}
+            className={`text-[17px] py-2 transition-colors ${
+              tab === t.id
+                ? "font-extrabold text-[#c2410c]"
+                : "font-semibold text-pine/55"
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Scrollable page content */}
+      <div
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto overscroll-contain px-4 pb-10"
+      >
+        {children}
+      </div>
     </div>
   );
 }

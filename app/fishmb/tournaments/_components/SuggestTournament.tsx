@@ -31,7 +31,7 @@ export function SuggestTournament() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, dates, location, entry, description, url }),
       });
-      setNote("Thanks — we'll verify it before it goes live. 🎣");
+ setNote("Thanks — we'll verify it before it goes live. ");
       setName("");
       setDates("");
       setLocation("");

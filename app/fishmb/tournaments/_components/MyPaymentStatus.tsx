@@ -40,7 +40,7 @@ export function MyPaymentStatus({
   return state.paid ? (
     <div className="bg-emerald-50 border border-emerald-200 rounded-2xl px-5 py-4 mt-4">
       <p className="text-emerald-800 font-bold text-sm">
-        ✓ Entry fee {centsToDollars(entryFeeCents)} — paid and confirmed by the organizer.
+ Entry fee {centsToDollars(entryFeeCents)} — paid and confirmed by the organizer.
       </p>
     </div>
   ) : (

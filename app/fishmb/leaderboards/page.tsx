@@ -11,11 +11,11 @@ import { fishFetch } from "../_components/fishFetch";
 type Category = "best" | "biggest" | "most" | "masters" | "above";
 
 const CATEGORIES: { key: Category; icon: string; label: string; unit: string }[] = [
-  { key: "best", icon: "🏆", label: "Best fishers", unit: "total inches" },
-  { key: "biggest", icon: "📏", label: "Biggest fish", unit: "inches" },
-  { key: "most", icon: "🎣", label: "Most fish", unit: "fish" },
-  { key: "masters", icon: "🎖️", label: "Most Masters", unit: "masters" },
-  { key: "above", icon: "⭐", label: "Above average", unit: "fish" },
+ { key: "best", icon: "", label: "Best fishers", unit: "total inches" },
+ { key: "biggest", icon: "", label: "Biggest fish", unit: "inches" },
+ { key: "most", icon: "", label: "Most fish", unit: "fish" },
+ { key: "masters", icon: "", label: "Most Masters", unit: "masters" },
+ { key: "above", icon: "", label: "Above average", unit: "fish" },
 ];
 
 interface Row {

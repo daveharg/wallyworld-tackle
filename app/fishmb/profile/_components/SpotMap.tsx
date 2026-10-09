@@ -118,6 +118,8 @@ export default function SpotMap({
   const containerRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<any>(null);
   const [expanded, setExpanded] = useState(false);
+  // Circular fill indicator shown at the press point during a long-press.
+  const [pressRing, setPressRing] = useState<{ x: number; y: number; p: number } | null>(null);
   const onPickRef = useRef(onPick);
   onPickRef.current = onPick;
   const onLongPressRef = useRef(onLongPress);
@@ -215,6 +217,7 @@ export default function SpotMap({
     if (!map || !containerRef.current) return;
     let L: any = null;
     let timer: ReturnType<typeof setTimeout> | null = null;
+    let rafId: number | null = null;
     let startX = 0;
     let startY = 0;
     const el = containerRef.current;
@@ -241,14 +244,35 @@ export default function SpotMap({
         clearTimeout(timer);
         timer = null;
       }
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      setPressRing(null);
     };
 
     const onDown = (clientX: number, clientY: number) => {
       cancel();
       startX = clientX;
       startY = clientY;
+      // Show the circular fill indicator at the press point.
+      const rect = el.getBoundingClientRect();
+      const rx = clientX - rect.left;
+      const ry = clientY - rect.top;
+      const t0 = performance.now();
+      const tick = () => {
+        const p = Math.min((performance.now() - t0) / 600, 1);
+        setPressRing({ x: rx, y: ry, p });
+        rafId = p < 1 ? requestAnimationFrame(tick) : null;
+      };
+      rafId = requestAnimationFrame(tick);
       timer = setTimeout(() => {
         timer = null;
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+        setPressRing(null);
         fire(clientX, clientY);
       }, 600);
     };
@@ -374,7 +398,7 @@ export default function SpotMap({
         const color = c.mine ? "#e4572e" : "#12322b";
         const icon = L.divIcon({
           className: "",
-          html: `<div style="width:30px;height:30px;border-radius:50%;background:${color};border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:15px;">🐟</div>`,
+          html: `<div style="width:30px;height:30px;border-radius:50%;background:${color};border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:15px;"></div>`,
           iconSize: [30, 30],
           iconAnchor: [15, 15],
         });
@@ -402,7 +426,7 @@ export default function SpotMap({
       const layer = L.layerGroup();
       const person = L.divIcon({
         className: "",
-        html: `<div style="font-size:26px;line-height:1;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.55));">🧍</div>`,
+        html: `<div style="font-size:26px;line-height:1;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.55));"></div>`,
         iconSize: [26, 26],
         iconAnchor: [13, 22],
       });
@@ -736,7 +760,7 @@ export default function SpotMap({
           : "bg-white/95 text-pine border-pine/15 hover:bg-white"
       }`}
     >
-      📏 Measure
+ Measure
     </button>
   );
 
@@ -759,7 +783,35 @@ export default function SpotMap({
           ← Back
         </button>
       )}
-      <ContoursToggle />
+      {!fill && <ContoursToggle />}
+      {/* Long-press circular fill indicator */}
+      {pressRing && (
+        <div
+          className="absolute z-[1002] pointer-events-none"
+          style={{
+            left: pressRing.x - 24,
+            top: pressRing.y - 24,
+            width: 48,
+            height: 48,
+          }}
+        >
+          <svg width="48" height="48" viewBox="0 0 48 48">
+            <circle cx="24" cy="24" r="20" fill="rgba(255,255,255,0.85)" />
+            <circle
+              cx="24"
+              cy="24"
+              r="20"
+              fill="none"
+              stroke="#1d4d2b"
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeDasharray={2 * Math.PI * 20}
+              strokeDashoffset={2 * Math.PI * 20 * (1 - pressRing.p)}
+              transform="rotate(-90 24 24)"
+            />
+          </svg>
+        </div>
+      )}
       {/*
         Sizing wrapper is React-owned; the inner div belongs to Leaflet.
         Its className must NEVER change between renders — when it does,
@@ -774,14 +826,14 @@ export default function SpotMap({
       {/* Measure result pill */}
       {measureDist !== null && (
         <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[600] bg-pine-deep/90 text-white text-xs font-bold rounded-full px-4 py-2 shadow-lg whitespace-nowrap">
-          📏 {formatDist(measureDist)}
+ {formatDist(measureDist)}
           <button
             type="button"
             aria-label="Clear measurement"
             onClick={() => setMeasurePts([])}
             className="ml-2 text-white/70 hover:text-white font-black"
           >
-            ✕
+ 
           </button>
         </div>
       )}
@@ -789,7 +841,7 @@ export default function SpotMap({
       {/* Live speed readout — sits above the map attribution */}
       {speedKmh !== null && (
         <div className="absolute bottom-9 right-3 z-[600] bg-pine-deep/90 text-white text-xs font-bold rounded-full px-3.5 py-2 shadow-lg tabular-nums">
-          🚤 {speedKmh.toFixed(0)} km/h
+ {speedKmh.toFixed(0)} km/h
         </div>
       )}
 
@@ -830,7 +882,7 @@ export default function SpotMap({
       {showSave && (
         <div className="absolute inset-0 z-[700] flex items-center justify-center p-4 bg-pine-deep/50">
           <div className="bg-paper rounded-3xl p-6 w-full max-w-xs shadow-2xl">
-            <h3 className="font-bold text-pine text-lg mb-1">🛥️ Save trail</h3>
+            <h3 className="font-bold text-pine text-lg mb-1">Save trail</h3>
             <p className="text-pine/55 text-xs mb-4 tabular-nums">
               {trailPts.length} points · {formatDist(trailPts.reduce((d, p, i) => (i === 0 ? d : d + haversineM(trailPts[i - 1].lat, trailPts[i - 1].lng, p.lat, p.lng)), 0))} · {fmtElapsed(Date.now() - (trailStart ?? Date.now()))}
             </p>

@@ -108,47 +108,47 @@ export default async function FishMBHome() {
           <HSlider>
             {[
               [
-                "📸",
+ "",
                 "Phone timestamp is official",
                 "The catch is stamped with the phone's clock the moment the picture is taken — on the website or in the app, even with no service. A catch made inside your tournament window counts even if it uploads hours later. The app snaps photos in-app only; every website entry passes organizer review.",
               ],
               [
-                "📍",
+ "",
                 "GPS on every catch",
                 "Coordinates are stamped with each photo and shown to you on a map. Catches outside Manitoba are rejected automatically.",
               ],
               [
-                "🗺️",
+ "",
                 "Your waters, your boundaries",
                 "Set the tournament for any lake — or a list of lakes. Want a specific bay or stretch? Pull the full list of catches with their GPS pins and enforce your own boundaries.",
               ],
               [
-                "🔍",
+ "",
                 "Duplicate detection",
                 "The same photo submitted twice — by anyone — gets flagged for your review.",
               ],
               [
-                "✅",
+ "",
                 "Organizer review",
                 "You approve every catch before it hits the leaderboard, and can disqualify with one tap.",
               ],
               [
-                "📵",
+ "",
                 "Log it at the boat",
                 "Photo, GPS and timestamp are captured offline — the camera roll can't be used, so every entry is the real moment.",
               ],
               [
-                "⏱️",
+ "⏱",
                 "Stamped when taken",
                 "The official catch time is the phone's timestamp at the shutter, not when it uploads.",
               ],
               [
-                "🔄",
+ "",
                 "Syncs itself",
                 "Entries upload on their own when service returns. The leaderboard fills in as anglers come back online.",
               ],
               [
-                "📺",
+ "",
                 "Full-screen leaderboard",
                 "Put the live board on a TV or projector at weigh-in — it refreshes itself, and anyone can open it on their phone.",
               ],
@@ -298,7 +298,7 @@ export default async function FishMBHome() {
                       />
                     ) : (
                       <span className="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center text-2xl shrink-0">
-                        🏷️
+ 
                       </span>
                     )}
                     <span className="min-w-0">

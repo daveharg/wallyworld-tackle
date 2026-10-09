@@ -101,7 +101,7 @@ export default function HowTournamentsWorkPage() {
 
       <div className="bg-signal/10 border border-signal/40 rounded-3xl p-6 mb-10 max-w-2xl">
         <p className="font-bold text-pine uppercase tracking-wider text-xs mb-1.5">
-          ⚠️ Know the law
+ Know the law
         </p>
         <p className="text-pine/70 text-sm leading-relaxed">
           In Manitoba, fishing tournaments with{" "}
@@ -126,7 +126,7 @@ export default function HowTournamentsWorkPage() {
 
       <div className="bg-gold/10 border border-gold/30 rounded-3xl p-6 mb-10 max-w-2xl">
         <p className="font-display font-bold uppercase text-pine tracking-wide mb-3">
-          🎣 Example: a June friends challenge
+ Example: a June friends challenge
         </p>
         <p className="text-pine/70 text-sm leading-relaxed">
           Say you and five friends want to compete all through June for the
@@ -174,7 +174,7 @@ export default function HowTournamentsWorkPage() {
             key={c.title}
             className="bg-pine/[0.04] border border-pine/10 rounded-3xl p-6"
           >
-            <h3 className="font-bold text-pine mb-1.5">🛡️ {c.title}</h3>
+            <h3 className="font-bold text-pine mb-1.5">{c.title}</h3>
             <p className="text-pine/65 text-sm leading-relaxed">{c.body}</p>
           </div>
         ))}

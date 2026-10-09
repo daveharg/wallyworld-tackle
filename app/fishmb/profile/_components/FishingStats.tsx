@@ -58,7 +58,7 @@ export default function FishingStats({ userId, hideTitle }: { userId: string; hi
       <section className="mb-8">
         {!hideTitle && (
           <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
-            🎣 Fishing stats
+ Fishing stats
           </h2>
         )}
         <div className="bg-pine/5 rounded-3xl h-32 animate-pulse" />
@@ -85,7 +85,7 @@ export default function FishingStats({ userId, hideTitle }: { userId: string; hi
     <section className="mb-8">
       {!hideTitle && (
         <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
-          🎣 Fishing stats
+ Fishing stats
         </h2>
       )}
       <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5 mb-4">
@@ -126,7 +126,7 @@ export default function FishingStats({ userId, hideTitle }: { userId: string; hi
         )}
         {since && (
           <p className="text-xs text-pine/45 mt-4 pt-3 border-t border-pine/10">
-            🎣 On FishMB since {since}
+ On FishMB since {since}
           </p>
         )}
       </div>
@@ -135,7 +135,7 @@ export default function FishingStats({ userId, hideTitle }: { userId: string; hi
         href="/fishmb/leaderboards"
         className="mt-4 inline-flex items-center gap-2 bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-xs px-6 py-3 rounded-full transition-colors"
       >
-        🏆 View leaderboards →
+ View leaderboards →
       </Link>
     </section>
   );

@@ -53,7 +53,7 @@ function CatchRow({
         />
       ) : (
         <span className="w-14 h-14 rounded-xl bg-pine/5 flex items-center justify-center text-2xl shrink-0">
-          🐟
+ 
         </span>
       )}
       <span className="flex-1 min-w-0">
@@ -87,8 +87,8 @@ export default function CatchesTab({
       <div className="flex bg-pine/5 rounded-full p-1 mb-3">
         {(
           [
-            { id: "mine", label: `🎣 My catches (${mine.length})` },
-            { id: "nearby", label: `🌍 On this lake (${nearby.length})` },
+ { id: "mine", label: ` My catches (${mine.length})` },
+ { id: "nearby", label: ` On this lake (${nearby.length})` },
           ] as const
         ).map((s) => (
           <button
@@ -111,7 +111,6 @@ export default function CatchesTab({
         </div>
       ) : list.length === 0 ? (
         <div className="text-center py-10">
-          <p className="text-4xl mb-3">🎣</p>
           <p className="font-bold text-pine">
             {scope === "mine" ? "No GPS catches yet" : "No public catches here yet"}
           </p>

@@ -61,12 +61,12 @@ export default function ClassifiedDetailPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          body: `🏷️ For sale on FishMB Classifieds: ${item.title}${price}\n\n${listingUrl()}`,
+ body: ` For sale on FishMB Classifieds: ${item.title}${price}\n\n${listingUrl()}`,
           photos: item.photos.slice(0, 4),
         }),
       });
       setShared(true);
-      setNote("Shared to your FishMB feed! 🎣");
+ setNote("Shared to your FishMB feed! ");
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not share to feed.");
     } finally {
@@ -77,13 +77,13 @@ export default function ClassifiedDetailPage() {
   const shareElsewhere = async () => {
     if (!item) return;
     const url = listingUrl();
-    const text = `🏷️ ${item.title}${item.price_cents != null ? ` — ${formatPrice(item.price_cents)}` : ""} (FishMB Classifieds)`;
+ const text = ` ${item.title}${item.price_cents != null ? ` — ${formatPrice(item.price_cents)}` : ""} (FishMB Classifieds)`;
     try {
       if (navigator.share) {
         await navigator.share({ title: item.title, text, url });
       } else {
         await navigator.clipboard.writeText(url);
-        setNote("Link copied — paste it anywhere! 📋");
+ setNote("Link copied — paste it anywhere! ");
       }
     } catch {
       // User dismissed the share sheet; nothing to do.
@@ -149,7 +149,6 @@ export default function ClassifiedDetailPage() {
   if (!item) {
     return (
       <div className="max-w-2xl mx-auto px-4 pt-16 pb-32 text-center">
-        <p className="text-4xl mb-3">🎣</p>
         <p className="font-bold text-pine mb-4">That listing is gone.</p>
         <Link href="/fishmb/classifieds" className="font-bold text-signal-dark hover:underline">
           ← Back to classifieds
@@ -216,7 +215,7 @@ export default function ClassifiedDetailPage() {
           </div>
           <h1 className="text-xl font-black text-pine tracking-tight mb-1">{item.title}</h1>
           {item.location && (
-            <p className="text-sm text-pine/55 mb-3">📍 {item.location}</p>
+            <p className="text-sm text-pine/55 mb-3">{item.location}</p>
           )}
           <p className="text-pine/80 text-[15px] leading-relaxed whitespace-pre-wrap mb-5">
             {item.description}
@@ -231,7 +230,7 @@ export default function ClassifiedDetailPage() {
               <img src={item.avatar_url} alt="" className="w-11 h-11 rounded-full object-cover" />
             ) : (
               <span className="w-11 h-11 rounded-full bg-pine/15 flex items-center justify-center text-xl">
-                🎣
+ 
               </span>
             )}
             <span>
@@ -248,7 +247,7 @@ export default function ClassifiedDetailPage() {
                   disabled={busy}
                   className="flex-1 min-w-[140px] bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-xs px-6 py-3.5 rounded-full transition-colors disabled:opacity-50"
                 >
-                  ✓ Mark as sold
+ Mark as sold
                 </button>
               )}
               <button
@@ -269,7 +268,7 @@ export default function ClassifiedDetailPage() {
                 ? "This item is sold"
                 : busy
                   ? "Opening chat…"
-                  : "💬 Message seller"}
+ : " Message seller"}
             </button>
           )}
           {note && (
@@ -286,13 +285,13 @@ export default function ClassifiedDetailPage() {
                 disabled={busy || shared}
                 className="flex-1 bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-xs px-4 py-3 rounded-full transition-colors disabled:opacity-50"
               >
-                {shared ? "✓ Shared" : "📢 FishMB feed"}
+ {shared ? " Shared" : " FishMB feed"}
               </button>
               <button
                 onClick={shareElsewhere}
                 className="flex-1 border border-pine/25 text-pine hover:bg-pine/5 font-bold uppercase tracking-wider text-xs px-4 py-3 rounded-full transition-colors"
               >
-                ↗️ Share…
+ ↗ Share…
               </button>
               <a
                 href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
