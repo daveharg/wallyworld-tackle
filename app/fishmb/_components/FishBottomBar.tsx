@@ -90,7 +90,7 @@ const RIGHT: Item[] = [
   },
 ];
 
-/** TikTok-style create button as a circle: white with cyan/red offset layers. */
+/** Create button as a circle: white with FishMB brand-color offset layers. */
 function PlusButton({ onClick, label }: { onClick: () => void; label: string }) {
   return (
     <button
@@ -99,8 +99,8 @@ function PlusButton({ onClick, label }: { onClick: () => void; label: string }) 
       aria-label={label}
       className="relative w-[52px] h-[52px] shrink-0 active:scale-95 transition-transform"
     >
-      <span className="absolute inset-0 translate-x-[3px] rounded-full bg-cyan-400" />
-      <span className="absolute inset-0 -translate-x-[3px] rounded-full bg-rose-500" />
+      <span className="absolute inset-0 translate-x-[3px] rounded-full bg-signal" />
+      <span className="absolute inset-0 -translate-x-[3px] rounded-full bg-gold" />
       <span className="absolute inset-0 rounded-full bg-white shadow-lg flex items-center justify-center">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.8" strokeLinecap="round">
           <path d="M12 5v14M5 12h14" />
