@@ -40,8 +40,15 @@ declare global {
     google?: {
       accounts: {
         id: {
-          initialize: (opts: { client_id: string; callback: (r: { credential: string }) => void }) => void;
+          initialize: (opts: {
+            client_id: string;
+            callback: (r: { credential: string }) => void;
+            auto_select?: boolean;
+            cancel_on_tap_outside?: boolean;
+          }) => void;
           renderButton: (el: HTMLElement, opts: Record<string, unknown>) => void;
+          prompt: () => void;
+          disableAutoSelect: () => void;
         };
       };
     };
@@ -142,34 +149,37 @@ function LoginModal({ onClose, onDone }: { onClose: () => void; onDone: (u: Fish
   useEffect(() => {
     if (!canContinue) return;
     let cancelled = false;
+    const handleCredential = async (resp: { credential: string }) => {
+      setBusy(true);
+      setError(null);
+      try {
+        const res = await fetch("/api/fish/auth/google", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id_token: resp.credential, age_confirmed: true, terms_accepted: true }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Sign-in failed.");
+        try {
+          localStorage.setItem(FISHMB_TOKEN_KEY, data.token);
+          localStorage.setItem("fishmb-terms-ok", "1");
+        } catch {
+          // storage unavailable — non-fatal
+        }
+        onDone(data.user, data.is_new_user === true);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Sign-in failed.");
+      } finally {
+        setBusy(false);
+      }
+    };
     const init = () => {
       if (cancelled || !window.google || !btnRef.current) return;
       window.google.accounts.id.initialize({
         client_id: FISHMB_GOOGLE_CLIENT_ID,
-        callback: async (resp) => {
-          setBusy(true);
-          setError(null);
-          try {
-            const res = await fetch("/api/fish/auth/google", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ id_token: resp.credential, age_confirmed: true, terms_accepted: true }),
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Sign-in failed.");
-            try {
-              localStorage.setItem(FISHMB_TOKEN_KEY, data.token);
-              localStorage.setItem("fishmb-terms-ok", "1");
-            } catch {
-              // storage unavailable — non-fatal
-            }
-            onDone(data.user, data.is_new_user === true);
-          } catch (e) {
-            setError(e instanceof Error ? e.message : "Sign-in failed.");
-          } finally {
-            setBusy(false);
-          }
-        },
+        callback: handleCredential,
+        auto_select: false,
+        cancel_on_tap_outside: true,
       });
       window.google.accounts.id.renderButton(btnRef.current, {
         theme: "outline",
@@ -177,6 +187,14 @@ function LoginModal({ onClose, onDone }: { onClose: () => void; onDone: (u: Fish
         text: "signin_with",
         width: 280,
       });
+      // One Tap for users already signed in to Google — avoids the
+      // "locked button" state where the GSI button shows the email
+      // but doesn't respond to clicks.
+      try {
+        window.google.accounts.id.prompt();
+      } catch {
+        // One Tap unavailable — button remains the fallback.
+      }
     };
     if (window.google) {
       init();
@@ -249,6 +267,33 @@ function LoginModal({ onClose, onDone }: { onClose: () => void; onDone: (u: Fish
           <p className="text-xs text-pine/50 mb-2">
             Check both boxes above to continue with Google.
           </p>
+        )}
+        {canContinue && (
+          <button
+            onClick={() => {
+              // Reset Google's button state — fixes the "locked" state where
+              // the button shows your email but won't respond to taps.
+              try {
+                window.google?.accounts.id.disableAutoSelect();
+              } catch { /* noop */ }
+              setError(null);
+              const btn = btnRef.current;
+              if (btn) {
+                btn.innerHTML = "";
+                try {
+                  window.google?.accounts.id.renderButton(btn, {
+                    theme: "outline",
+                    size: "large",
+                    text: "signin_with",
+                    width: 280,
+                  });
+                } catch { /* noop */ }
+              }
+            }}
+            className="mt-3 text-xs font-bold text-pine/40 hover:text-pine underline"
+          >
+            Button not working? Tap to reset it
+          </button>
         )}
         {busy && <p className="text-sm text-pine/60 mt-4">Signing you in…</p>}
         {error && <p className="text-sm text-signal-dark mt-4">{error}</p>}
