@@ -134,6 +134,32 @@ export default function MapsHub() {
     return () => navigator.geolocation.clearWatch(id);
   }, []);
 
+  // Manual "find me" — single-shot GPS fix that flies the map to you.
+  // (Covers denied-then-granted permission and slow first fixes.)
+  const [locating, setLocating] = useState(false);
+  const locateMe = () => {
+    if (!("geolocation" in navigator)) {
+      setNote("Your device doesn't support location.");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        setMyLoc((prev) => ({ ...loc, speed: prev?.speed ?? null }));
+        setMapCenter(loc);
+        setFocus({ lat: loc.lat, lng: loc.lng, key: `gps:manual:${Date.now()}`, zoom: 12 });
+        setLocating(false);
+      },
+      () => {
+        setLocating(false);
+        setNote("Couldn't get your location — check permission in Settings.");
+        setTimeout(() => setNote(null), 4000);
+      },
+      { enableHighAccuracy: true, timeout: 15000 }
+    );
+  };
+
   // Deep link from a shared spot in the feed: ?spot=lat,lng&name=…
   useEffect(() => {
     const raw = searchParams.get("spot");
@@ -370,6 +396,21 @@ export default function MapsHub() {
 
       {/* Wind overlay */}
       {windOn && <WindWidget lat={mapCenter.lat} lng={mapCenter.lng} />}
+
+      {/* Manual locate button */}
+      <button
+        type="button"
+        onClick={locateMe}
+        aria-label="Center on my location"
+        title="Center on my location"
+        className="absolute top-14 right-3 z-[500] w-11 h-11 rounded-full bg-white/95 backdrop-blur border border-pine/15 shadow-lg text-pine text-xl flex items-center justify-center active:scale-95 transition-transform"
+      >
+        {locating ? (
+          <span className="w-5 h-5 border-2 border-pine/30 border-t-pine rounded-full animate-spin" />
+        ) : (
+          "◎"
+        )}
+      </button>
 
       {/* Picking banner */}
       {picking && (
