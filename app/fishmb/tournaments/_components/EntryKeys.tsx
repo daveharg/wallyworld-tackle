@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { fishFetch } from "../../_components/fishFetch";
 
 interface TRedeemer {
@@ -16,6 +17,7 @@ interface TKey {
   label: string | null;
   max_uses: number | null;
   uses: number;
+  used_by_user_id: string | null;
   used_by_name: string | null;
   used_at: string | null;
   redeemers: TRedeemer[];
@@ -141,7 +143,23 @@ export function EntryKeys({ tournamentId }: { tournamentId: string }) {
           className="text-[10px] font-bold uppercase tracking-wider bg-pine/10 text-pine px-2.5 py-1 rounded-full"
           title={who ? `Used by ${who}` : "Used"}
         >
-          Used{who ? ` · ${who}` : ""}
+          Used
+          {who ? (
+            <>
+              {" · "}
+              {k.used_by_user_id ? (
+                <Link
+                  href={`/fishmb/anglers/${k.used_by_user_id}`}
+                  className="underline hover:text-signal-dark"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {who}
+                </Link>
+              ) : (
+                who
+              )}
+            </>
+          ) : null}
         </span>
       );
     }
@@ -242,9 +260,6 @@ export function EntryKeys({ tournamentId }: { tournamentId: string }) {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
           {keys.map((k) => {
             const copyable = k.max_uses === null || k.status === "unused";
-            const redeemerNames = k.redeemers
-              .map((r) => r.name)
-              .filter((n): n is string => !!n);
             return (
               <div
                 key={k.id}
@@ -270,7 +285,7 @@ export function EntryKeys({ tournamentId }: { tournamentId: string }) {
                     </button>
                   )}
                 </div>
-                {(k.label || redeemerNames.length > 0 || editingId === k.id) && (
+                {(k.label || k.redeemers.length > 0 || editingId === k.id) && (
                   <div className="mt-1">
                     {editingId === k.id ? (
                       <div className="flex items-center gap-2">
@@ -301,18 +316,34 @@ export function EntryKeys({ tournamentId }: { tournamentId: string }) {
                         </button>
                       </div>
                     ) : (
-                      <p className="text-xs text-pine/55 truncate flex items-center gap-2">
-                        <span className="flex-1 min-w-0 truncate">
+                      <p className="text-xs text-pine/55 flex items-center gap-2">
+                        <span className="flex-1 min-w-0">
                           {k.label && (
                             <span className="font-bold text-pine/75">{k.label}</span>
                           )}
-                          {k.label && redeemerNames.length > 0 && " · "}
-                          {redeemerNames.length > 0 && (
-                            <span title={redeemerNames.join(", ")}>
-                              Joined: {redeemerNames.join(", ")}
+                          {k.label && k.redeemers.length > 0 && <span className="block mt-0.5" />}
+                          {k.redeemers.length > 0 && (
+                            <span>
+                              Joined:{" "}
+                              {k.redeemers.map((r, i) => (
+                                <span key={r.user_id}>
+                                  {i > 0 && ", "}
+                                  {r.name ? (
+                                    <Link
+                                      href={`/fishmb/anglers/${r.user_id}`}
+                                      className="font-bold text-signal-dark hover:underline"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      {r.name}
+                                    </Link>
+                                  ) : (
+                                    "Unknown"
+                                  )}
+                                </span>
+                              ))}
                             </span>
                           )}
-                          {!k.label && redeemerNames.length === 0 && (
+                          {!k.label && k.redeemers.length === 0 && (
                             <span className="italic">No name</span>
                           )}
                         </span>
