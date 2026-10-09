@@ -66,7 +66,7 @@ const dayNo = Math.floor(Date.now() / (24 * 3600 * 1000));
 
 async function youtubePost(userId) {
   if (SHOWS.length === 0) return;
-  if (await alreadyPosted(userId, "%Manitoba Fishing Video of the Day%", 1)) {
+  if (!FORCE && (await alreadyPosted(userId, "%Manitoba Fishing Video of the Day%", 1))) {
     console.log("YouTube daily post: already posted in the last 24h, skipping.");
     return;
   }
@@ -329,6 +329,8 @@ const ARGS = process.argv.slice(2);
 const has = (f) => ARGS.includes(f);
 const YOUTUBE_ONLY = has("--youtube-only");
 const NO_YOUTUBE = has("--no-youtube");
+// --force bypasses the 24h/7d dedup checks (for a manual run; crons never use it).
+const FORCE = has("--force");
 // Granular flags for the split weekly/daily schedules.
 const ONLY = ["--tip", "--lake", "--hotspot", "--lodge", "--ads", "--weather"].filter(has);
 const runAll = ONLY.length === 0;
