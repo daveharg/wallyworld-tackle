@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation";
 import { fishFetch } from "../../_components/fishFetch";
 import type { SpotPin, TrailPoint } from "./SpotMap";
 import { SPOT_ICON_CHOICES } from "./spotIcons";
@@ -331,6 +332,29 @@ export default function FishingSpots() {
     setFocus({ lat, lng, key, zoom });
   };
 
+  // Deep link from a shared spot in the feed: ?spot=lat,lng&name=…
+  const searchParams = useSearchParams();
+  const [sharedSpot, setSharedSpot] = useState<SpotPin | null>(null);
+  useEffect(() => {
+    const raw = searchParams.get("spot");
+    if (!raw) return;
+    const [la, ln] = raw.split(",").map(Number);
+    if (!Number.isFinite(la) || !Number.isFinite(ln)) return;
+    const name = searchParams.get("name") || "Shared spot";
+    const pin: SpotPin = {
+      id: `shared:${la},${ln}`,
+      name,
+      lat: la,
+      lng: ln,
+      notes: "Shared from the feed",
+      icon: "pin",
+      created_at: new Date().toISOString(),
+    };
+    setSharedSpot(pin);
+    setFocus({ lat: la, lng: ln, key: pin.id, zoom: 15 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const useCurrentLocation = () => {
     if (!("geolocation" in navigator)) {
       setNote("Your device doesn't support location.");
@@ -414,6 +438,20 @@ export default function FishingSpots() {
     }
   };
 
+  const [sharingSpot, setSharingSpot] = useState<string | null>(null);
+  const shareSpot = async (id: string) => {
+    if (!window.confirm("Share this spot to the community feed? Everyone will see its location.")) return;
+    setSharingSpot(id);
+    try {
+      await fishFetch(`/api/fishmb/spots/${id}/share`, { method: "POST" });
+      setNote("Spot shared to the feed! 🎣");
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Could not share the spot.");
+    } finally {
+      setSharingSpot(null);
+    }
+  };
+
   const inputCls =
     "w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal";
 
@@ -466,7 +504,7 @@ export default function FishingSpots() {
             </div>
           )}
           <SpotMap
-            spots={spots}
+            spots={sharedSpot ? [...spots, sharedSpot] : spots}
             picking={picking}
             onPick={(lat, lng) => {
               setManualLat(lat);
@@ -721,6 +759,16 @@ export default function FishingSpots() {
                         className="text-pine/50 hover:text-pine px-2 py-1 text-sm font-bold"
                       >
                         ✏️
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => shareSpot(s.id)}
+                        disabled={sharingSpot === s.id}
+                        aria-label="Share spot to feed"
+                        title="Share this spot to the feed"
+                        className="text-pine/50 hover:text-pine px-2 py-1 text-sm font-bold disabled:opacity-40"
+                      >
+                        {sharingSpot === s.id ? "…" : "📤"}
                       </button>
                       <button
                         type="button"

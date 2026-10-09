@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import FishingSpots from "../profile/_components/FishingSpots";
 import LakeNotes from "../dashboard/_components/LakeNotes";
 
@@ -12,7 +13,9 @@ export default function MyMapsPage() {
     <div className="max-w-4xl mx-auto px-4 pt-4 md:pt-6 pb-32">
       <div className="space-y-8">
         <section>
-          <FishingSpots />
+          <Suspense>
+            <FishingSpots />
+          </Suspense>
         </section>
         <section>
           <h2 className="text-base font-black text-pine mb-3">📝 Lake notes</h2>

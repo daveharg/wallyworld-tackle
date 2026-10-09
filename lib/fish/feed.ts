@@ -17,6 +17,8 @@ export interface FeedItem {
   photos: string[];
   /** Optional video: { playback_id, duration } — bytes live on Mux. */
   video: { playback_id: string; duration: number | null } | null;
+  /** A shared fishing spot: { name, lat, lng, notes, icon } — tap to view/save. */
+  spot_share: { name: string; lat: number; lng: number; notes: string; icon: string } | null;
   species: string | null;
   length_in: number | null;
   visibility: string;
@@ -51,6 +53,8 @@ export async function ensureFeedColumns(): Promise<void> {
   // on Mux (converted + served by them), we only keep the playback reference.
   await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS video jsonb`);
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS video jsonb`);
+  // A shared fishing spot on a post: { name, lat, lng, notes, icon }.
+  await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS spot_share jsonb`);
   // Comments can target either an fm_discussions row or an fm_catches row, so
   // post_id carries NO foreign key (the original 003.sql FK to fm_discussions
   // broke commenting on catches). Keep the post_id index for lookups.
@@ -159,6 +163,7 @@ export async function getFeed(opts: GetFeedOptions = {}): Promise<FeedPage> {
               c.note AS body, c.photo_hold_url AS photo_url,
               COALESCE(c.photos, '[]'::jsonb) AS photos,
               c.video AS video,
+              NULL AS spot_share,
               c.species, c.length_in::float AS length_in,
               c.visibility, NULL AS species_tag,
               (SELECT COUNT(*) FROM fm_comments cm WHERE cm.post_id = c.id)::int AS comment_count,
@@ -171,6 +176,7 @@ export async function getFeed(opts: GetFeedOptions = {}): Promise<FeedPage> {
               d.body, d.photo_url,
               COALESCE(d.photos, '[]'::jsonb) AS photos,
               d.video AS video,
+              d.spot_share AS spot_share,
               NULL AS species, NULL AS length_in,
               d.visibility, d.species_tag,
               (SELECT COUNT(*) FROM fm_comments cm WHERE cm.post_id = d.id)::int AS comment_count,
@@ -259,6 +265,7 @@ export async function getSpeciesTips(species: string, limit = 20): Promise<FeedI
     `SELECT d.id, d.kind, d.user_id, u.name AS user_name, u.avatar_url,
             d.body, d.photo_url, COALESCE(d.photos, '[]'::jsonb) AS photos,
             d.video AS video,
+            d.spot_share AS spot_share,
             NULL AS species, NULL AS length_in,
             d.visibility, d.species_tag,
             (SELECT COUNT(*) FROM fm_comments cm WHERE cm.post_id = d.id)::int AS comment_count,

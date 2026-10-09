@@ -20,6 +20,7 @@ interface FeedItem {
   photo_url: string | null;
   photos: string[];
   video?: { playback_id: string; duration: number | null } | null;
+  spot_share?: { name: string; lat: number; lng: number; notes: string; icon: string } | null;
   species: string | null;
   length_in: number | null;
   species_tag?: string | null;
@@ -168,6 +169,72 @@ function FeedVideo({ playbackId }: { playbackId: string }) {
         className="w-full aspect-video"
         accentColor="#2f6b3a"
       />
+    </div>
+  );
+}
+
+/** A fishing spot shared to the feed — view it on the map or save a copy. */
+function SpotShareCard({
+  spot,
+  own,
+}: {
+  spot: { name: string; lat: number; lng: number; notes: string; icon: string };
+  own: boolean;
+}) {
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const saveSpot = async () => {
+    if (saving || saved) return;
+    setSaving(true);
+    try {
+      const d = await fishFetch("/api/fishmb/spots", {
+        method: "POST",
+        body: JSON.stringify({
+          name: spot.name,
+          lat: spot.lat,
+          lng: spot.lng,
+          notes: spot.notes || null,
+          icon: spot.icon,
+        }),
+      });
+      if (d?.spot) setSaved(true);
+    } catch {
+      // non-fatal
+    } finally {
+      setSaving(false);
+    }
+  };
+  const mapHref = `/fishmb/maps?spot=${spot.lat.toFixed(5)},${spot.lng.toFixed(5)}&name=${encodeURIComponent(spot.name)}`;
+  return (
+    <div className="mt-3 -mx-5 bg-pine/[0.04] border-y border-pine/10 px-5 py-4">
+      <div className="flex items-center gap-2 mb-1">
+        <span className="text-xl">📍</span>
+        <p className="font-bold text-pine truncate">{spot.name}</p>
+      </div>
+      {spot.notes ? (
+        <p className="text-pine/70 text-sm mb-3">{spot.notes}</p>
+      ) : null}
+      <p className="text-xs text-pine/45 tabular-nums mb-3">
+        {spot.lat.toFixed(5)}, {spot.lng.toFixed(5)}
+      </p>
+      <div className="flex gap-2">
+        <Link
+          href={mapHref}
+          className="flex-1 text-center bg-pine text-white font-bold uppercase tracking-wider text-xs px-4 py-3 rounded-2xl"
+        >
+          🗺️ View on map
+        </Link>
+        {!own && (
+          <button
+            type="button"
+            onClick={saveSpot}
+            disabled={saving || saved}
+            className="flex-1 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-4 py-3 rounded-2xl disabled:opacity-60 transition-colors"
+          >
+            {saved ? "✓ Saved!" : saving ? "Saving…" : "💾 Save spot"}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -1037,6 +1104,12 @@ function FeedPageInner() {
                     <>
                       {text && <p className="text-pine/80 text-sm whitespace-pre-line">{text}</p>}
                       {ytId && <YouTubeEmbed videoId={ytId} />}
+                      {item.spot_share && (
+                        <SpotShareCard
+                          spot={item.spot_share}
+                          own={user?.id === item.user_id}
+                        />
+                      )}
                     </>
                   );
                 })()}
