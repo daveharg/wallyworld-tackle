@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FishLoginButton, useFishAuth } from "./FishAuth";
 
 const NAV = [
@@ -29,9 +29,42 @@ export function Wordmark({ light = false }: { light?: boolean }) {
 export default function FishHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const { user, openLogin, logout } = useFishAuth();
+
+  // Keep the scroll handler reading the latest menu state without re-binding.
+  const openRef = useRef(open);
+  openRef.current = open;
+
+  // Hide the header when scrolling down, show it immediately on scroll up.
+  useEffect(() => {
+    setHidden(false);
+    let lastY = window.scrollY;
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        const scrollingDown = y > lastY;
+        if (!openRef.current) {
+          if (scrollingDown && y > 120) setHidden(true);
+          else if (!scrollingDown) setHidden(false);
+        }
+        lastY = y;
+        ticking = false;
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [pathname]);
+
   return (
-    <header className="sticky top-0 z-40 bg-paper/95 backdrop-blur border-b border-pine/10">
+    <header
+      className={`sticky top-0 z-40 bg-paper/95 backdrop-blur border-b border-pine/10 transition-transform duration-300 ${
+        hidden ? "-translate-y-full" : "translate-y-0"
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link href="/fishmb" aria-label="FishMB home">
