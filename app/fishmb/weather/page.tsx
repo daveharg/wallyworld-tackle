@@ -103,7 +103,7 @@ function PressureGauge({ value }: { value: number }) {
       <line x1={cx} y1={cy} x2={pt(angle, 72)} stroke="#ffffff" strokeWidth="4" strokeLinecap="round" />
       <circle cx={cx} cy={cy} r="7" fill="#ffffff" />
       <text x={cx} y={cy + 24} textAnchor="middle" fontSize="17" fontWeight="900" fill="#ffffff">
-        {Math.round(value)}
+        {value.toFixed(1)}
       </text>
       <text x={cx} y={cy + 37} textAnchor="middle" fontSize="9" fill="#ffffff" opacity="0.65">
         hPa
