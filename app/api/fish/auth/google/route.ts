@@ -31,6 +31,29 @@ import {
 } from "@/lib/fish/auth";
 import { verifyGoogleIdToken } from "@/lib/fish/google";
 
+/** Pick a unique display name, appending " 2", " 3", … when taken. */
+async function uniqueDisplayName(
+  base: string,
+  client: unknown,
+  excludeId?: string
+): Promise<string> {
+  const clean = base.trim().slice(0, 80) || "Angler";
+  const check = async (n: string) => {
+    const rows = await txQueryOne<{ id: string }>(
+      client as never,
+      `SELECT id FROM fm_users WHERE LOWER(name) = LOWER($1)${excludeId ? " AND id != $2" : ""} LIMIT 1`,
+      excludeId ? [n, excludeId] : [n]
+    );
+    return !rows;
+  };
+  if (await check(clean)) return clean;
+  for (let i = 2; i < 1000; i++) {
+    const candidate = `${clean} ${i}`.slice(0, 80);
+    if (await check(candidate)) return candidate;
+  }
+  return `${clean} ${Date.now().toString(36)}`.slice(0, 80);
+}
+
 export async function POST(req: NextRequest) {
   let body: { id_token?: unknown; age_confirmed?: unknown; terms_accepted?: unknown };
   try {
@@ -122,7 +145,9 @@ export async function POST(req: NextRequest) {
       [profile.sub]
     );
     if (existing) {
-      // Refresh profile details on each sign-in.
+      // Refresh profile details on each sign-in, but never steal another
+      // angler's display name — keep the current one if Google's is taken.
+      const safeName = await uniqueDisplayName(profile.name, client, existing.id);
       const updated = await txQueryOne<FishUser>(
         client,
         `UPDATE fm_users
@@ -130,18 +155,19 @@ export async function POST(req: NextRequest) {
                 age_confirmed = age_confirmed OR $5,
                 terms_accepted = terms_accepted OR $6
           WHERE id = $1 RETURNING *`,
-        [existing.id, profile.name, profile.email, profile.picture, ageConfirmed, termsAccepted]
+        [existing.id, safeName, profile.email, profile.picture, ageConfirmed, termsAccepted]
       );
       return { user: updated!, isNew: false };
     }
     if (!ageConfirmed || !termsAccepted) {
       throw new Error("AGE_GATE");
     }
+    const freshName = await uniqueDisplayName(profile.name, client);
     const created = await txQueryOne<FishUser>(
       client,
       `INSERT INTO fm_users (google_sub, name, email, avatar_url, age_confirmed, terms_accepted)
        VALUES ($1, $2, $3, $4, true, true) RETURNING *`,
-      [profile.sub, profile.name, profile.email, profile.picture]
+      [profile.sub, freshName, profile.email, profile.picture]
     );
     // Signup bonus: 1000 starting chips (balance default) + audit row.
     await txQueryOne(

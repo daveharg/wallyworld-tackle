@@ -36,7 +36,7 @@ export default function EditProfilePage() {
       <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide mb-6">
         Edit profile
       </h1>
-      <DashboardSettings />
+      <DashboardSettings afterSaveHref="/fishmb/profile" />
     </div>
   );
 }

@@ -37,6 +37,17 @@ export async function PATCH(req: NextRequest) {
   if (typeof body.name === "string") {
     const name = body.name.trim().slice(0, 80);
     if (name.length === 0) return badRequest("name cannot be empty.");
+    // Display names are unique (case-insensitive) — no two anglers share one.
+    const taken = await query(
+      `SELECT id FROM fm_users WHERE LOWER(name) = LOWER($1) AND id != $2 LIMIT 1`,
+      [name, me.id]
+    );
+    if (taken.length > 0) {
+      return NextResponse.json(
+        { error: "That display name is already taken — pick another one." },
+        { status: 409 }
+      );
+    }
     params.push(name);
     updates.push(`name = $${params.length}`);
   }

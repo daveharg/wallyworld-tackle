@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useFishAuth } from "../../_components/FishAuth";
 import { fishFetch } from "../../_components/fishFetch";
 import { compressImage } from "../../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 
 /** Dashboard settings: avatar, display name, bio, account type. */
-export default function DashboardSettings() {
+export default function DashboardSettings({ afterSaveHref }: { afterSaveHref?: string }) {
+  const router = useRouter();
   const { user, refresh } = useFishAuth();
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
@@ -67,6 +69,9 @@ export default function DashboardSettings() {
       });
       await refresh();
       setNote("Profile saved!");
+      if (afterSaveHref) {
+        setTimeout(() => router.push(afterSaveHref), 600);
+      }
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not save.");
     } finally {
