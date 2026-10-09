@@ -956,7 +956,7 @@ function FeedPageInner() {
             aria-expanded={sectionMenuOpen}
             className="flex items-center gap-1.5 text-xl font-black text-pine tracking-tight"
           >
-            {friendsOnly ? "👥 Friends" : tab === "catch" ? "🐟 Catches" : "🌊 Community"}
+            {friendsOnly ? (tab === "catch" ? "🎣 Friends Catches" : "👥 Friends") : tab === "catch" ? "🐟 Catches" : "🌊 Community"}
             <span className="text-pine/40 text-sm">▾</span>
           </button>
           {sectionMenuOpen && (
@@ -968,10 +968,12 @@ function FeedPageInner() {
                     ["community", "🌊 Community", "/fishmb/feed"],
                     ["buddies", "👥 Friends", "/fishmb/feed?friends=1"],
                     ["catches", "🐟 Catches", "/fishmb/feed?kind=catch"],
+                    ["friendcatches", "🎣 Friends Catches", "/fishmb/feed?kind=catch&friends=1"],
                   ] as const
                 ).map(([id, label, href]) => {
                   const current =
-                    (id === "buddies" && friendsOnly) ||
+                    (id === "buddies" && friendsOnly && tab !== "catch") ||
+                    (id === "friendcatches" && friendsOnly && tab === "catch") ||
                     (id === "catches" && tab === "catch" && !friendsOnly) ||
                     (id === "community" && tab !== "catch" && !friendsOnly);
                   return (
