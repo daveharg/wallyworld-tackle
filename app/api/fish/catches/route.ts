@@ -174,17 +174,34 @@ export async function POST(req: NextRequest) {
     return badRequest("lat must be between -90 and 90, lng between -180 and 180.");
   }
 
+  // Whether the catch location may appear on other anglers' maps.
+  const shareLocation = body.share_location === undefined ? true : body.share_location === true;
+
+  // Optional weather snapshot captured at log time (temp °C, condition code, wind kph).
+  let weather: { temp_c: number; code: number; wind_kph: number } | null = null;
+  if (body.weather && typeof body.weather === "object") {
+    const w = body.weather as Record<string, unknown>;
+    const t = Number(w.temp_c);
+    const c = Number(w.code);
+    const wk = Number(w.wind_kph);
+    if (Number.isFinite(t) && Number.isFinite(c)) {
+      weather = { temp_c: t, code: c, wind_kph: Number.isFinite(wk) ? wk : 0 };
+    }
+  }
+
   // Multi-photo storage (idempotent — same column the feed query already reads).
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS photos jsonb`);
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS lat double precision`);
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS lng double precision`);
+  await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS share_location boolean DEFAULT true`);
+  await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS weather jsonb`);
   const rows = await query<CatchRow>(
     `INSERT INTO fm_catches
-       (user_id, species, length_in, weight_lb, photo_measure_url, photo_hold_url, photos, visibility, note, caught_at, lat, lng)
-     VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9,COALESCE($10::timestamptz, now()),$11,$12)
+       (user_id, species, length_in, weight_lb, photo_measure_url, photo_hold_url, photos, visibility, note, caught_at, lat, lng, share_location, weather)
+     VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9,COALESCE($10::timestamptz, now()),$11,$12,$13,$14::jsonb)
      RETURNING *, (SELECT name FROM fm_users WHERE id = $1) AS name,
                    (SELECT avatar_url FROM fm_users WHERE id = $1) AS avatar_url`,
-    [me.id, species, lengthIn, weightLb, photoMeasure, photoHold, JSON.stringify(photos), visibility, note, caughtAt, lat, lng]
+    [me.id, species, lengthIn, weightLb, photoMeasure, photoHold, JSON.stringify(photos), visibility, note, caughtAt, lat, lng, shareLocation, weather ? JSON.stringify(weather) : null]
   );
   const newCatch = rows[0];
 

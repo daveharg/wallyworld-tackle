@@ -49,14 +49,22 @@ export default function WindWidget({ lat, lng }: { lat: number; lng: number }) {
   if (!wind) return null;
 
   return (
-    <div className="absolute top-14 left-3 z-20 bg-white/95 backdrop-blur border border-pine/15 rounded-full pl-2.5 pr-3.5 py-2 shadow-lg flex items-center gap-2">
-      <span
-        className="text-pine text-base inline-block transition-transform"
+    <div className="absolute top-[11rem] right-3 z-20 bg-white/95 backdrop-blur border border-pine/15 rounded-full pl-2.5 pr-3.5 py-2 shadow-lg flex items-center gap-2">
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#1d4d2b"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
         style={{ transform: `rotate(${wind.dir + 180}deg)` }}
         aria-hidden
       >
- 
-      </span>
+        <path d="M12 19V5" />
+        <path d="M5 12l7-7 7 7" />
+      </svg>
       <span className="text-xs font-black text-pine tabular-nums whitespace-nowrap">
         {wind.speed} km/h {compass16(wind.dir)}
       </span>

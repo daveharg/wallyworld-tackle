@@ -38,21 +38,28 @@ export async function GET(req: NextRequest) {
   // GPS columns are added lazily by the catch composer; ensure they exist.
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS lat double precision`);
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS lng double precision`);
+  await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS share_location boolean DEFAULT true`);
 
   let visibilityWhere: string;
   const params: unknown[] = [me.id, lat - dLat, lat + dLat, lng - dLng, lng + dLng];
   if (mineOnly) {
     visibilityWhere = `c.user_id = $1`;
   } else {
+    // Other anglers' catches only appear when they chose to share the location.
     visibilityWhere = `(
-      c.visibility = 'public'
-      OR c.user_id = $1
-      OR (c.visibility = 'friends' AND EXISTS (
-            SELECT 1 FROM fm_friendships f
-             WHERE f.status = 'accepted'
-               AND ((f.requester_id = $1 AND f.addressee_id = c.user_id)
-                 OR (f.addressee_id = $1 AND f.requester_id = c.user_id))
-          ))
+      c.user_id = $1
+      OR (
+        COALESCE(c.share_location, true) = true
+        AND (
+          c.visibility = 'public'
+          OR (c.visibility = 'friends' AND EXISTS (
+                SELECT 1 FROM fm_friendships f
+                 WHERE f.status = 'accepted'
+                   AND ((f.requester_id = $1 AND f.addressee_id = c.user_id)
+                     OR (f.addressee_id = $1 AND f.requester_id = c.user_id))
+              ))
+        )
+      )
     )`;
   }
 

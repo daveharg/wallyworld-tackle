@@ -836,6 +836,7 @@ function FeedPageInner() {
   const [videoErr, setVideoErr] = useState<string | null>(null);
   const [posting, setPosting] = useState(false);
   const [visibility, setVisibility] = useState<"public" | "friends" | "private">("public");
+  const [shareLocation, setShareLocation] = useState(true);
   const [catchSpecies, setCatchSpecies] = useState("");
   const [catchLength, setCatchLength] = useState("");
   const [catchLat, setCatchLat] = useState<number | null>(null);
@@ -1277,6 +1278,25 @@ function FeedPageInner() {
         urls.push(await uploadPhoto(f));
       }
       const photoUrl = urls[0];
+      // Snapshot the weather at the catch location (when we have GPS).
+      let weather: { temp_c: number; code: number; wind_kph: number } | null = null;
+      if (catchLat !== null && catchLng !== null) {
+        try {
+          const w = await fetch(
+            `https://api.open-meteo.com/v1/forecast?latitude=${catchLat}&longitude=${catchLng}&current=temperature_2m,weather_code,wind_speed_10m&wind_speed_unit=kmh&timezone=auto`
+          ).then((r) => r.json());
+          const cur = w?.current;
+          if (cur && Number.isFinite(cur.temperature_2m) && Number.isFinite(cur.weather_code)) {
+            weather = {
+              temp_c: Math.round(cur.temperature_2m),
+              code: cur.weather_code,
+              wind_kph: Math.round(cur.wind_speed_10m ?? 0),
+            };
+          }
+        } catch {
+          // Catch logs fine without weather.
+        }
+      }
       await fishFetch("/api/fish/catches", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1287,6 +1307,8 @@ function FeedPageInner() {
           photo_hold_url: photoUrl,
           photos: urls,
           visibility,
+          share_location: shareLocation,
+          weather,
           note: draft.trim() || null,
           lat: catchLat,
           lng: catchLng,
@@ -1318,6 +1340,7 @@ function FeedPageInner() {
       setTournamentId("");
       setCatchLat(null);
       setCatchLng(null);
+      setShareLocation(true);
       closeComposer();
       load();
     } catch (e) {
@@ -1810,6 +1833,35 @@ function FeedPageInner() {
                       remove
                     </button>
                   </div>
+                )}
+                {catchLat !== null && catchLng !== null && (
+                  <button
+                    type="button"
+                    onClick={() => setShareLocation(!shareLocation)}
+                    className="w-full flex items-center justify-between mt-2 bg-pine/5 border border-pine/10 rounded-2xl px-4 py-3 text-left"
+                  >
+                    <span>
+                      <span className="block text-sm font-bold text-pine">
+                        {shareLocation ? "Location shared" : "Location private"}
+                      </span>
+                      <span className="block text-xs text-pine/55 mt-0.5">
+                        {shareLocation
+                          ? "Other anglers can see this catch on the map."
+                          : "Only you will see where this was caught."}
+                      </span>
+                    </span>
+                    <span
+                      className={`shrink-0 w-12 h-7 rounded-full p-1 transition-colors ${
+                        shareLocation ? "bg-signal" : "bg-pine/15"
+                      }`}
+                    >
+                      <span
+                        className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                          shareLocation ? "translate-x-5" : ""
+                        }`}
+                      />
+                    </span>
+                  </button>
                 )}
                 {myTournaments.length > 0 && (
                   <div className="mt-3">
