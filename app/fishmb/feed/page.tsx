@@ -1179,34 +1179,48 @@ function FeedPageInner() {
         </p>
       ) : (
         <div className="space-y-4">
-          {items.map((item, idx) => (
+          {items.map((item, idx) => {
+            const photos = cardPhotos(item);
+            const ytId = item.body ? extractYouTubeId(item.body) : null;
+            const hasVideo = !!(item.video?.playback_id || ytId);
+            const authorOverlay = (
+              <>
+                <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/65 to-transparent pointer-events-none" />
+                <div className="absolute top-3 left-3 flex items-center gap-2.5">
+                  <Avatar name={item.user_name} url={item.avatar_url} small />
+                  <div className="leading-tight">
+                    <Link href={`/fishmb/anglers/${item.user_id}`} className="block font-bold text-white text-sm drop-shadow-md">
+                      {item.user_name}
+                    </Link>
+                    <p className="text-[11px] text-white/85 drop-shadow">
+                      {timeAgo(item.created_at)}
+                      {item.visibility === "friends" && " · 👥 friends"}
+                    </p>
+                  </div>
+                </div>
+                {item.kind === "catch" && (
+                  <span className="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider bg-black/55 text-white px-3 py-1 rounded-full">
+                    🐟 Catch
+                  </span>
+                )}
+              </>
+            );
+            return (
             <Fragment key={item.id}>
             <article className="bg-white border border-pine/10 rounded-3xl overflow-hidden max-sm:-mx-4 max-sm:rounded-none max-sm:border-x-0">
-              {item.video?.playback_id ? (
-                <FeedVideo playbackId={item.video.playback_id} />
-              ) : null}
-              {cardPhotos(item).length > 0 ? (
+              {hasVideo ? (
                 <div className="relative">
-                  <PhotoCarousel photos={cardPhotos(item)} bare />
-                  {/* readability scrim + overlaid author */}
-                  <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/65 to-transparent pointer-events-none" />
-                  <div className="absolute top-3 left-3 flex items-center gap-2.5">
-                    <Avatar name={item.user_name} url={item.avatar_url} small />
-                    <div className="leading-tight">
-                      <Link href={`/fishmb/anglers/${item.user_id}`} className="block font-bold text-white text-sm drop-shadow-md">
-                        {item.user_name}
-                      </Link>
-                      <p className="text-[11px] text-white/85 drop-shadow">
-                        {timeAgo(item.created_at)}
-                        {item.visibility === "friends" && " · 👥 friends"}
-                      </p>
-                    </div>
-                  </div>
-                  {item.kind === "catch" && (
-                    <span className="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider bg-black/55 text-white px-3 py-1 rounded-full">
-                      🐟 Catch
-                    </span>
+                  {item.video?.playback_id ? (
+                    <FeedVideo playbackId={item.video.playback_id} />
+                  ) : (
+                    <YouTubeEmbed videoId={ytId!} />
                   )}
+                  {authorOverlay}
+                </div>
+              ) : photos.length > 0 ? (
+                <div className="relative">
+                  <PhotoCarousel photos={photos} bare />
+                  {authorOverlay}
                 </div>
               ) : (
                 <div className="flex items-center gap-3 px-5 pt-4">
@@ -1235,14 +1249,12 @@ function FeedPageInner() {
                   </p>
                 )}
                 {item.body && (() => {
-                  const ytId = extractYouTubeId(item.body);
                   const text = ytId
                     ? item.body.replace(/https?:\/\/[^\s]+/g, "").replace(/\n{3,}/g, "\n\n").trim()
                     : item.body;
                   return (
                     <>
                       {text && <p className="text-pine/80 text-sm whitespace-pre-line">{text}</p>}
-                      {ytId && <YouTubeEmbed videoId={ytId} />}
                       {item.spot_share && (
                         <SpotShareCard
                           spot={item.spot_share}
@@ -1277,7 +1289,8 @@ function FeedPageInner() {
               <FeaturePromoCard promo={FEATURE_PROMOS[(idx - 2) / 3]} />
             )}
             </Fragment>
-          ))}
+            );
+          })}
         </div>
       )}
 
