@@ -25,13 +25,14 @@ import {
   getBearerToken,
   fishUserFromRequest,
   isAnonymousUser,
+  ensureProfileColumns,
   toApiUser,
   type FishUser,
 } from "@/lib/fish/auth";
 import { verifyGoogleIdToken } from "@/lib/fish/google";
 
 export async function POST(req: NextRequest) {
-  let body: { id_token?: unknown };
+  let body: { id_token?: unknown; age_confirmed?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -41,6 +42,9 @@ export async function POST(req: NextRequest) {
   if (typeof idToken !== "string" || idToken.length === 0 || idToken.length > 8192) {
     return NextResponse.json({ error: "id_token is required." }, { status: 400 });
   }
+  // 13+ self-declaration (OPC: under-13s need a parent/guardian to consent).
+  const ageConfirmed = body?.age_confirmed === true;
+  await ensureProfileColumns();
 
   let profile;
   try {
@@ -62,6 +66,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Session expired. Sign in again." }, { status: 401 });
     }
     if (isAnonymousUser(current)) {
+      if (!ageConfirmed) {
+        return NextResponse.json(
+          { error: "You must confirm you are 13 or older to join FishMB." },
+          { status: 400 }
+        );
+      }
       let linked: FishUser | null;
       try {
         linked = await withTransaction(async (client) => {
@@ -77,7 +87,8 @@ export async function POST(req: NextRequest) {
                 SET google_sub = $2,
                     name = CASE WHEN name = 'Guest Angler' THEN $3 ELSE name END,
                     email = COALESCE($4, email),
-                    avatar_url = COALESCE($5, avatar_url)
+                    avatar_url = COALESCE($5, avatar_url),
+                    age_confirmed = true
               WHERE id = $1 RETURNING *`,
             [current.id, profile.sub, profile.name, profile.email, profile.picture]
           );
@@ -98,7 +109,10 @@ export async function POST(req: NextRequest) {
     // Non-anonymous Bearer: fall through to the classic upsert below.
   }
 
-  const { user, isNew } = await withTransaction(async (client) => {
+  let user: FishUser;
+  let isNew: boolean;
+  try {
+    ({ user, isNew } = await withTransaction(async (client) => {
     const existing = await txQueryOne<FishUser>(
       client,
       `SELECT * FROM fm_users WHERE google_sub = $1`,
@@ -109,16 +123,20 @@ export async function POST(req: NextRequest) {
       const updated = await txQueryOne<FishUser>(
         client,
         `UPDATE fm_users
-            SET name = $2, email = COALESCE($3, email), avatar_url = COALESCE($4, avatar_url)
+            SET name = $2, email = COALESCE($3, email), avatar_url = COALESCE($4, avatar_url),
+                age_confirmed = age_confirmed OR $5
           WHERE id = $1 RETURNING *`,
-        [existing.id, profile.name, profile.email, profile.picture]
+        [existing.id, profile.name, profile.email, profile.picture, ageConfirmed]
       );
       return { user: updated!, isNew: false };
     }
+    if (!ageConfirmed) {
+      throw new Error("AGE_GATE");
+    }
     const created = await txQueryOne<FishUser>(
       client,
-      `INSERT INTO fm_users (google_sub, name, email, avatar_url)
-       VALUES ($1, $2, $3, $4) RETURNING *`,
+      `INSERT INTO fm_users (google_sub, name, email, avatar_url, age_confirmed)
+       VALUES ($1, $2, $3, $4, true) RETURNING *`,
       [profile.sub, profile.name, profile.email, profile.picture]
     );
     // Signup bonus: 1000 starting chips (balance default) + audit row.
@@ -129,7 +147,16 @@ export async function POST(req: NextRequest) {
       [created!.id]
     );
     return { user: created!, isNew: true };
-  });
+    }));
+  } catch (err) {
+    if (err instanceof Error && err.message === "AGE_GATE") {
+      return NextResponse.json(
+        { error: "You must confirm you are 13 or older to join FishMB." },
+        { status: 400 }
+      );
+    }
+    throw err;
+  }
 
   const token = await createSession(user.id);
   pruneExpiredSessions();

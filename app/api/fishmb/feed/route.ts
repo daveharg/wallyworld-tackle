@@ -4,10 +4,13 @@
 // POST: new discussion (auth), optional visibility + species_tag + up to 4 photos.
 
 import { NextRequest, NextResponse } from "next/server";
-import { fishUserFromRequest, unauthorized, badRequest } from "@/lib/fish/auth";
+import { fishUserFromRequest, isAnonymousUser, unauthorized, badRequest } from "@/lib/fish/auth";
 import { getFeed, createPost } from "@/lib/fish/feed";
 
 export async function GET(req: NextRequest) {
+  // The community feed is members-only — no signed-in account, no posts.
+  const me = await fishUserFromRequest(req).catch(() => null);
+  if (!me || isAnonymousUser(me)) return unauthorized();
   const { searchParams } = new URL(req.url);
   const limit = Math.min(parseInt(searchParams.get("limit") || "20", 10) || 20, 50);
   const kindParam = searchParams.get("kind");
@@ -16,13 +19,7 @@ export async function GET(req: NextRequest) {
   const q = (searchParams.get("q") || "").trim().slice(0, 80) || null;
   const friendsOnly = searchParams.get("friends") === "1";
   const cursor = decodeCursor(searchParams.get("cursor"));
-  let viewerId: string | null = null;
-  try {
-    const me = await fishUserFromRequest(req);
-    viewerId = me ? me.id : null;
-  } catch {
-    // guests see public items only
-  }
+  const viewerId = me.id;
   const { items, hasMore } = await getFeed({ limit, viewerId, q, kind, friendsOnly, cursor });
   return NextResponse.json({
     items,

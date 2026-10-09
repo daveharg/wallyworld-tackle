@@ -171,6 +171,46 @@ function FeedVideo({ playbackId }: { playbackId: string }) {
   );
 }
 
+/** What signed-out visitors see instead of the feed — the pitch, not the posts. */
+function FeedSignupWall({ onJoin }: { onJoin: () => void }) {
+  const perks = [
+    { icon: "🐟", text: "Share catches with photos & video" },
+    { icon: "🏆", text: "Join real tournaments" },
+    { icon: "🗺️", text: "Private maps, spots & lake notes" },
+    { icon: "💬", text: "Encrypted chats with fishing friends" },
+  ];
+  return (
+    <div className="text-center pt-10 pb-16 px-2">
+      <div className="text-6xl mb-4">🎣</div>
+      <h1 className="text-2xl font-black text-pine tracking-tight mb-2">
+        The bite is happening in here.
+      </h1>
+      <p className="text-pine/60 text-sm max-w-xs mx-auto mb-6">
+        Manitoba anglers are sharing catches, reports and tips right now. Join
+        free to see the community feed.
+      </p>
+      <button
+        onClick={onJoin}
+        className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-10 py-4 rounded-full transition-colors mb-8"
+      >
+        Join FishMB — it's free
+      </button>
+      <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto text-left">
+        {perks.map((p) => (
+          <div
+            key={p.text}
+            className="bg-white border border-pine/10 rounded-2xl px-4 py-3 flex items-center gap-2.5"
+          >
+            <span className="text-xl">{p.icon}</span>
+            <span className="text-xs font-bold text-pine/80 leading-snug">{p.text}</span>
+          </div>
+        ))}
+      </div>
+      <p className="text-[11px] text-pine/40 mt-6">Anglers 13+ only.</p>
+    </div>
+  );
+}
+
 /** Photos for a card: all attached photos, falling back to the legacy single photo_url. */
 function cardPhotos(item: FeedItem): string[] {
   if (item.photos && item.photos.length > 0) return item.photos;
@@ -366,7 +406,7 @@ function Comments({ postId }: { postId: string }) {
 function FeedPageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { user, openLogin } = useFishAuth();
+  const { user, loading: authLoading, openLogin } = useFishAuth();
   const [items, setItems] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -469,8 +509,10 @@ function FeedPageInner() {
   }, []);
 
   useEffect(() => {
+    // The feed is members-only — no fetching until signed in.
+    if (!user || user.is_anonymous) return;
     load();
-  }, [load]);
+  }, [load, user]);
 
   // Keep the feed section and composer in sync with the URL, so bottom-bar
   // taps work every time (even tapping the same button twice in a row).
@@ -827,11 +869,19 @@ function FeedPageInner() {
   };
 
 
+  // Members-only feed: signed-out visitors (and guests) get the pitch, not the posts.
+  if (!authLoading && (!user || user.is_anonymous)) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 pt-4 md:pt-6 pb-32">
+        <FeedSignupWall onJoin={openLogin} />
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto px-4 pt-4 md:pt-6 pb-32">
       {/* Feed section header — tap the title to switch sections */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="relative">
+      <div className="flex items-center justify-between mb-4">        <div className="relative">
           <button
             onClick={() => setSectionMenuOpen((o) => !o)}
             aria-haspopup="menu"
