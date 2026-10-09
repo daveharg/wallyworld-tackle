@@ -174,6 +174,9 @@ export default function FishingSpots() {
   const [focus, setFocus] = useState<{ lat: number; lng: number; key: string; zoom?: number } | null>(null);
   const [selectedFav, setSelectedFav] = useState("");
   const autoLoadedFav = useRef(false);
+  // Saved-spots dropdown selection (mirrors the saved-lakes dropdown).
+  const [selectedSpotId, setSelectedSpotId] = useState("");
+  const selectedSpot = spots.find((s) => s.id === selectedSpotId) ?? null;
 
   const load = async () => {
     try {
@@ -437,6 +440,10 @@ export default function FishingSpots() {
     try {
       await fishFetch(`/api/fishmb/spots/${id}`, { method: "DELETE" });
       setSpots(spots.filter((s) => s.id !== id));
+      if (selectedSpotId === id) {
+        setSelectedSpotId("");
+        setEditingId(null);
+      }
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not delete the spot.");
     }
@@ -610,16 +617,16 @@ export default function FishingSpots() {
         </div>
       )}
 
-      {/* Favorite lakes — quick map navigation */}
+      {/* Saved lakes — quick map navigation */}
       <div className="bg-white border border-pine/10 rounded-3xl p-6 mt-4">
         <h3 className="font-display font-bold uppercase text-pine text-lg tracking-wide mb-1">
-          ⭐ Saved locations
+          ⭐ Saved lakes
         </h3>
         <p className="text-pine/55 text-xs mb-3">
           Jump the map straight to a saved lake.
         </p>
         {favs.length > 0 ? (
-          <div className="flex gap-2">
+          <div>
             <select
               value={selectedFav}
               onChange={(e) => {
@@ -628,7 +635,7 @@ export default function FishingSpots() {
                 if (v && v !== "__add__") chooseFav(v);
               }}
               aria-label="Choose a saved lake"
-              className="flex-1 min-w-0 bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold focus:outline-none focus:border-signal"
+              className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold focus:outline-none focus:border-signal"
             >
               <option value="">Choose a saved lake…</option>
               {favs.map((f) => (
@@ -642,34 +649,30 @@ export default function FishingSpots() {
               <button
                 type="button"
                 onClick={() => removeFav(selectedFav)}
-                aria-label="Remove the selected lake"
-                title="Remove the selected lake"
-                className="shrink-0 bg-paper-deep border border-pine/15 rounded-2xl px-4 text-pine/50 hover:text-signal-dark text-sm font-bold"
+                className="mt-2 w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-2.5 text-signal-dark text-xs font-bold uppercase tracking-wider"
               >
-                🗑️
+                🗑️ Remove this lake
               </button>
             )}
           </div>
         ) : (
-          <div className="flex gap-2">
-            <select
-              value={selectedFav}
-              onChange={(e) => setSelectedFav(e.target.value)}
-              aria-label="Saved lakes"
-              className="flex-1 min-w-0 bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold focus:outline-none focus:border-signal"
-            >
-              <option value="">No saved lakes yet…</option>
-              <option value="__add__">➕ Add a new lake…</option>
-            </select>
-          </div>
+          <select
+            value={selectedFav}
+            onChange={(e) => setSelectedFav(e.target.value)}
+            aria-label="Saved lakes"
+            className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold focus:outline-none focus:border-signal"
+          >
+            <option value="">No saved lakes yet…</option>
+            <option value="__add__">➕ Add a new lake…</option>
+          </select>
         )}
         {selectedFav === "__add__" && (
-          <div className="flex gap-2 mt-2">
+          <div className="mt-2">
             <select
               value={addLakeId}
               onChange={(e) => setAddLakeId(e.target.value)}
               aria-label="Choose a lake to save"
-              className="flex-1 min-w-0 bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold focus:outline-none focus:border-signal"
+              className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold focus:outline-none focus:border-signal"
             >
               <option value="">Pick a lake…</option>
               {allLakes
@@ -688,126 +691,131 @@ export default function FishingSpots() {
                 setSelectedFav("");
               }}
               disabled={!addLakeId || addingLake}
-              className="shrink-0 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-5 rounded-2xl disabled:opacity-40 transition-colors"
+              className="mt-2 w-full bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-5 py-3 rounded-2xl disabled:opacity-40 transition-colors"
             >
-              {addingLake ? "Adding…" : "★ Add"}
+              {addingLake ? "Adding…" : "★ Add this lake"}
             </button>
           </div>
         )}
       </div>
 
-      {/* Saved spots — right under saved locations */}
-      {spots.length > 0 && (
-        <div className="bg-white border border-pine/10 rounded-3xl p-6 mt-4">
-          <h3 className="font-display font-bold uppercase text-pine text-lg tracking-wide mb-1">
-            📍 Saved spots
-          </h3>
-          <p className="text-pine/55 text-xs mb-3">
-            Tap a spot to jump the map to it.
-          </p>
-          <div className="space-y-2">
-            {spots.map((s) => (
-              <div
-                key={s.id}
-                className="bg-paper-deep border border-pine/10 rounded-2xl p-4"
-              >
-                {editingId === s.id ? (
-                  <div className="space-y-2">
-                    <input
-                      value={editName}
-                      onChange={(e) => setEditName(e.target.value)}
-                      maxLength={80}
-                      className={inputCls}
-                    />
-                    <input
-                      value={editNotes}
-                      onChange={(e) => setEditNotes(e.target.value)}
-                      maxLength={500}
-                      placeholder="Notes (optional)"
-                      className={inputCls}
-                    />
-                    <IconPicker value={editIcon} onChange={setEditIcon} />
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => saveEdit(s.id)}
-                        className="bg-pine text-white text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full"
-                      >
-                        Save
-                      </button>
-                      <button
-                        onClick={() => setEditingId(null)}
-                        className="text-pine/60 text-xs font-bold uppercase tracking-wider px-4 py-2"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-start justify-between gap-3">
-                    <button
-                      type="button"
-                      onClick={() => focusOn(Number(s.lat), Number(s.lng), `spot:${s.id}`, 15)}
-                      className="min-w-0 text-left flex-1"
-                      title="Show on map"
-                    >
-                      <p className="font-bold text-pine truncate hover:text-gold-dark">
-                        {spotEmoji(s.icon)} {s.name || "Fishing spot"}
-                      </p>
-                      <p className="text-xs text-pine/50 mt-0.5">
-                        {fmtDate(s.created_at)} ·{" "}
-                        <span className="tabular-nums">
-                          {Number(s.lat).toFixed(5)}, {Number(s.lng).toFixed(5)}
-                        </span>
-                      </p>
-                      {s.notes && <p className="text-sm text-pine/70 mt-1">{s.notes}</p>}
-                    </button>
-                    <div className="flex gap-1 shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setGoTo(s);
-                          focusOn(Number(s.lat), Number(s.lng), `spot:${s.id}`, 15);
-                        }}
-                        aria-label={`Navigate to ${s.name}`}
-                        title="Navigate to this spot"
-                        className="text-pine/50 hover:text-pine px-2 py-1 text-sm font-bold"
-                      >
-                        🧭
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => startEdit(s)}
-                        aria-label="Edit spot"
-                        className="text-pine/50 hover:text-pine px-2 py-1 text-sm font-bold"
-                      >
-                        ✏️
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => shareSpot(s.id)}
-                        disabled={sharingSpot === s.id}
-                        aria-label="Share spot to feed"
-                        title="Share this spot to the feed"
-                        className="text-pine/50 hover:text-pine px-2 py-1 text-sm font-bold disabled:opacity-40"
-                      >
-                        {sharingSpot === s.id ? "…" : "📤"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => removeSpot(s.id)}
-                        aria-label="Delete spot"
-                        className="text-pine/50 hover:text-signal-dark px-2 py-1 text-sm font-bold"
-                      >
-                        🗑️
-                      </button>
-                    </div>
-                  </div>
-                )}
+      {/* Saved spots — dropdown, works just like saved lakes */}
+      <div className="bg-white border border-pine/10 rounded-3xl p-6 mt-4">
+        <h3 className="font-display font-bold uppercase text-pine text-lg tracking-wide mb-1">
+          📍 Saved spots
+        </h3>
+        <p className="text-pine/55 text-xs mb-3">
+          Jump the map straight to a saved spot.
+        </p>
+        <select
+          value={selectedSpotId}
+          onChange={(e) => {
+            const v = e.target.value;
+            setSelectedSpotId(v);
+            const s = spots.find((x) => x.id === v);
+            if (s) {
+              setGoTo(s);
+              focusOn(Number(s.lat), Number(s.lng), `spot:${s.id}`, 15);
+            }
+          }}
+          aria-label="Choose a saved spot"
+          className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold focus:outline-none focus:border-signal"
+        >
+          <option value="">
+            {spots.length === 0 ? "No saved spots yet…" : "Choose a saved spot…"}
+          </option>
+          {spots.map((s) => (
+            <option key={s.id} value={s.id}>
+              {spotEmoji(s.icon)} {s.name || "Fishing spot"}
+            </option>
+          ))}
+        </select>
+        {selectedSpot && (
+          <div className="mt-3 bg-paper-deep border border-pine/10 rounded-2xl p-4">
+            {editingId === selectedSpot.id ? (
+              <div className="space-y-2">
+                <input
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  maxLength={80}
+                  className={inputCls}
+                />
+                <input
+                  value={editNotes}
+                  onChange={(e) => setEditNotes(e.target.value)}
+                  maxLength={500}
+                  placeholder="Notes (optional)"
+                  className={inputCls}
+                />
+                <IconPicker value={editIcon} onChange={setEditIcon} />
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => saveEdit(selectedSpot.id)}
+                    className="bg-pine text-white text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => setEditingId(null)}
+                    className="text-pine/60 text-xs font-bold uppercase tracking-wider px-4 py-2"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
-            ))}
+            ) : (
+              <div>
+                <p className="font-bold text-pine">
+                  {spotEmoji(selectedSpot.icon)} {selectedSpot.name || "Fishing spot"}
+                </p>
+                <p className="text-xs text-pine/50 mt-0.5">
+                  {fmtDate(selectedSpot.created_at)} ·{" "}
+                  <span className="tabular-nums">
+                    {Number(selectedSpot.lat).toFixed(5)}, {Number(selectedSpot.lng).toFixed(5)}
+                  </span>
+                </p>
+                {selectedSpot.notes && (
+                  <p className="text-sm text-pine/70 mt-1">{selectedSpot.notes}</p>
+                )}
+                <div className="flex gap-2 mt-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setGoTo(selectedSpot);
+                      focusOn(Number(selectedSpot.lat), Number(selectedSpot.lng), `spot:${selectedSpot.id}`, 15);
+                    }}
+                    className="flex-1 bg-pine text-white text-xs font-bold uppercase tracking-wider px-3 py-2.5 rounded-2xl"
+                  >
+                    🧭 Navigate
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => startEdit(selectedSpot)}
+                    className="flex-1 bg-white border border-pine/15 text-pine text-xs font-bold uppercase tracking-wider px-3 py-2.5 rounded-2xl"
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => shareSpot(selectedSpot.id)}
+                    disabled={sharingSpot === selectedSpot.id}
+                    className="flex-1 bg-white border border-pine/15 text-pine text-xs font-bold uppercase tracking-wider px-3 py-2.5 rounded-2xl disabled:opacity-40"
+                  >
+                    {sharingSpot === selectedSpot.id ? "…" : "📤 Share"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeSpot(selectedSpot.id)}
+                    className="flex-1 bg-white border border-pine/15 text-signal-dark text-xs font-bold uppercase tracking-wider px-3 py-2.5 rounded-2xl"
+                  >
+                    🗑️ Delete
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Recorded boat trails — overlay one to retrace your route */}
       <div className="bg-white border border-pine/10 rounded-3xl p-6 mt-4">
