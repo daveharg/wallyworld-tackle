@@ -22773,27 +22773,32 @@
     {
       "name": "Uncut Angling",
       "description": "Legendary Manitoba fishing channel by Aaron Wiebe — uncut, unscripted episodes chasing walleye, catfish, pike and smallmouth across the province.",
-      "url": "https://www.youtube.com/user/uncutangling"
+      "url": "https://www.youtube.com/user/uncutangling",
+      "rss_user": "uncutangling"
     },
     {
       "name": "Jay Siemens",
       "description": "High-production fishing filmmaker and former Uncut Angling cameraman; Manitoba trophy fishing, tips and cinematic adventure videos.",
-      "url": "https://www.youtube.com/c/jaysiemens/"
+      "url": "https://www.youtube.com/c/jaysiemens/",
+      "channel_id": "UC1QtG1n01F7z7fb4qhMOxqg"
     },
     {
       "name": "Clayton Schick Outdoors",
       "description": "Manitoba fishing guide turned YouTuber; open-water and ice fishing for giant lake trout, greenback walleye and monster pike across the province.",
-      "url": "https://www.youtube.com/@UC2a2x4_Vi-LbSBzKKJy7-7w"
+      "url": "https://www.youtube.com/@UC2a2x4_Vi-LbSBzKKJy7-7w",
+      "channel_id": "UC2a2x4_Vi-LbSBzKKJy7-7w"
     },
     {
       "name": "Nicole Stone Outdoors",
       "description": "North Dakota-based angler and media entrepreneur who partners with Hunt Fish Manitoba — including a Manitoba girls' trip jigging lake trout at Bakers Narrows.",
-      "url": "https://www.youtube.com/channel/UCguFClYXRte1XA1d7gw0d7A"
+      "url": "https://www.youtube.com/channel/UCguFClYXRte1XA1d7gw0d7A",
+      "channel_id": "UCguFClYXRte1XA1d7gw0d7A"
     },
     {
       "name": "Jessie Belot Angling",
       "description": "Manitoba angler posting ice-fishing adventures — Lake Winnipeg greenbacks, burbot and whitefish at Moak Lodge, and burbot-underwater footage.",
-      "url": "https://www.youtube.com/channel/UCQNNjBPOiz4f2R02tlqEg3w"
+      "url": "https://www.youtube.com/channel/UCQNNjBPOiz4f2R02tlqEg3w",
+      "channel_id": "UCQNNjBPOiz4f2R02tlqEg3w"
     },
     {
       "name": "Finally Fishing",

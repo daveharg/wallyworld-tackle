@@ -69,12 +69,46 @@ async function youtubePost(userId) {
     return;
   }
   const show = SHOWS[weekNo % SHOWS.length];
+  const video = await latestVideo(show);
+  const videoLine = video
+    ? `🎥 Watch: ${video.title}\nhttps://www.youtube.com/watch?v=${video.id}`
+    : `Give them a watch: ${show.url}`;
   const body =
     `🎬 Manitoba Fishing Video of the Week\n\n` +
     `This week's pick: ${show.name} — some of the best Manitoba fishing content on YouTube.\n\n` +
-    `Give them a watch: ${show.url}\n\n` +
+    `${videoLine}\n\n` +
     `Know a Manitoba fishing channel we should feature? Drop it in the comments! 👇`;
   await post(userId, body);
+}
+
+/** Newest video on a YouTube channel via its public RSS feed (no API key). */
+async function latestVideo(show) {
+  const param = show.channel_id
+    ? `channel_id=${show.channel_id}`
+    : show.rss_user
+      ? `user=${show.rss_user}`
+      : null;
+  if (!param) return null;
+  try {
+    const r = await fetch(`https://www.youtube.com/feeds/videos.xml?${param}`, {
+      headers: { "User-Agent": "FishMB/1.0" },
+      signal: AbortSignal.timeout(15000),
+    });
+    if (!r.ok) return null;
+    const xml = await r.text();
+    const entry = xml.match(/<entry>([\s\S]*?)<\/entry>/);
+    if (!entry) return null;
+    const idMatch = entry[1].match(/<yt:videoId>([^<]+)<\/yt:videoId>/);
+    const titleMatch = entry[1].match(/<title>([^<]+)<\/title>/);
+    if (!idMatch) return null;
+    return { id: idMatch[1], title: titleMatch ? decodeXml(titleMatch[1]) : "their latest video" };
+  } catch {
+    return null;
+  }
+}
+
+function decodeXml(s) {
+  return s.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'");
 }
 
 async function adPosts(userId) {

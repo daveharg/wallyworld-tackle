@@ -8,6 +8,7 @@ import { fishFetch } from "../_components/fishFetch";
 import { compressImage } from "../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 import MuxPlayer from "@mux/mux-player-react";
+import YouTubeEmbed, { extractYouTubeId } from "../_components/YouTubeEmbed";
 
 interface FeedItem {
   id: string;
@@ -1027,7 +1028,18 @@ function FeedPageInner() {
                     {item.length_in ? ` · ${Number(item.length_in).toFixed(1)}″` : ""}
                   </p>
                 )}
-                {item.body && <p className="text-pine/80 text-sm whitespace-pre-line">{item.body}</p>}
+                {item.body && (() => {
+                  const ytId = extractYouTubeId(item.body);
+                  const text = ytId
+                    ? item.body.replace(/https?:\/\/[^\s]+/g, "").replace(/\n{3,}/g, "\n\n").trim()
+                    : item.body;
+                  return (
+                    <>
+                      {text && <p className="text-pine/80 text-sm whitespace-pre-line">{text}</p>}
+                      {ytId && <YouTubeEmbed videoId={ytId} />}
+                    </>
+                  );
+                })()}
                 <div className="mt-3 flex items-center justify-between">
                   <Reactions item={item} onReacted={handleReacted} />
                   <button
