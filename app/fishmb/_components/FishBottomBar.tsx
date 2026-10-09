@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useFishAuth } from "./FishAuth";
 import { fishFetch } from "./fishFetch";
@@ -90,22 +90,24 @@ const RIGHT: Item[] = [
   },
 ];
 
-/** Create button as a circle: white with FishMB brand-color offset layers. */
-function PlusButton({ onClick, label }: { onClick: () => void; label: string }) {
+/** Center + button: dark circle like the reference design (X while the menu is open). */
+function PlusButton({ onClick, label, open }: { onClick: () => void; label: string; open: boolean }) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="relative w-[52px] h-[52px] shrink-0 active:scale-95 transition-transform"
+      className="w-[54px] h-[54px] shrink-0 rounded-full bg-pine-deep text-white shadow-lg flex items-center justify-center active:scale-95 transition-transform"
     >
-      <span className="absolute inset-0 translate-x-[3px] rounded-full bg-signal" />
-      <span className="absolute inset-0 -translate-x-[3px] rounded-full bg-gold" />
-      <span className="absolute inset-0 rounded-full bg-white shadow-lg flex items-center justify-center">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.8" strokeLinecap="round">
+      {open ? (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      ) : (
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round">
           <path d="M12 5v14M5 12h14" />
         </svg>
-      </span>
+      )}
     </button>
   );
 }
@@ -117,8 +119,6 @@ function Bar() {
   const [unread, setUnread] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [postGateOpen, setPostGateOpen] = useState(false);
-  const sheetRef = useRef<HTMLDivElement>(null);
-  const touchStartY = useRef<number | null>(null);
 
   useEffect(() => {
     let stop = false;
@@ -154,16 +154,7 @@ function Bar() {
     else setPostGateOpen(true);
   };
 
-  // Swipe down on the popup dismisses it.
-  const onSheetTouchStart = (e: React.TouchEvent) => {
-    touchStartY.current = e.touches[0]?.clientY ?? null;
-  };
-  const onSheetTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartY.current === null) return;
-    const endY = e.changedTouches[0]?.clientY ?? touchStartY.current;
-    if (endY - touchStartY.current > 40) setMenuOpen(false);
-    touchStartY.current = null;
-  };
+  // Swipe down / tap-away handled by the overlay click; the X button also closes.
 
   const renderItem = (item: Item) => {
     const active = item.match(pathname);
@@ -173,12 +164,12 @@ function Bar() {
         key={item.href}
         href={item.href}
         aria-label={showBadge ? `Inbox, ${unread} unread` : item.label}
-        className={`relative flex flex-col items-center justify-center gap-1 w-14 py-1 transition-colors ${
-          active ? "text-signal" : "text-pine/45 hover:text-pine"
+        className={`relative flex flex-col items-center justify-center gap-1 w-16 py-2 rounded-full transition-colors ${
+          active ? "text-pine bg-pine/[0.07]" : "text-pine/45 hover:text-pine"
         }`}
       >
         {item.icon}
-        <span className="text-[10px] font-medium leading-none">{item.label}</span>
+        <span className={`text-[10px] leading-none ${active ? "font-bold" : "font-medium"}`}>{item.label}</span>
         {showBadge && (
           <span className="absolute top-0 right-1 min-w-5 h-5 px-1 rounded-full bg-rose-500 text-white text-[10px] font-black flex items-center justify-center">
             {unread > 99 ? "99+" : unread}
@@ -189,38 +180,40 @@ function Bar() {
   };
 
   return (
-    <nav aria-label="FishMB sections" className="fixed z-40 bottom-0 inset-x-0 md:bottom-5 flex justify-center pointer-events-none">
-      {/* + popup menu */}
+    <nav aria-label="FishMB sections" className="fixed z-40 bottom-0 inset-x-0 flex justify-center pointer-events-none">
+      <style>{`@keyframes fmb-rise { from { opacity: 0; transform: translateY(14px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }`}</style>
+      {/* + menu: shade out the background, floating circular action buttons */}
       {menuOpen && (
-        <div className="fixed inset-0 z-50 pointer-events-auto" onClick={() => setMenuOpen(false)}>
+        <div
+          className="fixed inset-0 z-40 pointer-events-auto bg-pine-deep/70 backdrop-blur-[2px]"
+          onClick={() => setMenuOpen(false)}
+        >
           <div
-            ref={sheetRef}
+            className="absolute inset-0 flex flex-col items-center justify-center gap-7 pb-28"
             onClick={(e) => e.stopPropagation()}
-            onTouchStart={onSheetTouchStart}
-            onTouchEnd={onSheetTouchEnd}
-            className="absolute bottom-24 left-1/2 -translate-x-1/2 w-64 bg-white rounded-3xl shadow-2xl border border-pine/10 overflow-hidden"
           >
-            <div className="w-10 h-1 rounded-full bg-pine/20 mx-auto mt-2.5" />
-            <div className="p-2">
-              {PLUS_ACTIONS.map((a) => (
-                <Link
-                  key={a.href}
-                  href={a.href}
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-pine/5 active:bg-pine/10 transition-colors"
-                >
-                  <span className="text-2xl">{a.icon}</span>
-                  <span className="text-sm font-bold text-pine">{a.label}</span>
-                </Link>
-              ))}
-            </div>
+            {PLUS_ACTIONS.map((a, i) => (
+              <Link
+                key={a.href}
+                href={a.href}
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-5 w-64"
+                style={{ animation: "fmb-rise 0.25s ease-out both", animationDelay: `${i * 60}ms` }}
+              >
+                <span className="w-16 h-16 shrink-0 rounded-full bg-white shadow-2xl flex items-center justify-center text-3xl">
+                  {a.icon}
+                </span>
+                <span className="text-white text-2xl font-bold tracking-tight">{a.label}</span>
+              </Link>
+            ))}
           </div>
         </div>
       )}
 
+      {/* Floating pill bar, raised off the bottom of the phone */}
       <div
-        className="pointer-events-auto w-full md:w-[38rem] md:max-w-[calc(100vw-2rem)] relative bg-white/95 backdrop-blur border-t md:border border-pine/10 md:rounded-3xl px-2 pt-2 shadow-[0_-8px_30px_rgba(0,0,0,0.08)]"
-        style={{ paddingBottom: "calc(1.1rem + env(safe-area-inset-bottom))" }}
+        className="pointer-events-auto w-full mx-4 mb-5 md:mx-0 md:mb-6 md:w-[38rem] md:max-w-[calc(100vw-2rem)] relative bg-white rounded-full px-3 shadow-[0_10px_36px_rgba(0,0,0,0.16)] border border-pine/10"
+        style={{ paddingTop: "0.55rem", paddingBottom: "calc(0.55rem + env(safe-area-inset-bottom))" }}
       >
         <div className="flex items-center">
           {LEFT.map((item) => (
@@ -229,7 +222,7 @@ function Bar() {
             </div>
           ))}
           <div className="flex-1 flex justify-center">
-            <PlusButton onClick={onPlusTap} label="Create" />
+            <PlusButton onClick={onPlusTap} label={menuOpen ? "Close menu" : "Create"} open={menuOpen} />
           </div>
           {RIGHT.map((item) => (
             <div key={item.href} className="flex-1 flex justify-center">
