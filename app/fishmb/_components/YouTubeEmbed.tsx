@@ -20,6 +20,7 @@ export default function YouTubeEmbed({ videoId }: { videoId: string }) {
   const boxRef = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
   const [muted, setMuted] = useState(true);
+  const [unmuted, setUnmuted] = useState(false);
 
   useEffect(() => {
     const el = boxRef.current;
@@ -34,8 +35,16 @@ export default function YouTubeEmbed({ videoId }: { videoId: string }) {
 
   // Re-mute whenever a fresh autoplay starts (browser policy for autoplay).
   useEffect(() => {
-    if (inView) setMuted(true);
+    if (inView) {
+      setMuted(true);
+      setUnmuted(false);
+    }
   }, [inView, videoId]);
+
+  const tapForSound = () => {
+    setMuted(false);
+    setUnmuted(true);
+  };
 
   const src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${
     muted ? 1 : 0
@@ -64,15 +73,30 @@ export default function YouTubeEmbed({ videoId }: { videoId: string }) {
           loading="lazy"
         />
       )}
-      {/* Tap anywhere to toggle sound */}
-      <button
-        type="button"
-        onClick={() => setMuted((m) => !m)}
-        aria-label={muted ? "Unmute video" : "Mute video"}
-        className="absolute bottom-3 right-3 rounded-full bg-black/65 text-white text-sm font-bold px-4 py-2 backdrop-blur-sm"
-      >
-        {muted ? "🔇 Tap for sound" : "🔊"}
-      </button>
+      {/* First tap anywhere turns the sound on (tapping the YouTube frame
+          itself would only pause). After that, taps go straight to YouTube. */}
+      {inView && muted && !unmuted && (
+        <button
+          type="button"
+          onClick={tapForSound}
+          aria-label="Tap for sound"
+          className="absolute inset-0 z-10 flex items-end justify-end p-3 bg-transparent"
+        >
+          <span className="rounded-full bg-black/65 text-white text-sm font-bold px-4 py-2 backdrop-blur-sm">
+            🔇 Tap for sound
+          </span>
+        </button>
+      )}
+      {unmuted && (
+        <button
+          type="button"
+          onClick={() => setMuted((m) => !m)}
+          aria-label={muted ? "Unmute video" : "Mute video"}
+          className="absolute bottom-3 right-3 z-10 rounded-full bg-black/65 text-white text-sm font-bold px-4 py-2 backdrop-blur-sm"
+        >
+          {muted ? "🔇 Tap for sound" : "🔊"}
+        </button>
+      )}
     </div>
   );
 }
