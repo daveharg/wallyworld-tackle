@@ -545,5 +545,295 @@
  "wolverine-lodge": {
   "lat": 56.9996,
   "lng": -101.4502
+ },
+ "buffalo-point-resort": {
+  "lat": 49.001396,
+  "lng": -95.233871,
+  "via": "Buffalo Point Resort, 20 Buffalo Point Rd, Manitoba"
+ },
+ "ganglers-north-seal-river": {
+  "lat": 58.97846,
+  "lng": -99.97113,
+  "via": "Egenolf Lake, Manitoba (lodge pin verified via reverse geocode)"
+ },
+ "gearys-manitoba-outposts": {
+  "lat": 53.0143,
+  "lng": -94.8747,
+  "via": "Warrington Lake, Manitoba (Hornell/Mantricia/Warrington outpost lakes cluster)"
+ },
+ "golden-eagle-lodge": {
+  "lat": 56.6463,
+  "lng": -100.65673,
+  "via": "Sickle Lake, Manitoba"
+ },
+ "grey-owl-outfitters": {
+  "lat": 56.818979,
+  "lng": -101.016633,
+  "via": "Lodge near Lynn Lake, Manitoba (Eldon Lake area)"
+ },
+ "kaska-goose-lodge": {
+  "lat": 57.0362,
+  "lng": -90.103039,
+  "via": "Kaskattama River Delta, Cape Tatnam, Manitoba"
+ },
+ "lawford-lake-outfitters": {
+  "lat": 54.4999,
+  "lng": -96.6999,
+  "via": "Lawford Lake, Manitoba"
+ },
+ "lodge-at-little-duck": {
+  "lat": 59.44903,
+  "lng": -97.72915,
+  "via": "Little Duck Lake, Manitoba (lodge on north end)"
+ },
+ "mystery-country-fish-camps": {
+  "lat": 55.54854,
+  "lng": -96.13732,
+  "via": "Bear Head Lake, Manitoba (Bear Head/Dafoe/Teal lakes outcamps, Thompson area)"
+ },
+ "nueltin-fly-in-lodges": {
+  "lat": 60.15083,
+  "lng": -99.75639,
+  "via": "Nueltin Lake, Manitoba"
+ },
+ "teepee-outfitters": {
+  "lat": 57.23806,
+  "lng": -98.9842,
+  "via": "Numakoos Lake, Manitoba (one of two TeePee operating lakes)"
+ },
+ "trail-end-camp": {
+  "lat": 50.30031,
+  "lng": -95.55134,
+  "via": "Pointe du Bois, Manitoba"
+ },
+ "wavey-creek-outfitters": {
+  "lat": 50.250238,
+  "lng": -96.947755,
+  "via": "Medicine Creek Rd, RM of St. Andrews, Manitoba"
+ },
+ "ash-rapids-lodge": {
+  "lat": 49.6284,
+  "lng": -94.7584,
+  "via": "1 Ash Bay, Lake of the Woods (ashrapidslodge.ca listing)"
+ },
+ "ballards-black-island": {
+  "lat": 49.1919,
+  "lng": -94.313,
+  "via": "Big Black Island, ~6 mi north of Morson (blackisland.com)"
+ },
+ "buena-vista-resort": {
+  "lat": 49.124,
+  "lng": -94.3003,
+  "via": "155 Vauthey Rd, Morson"
+ },
+ "clarke-crombie-camp": {
+  "lat": 49.1102,
+  "lng": -93.9269,
+  "via": "33 Dock Rd, Nestor Falls"
+ },
+ "clipper-bay-camp": {
+  "lat": 49.2872,
+  "lng": -94.0827,
+  "via": "Calvert Island, Whitefish Bay (58-acre island, 10 mi south of Sioux Narrows)"
+ },
+ "crawfords-camp": {
+  "lat": 49.4138,
+  "lng": -94.1025,
+  "via": "5821 HWY-71, Sioux Narrows"
+ },
+ "crow-rock-lodge": {
+  "lat": 49.5963,
+  "lng": -94.5952,
+  "via": "private island, Unorganized Kenora District; near Queen Island"
+ },
+ "crystal-harbour-resort": {
+  "lat": 49.3981,
+  "lng": -94.0504,
+  "via": "5340 Hwy 71, Sioux Narrows (official site GPS)"
+ },
+ "duck-bay-lodge": {
+  "lat": 49.0182,
+  "lng": -94.2611,
+  "via": "Hay Island, Sabaskong Bay"
+ },
+ "floating-lodges-sioux-narrows": {
+  "lat": 49.4214,
+  "lng": -94.0936,
+  "via": "Sioux Narrows, Ontario (district-level; houseboat base)"
+ },
+ "grassy-narrows-lodge": {
+  "lat": 49.1291,
+  "lng": -94.2865,
+  "via": "10099 HWY-621, Morson"
+ },
+ "harris-hill-resort": {
+  "lat": 48.9556,
+  "lng": -94.5415,
+  "via": "5209 Fishery Rd off Hwy 600, between Rainy River & Morson (NOT Morson town; drive-to resort)"
+ },
+ "helliars-resort": {
+  "lat": 49.1131,
+  "lng": -93.9266,
+  "via": "1311 HWY-71, Nestor Falls"
+ },
+ "houseboat-adventures": {
+  "lat": 49.7654,
+  "lng": -94.4918,
+  "via": "318 Main St S, Kenora"
+ },
+ "indianhead-lodge": {
+  "lat": 49.366,
+  "lng": -93.9972,
+  "via": "Indian Head Rd, Sioux Narrows (street-level)"
+ },
+ "lake-of-the-woods-lodge": {
+  "lat": 49.0746,
+  "lng": -93.9966,
+  "via": "private 35-acre island, Sabaskong Bay, 5 mi from Nestor Falls"
+ },
+ "laughing-water-lodge": {
+  "lat": 49.437,
+  "lng": -94.0278,
+  "via": "120 Laughing Water Rd, Sioux Narrows"
+ },
+ "lebrons-long-bay-camp": {
+  "lat": 49.4297,
+  "lng": -94.0309,
+  "via": "1 Lebron's Rd, Sioux Narrows"
+ },
+ "little-bear-island-camp": {
+  "lat": 49.1641,
+  "lng": -94.165,
+  "via": "private island, Sabaskong Bay, 6 mi east of Morson"
+ },
+ "moore-bay-lodge": {
+  "lat": 49.7337,
+  "lng": -94.5739,
+  "via": "Peninsula Rd, Pipestone Peninsula, ~8 mi south of Kenora (lodge address 2791 Pipestone Peninsula)"
+ },
+ "muskie-bay-resort": {
+  "lat": 49.2189,
+  "lng": -93.9884,
+  "via": "2740 HWY-71, Sioux Narrows-Nestor Falls"
+ },
+ "mylies-place-resort": {
+  "lat": 49.1322,
+  "lng": -94.3027,
+  "via": "380 Vauthey Rd, Morson"
+ },
+ "new-moon-landing": {
+  "lat": 49.1313,
+  "lng": -94.2858,
+  "via": "10141 HWY-621, Morson"
+ },
+ "new-moon-lodge": {
+  "lat": 49.0979,
+  "lng": -94.3153,
+  "via": "HWY-621, Morson"
+ },
+ "obabikon-bay-camp": {
+  "lat": 49.2297,
+  "lng": -94.2823,
+  "via": "Obabikon Bay, Lake of the Woods (obabikon.com)"
+ },
+ "ontario-wilderness-houseboat-rentals": {
+  "lat": 49.1268,
+  "lng": -94.2877,
+  "via": "10045 HWY-621, Morson"
+ },
+ "pipestone-point-resort": {
+  "lat": 49.7667,
+  "lng": -94.4893,
+  "via": "Matheson St S, Kenora"
+ },
+ "red-wing-lodge": {
+  "lat": 49.1279,
+  "lng": -94.2689,
+  "via": "Red Wing Rd area, Morson"
+ },
+ "regina-bay-resort": {
+  "lat": 49.3999,
+  "lng": -94.0521,
+  "via": "Hagens Rd, Sioux Narrows (reginabaylodge.net)"
+ },
+ "rex-toltons-miles-bay-camp": {
+  "lat": 49.2778,
+  "lng": -94.3658,
+  "via": "Miles Bay, Lake of the Woods (secluded island, 13 mi north of Morson)"
+ },
+ "rod-and-reel-resort": {
+  "lat": 49.4148,
+  "lng": -94.098,
+  "via": "Woodpecker Hl, Sioux Narrows"
+ },
+ "saarelas-moonlite-bay": {
+  "lat": 49.1439,
+  "lng": -94.2964,
+  "via": "Little Raspberry Island, near Morson"
+ },
+ "sabaskong-bay-lodge": {
+  "lat": 49.1103,
+  "lng": -94.1764,
+  "via": "Cedar Island, Sabaskong Bay (ontario.app POINT)"
+ },
+ "shady-roost-fishing-lodge": {
+  "lat": 49.1403,
+  "lng": -93.9452,
+  "via": "Shady Roost Rd, Nestor Falls (street-level; also listed as 15-42 Sabaskong Bay)"
+ },
+ "smith-camps": {
+  "lat": 49.7,
+  "lng": -94.3707,
+  "via": "Storm Bay Rd, Kenora"
+ },
+ "spruce-island-camp": {
+  "lat": 49.3623,
+  "lng": -94.6728,
+  "via": "Spruce Island, Sabaskosing Bay"
+ },
+ "sunset-cove-resort": {
+  "lat": 49.1294,
+  "lng": -93.9298,
+  "via": "1503 HWY-71, Nestor Falls"
+ },
+ "tetu-island-lodge": {
+  "lat": 50.1966,
+  "lng": -95.0431,
+  "via": "Tetu Lake, north of Kenora"
+ },
+ "thompsons-lodge": {
+  "lat": 49.1115,
+  "lng": -93.9295,
+  "via": "20 Dock Rd N, Nestor Falls"
+ },
+ "tomahawk-resort": {
+  "lat": 49.4037,
+  "lng": -94.0735,
+  "via": "111 Tomahawk Rd, Sioux Narrows"
+ },
+ "totem-resorts": {
+  "lat": 49.4343,
+  "lng": -94.0754,
+  "via": "Totem Lodge, 120 Totem Rd, Sioux Narrows"
+ },
+ "white-birch-lodge": {
+  "lat": 49.4088,
+  "lng": -94.0926,
+  "via": "30 Skyers Rd, Regina Bay, Sioux Narrows"
+ },
+ "white-pine-lodge": {
+  "lat": 49.3521,
+  "lng": -93.9896,
+  "via": "White Pine Rd, Sioux Narrows (street-level)"
+ },
+ "witch-bay-canadian-camps": {
+  "lat": 49.5927,
+  "lng": -94.2346,
+  "via": "Witch Bay, Lake of the Woods"
+ },
+ "youngs-wilderness-camp": {
+  "lat": 49.199,
+  "lng": -93.9504,
+  "via": "2371 HWY-71, Nestor Falls"
  }
 }

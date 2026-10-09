@@ -22763,7 +22763,7 @@
     {
       "id": "tetu-island-lodge",
       "name": "Tetu Island Lodge",
-      "location": "Lake of the Woods, Ontario (island near Kenora)",
+      "location": "Tetu Lake, Ontario (north of Kenora)",
       "kind": "lodge",
       "species": [
         "Northern Pike",
@@ -22771,7 +22771,7 @@
         "Smallmouth Bass",
         "Walleye"
       ],
-      "description": "Island lodge on Lake of the Woods near Kenora; trophy pike, muskie, smallmouth and walleye. (Website/phone unverified — listed via resortsandlodges.com.)",
+      "description": "Island lodge on Tetu Lake north of Kenora; trophy pike, muskie, smallmouth and walleye. (Permanently closed — verified via public receivership records.)",
       "website": null,
       "phone": null,
       "email": null,
@@ -22780,12 +22780,12 @@
       "packages": [],
       "rates_note": null,
       "fishing_waters": [
-        "Lake of the Woods"
+        "Tetu Lake"
       ],
       "ice_fishing": false,
       "ice_fishing_details": null,
       "established": null,
-      "access": "Island near Kenora"
+      "access": "Island on Tetu Lake, north of Kenora"
     },
     {
       "id": "houseboat-adventures",

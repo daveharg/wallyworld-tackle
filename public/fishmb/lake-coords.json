@@ -1138,5 +1138,170 @@
     "lat": 55.2934,
     "lng": -97.9623,
     "name": "Wintering Lake, Local Government District of Mystery Lake, Manitoba, Canada"
+  },
+  "blueberry-pond": {
+    "lat": 49.6667,
+    "lng": -95.4333,
+    "name": "Blueberry Pond, Manitoba, Canada"
+  },
+  "burrows-lake": {
+    "lat": 51.42639,
+    "lng": -101.04919,
+    "name": "Burrows Lake, Manitoba, Canada"
+  },
+  "cedar-pond": {
+    "lat": 53.994,
+    "lng": -101.26552,
+    "name": "Cedar Pond, Manitoba, Canada"
+  },
+  "chocolate-lake": {
+    "lat": 54.24621,
+    "lng": -101.68911,
+    "name": "Chocolate Lake, Manitoba, Canada"
+  },
+  "clear-lake": {
+    "lat": 50.6507,
+    "lng": -99.97081,
+    "name": "Clear Lake, Riding Mountain National Park, Manitoba, Canada"
+  },
+  "corstophine-lake": {
+    "lat": 50.5833,
+    "lng": -100.2,
+    "name": "Corstophine Lake, Manitoba, Canada"
+  },
+  "dorothy-pond": {
+    "lat": 50.1367,
+    "lng": -95.76164,
+    "name": "Dorothy Pond, Manitoba, Canada"
+  },
+  "foot-print-lake": {
+    "lat": 55.78435,
+    "lng": -98.87745,
+    "name": "Foot Print Lake, Manitoba, Canada"
+  },
+  "gull-pond": {
+    "lat": 50.75311,
+    "lng": -97.01786,
+    "name": "Gull Pond, Manitoba, Canada"
+  },
+  "hoopers-lake": {
+    "lat": 50.2978,
+    "lng": -101.10011,
+    "name": "Hoopers Lake, Manitoba, Canada"
+  },
+  "langan-lakes": {
+    "lat": 51.55829,
+    "lng": -101.32781,
+    "name": "Langan Lakes, Manitoba, Canada"
+  },
+  "little-jackfish-lake": {
+    "lat": 50.48671,
+    "lng": -100.08584,
+    "name": "Little Jackfish Lake, Manitoba, Canada"
+  },
+  "little-troy-lake": {
+    "lat": 56.02161,
+    "lng": -97.25154,
+    "name": "Little Troy Lake, Manitoba, Canada"
+  },
+  "marge-lake": {
+    "lat": 51.63079,
+    "lng": -100.92418,
+    "name": "Marge Lake, Manitoba, Canada"
+  },
+  "munroe-lake": {
+    "lat": 59.19694,
+    "lng": -98.55444,
+    "name": "Munroe Lake, Manitoba, Canada"
+  },
+  "nueltin-lake": {
+    "lat": 60.15083,
+    "lng": -99.75639,
+    "name": "Nueltin Lake, Manitoba, Canada"
+  },
+  "patterson-lake": {
+    "lat": 50.6478,
+    "lng": -100.5825,
+    "name": "Patterson Lake, Manitoba, Canada"
+  },
+  "pybus-lake": {
+    "lat": 50.5,
+    "lng": -100.1833,
+    "name": "Pybus Lake, Manitoba, Canada"
+  },
+  "reindeer-lake": {
+    "lat": 57.3,
+    "lng": -102.367,
+    "name": "Reindeer Lake, Manitoba, Canada"
+  },
+  "saint-george-lake": {
+    "lat": 51.7339,
+    "lng": -97.43897,
+    "name": "Lake St. George, Manitoba, Canada"
+  },
+  "sasa-ginni-gak-lake": {
+    "lat": 51.59333,
+    "lng": -95.66725,
+    "name": "Sasaginnigak Lake, Manitoba, Canada"
+  },
+  "shoal-lake-west": {
+    "lat": 50.40407635,
+    "lng": -100.619930083,
+    "name": "Shoal Lake, Manitoba, Canada"
+  },
+  "shoal-lakes": {
+    "lat": 50.398,
+    "lng": -97.645,
+    "name": "Shoal Lakes (East & West), Manitoba, Canada"
+  },
+  "silver-beach-lake": {
+    "lat": 50.8556,
+    "lng": -101.00028,
+    "name": "Silver Beach Lake, Manitoba, Canada"
+  },
+  "snowberry-pond": {
+    "lat": 49.3833,
+    "lng": -95.3833,
+    "name": "Snowberry Pond, Manitoba, Canada"
+  },
+  "spear-lake": {
+    "lat": 50.79609,
+    "lng": -101.31951,
+    "name": "Spear Lake, Manitoba, Canada"
+  },
+  "ste-rose-pond": {
+    "lat": 51.059606,
+    "lng": -99.531747,
+    "name": "Ste. Rose Trout Pond, Ste. Rose du Lac, Manitoba, Canada"
+  },
+  "tower-pond": {
+    "lat": 51.05,
+    "lng": -96.7667,
+    "name": "Tower Pond, Manitoba, Canada"
+  },
+  "uncle-bobs-trout-pond": {
+    "lat": 51.11768,
+    "lng": -99.96693,
+    "name": "Uncle Bob's Trout Pond, Dauphin, Manitoba, Canada"
+  },
+  "vanderkerckhove-lake": {
+    "lat": 56.99991,
+    "lng": -101.42944,
+    "name": "Vanderkerckhove Lake, Manitoba, Canada"
+  },
+  "vermilion-reservoir": {
+    "lat": 51.012356,
+    "lng": -100.167667,
+    "name": "Vermilion Reservoir, Manitoba, Canada"
+  },
+  "west-goose-lake": {
+    "lat": 51.2226,
+    "lng": -101.3556,
+    "name": "West Goose Lake, Roblin, Manitoba, Canada"
+  },
+  "west-watjask-lake": {
+    "lat": 51.6521,
+    "lng": -101.4544,
+    "name": "West Watjask Lake, Manitoba, Canada"
   }
 }
