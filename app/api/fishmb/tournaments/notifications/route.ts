@@ -28,7 +28,26 @@ export async function GET(req: NextRequest) {
         AND (t.participants_seen_at IS NULL OR p.joined_at > t.participants_seen_at)`,
     [me.id]
   );
-  return NextResponse.json({ new_joins: Number(rows[0]?.new_joins ?? 0) });
+  // Which tournaments have unseen joins (for deep-linking the notification).
+  const tourneys = await query<{ id: string; name: string; new_joins: string }>(
+    `SELECT t.id, t.name, COUNT(*) AS new_joins
+       FROM fm_tournament_participants p
+       JOIN fm_tournaments t ON t.id = p.tournament_id
+      WHERE t.organizer_id = $1
+        AND p.user_id != $1
+        AND (t.participants_seen_at IS NULL OR p.joined_at > t.participants_seen_at)
+      GROUP BY t.id, t.name
+      ORDER BY MAX(p.joined_at) DESC`,
+    [me.id]
+  );
+  return NextResponse.json({
+    new_joins: Number(rows[0]?.new_joins ?? 0),
+    tournaments: tourneys.map((t) => ({
+      id: t.id,
+      name: t.name,
+      new_joins: Number(t.new_joins),
+    })),
+  });
 }
 
 /** POST — mark all of the organizer's tournaments as seen (clears the badge). */

@@ -221,6 +221,10 @@ export async function ensureTournamentTables(): Promise<void> {
   await query(`ALTER TABLE fm_tournament_participants ADD COLUMN IF NOT EXISTS paid boolean NOT NULL DEFAULT false`);
   await query(`ALTER TABLE fm_tournament_participants ADD COLUMN IF NOT EXISTS paid_at timestamptz`);
   await query(`ALTER TABLE fm_tournament_participants ADD COLUMN IF NOT EXISTS paid_marked_by uuid REFERENCES fm_users(id)`);
+  // Organizer dashboard: check-in on tournament day + private organizer notes.
+  await query(`ALTER TABLE fm_tournament_participants ADD COLUMN IF NOT EXISTS checked_in boolean NOT NULL DEFAULT false`);
+  await query(`ALTER TABLE fm_tournament_participants ADD COLUMN IF NOT EXISTS checked_in_at timestamptz`);
+  await query(`ALTER TABLE fm_tournament_participants ADD COLUMN IF NOT EXISTS organizer_note text NOT NULL DEFAULT ''`);
   // Multi-photo catches: primary photo stays in photo_url; all photos (1-4) in photo_urls.
   await query(`ALTER TABLE fm_tournament_entries ADD COLUMN IF NOT EXISTS photo_urls jsonb NOT NULL DEFAULT '[]'`);
   await query(`UPDATE fm_tournament_entries SET photo_urls = jsonb_build_array(photo_url) WHERE photo_urls = '[]' OR jsonb_array_length(photo_urls) = 0`);
@@ -355,15 +359,26 @@ export interface TournamentParticipant {
   joined_at: string;
   paid: boolean;
   paid_at: string | null;
+  checked_in: boolean;
+  checked_in_at: string | null;
+  organizer_note: string;
+  key_code: string | null;
+  key_label: string | null;
 }
 
-/** Organizer-only participant list with entry-fee payment status. */
+/** Organizer-only participant list with entry-fee payment status, check-in,
+ *  and which invite key each angler used (auto-linked at redemption). */
 export async function listParticipants(tournamentId: string): Promise<TournamentParticipant[]> {
   await ensureTournamentTables();
   return query<TournamentParticipant>(
-    `SELECT p.user_id, u.name, u.avatar_url, p.joined_at, p.paid, p.paid_at
+    `SELECT p.user_id, u.name, u.avatar_url, p.joined_at, p.paid, p.paid_at,
+            p.checked_in, p.checked_in_at, p.organizer_note,
+            k.key_code, k.label AS key_label
        FROM fm_tournament_participants p
        JOIN fm_users u ON u.id = p.user_id
+       LEFT JOIN fm_tournament_key_redemptions r
+         ON r.tournament_id = p.tournament_id AND r.user_id = p.user_id
+       LEFT JOIN fm_tournament_keys k ON k.id = r.key_id
       WHERE p.tournament_id = $1
       ORDER BY p.joined_at ASC`,
     [tournamentId]
@@ -390,6 +405,58 @@ export async function setParticipantPaid(
     [tournamentId, userId, paid, markedBy]
   );
   return rows[0] ?? null;
+}
+
+/** Organizer marks a participant checked-in (tournament day). */
+export async function setParticipantCheckedIn(
+  tournamentId: string,
+  userId: string,
+  checkedIn: boolean
+): Promise<boolean> {
+  await ensureTournamentTables();
+  const rows = await query<{ user_id: string }>(
+    `UPDATE fm_tournament_participants
+        SET checked_in = $3,
+            checked_in_at = CASE WHEN $3 THEN now() ELSE NULL END
+      WHERE tournament_id = $1 AND user_id = $2
+      RETURNING user_id`,
+    [tournamentId, userId, checkedIn]
+  );
+  return rows.length > 0;
+}
+
+/** Organizer saves a private note on a participant (only the organizer sees it). */
+export async function setParticipantNote(
+  tournamentId: string,
+  userId: string,
+  note: string
+): Promise<boolean> {
+  await ensureTournamentTables();
+  const rows = await query<{ user_id: string }>(
+    `UPDATE fm_tournament_participants SET organizer_note = $3
+      WHERE tournament_id = $1 AND user_id = $2
+      RETURNING user_id`,
+    [tournamentId, userId, note.slice(0, 500)]
+  );
+  return rows.length > 0;
+}
+
+/** Organizer removes a participant (also removes their key redemption). */
+export async function removeParticipant(
+  tournamentId: string,
+  userId: string
+): Promise<boolean> {
+  await ensureTournamentTables();
+  await query(
+    `DELETE FROM fm_tournament_key_redemptions WHERE tournament_id = $1 AND user_id = $2`,
+    [tournamentId, userId]
+  );
+  const rows = await query<{ user_id: string }>(
+    `DELETE FROM fm_tournament_participants WHERE tournament_id = $1 AND user_id = $2
+     RETURNING user_id`,
+    [tournamentId, userId]
+  );
+  return rows.length > 0;
 }
 
 /** What a participant sees about their own entry-fee payment. */

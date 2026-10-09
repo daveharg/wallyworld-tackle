@@ -31,7 +31,7 @@ const SECTIONS = [
   },
   {
     icon: "🗺️",
-    title: "Maps & Spots",
+    title: "Garmin maps & spots",
     text: "Your private GPS map. Mark honey holes with a press-and-hold, save spots from your current location, and add lake notes. Your spots are private by default — share them with friends only when you choose to. And when the FishMB mobile app lands, flip any map to Garmin Navionics depth contours: bring your own Navionics account, toggle the contour layer over the FishMB base map, and your spots and catches render on both. You pay Garmin directly — FishMB never touches chart money.",
   },
   {
@@ -56,8 +56,8 @@ const SECTIONS = [
   },
   {
     icon: "📖",
-    title: "Lakes & Regulations",
-    text: "271 Manitoba lakes with 2026 regulations, verified lodging, and Master Angler trophy records. Every lake page shows what's biting, where to stay, and the official rules — no guessing.",
+    title: "Lakes, Regulations & Stocking",
+    text: "271 Manitoba lakes with 2026 regulations, verified lodging, and Master Angler trophy records. Every lake page shows what's biting, where to stay, the official rules — plus provincial fish stocking reports so you know what's been put in the water and when. No guessing.",
   },
   {
     icon: "👥",

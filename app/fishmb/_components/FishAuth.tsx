@@ -362,15 +362,20 @@ export function FishLoginButton() {
 
   // New tournament joins (organizer alerts) — same badge system.
   const [joinCount, setJoinCount] = useState(0);
+  const [joinTourneyId, setJoinTourneyId] = useState<string | null>(null);
   useEffect(() => {
     if (!user) {
       setJoinCount(0);
+      setJoinTourneyId(null);
       return;
     }
     let cancelled = false;
     fishFetch("/api/fishmb/tournaments/notifications")
       .then((d) => {
-        if (!cancelled) setJoinCount(Number((d as { new_joins?: number }).new_joins ?? 0));
+        if (cancelled) return;
+        const data = d as { new_joins?: number; tournaments?: { id: string }[] };
+        setJoinCount(Number(data.new_joins ?? 0));
+        setJoinTourneyId(data.tournaments?.[0]?.id ?? null);
       })
       .catch(() => {});
     return () => {
@@ -418,7 +423,7 @@ export function FishLoginButton() {
     <div className="relative block" ref={ref}>
       <button
         onClick={() => setMenu((m) => !m)}
-        className="relative inline-flex items-center gap-2 bg-pine/5 hover:bg-pine/10 rounded-full pl-1 pr-4 py-1 transition-colors"
+        className="relative inline-flex items-center gap-2 bg-pine/5 hover:bg-pine/10 rounded-full pl-1 pr-4 h-10 transition-colors"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         {user.avatar_url ? (
@@ -474,7 +479,7 @@ export function FishLoginButton() {
               )}
             </Link>
             <Link
-              href="/fishmb/tournaments"
+              href={joinTourneyId ? `/fishmb/tournaments/${joinTourneyId}/manage` : "/fishmb/tournaments"}
               onClick={() => setMenu(false)}
               className="flex items-center justify-between px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70 hover:text-signal hover:bg-pine/5"
             >

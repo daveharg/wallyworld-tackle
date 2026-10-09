@@ -8,7 +8,6 @@ import { compressImage } from "../../../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 import { CatchMap } from "../../_components/CatchMap";
 import { EntryKeys } from "../../_components/EntryKeys";
-import { EntryFees } from "../../_components/EntryFees";
 import { PayoutEditor } from "../../_components/PayoutEditor";
 import type { PayoutTier } from "@/lib/fish/tournaments";
 
@@ -464,6 +463,266 @@ function EditTournament({ tournament, onSaved }: { tournament: Detail["tournamen
   );
 }
 
+interface Angler {
+  user_id: string;
+  name: string;
+  avatar_url: string | null;
+  joined_at: string;
+  paid: boolean;
+  paid_at: string | null;
+  checked_in: boolean;
+  checked_in_at: string | null;
+  organizer_note: string;
+  key_code: string | null;
+  key_label: string | null;
+}
+
+/** Organizer's angler dashboard: who joined, who paid, who checked in,
+ *  which invite key each angler used (auto-linked at redemption), plus
+ *  private notes and CSV export. */
+function AnglersDashboard({ tournamentId, inviteCode, entryFeeCents }: { tournamentId: string; inviteCode: string; entryFeeCents: number }) {
+  const [anglers, setAnglers] = useState<Angler[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<"all" | "unpaid" | "unchecked">("all");
+  const [noteEdits, setNoteEdits] = useState<Record<string, string>>({});
+  const [busy, setBusy] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    try {
+      const d = await fishFetch(`/api/fishmb/tournaments/${tournamentId}/participants`);
+      setAnglers((d as { participants: Angler[] }).participants ?? []);
+    } catch {
+      /* leave empty */
+    } finally {
+      setLoading(false);
+    }
+  }, [tournamentId]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const patch = async (userId: string, body: Record<string, unknown>) => {
+    setBusy(userId);
+    try {
+      await fishFetch(`/api/fishmb/tournaments/${tournamentId}/participants/${userId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      await load();
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const remove = async (a: Angler) => {
+    if (!window.confirm(`Remove ${a.name} from this tournament? Their catches stay, but they can no longer enter new ones.`)) return;
+    setBusy(a.user_id);
+    try {
+      await fishFetch(`/api/fishmb/tournaments/${tournamentId}/participants/${a.user_id}`, { method: "DELETE" });
+      await load();
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const saveNote = async (a: Angler) => {
+    const val = noteEdits[a.user_id] ?? "";
+    await patch(a.user_id, { organizer_note: val });
+    setNoteEdits((m) => {
+      const n = { ...m };
+      delete n[a.user_id];
+      return n;
+    });
+  };
+
+  const exportCsv = () => {
+    const rows = [
+      ["Name", "Joined", "Entry key used", "Paid", "Checked in", "Note"],
+      ...anglers.map((a) => [
+        a.name,
+        new Date(a.joined_at).toLocaleString(),
+        a.key_code ?? inviteCode,
+        a.paid ? "yes" : "no",
+        a.checked_in ? "yes" : "no",
+        (a.organizer_note ?? "").replace(/"/g, '""'),
+      ]),
+    ];
+    const csv = rows.map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
+    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "tournament-anglers.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const paidCount = anglers.filter((a) => a.paid).length;
+  const checkedCount = anglers.filter((a) => a.checked_in).length;
+  const collected = paidCount * entryFeeCents;
+  const outstanding = (anglers.length - paidCount) * entryFeeCents;
+  const fmt = (c: number) => `$${(c / 100).toFixed(2).replace(/\.00$/, "")}`;
+
+  const visible = anglers.filter((a) => {
+    if (filter === "unpaid" && a.paid) return false;
+    if (filter === "unchecked" && a.checked_in) return false;
+    if (search && !a.name.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
+
+  return (
+    <section className="bg-white border border-pine/10 rounded-3xl p-6 md:p-8 mb-8">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-1">
+        <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide">
+          🎣 Anglers {anglers.length > 0 && <span className="text-pine/50">({anglers.length})</span>}
+        </h2>
+        {anglers.length > 0 && (
+          <button
+            onClick={exportCsv}
+            className="text-xs font-bold uppercase tracking-wider text-pine/60 hover:text-signal border border-pine/20 rounded-full px-4 py-2 transition-colors"
+          >
+            ⬇ Export CSV
+          </button>
+        )}
+      </div>
+      <p className="text-pine/55 text-sm mb-5">
+        Everyone who joined, which entry key they used, who paid, who checked in.
+      </p>
+
+      {loading ? (
+        <p className="text-pine/50 text-sm">Loading anglers…</p>
+      ) : anglers.length === 0 ? (
+        <p className="text-pine/50 text-sm">No anglers yet — share your invite link above to fill the roster.</p>
+      ) : (
+        <>
+          {/* Summary tiles */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+            <div className="bg-paper-deep rounded-2xl px-4 py-3">
+              <p className="text-2xl font-black text-pine">{anglers.length}</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-pine/55">Anglers</p>
+            </div>
+            <div className="bg-paper-deep rounded-2xl px-4 py-3">
+              <p className="text-2xl font-black text-green-700">{paidCount}</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-pine/55">Paid · {fmt(collected)}</p>
+            </div>
+            <div className="bg-paper-deep rounded-2xl px-4 py-3">
+              <p className="text-2xl font-black text-signal">{anglers.length - paidCount}</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-pine/55">Unpaid · {fmt(outstanding)}</p>
+            </div>
+            <div className="bg-paper-deep rounded-2xl px-4 py-3">
+              <p className="text-2xl font-black text-pine">{checkedCount}</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider text-pine/55">Checked in</p>
+            </div>
+          </div>
+
+          {/* Search + filters */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search anglers…"
+              className="flex-1 min-w-[160px] bg-paper-deep border border-pine/15 rounded-full px-4 py-2 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal"
+            />
+            {(["all", "unpaid", "unchecked"] as const).map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`text-xs font-bold uppercase tracking-wider rounded-full px-4 py-2 transition-colors ${
+                  filter === f ? "bg-pine text-white" : "bg-paper-deep text-pine/60 hover:text-pine"
+                }`}
+              >
+                {f === "all" ? "All" : f === "unpaid" ? "Unpaid" : "Not checked in"}
+              </button>
+            ))}
+          </div>
+
+          {/* Angler rows */}
+          <div className="space-y-3">
+            {visible.map((a) => {
+              const keyDisplay = a.key_code ?? inviteCode;
+              const noteVal = noteEdits[a.user_id] ?? a.organizer_note ?? "";
+              const noteDirty = (noteEdits[a.user_id] ?? a.organizer_note ?? "") !== (a.organizer_note ?? "");
+              return (
+                <div key={a.user_id} className="border border-pine/10 rounded-2xl p-4">
+                  <div className="flex items-center gap-3">
+                    {a.avatar_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={a.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover" />
+                    ) : (
+                      <span className="w-10 h-10 rounded-full bg-signal text-white flex items-center justify-center font-bold">
+                        {a.name.charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-pine truncate">{a.name}</p>
+                      <p className="text-xs text-pine/50">
+                        Joined {new Date(a.joined_at).toLocaleDateString()}
+                        {" · "}Key: <code className="font-mono font-bold text-pine/70">{keyDisplay}</code>
+                        {a.key_label && <span className="text-pine/50"> ({a.key_label})</span>}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => remove(a)}
+                      disabled={busy === a.user_id}
+                      title="Remove angler"
+                      className="text-pine/30 hover:text-red-600 text-lg px-2 transition-colors"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 mt-3">
+                    <button
+                      onClick={() => patch(a.user_id, { paid: !a.paid })}
+                      disabled={busy === a.user_id}
+                      className={`text-xs font-bold uppercase tracking-wider rounded-full px-4 py-2 transition-colors ${
+                        a.paid ? "bg-green-700 text-white" : "bg-paper-deep text-pine/60 hover:text-pine"
+                      }`}
+                    >
+                      {a.paid ? "✓ Paid" : "Mark paid"}
+                    </button>
+                    <button
+                      onClick={() => patch(a.user_id, { checked_in: !a.checked_in })}
+                      disabled={busy === a.user_id}
+                      className={`text-xs font-bold uppercase tracking-wider rounded-full px-4 py-2 transition-colors ${
+                        a.checked_in ? "bg-pine text-white" : "bg-paper-deep text-pine/60 hover:text-pine"
+                      }`}
+                    >
+                      {a.checked_in ? "✓ Checked in" : "Check in"}
+                    </button>
+                  </div>
+                  <div className="flex gap-2 mt-3">
+                    <input
+                      value={noteVal}
+                      onChange={(e) => setNoteEdits((m) => ({ ...m, [a.user_id]: e.target.value }))}
+                      placeholder="Private note (only you see this)…"
+                      maxLength={500}
+                      className="flex-1 bg-paper-deep border border-pine/15 rounded-full px-4 py-2 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal"
+                    />
+                    {noteDirty && (
+                      <button
+                        onClick={() => saveNote(a)}
+                        disabled={busy === a.user_id}
+                        className="text-xs font-bold uppercase tracking-wider bg-signal text-white rounded-full px-4 py-2 hover:bg-signal-dark transition-colors"
+                      >
+                        Save
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+            {visible.length === 0 && (
+              <p className="text-pine/50 text-sm text-center py-4">No anglers match this filter.</p>
+            )}
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
 
 export default function ManageTournamentPage({ params }: { params: { id: string } }) {  const { user, openLogin } = useFishAuth();
   const [detail, setDetail] = useState<Detail | null>(null);
@@ -613,8 +872,8 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
         </div>
       </section>
 
-      {/* Entry fees — organizer tracks who has paid */}
-      <EntryFees tournamentId={t.id} entryFeeCents={t.entry_fee_cents} />
+      {/* Anglers dashboard — who joined, keys used, paid, checked in */}
+      <AnglersDashboard tournamentId={t.id} inviteCode={t.invite_code} entryFeeCents={t.entry_fee_cents} />
 
       {/* Full tournament editor */}
       <EditTournament tournament={t} onSaved={load} />
