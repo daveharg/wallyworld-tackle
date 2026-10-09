@@ -137,9 +137,16 @@ export default function ProfileView({
             <h1 className="font-display font-bold text-pine text-2xl md:text-3xl tracking-wide truncate">
               {user.name}
             </h1>
-            {!data.is_self && (
-              <>
-                {data.friendship_status === "accepted" ? (
+            {data.is_self ? (
+              <Link
+                href="/fishmb/profile/edit"
+                className="text-xs font-bold uppercase tracking-wider text-pine/60 hover:text-pine bg-pine/10 hover:bg-pine/15 rounded-full px-4 py-2 transition-colors"
+              >
+                ✏️ Edit profile
+              </Link>
+            ) : (
+            <>
+              {data.friendship_status === "accepted" ? (
                   <span className="text-xs font-bold uppercase tracking-wider text-pine/50 bg-pine/10 rounded-full px-4 py-2">
                     Friends ✓
                   </span>
