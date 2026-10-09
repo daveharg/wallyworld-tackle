@@ -92,6 +92,7 @@ export interface Tournament {
   auto_approve_entries: boolean;
   photo_mode: string;
   hide_locations: boolean;
+  participants_seen_at: string | null;
   cover_photo_url: string | null;
   venue_name: string | null;
   venue_address: string | null;
@@ -241,6 +242,9 @@ export async function ensureTournamentTables(): Promise<void> {
   // (organizer still sees it for verification); everyone else only sees that
   // the catch was confirmed inside the tournament area.
   await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS hide_locations boolean NOT NULL DEFAULT false`);
+  // Organizer notification watermark: new joins after this timestamp count as
+  // "new" until the organizer opens the manage page.
+  await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS participants_seen_at timestamptz`);
   // One-time repair: the seeded demo's posted rules say entries are
   // auto-approved, so honor that and clear the stuck "pending" backlog.
   // (Organizer ownership is left alone — it isn't needed for this fix.)

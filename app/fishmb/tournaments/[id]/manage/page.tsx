@@ -191,6 +191,12 @@ function EditTournament({ tournament, onSaved }: { tournament: Detail["tournamen
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // The organizer has seen the participants — clear the "new joins" badge.
+  useEffect(() => {
+    fishFetch("/api/fishmb/tournaments/notifications", { method: "POST" }).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const uploadCover = async (file: File) => {
     setUploading(true);
     setNote(null);

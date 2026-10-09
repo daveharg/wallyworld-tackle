@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { fishFetch } from "./fishFetch";
 import {
   FISHMB_GOOGLE_CLIENT_ID,
   FISHMB_TOKEN_KEY,
@@ -359,6 +360,26 @@ export function FishLoginButton() {
     };
   }, [user]);
 
+  // New tournament joins (organizer alerts) — same badge system.
+  const [joinCount, setJoinCount] = useState(0);
+  useEffect(() => {
+    if (!user) {
+      setJoinCount(0);
+      return;
+    }
+    let cancelled = false;
+    fishFetch("/api/fishmb/tournaments/notifications")
+      .then((d) => {
+        if (!cancelled) setJoinCount(Number((d as { new_joins?: number }).new_joins ?? 0));
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  const totalAlerts = pendingCount + joinCount;
+
   // Close the menu on any outside tap. (A fixed overlay div can't do this job:
   // the header's backdrop-blur makes it a containing block, clipping the overlay
   // to the header strip.)
@@ -408,9 +429,9 @@ export function FishLoginButton() {
           </span>
         )}
         <span className="text-sm font-bold text-pine max-w-[120px] truncate">{user.name}</span>
-        {pendingCount > 0 && (
+        {totalAlerts > 0 && (
           <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 rounded-full bg-signal text-white text-[11px] font-black flex items-center justify-center shadow">
-            {pendingCount > 9 ? "9+" : pendingCount}
+            {totalAlerts > 9 ? "9+" : totalAlerts}
           </span>
         )}
       </button>
@@ -449,6 +470,18 @@ export function FishLoginButton() {
               {pendingCount > 0 && (
                 <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-signal text-white text-[11px] font-black flex items-center justify-center">
                   {pendingCount > 9 ? "9+" : pendingCount}
+                </span>
+              )}
+            </Link>
+            <Link
+              href="/fishmb/tournaments"
+              onClick={() => setMenu(false)}
+              className="flex items-center justify-between px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70 hover:text-signal hover:bg-pine/5"
+            >
+              <span>🏆 Tournaments</span>
+              {joinCount > 0 && (
+                <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-signal text-white text-[11px] font-black flex items-center justify-center">
+                  {joinCount > 9 ? "9+" : joinCount}
                 </span>
               )}
             </Link>
