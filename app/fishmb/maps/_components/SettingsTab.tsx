@@ -68,6 +68,7 @@ export default function SettingsTab({
   const [addLakeId, setAddLakeId] = useState("");
   const [addingLake, setAddingLake] = useState(false);
   const [selectedFav, setSelectedFav] = useState("");
+  const [showContoursSoon, setShowContoursSoon] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -133,10 +134,45 @@ export default function SettingsTab({
   return (
     <div className="pt-1 space-y-4">
  <Section icon="" title="Map options" sub="Tune the map to how you fish.">
+        <p className="text-[11px] font-black uppercase tracking-[0.14em] text-pine/45 mb-2">
+          Map overlay
+        </p>
+        <div className="flex bg-pine/5 rounded-full p-1 mb-2">
+          {(
+            [
+              { id: "satellite", label: "Satellite" },
+              { id: "streets", label: "Streets" },
+              { id: "contours", label: "Contours" },
+            ] as const
+          ).map((b) => (
+            <button
+              key={b.id}
+              type="button"
+              onClick={() => {
+                if (b.id === "contours") {
+                  setShowContoursSoon(true);
+                } else {
+                  onBasemapChange(b.id);
+                }
+              }}
+              className={`flex-1 py-2 rounded-full text-[13px] font-bold transition-colors ${
+                basemap === b.id ? "bg-white text-pine shadow" : "text-pine/50"
+              }`}
+            >
+              {b.label}
+            </button>
+          ))}
+        </div>
+        {showContoursSoon && (
+          <p className="text-[11px] text-pine/55 mb-2 bg-pine/5 rounded-2xl px-4 py-3">
+            Depth contours are coming with the FishMB mobile app (Garmin
+            Navionics). Your spots will work on both views.
+          </p>
+        )}
         <button
           type="button"
           onClick={() => onWindChange(!windOn)}
-          className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3 mb-3"
+          className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3 mt-3"
         >
           <span className="text-sm font-bold text-pine">Wind overlay</span>
           <span
@@ -151,28 +187,9 @@ export default function SettingsTab({
             />
           </span>
         </button>
-        <p className="text-[11px] text-pine/45 -mt-1 mb-3">
+        <p className="text-[11px] text-pine/45 mt-2">
           Shows live wind speed and direction at the centre of your map.
         </p>
-        <div className="flex bg-pine/5 rounded-full p-1 mb-3">
-          {(
-            [
- { id: "streets", label: " Streets" },
- { id: "satellite", label: " Satellite" },
-            ] as const
-          ).map((b) => (
-            <button
-              key={b.id}
-              type="button"
-              onClick={() => onBasemapChange(b.id)}
-              className={`flex-1 py-2 rounded-full text-[13px] font-bold transition-colors ${
-                basemap === b.id ? "bg-white text-pine shadow" : "text-pine/50"
-              }`}
-            >
-              {b.label}
-            </button>
-          ))}
-        </div>
       </Section>
 
  <Section icon="" title="Saved lakes" sub="Jump the map straight to a saved lake.">
