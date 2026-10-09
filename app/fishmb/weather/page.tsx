@@ -93,19 +93,19 @@ function PressureGauge({ value }: { value: number }) {
   return (
     <svg viewBox="0 0 200 115" className="w-full">
       {zones.map(([p0, p1, c], i) => (
-        <path key={i} d={arc(ang(p0), ang(p1))} stroke={c} strokeWidth="13" fill="none" strokeLinecap="butt" opacity="0.85" />
+        <path key={i} d={arc(ang(p0), ang(p1))} stroke={c} strokeWidth="13" fill="none" strokeLinecap="butt" />
       ))}
       {/* Ideal band label */}
-      <text x={cx + 62 * Math.cos(rad(ang(1015.5)))} y={cy - 62 * Math.sin(rad(ang(1015.5))) - 12} textAnchor="middle" fontSize="9" fontWeight="800" fill="#15803d">
+      <text x={cx + 62 * Math.cos(rad(ang(1015.5)))} y={cy - 62 * Math.sin(rad(ang(1015.5))) - 12} textAnchor="middle" fontSize="9" fontWeight="800" fill="#4ade80">
         IDEAL
       </text>
       {/* Needle */}
-      <line x1={cx} y1={cy} x2={pt(angle, 62)} stroke="#0f2a22" strokeWidth="4" strokeLinecap="round" />
-      <circle cx={cx} cy={cy} r="7" fill="#0f2a22" />
-      <text x={cx} y={cy + 22} textAnchor="middle" fontSize="17" fontWeight="900" fill="#0f2a22">
+      <line x1={cx} y1={cy} x2={pt(angle, 62)} stroke="#ffffff" strokeWidth="4" strokeLinecap="round" />
+      <circle cx={cx} cy={cy} r="7" fill="#ffffff" />
+      <text x={cx} y={cy + 22} textAnchor="middle" fontSize="17" fontWeight="900" fill="#ffffff">
         {Math.round(value)}
       </text>
-      <text x={cx} y={cy + 34} textAnchor="middle" fontSize="9" fill="#0f2a22" opacity="0.6">
+      <text x={cx} y={cy + 34} textAnchor="middle" fontSize="9" fill="#ffffff" opacity="0.65">
         hPa
       </text>
     </svg>
