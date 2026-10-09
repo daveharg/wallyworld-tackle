@@ -236,6 +236,134 @@ const EXPLAINERS: Record<string, { title: string; body: string[] }> = {
   },
 };
 
+/* ------------------------------------------------------------------ */
+/* Fish activity forecast: rest of today, tomorrow, best times          */
+/* ------------------------------------------------------------------ */
+
+/** Score one hour's fishing quality 0-100 from pressure and trend. */
+function hourScore(pressure: number, trend3h: number): number {
+  let s = 50;
+  // Sweet spot pressure.
+  if (pressure >= 1009 && pressure <= 1022) s += 25;
+  else if (pressure >= 1005 && pressure <= 1026) s += 10;
+  else if (pressure > 1030 || pressure < 1000) s -= 20;
+  // Falling pressure ahead of a front = feeding window.
+  if (trend3h <= -2) s += 20;
+  else if (trend3h <= -1) s += 10;
+  else if (trend3h >= 2) s -= 10;
+  return Math.max(0, Math.min(100, s));
+}
+
+function scoreLabel(s: number): { label: string; color: string } {
+  if (s >= 70) return { label: "Good", color: "#22c55e" };
+  if (s >= 50) return { label: "Fair", color: "#84cc16" };
+  if (s >= 35) return { label: "Slow", color: "#f59e0b" };
+  return { label: "Tough", color: "#ef4444" };
+}
+
+function fmtHour(iso: string): string {
+  try {
+    const d = new Date(iso);
+    let h = d.getHours();
+    const ap = h >= 12 ? "PM" : "AM";
+    h = h % 12 || 12;
+    return `${h}${ap}`;
+  } catch {
+    return "";
+  }
+}
+
+interface DayForecast {
+  label: string;
+  color: string;
+  note: string;
+}
+
+interface BestWindow {
+  start: string;
+  end: string;
+  score: number;
+}
+
+function fishingForecast(
+  hourlyTime: string[],
+  hourlyPressure: number[],
+  nowIdx: number
+): { restOfDay: DayForecast; tomorrow: DayForecast; bestTimes: BestWindow[] } {
+  // Score every hour from now through end of tomorrow.
+  const scores: { idx: number; score: number }[] = [];
+  for (let i = nowIdx; i < hourlyPressure.length; i++) {
+    const p = hourlyPressure[i];
+    const prev = hourlyPressure[Math.max(0, i - 3)];
+    scores.push({ idx: i, score: hourScore(p, p - prev) });
+  }
+  const avg = (list: { score: number }[]) =>
+    list.length ? list.reduce((a, b) => a + b.score, 0) / list.length : 50;
+
+  // Rest of today: hours remaining before midnight.
+  const todayStr = hourlyTime[nowIdx]?.slice(0, 10) ?? "";
+  const restToday = scores.filter((s) => (hourlyTime[s.idx] ?? "").slice(0, 10) === todayStr);
+  const restAvg = avg(restToday);
+  const restInfo = scoreLabel(restAvg);
+
+  // Tomorrow: all hours with tomorrow's date.
+  const tomorrowStr = (() => {
+    const d = new Date(hourlyTime[nowIdx] ?? "");
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().slice(0, 10);
+  })();
+  // Match by local date — hourly times are local ISO.
+  const tomorrowScores = scores.filter((s) => {
+    const t = hourlyTime[s.idx] ?? "";
+    return t.slice(0, 10) !== todayStr;
+  });
+  const tomAvg = avg(tomorrowScores);
+  const tomInfo = scoreLabel(tomAvg);
+
+  // Best 3-hour windows: sliding window over the scored hours.
+  const windows: BestWindow[] = [];
+  for (let i = 0; i + 2 < scores.length; i += 1) {
+    const wAvg = (scores[i].score + scores[i + 1].score + scores[i + 2].score) / 3;
+    windows.push({
+      start: fmtHour(hourlyTime[scores[i].idx] ?? ""),
+      end: fmtHour(hourlyTime[scores[i + 2].idx] ?? ""),
+      score: wAvg,
+    });
+  }
+  windows.sort((a, b) => b.score - a.score);
+  // Pick top 2 non-overlapping windows.
+  const best: BestWindow[] = [];
+  for (const w of windows) {
+    if (best.length >= 2) break;
+    if (w.score < 55) break;
+    best.push(w);
+  }
+
+  return {
+    restOfDay: {
+      ...restInfo,
+      note:
+        restToday.length === 0
+          ? "Day's about done — check tomorrow."
+          : restAvg >= 70
+            ? "Conditions hold — get out there."
+            : restAvg >= 50
+              ? "Decent window left today."
+              : "Bite likely fading — tomorrow may be better.",
+    },
+    tomorrow: {
+      ...tomInfo,
+      note:
+        tomAvg >= 70
+          ? "Looks like a good day to fish."
+          : tomAvg >= 50
+            ? "Fishable — watch the pressure trend."
+            : "Tough conditions expected.",
+    },
+    bestTimes: best,
+  };
+}
+
 function biteOutlook(p: number, trend: number, cloud: number, wind: number): { label: string; color: string; note: string } {
   if (trend <= -2) return { label: "Feeding window", color: "#f59e0b", note: "Pressure falling — front coming. Fish now, the bite may die when it hits." };
   if (p >= 1009 && p <= 1022 && trend >= -0.5 && cloud >= 40)
@@ -323,6 +451,7 @@ export default function WeatherPage() {
       trend = 0;
     }
     const outlook = biteOutlook(c.pressure_msl, trend, c.cloud_cover, c.wind_speed_10m);
+    const forecast = fishingForecast(data.hourly.time, data.hourly.pressure_msl, nowHourIdx);
     // Long-range front analysis: scan the full past pressure history for the
     // steepest drop (a front coming through). After a cold front the bite can
     // stay off for days, so anglers need to see WHEN it hit, not just the 3h trend.
@@ -354,7 +483,7 @@ export default function WeatherPage() {
           : frontAgoH !== null && frontAgoH < 72
  ? { label: "Post-front", color: "#f59e0b", icon: "" }
  : { label: "Stable", color: "#22c55e", icon: "" };
-    return { c, trend, outlook, front, frontAgoH, frontDrop, wmo: wmo(c.weather_code), nowHourIdx, todayIdx };
+    return { c, trend, outlook, forecast, front, frontAgoH, frontDrop, wmo: wmo(c.weather_code), nowHourIdx, todayIdx };
   }, [data]);
 
   const moon = useMemo(() => moonPhase(), []);
@@ -421,14 +550,55 @@ export default function WeatherPage() {
               </div>
 
               {/* Fish activity banner */}
-              <div className="mt-5 rounded-3xl bg-white/[0.07] border border-white/10 p-4 flex items-center gap-3">
-                <span className="w-3 h-3 rounded-full shrink-0" style={{ background: derived.outlook.color }} />
-                <div>
-                  <p className="text-sm font-black">
-                    Fish activity: <span style={{ color: derived.outlook.color }}>{derived.outlook.label}</span>
-                  </p>
-                  <p className="text-xs text-white/60 mt-0.5">{derived.outlook.note}</p>
+              <div className="mt-5 rounded-3xl bg-white/[0.07] border border-white/10 p-4">
+                <div className="flex items-center gap-3">
+                  <span className="w-3 h-3 rounded-full shrink-0" style={{ background: derived.outlook.color }} />
+                  <div>
+                    <p className="text-sm font-black">
+                      Fish activity: <span style={{ color: derived.outlook.color }}>{derived.outlook.label}</span>
+                    </p>
+                    <p className="text-xs text-white/60 mt-0.5">{derived.outlook.note}</p>
+                  </div>
                 </div>
+                <div className="grid grid-cols-2 gap-2.5 mt-3">
+                  <div className="rounded-2xl bg-white/[0.05] border border-white/10 px-3 py-2.5">
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-white/45">
+                      Rest of today
+                    </p>
+                    <p className="text-sm font-extrabold mt-0.5" style={{ color: derived.forecast.restOfDay.color }}>
+                      {derived.forecast.restOfDay.label}
+                    </p>
+                    <p className="text-[11px] text-white/55 mt-0.5 leading-snug">
+                      {derived.forecast.restOfDay.note}
+                    </p>
+                  </div>
+                  <div className="rounded-2xl bg-white/[0.05] border border-white/10 px-3 py-2.5">
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-white/45">
+                      Tomorrow
+                    </p>
+                    <p className="text-sm font-extrabold mt-0.5" style={{ color: derived.forecast.tomorrow.color }}>
+                      {derived.forecast.tomorrow.label}
+                    </p>
+                    <p className="text-[11px] text-white/55 mt-0.5 leading-snug">
+                      {derived.forecast.tomorrow.note}
+                    </p>
+                  </div>
+                </div>
+                {derived.forecast.bestTimes.length > 0 && (
+                  <div className="mt-2.5 rounded-2xl bg-white/[0.05] border border-white/10 px-3 py-2.5">
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-white/45">
+                      Best times to fish
+                    </p>
+                    <p className="text-sm font-bold text-white mt-1">
+                      {derived.forecast.bestTimes.map((w, i) => (
+                        <span key={i}>
+                          {i > 0 && <span className="text-white/40 font-normal"> · </span>}
+                          {w.start}–{w.end}
+                        </span>
+                      ))}
+                    </p>
+                  </div>
+                )}
               </div>
             </>
           ) : (
