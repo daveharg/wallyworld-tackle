@@ -71,14 +71,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+import { headers } from "next/headers";
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // fishmb.ca gets zero Wallyworld store chrome — the middleware flags it.
+  const h = await headers();
+  const isFishMb = h.get("x-fishmb-site") === "1";
   return (
     <html lang="en">
       <body className={`${display.variable} ${body.variable}`}>
         <AuthProviders>
           <CartProvider>
             <ScrollToTop />
-            <Chrome>{children}</Chrome>
+            {isFishMb ? <>{children}</> : <Chrome>{children}</Chrome>}
           </CartProvider>
         </AuthProviders>
       </body>
