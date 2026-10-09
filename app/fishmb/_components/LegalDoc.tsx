@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
 /** Shared shell for FishMB legal pages (Terms, Privacy). */
@@ -13,8 +16,23 @@ export function LegalDoc({
   intro: string;
   sections: { heading: string; body: ReactNode }[];
 }) {
+  const router = useRouter();
+  const goBack = () => {
+    // Opened in a new tab (e.g. from signup) → no history, go to the feed.
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/fishmb/feed");
+    }
+  };
   return (
     <div className="max-w-3xl mx-auto px-4 pt-6 md:pt-10 pb-32">
+      <button
+        onClick={goBack}
+        className="inline-flex items-center gap-1.5 text-sm font-bold text-signal-dark hover:underline mb-4"
+      >
+        ← Back
+      </button>
       <p className="text-xs font-bold uppercase tracking-[0.25em] text-signal-dark mb-2">
         FishMB
       </p>
