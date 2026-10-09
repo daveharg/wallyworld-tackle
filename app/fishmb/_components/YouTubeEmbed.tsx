@@ -44,7 +44,7 @@ export default function YouTubeEmbed({ videoId }: { videoId: string }) {
   return (
     <div
       ref={boxRef}
-      className="relative w-full overflow-hidden rounded-2xl bg-black/90 mt-3"
+      className="relative w-full -mx-5 max-sm:rounded-none overflow-hidden rounded-2xl bg-black/90 mt-3"
       style={{ aspectRatio: "16 / 9" }}
     >
       {inView ? (
