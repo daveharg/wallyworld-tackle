@@ -101,6 +101,8 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
         <InviteCodeReveal tournamentId={t.id} />
       </div>
 
+      <LicenceNotice participantCount={t.participant_count} maxParticipants={t.max_participants} />
+
       {/* Rules — dedicated section */}
       {t.rules && (
         <section className="mt-10">
@@ -121,7 +123,6 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
         />
       </div>
       <MyPaymentStatus tournamentId={t.id} entryFeeCents={t.entry_fee_cents ?? 0} />
-      <LicenceNotice participantCount={t.participant_count} maxParticipants={t.max_participants} />
 
       {/* Leaderboard */}
       <div className="flex items-center justify-between mt-12 mb-4">

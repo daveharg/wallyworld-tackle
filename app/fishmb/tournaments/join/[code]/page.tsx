@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTournamentByInvite } from "@/lib/fish/tournaments";
 import { JoinButton } from "../../_components/JoinButton";
-import { PrizePot } from "../../_components/PrizePot";
+import { PrizePot, LicenceNotice } from "../../_components/PrizePot";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 60;
@@ -47,10 +47,14 @@ export default async function JoinTournamentPage({ params }: { params: { code: s
       <h1 className="font-display font-bold uppercase text-pine text-4xl md:text-5xl tracking-wide mb-3 text-center">
         {t.name}
       </h1>
-      <p className="text-pine/60 mb-8 text-center">
+      <p className="text-pine/60 mb-6 text-center">
         Organized by {t.organizer_name} · {t.participant_count}{" "}
         {t.participant_count === 1 ? "angler" : "anglers"} in so far
       </p>
+
+      <div className="mb-6">
+        <LicenceNotice participantCount={t.participant_count} maxParticipants={t.max_participants} />
+      </div>
 
       <div className="bg-white border border-pine/10 rounded-3xl p-6 mb-6 space-y-3">
         <div className="flex flex-wrap gap-x-6 gap-y-2 text-pine text-sm">
