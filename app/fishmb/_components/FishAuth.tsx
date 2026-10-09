@@ -452,7 +452,7 @@ export function FishLoginButton() {
       if (startY - endY > 40) setMenu(false);
       startY = null;
     };
-    const menuEl = ref.current?.querySelector("[data-menu-panel]");
+    const menuEl = ref.current?.querySelector("[data-menu-panel]") as HTMLElement | null;
     document.addEventListener("pointerdown", close);
     document.addEventListener("keydown", onKey);
     menuEl?.addEventListener("touchstart", onTouchStart, { passive: true });
