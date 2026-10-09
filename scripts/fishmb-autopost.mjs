@@ -1,7 +1,8 @@
-// FishMB auto-posts — generates the weekly batch of official feed posts:
+// FishMB auto-posts — official feed posts by the FishMB user:
+//   Daily: morning weather report (--weather), YouTube video of the day (--youtube-only)
 //   1. Manitoba fishing YouTube video of the week (rotates through youtube_shows)
 //   2. Queued business ad posts (fm_ads, slot='feed', status='approved')
-//   3. Weekly content posts (fishing tip + lake of the week)
+//   3. Weekly content posts, each on its own day: tip (--tip), lake (--lake), hot spot (--hotspot), lodge (--lodge)
 //
 // Usage: DATABASE_URL=postgres://... node scripts/fishmb-autopost.mjs [--dry-run]
 // Idempotent: skips any post type already posted in the last 7 days.
@@ -179,61 +180,165 @@ function lakeBlurb(lake) {
   return lines.join("\n");
 }
 
-async function contentPosts(userId) {
+async function tipPost(userId) {
   if (await alreadyPosted(userId, "%🎣 FishMB Tip of the Week%")) {
     console.log("Tip post: already posted this week, skipping.");
-  } else {
-    const tip = TIPS[weekNo % TIPS.length];
-    await post(
-      userId,
-      `🎣 FishMB Tip of the Week\n\n${tip}\n\nGot a tip that's been working for you? Share it below! 👇`
-    );
+    return;
   }
-  // Lakes with real verified photos get the rich treatment.
+  const tip = TIPS[weekNo % TIPS.length];
+  await post(
+    userId,
+    `🎣 FishMB Tip of the Week\n\n${tip}\n\nGot a tip that's been working for you? Share it below! 👇`
+  );
+}
+
+async function lakePost(userId) {
+  const walleyeLakes = LAKES.filter((l) => (l.species ?? []).some((sp) => /walleye/i.test(sp)));
+  if (walleyeLakes.length === 0) return;
+  if (await alreadyPosted(userId, "%🌊 Lake of the Week%")) {
+    console.log("Lake post: already posted this week, skipping.");
+    return;
+  }
+  const withPhoto = walleyeLakes.filter((l) => WEEKLY_PHOTOS[l.id]);
+  const pool = withPhoto.length > 0 ? withPhoto : walleyeLakes;
+  const lakeOfWeek = pool[weekNo % pool.length];
+  await post(
+    userId,
+    `🌊 Lake of the Week: ${lakeOfWeek.name}\n\n${lakeBlurb(lakeOfWeek)}\n\nSee the full lake page for 2026 regulations, stocking history, and lodging — then get out there! 🎣`,
+    WEEKLY_PHOTOS[lakeOfWeek.id] ?? null
+  );
+}
+
+async function hotspotPost(userId) {
   const photoLakes = LAKES.filter((l) => WEEKLY_PHOTOS[l.id]);
-  const walleyeLakes = LAKES.filter((l) => (l.species ?? []).some((s) => /walleye/i.test(s)));
-  let lakeOfWeek = null;
-  if (walleyeLakes.length > 0) {
-    if (await alreadyPosted(userId, "%🌊 Lake of the Week%")) {
-      console.log("Lake post: already posted this week, skipping.");
-    } else {
-      // Prefer a lake with a real photo; fall back to rotation.
-      const withPhoto = walleyeLakes.filter((l) => WEEKLY_PHOTOS[l.id]);
-      const pool = withPhoto.length > 0 ? withPhoto : walleyeLakes;
-      lakeOfWeek = pool[weekNo % pool.length];
-      await post(
-        userId,
-        `🌊 Lake of the Week: ${lakeOfWeek.name}\n\n${lakeBlurb(lakeOfWeek)}\n\nSee the full lake page for 2026 regulations, stocking history, and lodging — then get out there! 🎣`,
-        WEEKLY_PHOTOS[lakeOfWeek.id] ?? null
-      );
-    }
+  if (photoLakes.length === 0) return;
+  if (await alreadyPosted(userId, "%🔥 Hot Spot of the Week%")) {
+    console.log("Hot spot post: already posted this week, skipping.");
+    return;
   }
-  // Hot Spot of the Week — a featured fishing spot with a real photo.
-  // Never the same lake as this week's Lake of the Week.
-  if (photoLakes.length > 0) {
-    if (await alreadyPosted(userId, "%🔥 Hot Spot of the Week%")) {
-      console.log("Hot spot post: already posted this week, skipping.");
-    } else {
-      const hotPool = lakeOfWeek
-        ? photoLakes.filter((l) => l.id !== lakeOfWeek.id)
-        : photoLakes;
-      const pool2 = hotPool.length > 0 ? hotPool : photoLakes;
-      const lake = pool2[(weekNo + Math.floor(pool2.length / 2)) % pool2.length];
-      await post(
-        userId,
-        `🔥 Hot Spot of the Week: ${lake.name}\n\n${lakeBlurb(lake)}\n\nOne of Manitoba's premier fishing destinations — who's been out here lately? Drop your reports! 🎣`,
-        WEEKLY_PHOTOS[lake.id] ?? null
-      );
-    }
+  const lake = photoLakes[(weekNo + Math.floor(photoLakes.length / 2)) % photoLakes.length];
+  await post(
+    userId,
+    `🔥 Hot Spot of the Week: ${lake.name}\n\n${lakeBlurb(lake)}\n\nOne of Manitoba's premier fishing destinations — who's been out here lately? Drop your reports! 🎣`,
+    WEEKLY_PHOTOS[lake.id] ?? null
+  );
+}
+
+const LODGES = data.lodges ?? [];
+
+/** Richer lodge blurb assembled from the verified lodge directory. */
+function lodgeBlurb(lodge) {
+  const lines = [];
+  if (lodge.location) lines.push(`📍 ${lodge.location}`);
+  const species = (lodge.species ?? []).slice(0, 6).join(", ");
+  if (species) lines.push(`🐟 ${species}`);
+  if (lodge.description) {
+    const snippet = lodge.description.split(/(?<=[.!?])\s/)[0]?.slice(0, 240);
+    if (snippet) lines.push(`\n${snippet}`);
   }
+  if (lodge.website) lines.push(`\n🌐 ${lodge.website}`);
+  if (lodge.phone) lines.push(`📞 ${lodge.phone}`);
+  return lines.join("\n");
+}
+
+async function lodgePost(userId) {
+  if (LODGES.length === 0) return;
+  if (await alreadyPosted(userId, "%🏕️ Lodge of the Week%")) {
+    console.log("Lodge post: already posted this week, skipping.");
+    return;
+  }
+  const withSite = LODGES.filter((l) => l.website);
+  const pool = withSite.length > 0 ? withSite : LODGES;
+  const lodge = pool[weekNo % pool.length];
+  await post(
+    userId,
+    `🏕️ Lodge of the Week: ${lodge.name}\n\n${lodgeBlurb(lodge)}\n\nKnow this spot? Drop a review in the comments! 🎣`
+  );
+}
+
+function compass(deg) {
+  const dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
+  return dirs[Math.round(deg / 22.5) % 16];
+}
+
+/** Moon phase — same math as the weather page. */
+function moonPhase(date = new Date()) {
+  const ref = Date.UTC(2000, 0, 6, 18, 14) / 86400000;
+  const now = date.getTime() / 86400000;
+  const age = ((((now - ref) % 29.53058867) + 29.53058867) % 29.53058867);
+  const illum = Math.round(((1 - Math.cos((age / 29.53058867) * 2 * Math.PI)) / 2) * 100);
+  const idx = Math.floor((age / 29.53058867) * 8 + 0.5) % 8;
+  const names = ["New Moon","Waxing Crescent","First Quarter","Waxing Gibbous","Full Moon","Waning Gibbous","Last Quarter","Waning Crescent"];
+  const icons = ["🌑","🌒","🌓","🌔","🌕","🌖","🌗","🌘"];
+  return { name: names[idx], icon: icons[idx], illum, idx };
+}
+
+function biteOutlook(p, trend, cloud, wind) {
+  if (trend <= -2) return { label: "Feeding window", note: "Pressure falling — front coming. Fish now, the bite may die when it hits." };
+  if (p >= 1009 && p <= 1022 && trend >= -0.5 && cloud >= 40)
+    return { label: "Good", note: "Pressure in the sweet spot, low light. Fish should be active." };
+  if (p >= 1009 && p <= 1022)
+    return { label: "Fair", note: "Pressure is fine — bright skies may push fish deeper or tighter to cover." };
+  if (p > 1030) return { label: "Tough", note: "Very high pressure, bluebird conditions. Slow down, downsize, fish deep." };
+  if (wind >= 40) return { label: "Windy", note: "Strong wind — fish the sheltered side and watch the whitecaps." };
+  return { label: "Unsettled", note: "Pressure is off the sweet spot. Fish structure and stay adaptable." };
+}
+
+async function weatherPost(userId) {
+  if (await alreadyPosted(userId, "%FishMB Morning Weather Report%", 1)) {
+    console.log("Weather post: already posted in the last 24h, skipping.");
+    return;
+  }
+  const url = "https://api.open-meteo.com/v1/forecast?latitude=49.9&longitude=-97.14" +
+    "&current=temperature_2m,apparent_temperature,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m" +
+    "&hourly=pressure_msl&daily=temperature_2m_max,temperature_2m_min" +
+    "&timezone=America%2FWinnipeg&forecast_days=2";
+  let wx = null;
+  try {
+    const r = await fetch(url, { headers: { "User-Agent": "FishMB/1.0" }, signal: AbortSignal.timeout(15000) });
+    if (r.ok) wx = await r.json();
+  } catch { /* fall through to text-only post */ }
+  const dayName = new Date().toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric", timeZone: "America/Winnipeg" });
+  let body = `☀️ FishMB Morning Weather Report — ${dayName}\n\n📍 Winnipeg area\n`;
+  if (wx && wx.current) {
+    const c = wx.current;
+    let trend = 0;
+    try {
+      const times = wx.hourly.time ?? [];
+      const pressures = wx.hourly.pressure_msl ?? [];
+      const nowI = times.findIndex((t) => t >= c.time.slice(0, 13));
+      if (nowI >= 3) trend = pressures[nowI] - pressures[nowI - 3];
+    } catch { /* ignore */ }
+    const trendTxt = trend <= -0.5 ? "falling ↘" : trend >= 0.5 ? "rising ↗" : "steady →";
+    const outlook = biteOutlook(c.pressure_msl, trend, c.cloud_cover, c.wind_speed_10m);
+    const moon = moonPhase();
+    body += `🌡️ ${Math.round(c.temperature_2m)}°C (feels ${Math.round(c.apparent_temperature)}°C)\n` +
+      `💨 ${Math.round(c.wind_speed_10m)} km/h ${compass(c.wind_direction_10m)} (gusts ${Math.round(c.wind_gusts_10m)})\n` +
+      `☁️ ${c.cloud_cover}% cloud · 🧭 ${c.pressure_msl.toFixed(1)} hPa, ${trendTxt}\n` +
+      `🎣 Fish activity: ${outlook.label} — ${outlook.note}\n` +
+      `${moon.icon} ${moon.name}, ${moon.illum}% lit\n`;
+  } else {
+    body += `Today's full forecast didn't load — check the live conditions in the app.\n`;
+  }
+  body += `\nFull forecast, wind map & pressure gauge 👇\nhttps://www.fishmb.ca/fishmb/weather`;
+  await post(userId, body);
 }
 
 const userId = await ensureFishMBUser();
-const YOUTUBE_ONLY = process.argv.includes("--youtube-only");
-const NO_YOUTUBE = process.argv.includes("--no-youtube");
-if (!NO_YOUTUBE) await youtubePost(userId);
+const ARGS = process.argv.slice(2);
+const has = (f) => ARGS.includes(f);
+const YOUTUBE_ONLY = has("--youtube-only");
+const NO_YOUTUBE = has("--no-youtube");
+// Granular flags for the split weekly/daily schedules.
+const ONLY = ["--tip", "--lake", "--hotspot", "--lodge", "--ads", "--weather"].filter(has);
+const runAll = ONLY.length === 0;
+if (!NO_YOUTUBE && (runAll || YOUTUBE_ONLY)) await youtubePost(userId);
 if (!YOUTUBE_ONLY) {
-  await adPosts(userId);
-  await contentPosts(userId);
+  if (runAll || has("--ads")) await adPosts(userId);
+  if (runAll || has("--tip")) await tipPost(userId);
+  if (runAll || has("--lake")) await lakePost(userId);
+  if (runAll || has("--hotspot")) await hotspotPost(userId);
+  if (runAll || has("--lodge")) await lodgePost(userId);
+  if (has("--weather")) await weatherPost(userId);
 }
 console.log(DRY ? "Dry run complete." : "Auto-post batch complete.");
