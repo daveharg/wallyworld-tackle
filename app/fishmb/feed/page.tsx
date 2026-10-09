@@ -1002,6 +1002,13 @@ function FeedPageInner() {
       if (!user) {
         openLogin();
       } else {
+        // Pre-fill the catch location when coming from a saved map spot.
+        const plat = parseFloat(searchParams.get("lat") ?? "");
+        const plng = parseFloat(searchParams.get("lng") ?? "");
+        if (Number.isFinite(plat) && Number.isFinite(plng)) {
+          setCatchLat(plat);
+          setCatchLng(plng);
+        }
         setMode(action === "log" ? "catch" : "post");
         setComposerOpen(true);
       }

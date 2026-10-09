@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { Suspense, useEffect, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import type {
   BasemapId,
   CatchPin,
@@ -47,6 +47,7 @@ const inputCls =
  * sheet (Catches / Saved spots / Settings). Swipe up to expand, down to peek.
  */
 export default function MapsHub() {
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   // Sheet
@@ -293,8 +294,8 @@ export default function MapsHub() {
     setQuickAdd({ lat, lng });
   };
 
-  const saveQuickAdd = async () => {
-    if (!quickAdd || quickSaving) return;
+  const saveQuickAdd = async (): Promise<boolean> => {
+    if (!quickAdd || quickSaving) return false;
     setQuickSaving(true);
     setNote(null);
     try {
@@ -315,11 +316,23 @@ export default function MapsHub() {
       setQuickNotes("");
       setQuickIcon("pin");
  setNote("Spot saved! ");
+      return true;
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not save the spot.");
+      return false;
     } finally {
       setQuickSaving(false);
     }
+  };
+
+  /** Save the spot, then jump to the feed's catch composer with this
+   *  spot's location pre-filled. */
+  const saveAndLogCatch = async () => {
+    if (!quickAdd || quickSaving) return;
+    const lat = quickAdd.lat;
+    const lng = quickAdd.lng;
+    const ok = await saveQuickAdd();
+    if (ok) router.push(`/fishmb/feed?log=catch&lat=${lat}&lng=${lng}`);
   };
 
   const editSpot = async (
@@ -702,21 +715,31 @@ export default function MapsHub() {
                 ))}
               </div>
             </div>
-            <div className="flex gap-2 mt-4">
+            <div className="flex flex-col gap-2 mt-4">
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setQuickAdd(null)}
+                  className="flex-1 bg-pine/10 hover:bg-pine/20 text-pine font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={saveQuickAdd}
+                  disabled={quickSaving}
+                  className="flex-1 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full disabled:opacity-50 transition-colors"
+                >
+                  {quickSaving ? "Saving…" : "Save spot"}
+                </button>
+              </div>
               <button
                 type="button"
-                onClick={() => setQuickAdd(null)}
-                className="flex-1 bg-pine/10 hover:bg-pine/20 text-pine font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={saveQuickAdd}
+                onClick={saveAndLogCatch}
                 disabled={quickSaving}
-                className="flex-1 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full disabled:opacity-50 transition-colors"
+                className="w-full bg-pine text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full disabled:opacity-50 transition-colors"
               >
-                {quickSaving ? "Saving…" : "Save spot"}
+                Save spot & log a catch here
               </button>
             </div>
           </div>
