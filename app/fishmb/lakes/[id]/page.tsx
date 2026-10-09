@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getLake, getLakes, getZone, getGuideUrl, getStockingHistory, type StockingEvent } from "@/lib/fishmb";
+import { getLake, getLakes, getZone, getGuideUrl, getStockingHistory, getTrophyCatches, type StockingEvent, type TrophyCatch } from "@/lib/fishmb";
 import { slugifySpecies, getSpeciesAdvice } from "@/lib/fishmb-species";
 import { lakePhotoUrl, hasRealLakePhoto, lakePhotoCredit } from "@/lib/fishmb-constants";
 import { LakeMap } from "../_components/LakeMap";
@@ -98,6 +98,44 @@ function formatStockDate(iso: string | null): string {  if (!iso) return "—";
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   if (!y || !m || !d) return iso;
   return `${months[m - 1]} ${d}, ${y}`;
+}
+
+/** Biggest documented catches for one lake, from the Master Angler record book. */
+function TrophyCatches({ lakeId }: { lakeId: string }) {
+  const catches: TrophyCatch[] = getTrophyCatches(lakeId);
+  if (catches.length === 0) return null;
+  return (
+    <section>
+      <h2 className="font-display font-bold uppercase text-2xl text-pine tracking-wide mb-1">
+        🏆 Trophy catches
+      </h2>
+      <p className="text-sm text-pine/55 mb-4">
+        The biggest documented fish caught here, from the Manitoba Master
+        Angler record book.
+      </p>
+      <div className="rounded-2xl border border-pine/10 bg-white divide-y divide-pine/8 overflow-hidden">
+        {catches.map((c, i) => (
+          <div key={i} className="px-4 py-3 flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-pine">
+                {c.inch.toFixed(2).replace(/\.?0+$/, "")}″ {c.species}
+                {c.released && <span className="ml-2 text-[10px] font-black uppercase tracking-wider text-green-700 bg-green-700/10 rounded-full px-2 py-0.5">Released</span>}
+              </p>
+              <p className="text-xs text-pine/60 truncate">
+                {c.angler} · {c.date}
+              </p>
+            </div>
+            <p className="text-xs text-pine/40 whitespace-nowrap tabular-nums">
+              {c.cm.toFixed(1)} cm
+            </p>
+          </div>
+        ))}
+      </div>
+      <p className="text-xs text-pine/40 mt-3">
+        Source: Manitoba Master Angler record book (anglers.travelmanitoba.com)
+      </p>
+    </section>
+  );
 }
 
 /** Provincial stocking records table for one lake (exact dates + quantities). */
@@ -239,6 +277,9 @@ export default function LakeDetailPage({ params }: { params: { id: string } }) {
               </div>
             </section>
           )}
+
+          {/* Trophy catches from the Master Angler record book */}
+          <TrophyCatches lakeId={lake.id} />
 
           {/* Location map */}
           {coords && (

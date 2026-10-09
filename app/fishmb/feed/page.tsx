@@ -9,6 +9,59 @@ import { compressImage } from "../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 import MuxPlayer from "@mux/mux-player-react";
 import YouTubeEmbed, { extractYouTubeId } from "../_components/YouTubeEmbed";
+import { TournamentBuilder } from "../tournaments/_components/TournamentBuilder";
+import { JoinByCode } from "../tournaments/_components/JoinByCode";
+
+/** Tournament tab inside the + composer: build one here or join with a code. */
+function TournamentPanel() {
+  const [sub, setSub] = useState<"build" | "join">("build");
+  const [lakes, setLakes] = useState<{ id: string; name: string; region: string }[]>([]);
+  useEffect(() => {
+    let stop = false;
+    fishFetch("/api/fishmb/lakes/options")
+      .then((d) => {
+        if (!stop) setLakes((d as { lakes?: { id: string; name: string; region: string }[] }).lakes ?? []);
+      })
+      .catch(() => {});
+    return () => {
+      stop = true;
+    };
+  }, []);
+  return (
+    <div>
+      <div className="flex gap-2 mb-5">
+        {(
+          [
+            ["build", "🏆 Build a tournament"],
+            ["join", "🔑 Join with a code"],
+          ] as const
+        ).map(([v, label]) => (
+          <button
+            key={v}
+            type="button"
+            onClick={() => setSub(v)}
+            className={`flex-1 px-4 py-3 rounded-2xl text-xs font-bold uppercase tracking-wider transition-colors ${
+              sub === v ? "bg-gold text-pine-deep" : "bg-pine/5 text-pine/60 hover:bg-pine/10"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      {sub === "build" ? (
+        <TournamentBuilder lakes={lakes} />
+      ) : (
+        <div className="py-4">
+          <p className="text-sm text-pine/65 mb-4">
+            Got an invite code from an organizer? Enter it to join their
+            tournament.
+          </p>
+          <JoinByCode />
+        </div>
+      )}
+    </div>
+  );
+}
 
 interface FeedItem {
   id: string;
@@ -516,7 +569,7 @@ function FeedPageInner() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [q, setQ] = useState("");
   const [activeQ, setActiveQ] = useState("");
-  const [mode, setMode] = useState<"post" | "catch">("post");
+  const [mode, setMode] = useState<"post" | "catch" | "tournament">("post");
   const [draft, setDraft] = useState("");
   const [catchPhotos, setCatchPhotos] = useState<File[]>([]);
   const [postPhotos, setPostPhotos] = useState<File[]>([]);
@@ -1285,12 +1338,13 @@ function FeedPageInner() {
       {user && composerOpen && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
           <div className="absolute inset-0 bg-pine-deep/60" onClick={() => closeComposer()} />
-          <div className="relative bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl p-5 max-h-[92vh] overflow-y-auto">
+          <div className={`relative bg-white w-full rounded-t-3xl sm:rounded-3xl p-5 max-h-[92vh] overflow-y-auto transition-all ${mode === "tournament" ? "sm:max-w-3xl" : "sm:max-w-lg"}`}>
             <div className="flex gap-2 mb-4 items-center">
               {(
                 [
                   ["post", "Share a post"],
                   ["catch", "🐟 Log a catch"],
+                  ["tournament", "🏆 Tournament"],
                 ] as const
               ).map(([v, label]) => (
                 <button
@@ -1306,13 +1360,6 @@ function FeedPageInner() {
                   {label}
                 </button>
               ))}
-              <Link
-                href="/fishmb/tournaments/create"
-                onClick={() => closeComposer()}
-                className="px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors bg-gold/15 text-gold-dark hover:bg-gold/25"
-              >
-                🏆 Tournament
-              </Link>
               <button
                 onClick={() => closeComposer()}
                 aria-label="Close composer"
@@ -1423,7 +1470,7 @@ function FeedPageInner() {
                 {catchNote && <p className="text-sm text-signal-dark mt-3">{catchNote}</p>}
                 {videoErr && <p className="text-sm text-signal-dark mt-3">{videoErr}</p>}
               </>
-            ) : (
+            ) : mode === "catch" ? (
               <>
                 <div className="grid grid-cols-2 gap-3">
                   <input
@@ -1561,6 +1608,8 @@ function FeedPageInner() {
                 </button>
                 {catchNote && <p className="text-sm text-pine mt-3">{catchNote}</p>}
               </>
+            ) : (
+              <TournamentPanel />
             )}
           </div>
         </div>

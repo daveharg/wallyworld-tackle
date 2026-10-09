@@ -150,6 +150,35 @@ export function getStockingHistory(lakeId: string): StockingEvent[] {
   return stockingCache[lakeId] ?? [];
 }
 
+export interface TrophyCatch {
+  species: string;
+  inch: number;
+  cm: number;
+  date: string;
+  waterbody: string;
+  angler: string;
+  released: boolean;
+}
+
+let trophyCache: Record<string, TrophyCatch[]> | null = null;
+
+/**
+ * Biggest documented catches per lake, scraped from the Manitoba Master
+ * Angler record book (anglers.travelmanitoba.com). Top entries per species.
+ * Empty array when the lake has no recorded trophy catches.
+ */
+export function getTrophyCatches(lakeId: string): TrophyCatch[] {
+  if (!trophyCache) {
+    const p = path.join(process.cwd(), "public", "fishmb", "trophy-records.json");
+    try {
+      trophyCache = JSON.parse(fs.readFileSync(p, "utf8")) as Record<string, TrophyCatch[]>;
+    } catch {
+      trophyCache = {};
+    }
+  }
+  return trophyCache[lakeId] ?? [];
+}
+
 export function getLakes(): Lake[] {
   return getFishData().lakes;
 }
