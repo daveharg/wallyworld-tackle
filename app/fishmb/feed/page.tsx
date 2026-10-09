@@ -1253,7 +1253,14 @@ function FeedPageInner() {
       body: form,
     });
     const up = await upRes.json();
-    if (!upRes.ok) throw new Error(up.error || "Photo upload failed.");
+    if (!upRes.ok) {
+      const raw = up.error || "Photo upload failed.";
+      // Translate technical server errors into plain language.
+      const friendly = raw.includes("multipart") || raw.includes("'file'")
+        ? "Couldn't upload the photo — try picking it again."
+        : raw;
+      throw new Error(friendly);
+    }
     return up.url as string;
   };
 
@@ -1328,6 +1335,27 @@ function FeedPageInner() {
     if (!Number.isFinite(lengthIn) || lengthIn <= 0) {
       setCatchNote("Enter the length in inches.");
       return;
+    }
+    // If entering a tournament, check the tournament window FIRST so the
+    // user gets a clear message instead of a confusing upload error.
+    if (tournamentId) {
+      try {
+        const t = await fishFetch(`/api/fishmb/tournaments/${tournamentId}`);
+        const now = Date.now();
+        const start = new Date(t.tournament?.starts_at ?? t.starts_at).getTime();
+        const end = new Date(t.tournament?.ends_at ?? t.ends_at).getTime();
+        const name = t.tournament?.name ?? t.name ?? "This tournament";
+        if (Number.isFinite(start) && now < start) {
+          setCatchNote(`${name} hasn't started yet.`);
+          return;
+        }
+        if (Number.isFinite(end) && now > end) {
+          setCatchNote(`${name} has ended.`);
+          return;
+        }
+      } catch {
+        // If we can't check, let the server validate on submit.
+      }
     }
     if (catchPhotos.length === 0) {
       setCatchNote("Add a photo of your catch.");
