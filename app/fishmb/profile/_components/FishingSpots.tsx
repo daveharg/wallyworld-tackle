@@ -559,10 +559,14 @@ export default function FishingSpots() {
           Jump the map straight to a saved lake.
         </p>
         {favs.length > 0 ? (
-          <div className="flex gap-2 mb-3">
+          <div className="flex gap-2">
             <select
               value={selectedFav}
-              onChange={(e) => chooseFav(e.target.value)}
+              onChange={(e) => {
+                const v = e.target.value;
+                setSelectedFav(v);
+                if (v && v !== "__add__") chooseFav(v);
+              }}
               aria-label="Choose a saved lake"
               className="flex-1 min-w-0 bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold focus:outline-none focus:border-signal"
             >
@@ -572,8 +576,9 @@ export default function FishingSpots() {
                   {f.name}
                 </option>
               ))}
+              <option value="__add__">➕ Add a new lake…</option>
             </select>
-            {selectedFav && (
+            {selectedFav && selectedFav !== "__add__" && (
               <button
                 type="button"
                 onClick={() => removeFav(selectedFav)}
@@ -586,34 +591,49 @@ export default function FishingSpots() {
             )}
           </div>
         ) : (
-          <p className="text-pine/40 text-xs mb-3">No saved lakes yet — choose below to add one.</p>
+          <div className="flex gap-2">
+            <select
+              value={selectedFav}
+              onChange={(e) => setSelectedFav(e.target.value)}
+              aria-label="Saved lakes"
+              className="flex-1 min-w-0 bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold focus:outline-none focus:border-signal"
+            >
+              <option value="">No saved lakes yet…</option>
+              <option value="__add__">➕ Add a new lake…</option>
+            </select>
+          </div>
         )}
-        <div className="flex gap-2">
-          <select
-            value={addLakeId}
-            onChange={(e) => setAddLakeId(e.target.value)}
-            aria-label="Choose a lake to save"
-            className="flex-1 min-w-0 bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold focus:outline-none focus:border-signal"
-          >
-            <option value="">Add a lake…</option>
-            {allLakes
-              .filter((l) => !favIds.has(l.id))
-              .map((l) => (
-                <option key={l.id} value={l.id}>
-                  {l.name}
-                  {l.region ? ` — ${l.region}` : ""}
-                </option>
-              ))}
-          </select>
-          <button
-            type="button"
-            onClick={addFavLake}
-            disabled={!addLakeId || addingLake}
-            className="shrink-0 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-5 rounded-2xl disabled:opacity-40 transition-colors"
-          >
-            {addingLake ? "Adding…" : "★ Add"}
-          </button>
-        </div>
+        {selectedFav === "__add__" && (
+          <div className="flex gap-2 mt-2">
+            <select
+              value={addLakeId}
+              onChange={(e) => setAddLakeId(e.target.value)}
+              aria-label="Choose a lake to save"
+              className="flex-1 min-w-0 bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold focus:outline-none focus:border-signal"
+            >
+              <option value="">Pick a lake…</option>
+              {allLakes
+                .filter((l) => !favIds.has(l.id))
+                .map((l) => (
+                  <option key={l.id} value={l.id}>
+                    {l.name}
+                    {l.region ? ` — ${l.region}` : ""}
+                  </option>
+                ))}
+            </select>
+            <button
+              type="button"
+              onClick={async () => {
+                await addFavLake();
+                setSelectedFav("");
+              }}
+              disabled={!addLakeId || addingLake}
+              className="shrink-0 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-5 rounded-2xl disabled:opacity-40 transition-colors"
+            >
+              {addingLake ? "Adding…" : "★ Add"}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Saved spots — right under saved locations */}
