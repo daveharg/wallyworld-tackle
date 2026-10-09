@@ -147,7 +147,7 @@ export default function MapSearch({
   };
 
   return (
-    <div ref={boxRef} className="absolute top-3 left-3 z-20 w-56 max-w-[60vw]">
+    <div ref={boxRef} className="absolute top-3 left-1/2 -translate-x-1/2 z-20 w-72 max-w-[75vw]">
       <input
         value={q}
         onChange={(e) => {
