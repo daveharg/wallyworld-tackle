@@ -118,6 +118,25 @@ export default function FishMBComingSoon() {
           ))}
         </div>
 
+        <div className="mt-12 bg-gold/10 border border-gold/40 rounded-3xl p-8 text-left">
+          <p className="font-display font-bold uppercase tracking-wide text-2xl mb-3">
+            🧪 We&apos;re in beta — help us make it perfect
+          </p>
+          <p className="text-white/70 text-sm leading-relaxed mb-4">
+            FishMB is live but still being built, and we want to get it right
+            for Manitoba anglers. Got an idea for a feature we should add? Run
+            into something that&apos;s broken or confusing? Tell us — we read
+            every message and try to fix issues or ship requested features
+            within 48 hours.
+          </p>
+          <Link
+            href="/fishmb/contact"
+            className="inline-block bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-8 py-3.5 rounded-full transition-colors"
+          >
+            Suggest a feature / report an issue
+          </Link>
+        </div>
+
         <div className="mt-16 pt-8 border-t border-white/10">
           <p className="text-white/40 text-sm">
             FishMB — Manitoba fishing, together.
