@@ -722,9 +722,9 @@ function Comments({ postId }: { postId: string }) {
                 c.viewer_reaction === 1 ? "text-signal" : "text-pine/40 hover:text-pine"
               }`}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill={c.viewer_reaction === 1 ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M7 10v11H4a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h3Zm2.5 10.5 4.5-9.5c.6-1.2 2.2-1.6 3.4-1H20a2 2 0 0 1 2 2.4l-1.5 7a2 2 0 0 1-2 1.6H9.5Z" />
-                <path d="M9.5 20.5v-9" />
+              <svg width="15" height="15" viewBox="0 0 24 24" fill={c.viewer_reaction === 1 ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M7 10v12" />
+                <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z" />
               </svg>
               {c.like_count > 0 && <span>{c.like_count}</span>}
             </button>
@@ -735,9 +735,9 @@ function Comments({ postId }: { postId: string }) {
                 c.viewer_reaction === -1 ? "text-signal" : "text-pine/40 hover:text-pine"
               }`}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill={c.viewer_reaction === -1 ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="rotate-180">
-                <path d="M7 10v11H4a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h3Zm2.5 10.5 4.5-9.5c.6-1.2 2.2-1.6 3.4-1H20a2 2 0 0 1 2 2.4l-1.5 7a2 2 0 0 1-2 1.6H9.5Z" />
-                <path d="M9.5 20.5v-9" />
+              <svg width="15" height="15" viewBox="0 0 24 24" fill={c.viewer_reaction === -1 ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 14V2" />
+                <path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z" />
               </svg>
               {c.dislike_count > 0 && <span>{c.dislike_count}</span>}
             </button>
