@@ -12,7 +12,7 @@ import {
   CLASSIFIED_CATEGORIES,
   classifiedCategoryMeta,
   formatPrice,
-} from "@/lib/fish/classifieds";
+} from "@/lib/fish/classifieds-meta";
 
 interface Listing {
   id: string;

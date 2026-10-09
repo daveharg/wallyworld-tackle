@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useFishAuth } from "../../_components/FishAuth";
 import { fishFetch } from "../../_components/fishFetch";
-import { classifiedCategoryMeta, formatPrice } from "@/lib/fish/classifieds";
+import { classifiedCategoryMeta, formatPrice } from "@/lib/fish/classifieds-meta";
 
 interface Listing {
   id: string;

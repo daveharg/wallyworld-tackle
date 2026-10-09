@@ -6,7 +6,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { fishFetch } from "../../_components/fishFetch";
-import { classifiedCategoryMeta, formatPrice } from "@/lib/fish/classifieds";
+import { classifiedCategoryMeta, formatPrice } from "@/lib/fish/classifieds-meta";
 
 interface MyListing {
   id: string;

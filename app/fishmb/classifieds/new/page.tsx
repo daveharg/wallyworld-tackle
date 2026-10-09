@@ -9,7 +9,7 @@ import { useFishAuth } from "../../_components/FishAuth";
 import { fishFetch } from "../../_components/fishFetch";
 import { compressImage } from "../../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
-import { CLASSIFIED_CATEGORIES } from "@/lib/fish/classifieds";
+import { CLASSIFIED_CATEGORIES } from "@/lib/fish/classifieds-meta";
 
 export default function NewClassifiedPage() {
   const { user, openLogin } = useFishAuth();
