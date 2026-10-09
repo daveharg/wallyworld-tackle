@@ -203,6 +203,23 @@ export default function MapsHub() {
       urlPlaced.current = true;
       setFocus({ lat: qLat, lng: qLng, key: `url:${qLat},${qLng}`, zoom: qZoom });
       setMapCenter({ lat: qLat, lng: qLng });
+      return;
+    }
+    // No URL location — restore the last map position if the user picked one.
+    // Otherwise the GPS effect below centres on the current location.
+    try {
+      const raw = localStorage.getItem("fishmb-map-center");
+      if (raw) {
+        const saved = JSON.parse(raw) as { lat: number; lng: number; zoom?: number };
+        if (Number.isFinite(saved.lat) && Number.isFinite(saved.lng)) {
+          urlPlaced.current = true;
+          const z = Math.min(Math.max(saved.zoom ?? 11, 3), 18);
+          setFocus({ lat: saved.lat, lng: saved.lng, key: `saved:${Date.now()}`, zoom: z });
+          setMapCenter({ lat: saved.lat, lng: saved.lng });
+        }
+      }
+    } catch {
+      // No saved position — GPS takes over.
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -261,10 +278,19 @@ export default function MapsHub() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myLoc]);
 
-  // Refresh nearby catches as the map moves (debounced).
+  // Refresh nearby catches as the map moves (debounced). Also remembers
+  // the last map position so reopening the map returns you where you were.
   const nearbyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const onMoveEnd = (center: { lat: number; lng: number }) => {
+  const onMoveEnd = (center: { lat: number; lng: number }, zoom: number) => {
     setMapCenter(center);
+    try {
+      localStorage.setItem(
+        "fishmb-map-center",
+        JSON.stringify({ lat: center.lat, lng: center.lng, zoom })
+      );
+    } catch {
+      // Storage unavailable — non-fatal.
+    }
     if (nearbyTimer.current) clearTimeout(nearbyTimer.current);
     nearbyTimer.current = setTimeout(() => loadNearbyCatches(center.lat, center.lng), 800);
   };
