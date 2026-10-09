@@ -182,6 +182,10 @@ export default function SpotMap({
         const c = m.getCenter();
         onMoveEndRef.current?.({ lat: c.lat, lng: c.lng }, m.getZoom());
       });
+      // A manual drag means the user's view wins over auto-fit from now on.
+      m.on("dragstart", () => {
+        mapPlacedRef.current = true;
+      });
       m.on("focus", () => m.scrollWheelZoom.enable());
       m.on("blur", () => m.scrollWheelZoom.disable());
       m.on("click", (e: { latlng: { lat: number; lng: number } }) => {
@@ -327,7 +331,9 @@ export default function SpotMap({
       }
       layer.addTo(map);
       layerRef.current = layer;
-      if (bounds.length > 0) {
+      // Only auto-fit when nothing has placed the map yet (no GPS focus,
+      // no lake/spot selection, no manual drag) — otherwise the user's view wins.
+      if (bounds.length > 0 && !mapPlacedRef.current) {
         if (bounds.length === 1) {
           map.setView(bounds[0], 12, { animate: true });
         } else {
@@ -585,9 +591,13 @@ export default function SpotMap({
 
   // External recenter requests (favorite lake or spot clicked).
   const lastFocusKey = useRef<string | null>(null);
+  // Set when a focus request flies the map, or the user drags it themselves —
+  // either one wins over the automatic fit-to-spots below.
+  const mapPlacedRef = useRef(false);
   useEffect(() => {
     if (!map || !focus || focus.key === lastFocusKey.current) return;
     lastFocusKey.current = focus.key;
+    mapPlacedRef.current = true;
     map.flyTo([focus.lat, focus.lng], focus.zoom ?? 11, { animate: true, duration: 1.2 });
   }, [map, focus]);
 

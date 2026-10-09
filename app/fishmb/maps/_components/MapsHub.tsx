@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import type {
   BasemapId,
@@ -367,7 +367,10 @@ export default function MapsHub() {
   return (
     <div className="fixed inset-0 top-16 bottom-0 overflow-hidden bg-paper">
       <div className="absolute inset-0">
-        {!loading && (
+        {/* Its own Suspense boundary so a slow map chunk never blanks the sheet */}
+        <Suspense
+          fallback={<div className="absolute inset-0 bg-pine/5 animate-pulse" />}
+        >
           <SpotMap
             fill
             spots={sharedSpot ? [...spots, sharedSpot] : spots}
@@ -390,8 +393,15 @@ export default function MapsHub() {
             basemap={basemap}
             onMoveEnd={onMoveEnd}
           />
+        </Suspense>
+        {loading && (
+          <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+            <div className="bg-white/90 rounded-full px-5 py-2.5 shadow-lg text-sm font-bold text-pine flex items-center gap-2">
+              <span className="w-4 h-4 border-2 border-pine/30 border-t-pine rounded-full animate-spin" />
+              Loading map…
+            </div>
+          </div>
         )}
-        {loading && <div className="absolute inset-0 bg-pine/5 animate-pulse" />}
       </div>
 
       {/* Wind overlay */}
