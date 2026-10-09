@@ -33,7 +33,7 @@ export default function ContoursToggle() {
               Depth contours coming soon
             </h3>
             <p className="text-pine/70 text-sm leading-relaxed mb-2">
-              We're bringing Navionics-style depth contour maps to FishMB.
+              We're bringing Garmin Navionics depth contour maps to FishMB.
               Flip any map between the regular view and contours — your spots
               work on both.
             </p>
