@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { fishFetch } from "../../_components/fishFetch";
+import { GpxImport } from "./GpxImport";
 import type { SpotPin, TrailPoint } from "./SpotMap";
 import { SPOT_ICON_CHOICES } from "./spotIcons";
 import { haversineM, bearingDeg, compassLabel, formatDist } from "./geo";
@@ -478,6 +479,7 @@ export default function FishingSpots() {
         >
           {locating ? "Getting location…" : "📍 Mark my current location"}
         </button>
+        <GpxImport onImported={load} />
       </div>
       {note && (
         <p className="text-sm text-signal-dark bg-signal/10 border border-signal/30 rounded-2xl px-4 py-3 mb-4">
