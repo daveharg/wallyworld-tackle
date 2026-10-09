@@ -32,7 +32,7 @@ interface SpotMapProps {
   /** The in-progress manual pin (rendered distinctly). */
   pendingPin?: { lat: number; lng: number } | null;
   /** Recenter request: when the key changes, fly the map to lat/lng. */
-  focus?: { lat: number; lng: number; key: string } | null;
+  focus?: { lat: number; lng: number; key: string; zoom?: number } | null;
   /** Live GPS position — rendered as a person marker that follows you. */
   myLoc?: { lat: number; lng: number; speed: number | null } | null;
   /** A saved trail to overlay on the map (retrace your route). */
@@ -494,7 +494,7 @@ export default function SpotMap({
   useEffect(() => {
     if (!map || !focus || focus.key === lastFocusKey.current) return;
     lastFocusKey.current = focus.key;
-    map.flyTo([focus.lat, focus.lng], 11, { animate: true, duration: 1.2 });
+    map.flyTo([focus.lat, focus.lng], focus.zoom ?? 11, { animate: true, duration: 1.2 });
   }, [map, focus]);
 
   // A quick tap on the map (not a drag, not a long-press) opens it fullscreen.

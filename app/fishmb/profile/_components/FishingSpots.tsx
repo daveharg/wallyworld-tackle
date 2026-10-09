@@ -169,7 +169,7 @@ export default function FishingSpots() {
   const [allLakes, setAllLakes] = useState<{ id: string; name: string; region?: string }[]>([]);
   const [addLakeId, setAddLakeId] = useState("");
   const [addingLake, setAddingLake] = useState(false);
-  const [focus, setFocus] = useState<{ lat: number; lng: number; key: string } | null>(null);
+  const [focus, setFocus] = useState<{ lat: number; lng: number; key: string; zoom?: number } | null>(null);
   const [selectedFav, setSelectedFav] = useState("");
   const autoLoadedFav = useRef(false);
 
@@ -323,12 +323,12 @@ export default function FishingSpots() {
     }
   }, [favs]);
 
-  const focusOn = (lat: number | null, lng: number | null, key: string) => {
+  const focusOn = (lat: number | null, lng: number | null, key: string, zoom?: number) => {
     if (lat === null || lng === null) {
       setNote("No map coordinates for that lake yet.");
       return;
     }
-    setFocus({ lat, lng, key });
+    setFocus({ lat, lng, key, zoom });
   };
 
   const useCurrentLocation = () => {
@@ -686,7 +686,7 @@ export default function FishingSpots() {
                   <div className="flex items-start justify-between gap-3">
                     <button
                       type="button"
-                      onClick={() => focusOn(Number(s.lat), Number(s.lng), `spot:${s.id}`)}
+                      onClick={() => focusOn(Number(s.lat), Number(s.lng), `spot:${s.id}`, 15)}
                       className="min-w-0 text-left flex-1"
                       title="Show on map"
                     >
@@ -706,7 +706,7 @@ export default function FishingSpots() {
                         type="button"
                         onClick={() => {
                           setGoTo(s);
-                          focusOn(Number(s.lat), Number(s.lng), `spot:${s.id}`);
+                          focusOn(Number(s.lat), Number(s.lng), `spot:${s.id}`, 15);
                         }}
                         aria-label={`Navigate to ${s.name}`}
                         title="Navigate to this spot"
