@@ -5,8 +5,8 @@ import type { SheetTab } from "./types";
 
 export type { SheetTab };
 
-/** Sheet snap positions: peek, half-screen, fullscreen. */
-export type SheetSnap = "collapsed" | "half" | "full";
+/** Sheet snap positions: mini peek, peek, half-screen, fullscreen. */
+export type SheetSnap = "mini" | "collapsed" | "half" | "full";
 
 const TABS: { id: SheetTab; label: string }[] = [
   { id: "catches", label: "Catches" },
@@ -26,6 +26,7 @@ interface Props {
 }
 
 const TOP: Record<SheetSnap, string> = {
+  mini: "top-[calc(100dvh-32px)]",
   collapsed: "top-[calc(100dvh-225px)]",
   half: "top-[50dvh]",
   full: "top-3 md:top-[68px]",
@@ -33,9 +34,9 @@ const TOP: Record<SheetSnap, string> = {
 
 /**
  * Bottom sheet styled like a full page sliding up from behind the bottom bar.
- * Three snap positions:
- * - collapsed: peeks just above the bar (grabber + tab row visible);
- *   swipe up or tap a tab to open.
+ * Four snap positions:
+ * - mini: just the grabber peeks out — swipe up to reopen.
+ * - collapsed: peeks just above the bar (grabber + tab row visible).
  * - half: covers the bottom half — used for lake details with the lake
  *   centred on the map above; drag up for the full page, down for full map.
  * - full: fullscreen page; swipe down anywhere to close.
@@ -75,10 +76,22 @@ export default function MapSheet({
     const scroller = scrollRef.current;
     const atTop = fromHeader.current || !scroller || scroller.scrollTop <= 0;
 
-    if (snap === "collapsed") {
+    if (snap === "mini") {
+      // Mini peek: drag up to reopen the peek.
+      if (dy < -8) {
+        dragTarget.current = "collapsed";
+        setDragDy(dy);
+      } else {
+        setDragDy(0);
+      }
+    } else if (snap === "collapsed") {
       // Peek: drag up to open — back to the lake detail if one is open.
       if (dy < -8) {
         dragTarget.current = detailMode ? "half" : "full";
+        setDragDy(dy);
+      } else if (dy > 8) {
+        // Drag down → mini peek (grabber only).
+        dragTarget.current = "mini";
         setDragDy(dy);
       } else {
         setDragDy(0);
