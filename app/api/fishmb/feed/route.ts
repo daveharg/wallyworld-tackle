@@ -76,6 +76,15 @@ export async function POST(req: NextRequest) {
     typeof body.species_tag === "string" && body.species_tag.trim()
       ? body.species_tag.trim().slice(0, 60)
       : null;
-  const item = await createPost(me.id, text, photoUrl, visibility, speciesTag, photos);
+  // Optional video: { playback_id, duration } — the client uploads to Mux
+  // directly and passes the ready playback id. We validate the shape only;
+  // Mux owns the bytes.
+  let video: { playback_id: string; duration: number | null } | null = null;
+  const bv = body.video as { playback_id?: unknown; duration?: unknown } | null | undefined;
+  if (bv && typeof bv.playback_id === "string" && /^[A-Za-z0-9]+$/.test(bv.playback_id)) {
+    const dur = typeof bv.duration === "number" && bv.duration > 0 ? Math.min(bv.duration, 3600) : null;
+    video = { playback_id: bv.playback_id, duration: dur };
+  }
+  const item = await createPost(me.id, text, photoUrl, visibility, speciesTag, photos, video);
   return NextResponse.json({ item }, { status: 201 });
 }

@@ -15,6 +15,8 @@ export interface FeedItem {
   photo_url: string | null;
   /** All attached photos (jsonb). photo_url is kept as the first photo for compat. */
   photos: string[];
+  /** Optional video: { playback_id, duration } — bytes live on Mux. */
+  video: { playback_id: string; duration: number | null } | null;
   species: string | null;
   length_in: number | null;
   visibility: string;
@@ -45,6 +47,10 @@ export async function ensureFeedColumns(): Promise<void> {
   await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS species_tag text`);
   await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS photos jsonb`);
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS photos jsonb`);
+  // Optional video per post/catch: { playback_id, duration } — video bytes live
+  // on Mux (converted + served by them), we only keep the playback reference.
+  await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS video jsonb`);
+  await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS video jsonb`);
   // Comments can target either an fm_discussions row or an fm_catches row, so
   // post_id carries NO foreign key (the original 003.sql FK to fm_discussions
   // broke commenting on catches). Keep the post_id index for lookups.
@@ -152,6 +158,7 @@ export async function getFeed(opts: GetFeedOptions = {}): Promise<FeedPage> {
        SELECT c.id, 'catch' AS kind, c.user_id, u.name AS user_name, u.avatar_url,
               c.note AS body, c.photo_hold_url AS photo_url,
               COALESCE(c.photos, '[]'::jsonb) AS photos,
+              c.video AS video,
               c.species, c.length_in::float AS length_in,
               c.visibility, NULL AS species_tag,
               (SELECT COUNT(*) FROM fm_comments cm WHERE cm.post_id = c.id)::int AS comment_count,
@@ -163,6 +170,7 @@ export async function getFeed(opts: GetFeedOptions = {}): Promise<FeedPage> {
        SELECT d.id, d.kind, d.user_id, u.name AS user_name, u.avatar_url,
               d.body, d.photo_url,
               COALESCE(d.photos, '[]'::jsonb) AS photos,
+              d.video AS video,
               NULL AS species, NULL AS length_in,
               d.visibility, d.species_tag,
               (SELECT COUNT(*) FROM fm_comments cm WHERE cm.post_id = d.id)::int AS comment_count,
@@ -186,23 +194,24 @@ export async function createPost(
   photoUrl: string | null,
   visibility: "public" | "friends" = "public",
   speciesTag: string | null = null,
-  photos: string[] = []
+  photos: string[] = [],
+  video: { playback_id: string; duration: number | null } | null = null
 ): Promise<FeedItem> {
   await ensureFeedColumns();
   const finalPhotos = photos.length > 0 ? photos : photoUrl ? [photoUrl] : [];
   const finalPhotoUrl = finalPhotos[0] ?? null;
   const rows = await query<FeedItem>(
-    `INSERT INTO fm_discussions (user_id, body, kind, photo_url, photos, visibility, species_tag)
-     VALUES ($1, $2, 'post', $3, $4::jsonb, $5, $6)
+    `INSERT INTO fm_discussions (user_id, body, kind, photo_url, photos, video, visibility, species_tag)
+     VALUES ($1, $2, 'post', $3, $4::jsonb, $5::jsonb, $6, $7)
      RETURNING id, 'post' AS kind, user_id,
        (SELECT name FROM fm_users WHERE id = $1) AS user_name,
        (SELECT avatar_url FROM fm_users WHERE id = $1) AS avatar_url,
-       body, photo_url, photos, NULL AS species, NULL AS length_in,
+       body, photo_url, photos, video, NULL AS species, NULL AS length_in,
        visibility, species_tag,
        0 AS comment_count,
        0 AS like_count, 0 AS dislike_count, NULL::smallint AS viewer_reaction,
        created_at`,
-    [userId, body, finalPhotoUrl, JSON.stringify(finalPhotos), visibility, speciesTag]
+    [userId, body, finalPhotoUrl, JSON.stringify(finalPhotos), video ? JSON.stringify(video) : null, visibility, speciesTag]
   );
   return normalizeFeedItem(rows[0]);
 }
@@ -249,6 +258,7 @@ export async function getSpeciesTips(species: string, limit = 20): Promise<FeedI
   const rows = await query<FeedItem>(
     `SELECT d.id, d.kind, d.user_id, u.name AS user_name, u.avatar_url,
             d.body, d.photo_url, COALESCE(d.photos, '[]'::jsonb) AS photos,
+            d.video AS video,
             NULL AS species, NULL AS length_in,
             d.visibility, d.species_tag,
             (SELECT COUNT(*) FROM fm_comments cm WHERE cm.post_id = d.id)::int AS comment_count,

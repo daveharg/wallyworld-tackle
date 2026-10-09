@@ -7,6 +7,7 @@ import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
 import { compressImage } from "../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
+import MuxPlayer from "@mux/mux-player-react";
 
 interface FeedItem {
   id: string;
@@ -17,6 +18,7 @@ interface FeedItem {
   body: string | null;
   photo_url: string | null;
   photos: string[];
+  video?: { playback_id: string; duration: number | null } | null;
   species: string | null;
   length_in: number | null;
   species_tag?: string | null;
@@ -153,6 +155,19 @@ function FeedAdCard({ ad }: { ad: FeedAd }) {
         </a>
       )}
     </article>
+  );
+}
+
+/** Mux-hosted video attached to a post (converted to universal HLS by Mux). */
+function FeedVideo({ playbackId }: { playbackId: string }) {
+  return (
+    <div className="w-full bg-black">
+      <MuxPlayer
+        playbackId={playbackId}
+        className="w-full aspect-video"
+        accentColor="#2f6b3a"
+      />
+    </div>
   );
 }
 
@@ -368,6 +383,12 @@ function FeedPageInner() {
   const [draft, setDraft] = useState("");
   const [catchPhotos, setCatchPhotos] = useState<File[]>([]);
   const [postPhotos, setPostPhotos] = useState<File[]>([]);
+  // Optional one video per post (60s max) — uploads straight to Mux.
+  const [postVideo, setPostVideo] = useState<File | null>(null);
+  const [videoProgress, setVideoProgress] = useState<number | null>(null);
+  const [videoPhase, setVideoPhase] = useState<"idle" | "uploading" | "processing" | "ready" | "error">("idle");
+  const [videoPlayback, setVideoPlayback] = useState<{ playback_id: string; duration: number | null } | null>(null);
+  const [videoErr, setVideoErr] = useState<string | null>(null);
   const [posting, setPosting] = useState(false);
   const [visibility, setVisibility] = useState<"public" | "friends" | "private">("public");
   const [catchSpecies, setCatchSpecies] = useState("");
@@ -568,6 +589,90 @@ function FeedPageInner() {
       .catch(() => {});
   }, [user]);
 
+  const uploadVideoFile = async (file: File): Promise<void> => {
+    setVideoErr(null);
+    setVideoPhase("uploading");
+    setVideoProgress(0);
+    setVideoPlayback(null);
+    try {
+      const { upload_id, upload_url } = (await fishFetch("/api/fish/video/upload-url", {
+        method: "POST",
+      })) as { upload_id: string; upload_url: string };
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("PUT", upload_url);
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) setVideoProgress(e.loaded / e.total);
+        };
+        xhr.onload = () =>
+          xhr.status >= 200 && xhr.status < 300
+            ? resolve()
+            : reject(new Error("Video upload failed."));
+        xhr.onerror = () => reject(new Error("Video upload failed."));
+        xhr.send(file);
+      });
+      setVideoPhase("processing");
+      // Poll Mux until the video is converted and playable.
+      for (let i = 0; i < 60; i++) {
+        await new Promise((r) => setTimeout(r, 5000));
+        const s = (await fishFetch(
+          `/api/fish/video/status?upload_id=${encodeURIComponent(upload_id)}`
+        )) as { status: string; playback_id?: string; duration?: number | null };
+        if (s.status === "ready" && s.playback_id) {
+          setVideoPlayback({ playback_id: s.playback_id, duration: s.duration ?? null });
+          setVideoPhase("ready");
+          return;
+        }
+        if (s.status === "errored") throw new Error("Video processing failed.");
+      }
+      throw new Error("Video is taking too long — try again.");
+    } catch (e) {
+      setVideoPhase("error");
+      setVideoErr(e instanceof Error ? e.message : "Video upload failed.");
+    }
+  };
+
+  const pickVideo = async (file: File) => {
+    setVideoErr(null);
+    // 60-second cap, checked on-device before uploading.
+    const duration: number = await new Promise<number>((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const v = document.createElement("video");
+      v.preload = "metadata";
+      v.onloadedmetadata = () => {
+        URL.revokeObjectURL(url);
+        resolve(v.duration || 0);
+      };
+      v.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error("Couldn't read that video."));
+      };
+      v.src = url;
+    }).catch((e) => {
+      setVideoErr(e instanceof Error ? e.message : "Couldn't read that video.");
+      return -1;
+    });
+    if (duration < 0) return;
+    if (duration > 62) {
+      setVideoErr("Videos are capped at 60 seconds — trim it down first.");
+      return;
+    }
+    if (file.size > 200 * 1024 * 1024) {
+      setVideoErr("That video is too big (200MB max).");
+      return;
+    }
+    setPostVideo(file);
+    uploadVideoFile(file);
+  };
+
+  const clearVideo = () => {
+    setPostVideo(null);
+    setVideoProgress(null);
+    setVideoPhase("idle");
+    setVideoPlayback(null);
+    setVideoErr(null);
+  };
+
   const uploadPhoto = async (file: File): Promise<string> => {
     const token = localStorage.getItem(FISHMB_TOKEN_KEY);
     const form = new FormData();
@@ -602,12 +707,14 @@ function FeedPageInner() {
           body: draft.trim(),
           photo_url: urls[0] ?? null,
           photos: urls,
+          video: videoPhase === "ready" ? videoPlayback : null,
           visibility: visibility === "private" ? "public" : visibility,
         }),
       });
       setItems([d.item, ...items]);
       setDraft("");
       setPostPhotos([]);
+      clearVideo();
       closeComposer();
     } catch (e) {
       setCatchNote(e instanceof Error ? e.message : "Could not post.");
@@ -818,6 +925,9 @@ function FeedPageInner() {
           {items.map((item, idx) => (
             <Fragment key={item.id}>
             <article className="bg-white border border-pine/10 rounded-3xl overflow-hidden max-sm:-mx-4 max-sm:rounded-none max-sm:border-x-0">
+              {item.video?.playback_id ? (
+                <FeedVideo playbackId={item.video.playback_id} />
+              ) : null}
               {cardPhotos(item).length > 0 ? (
                 <div className="relative">
                   <PhotoCarousel photos={cardPhotos(item)} bare />
@@ -1013,22 +1123,56 @@ function FeedPageInner() {
                   </div>
                 )}
                 <div className="flex items-center justify-between mt-3 gap-2 flex-wrap">
-                  <label className="text-sm font-bold text-signal-dark cursor-pointer">
-                    {postPhotos.length > 0
-                      ? `📷 ${postPhotos.length}/4 photos`
-                      : "📷 Add photos (up to 4)"}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      className="hidden"
-                      onChange={(e) => {
-                        const picked = Array.from(e.target.files ?? []).slice(0, 4 - postPhotos.length);
-                        if (picked.length) setPostPhotos([...postPhotos, ...picked].slice(0, 4));
-                        e.target.value = "";
-                      }}
-                    />
-                  </label>
+                  <div className="flex items-center gap-3">
+                    <label className="text-sm font-bold text-signal-dark cursor-pointer">
+                      {postPhotos.length > 0
+                        ? `📷 ${postPhotos.length}/4 photos`
+                        : "📷 Add photos (up to 4)"}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        className="hidden"
+                        onChange={(e) => {
+                          const picked = Array.from(e.target.files ?? []).slice(0, 4 - postPhotos.length);
+                          if (picked.length) setPostPhotos([...postPhotos, ...picked].slice(0, 4));
+                          e.target.value = "";
+                        }}
+                      />
+                    </label>
+                    {!postVideo ? (
+                      <label className="text-sm font-bold text-signal-dark cursor-pointer">
+                        🎬 Add video (60s)
+                        <input
+                          type="file"
+                          accept="video/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            e.target.value = "";
+                            if (f) pickVideo(f);
+                          }}
+                        />
+                      </label>
+                    ) : (
+                      <span className="relative text-xs font-bold text-pine/70 bg-pine/5 rounded-full pl-3 pr-2 py-1.5">
+                        🎬 {postVideo.name.slice(0, 18)}
+                        {videoPhase === "uploading" && videoProgress !== null && (
+                          <span className="text-pine/50"> · {Math.round(videoProgress * 100)}%</span>
+                        )}
+                        {videoPhase === "processing" && <span className="text-pine/50"> · processing…</span>}
+                        {videoPhase === "ready" && <span className="text-green-700"> · ready ✓</span>}
+                        {videoPhase === "error" && <span className="text-signal-dark"> · failed</span>}
+                        <button
+                          onClick={clearVideo}
+                          aria-label="Remove video"
+                          className="ml-1.5 text-pine/50 hover:text-signal-dark font-bold"
+                        >
+                          ✕
+                        </button>
+                      </span>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2">
                     <select
                       value={visibility === "private" ? "public" : visibility}
@@ -1041,14 +1185,15 @@ function FeedPageInner() {
                     </select>
                     <button
                       onClick={post}
-                      disabled={posting || !draft.trim()}
+                      disabled={posting || !draft.trim() || (postVideo !== null && videoPhase !== "ready")}
                       className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-6 py-2.5 rounded-full disabled:opacity-40 transition-colors"
                     >
-                      {posting ? "Posting…" : "Post"}
+                      {posting ? "Posting…" : videoPhase === "uploading" || videoPhase === "processing" ? "Waiting for video…" : "Post"}
                     </button>
                   </div>
                 </div>
                 {catchNote && <p className="text-sm text-signal-dark mt-3">{catchNote}</p>}
+                {videoErr && <p className="text-sm text-signal-dark mt-3">{videoErr}</p>}
               </>
             ) : (
               <>
