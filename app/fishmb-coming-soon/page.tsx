@@ -28,46 +28,71 @@ const SECTIONS = [
     icon: "📰",
     title: "The Feed",
     text: "A social-media-style feed for Manitoba anglers. Share catches with up to 4 photos and videos, post lake reports and fishing tips, and follow the anglers you fish with. Watch top Manitoba YouTube channels, see which lakes are hottest right now, and join community fishing challenges with real-time leaderboards and anti-cheat verification.",
+    href: "/fishmb/feed",
+    cta: "Open the feed",
   },
   {
     icon: "🗺️",
     title: "Garmin maps & spots",
     text: "Your private GPS map. Mark honey holes with a press-and-hold, save spots from your current location, and add lake notes. Your spots are private by default — share them with friends only when you choose to. And when the FishMB mobile app lands, flip any map to Garmin Navionics depth contours: bring your own Navionics account, toggle the contour layer over the FishMB base map, and your spots and catches render on both. You pay Garmin directly — FishMB never touches chart money.",
+    href: "/fishmb/maps",
+    cta: "Open maps",
   },
   {
     icon: "🏆",
     title: "Tournaments",
     text: "Run your own catch-photo-release tournaments. Build one in three steps — basics, waters & species, review — then share the invite code. Live leaderboards, GPS-verified catches, photo anti-cheat, and entry fees with prize payouts. Organizers get join alerts and a full manage page. Strict camera-only fresh photos keep real-money events honest.",
+    href: "/fishmb/tournaments",
+    cta: "Browse tournaments",
   },
   {
     icon: "🌦️",
     title: "AI Fish Forecast",
     text: "A weather app with AI that predicts how active the fish are. Barometric pressure gauge, wind map and storm-front tracking for Manitoba lakes — check the pressure trend before you hook up the boat.",
+    href: "/fishmb/weather",
+    cta: "Check the forecast",
   },
   {
     icon: "🔒",
     title: "Messages",
     text: "End-to-end encrypted chats with your fishing buddies. Plan trips, share spots, send photos — not even FishMB can read them. Unread badges keep you in the loop.",
+    href: "/fishmb/messages",
+    cta: "Open inbox",
   },
   {
     icon: "🐟",
     title: "Catch Logging",
     text: "Log every catch with photos, lengths and GPS. Build your lifetime record — species counts, biggest fish, tournament catches — with stat pages and a you-vs-friends leaderboard for every stat.",
+    href: "/fishmb/feed?log=catch",
+    cta: "Log a catch",
   },
   {
     icon: "📖",
     title: "Lakes, Regulations & Stocking",
-    text: "271 Manitoba lakes with 2026 regulations, verified lodging, and Master Angler trophy records. Every lake page shows what's biting, where to stay, the official rules — plus provincial fish stocking reports so you know what's been put in the water and when. No guessing.",
+    text: "272 Manitoba lakes with 2026 regulations, 175 verified lodges and guides, and Master Angler trophy records. Every lake page shows what's biting, where to stay, the official rules — plus provincial fish stocking reports so you know what's been put in the water and when. No guessing.",
+    href: "/fishmb/lakes",
+    cta: "Explore lakes",
+  },
+  {
+    icon: "💡",
+    title: "Fishing Tips",
+    text: "Pick a species and learn how to catch it. Every guide shows where to catch that fish in Manitoba — lake maps included — plus how-to techniques that actually work here. And when you crack the code yourself, add your own tip on the fish's page for every Manitoba angler to learn from.",
+    href: "/fishmb/tips",
+    cta: "Get fishing tips",
   },
   {
     icon: "👥",
     title: "Friends",
     text: "Find anglers, send friend requests, and build your crew. Friends-only posts, shared spots, and head-to-head stat comparisons. Your fishing circle, in one place.",
+    href: "/fishmb/friends",
+    cta: "Find friends",
   },
   {
     icon: "🏷️",
     title: "Classifieds",
     text: "Buy and sell gear Manitoba-angler to Manitoba-angler. Rods, reels, ice shacks, boats — list it, share it to the feed, and message the seller directly.",
+    href: "/fishmb/classifieds",
+    cta: "Browse classifieds",
   },
 ];
 
@@ -113,7 +138,13 @@ export default function FishMBComingSoon() {
                 <span className="text-3xl">{s.icon}</span>
                 <p className="font-bold text-lg">{s.title}</p>
               </div>
-              <p className="text-white/60 text-sm leading-relaxed">{s.text}</p>
+              <p className="text-white/60 text-sm leading-relaxed mb-3">{s.text}</p>
+              <Link
+                href={s.href}
+                className="inline-block text-signal font-bold text-sm uppercase tracking-wider hover:underline"
+              >
+                {s.cta} →
+              </Link>
             </div>
           ))}
         </div>

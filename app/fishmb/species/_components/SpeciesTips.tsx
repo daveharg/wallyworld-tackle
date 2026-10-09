@@ -11,11 +11,12 @@ interface Tip {
   user: { id: string; name: string; avatar_url: string | null };
 }
 
-/** Angler tips on a how-to-fish page. Posting also drops the tip in the community feed. */
+/** Angler tips on a how-to-fish page. Sharing to the community feed is optional. */
 export function SpeciesTips({ species }: { species: string }) {
   const { user, openLogin } = useFishAuth();
   const [tips, setTips] = useState<Tip[]>([]);
   const [draft, setDraft] = useState("");
+  const [shareInFeed, setShareInFeed] = useState(false);
   const [posting, setPosting] = useState(false);
   const [open, setOpen] = useState(false);
   const [note, setNote] = useState<string | null>(null);
@@ -38,12 +39,13 @@ export function SpeciesTips({ species }: { species: string }) {
       const d = await fishFetch("/api/fish/discussions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ body: draft.trim(), species_tag: species, kind: "tip" }),
+        body: JSON.stringify({ body: draft.trim(), species_tag: species, kind: "tip", in_feed: shareInFeed }),
       });
       setTips([d.discussion, ...tips]);
       setDraft("");
+      setShareInFeed(false);
       setOpen(false);
-      setNote("Tip posted — it's in the community feed too! 🎣");
+      setNote(shareInFeed ? "Tip posted — it's in the community feed too! 🎣" : "Tip posted on this page! 🎣");
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not post your tip.");
     } finally {
@@ -75,7 +77,16 @@ export function SpeciesTips({ species }: { species: string }) {
             placeholder={`Your best ${species.toLowerCase()} tip…`}
             className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal resize-none"
           />
-          <div className="flex justify-end mt-3">
+          <div className="flex items-center justify-between mt-3">
+            <label className="flex items-center gap-2 text-xs text-pine/65 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={shareInFeed}
+                onChange={(e) => setShareInFeed(e.target.checked)}
+                className="w-4 h-4 accent-[#e4572e]"
+              />
+              Also share in the community feed
+            </label>
             <button
               onClick={submit}
               disabled={posting || !draft.trim()}

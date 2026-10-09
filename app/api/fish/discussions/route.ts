@@ -75,6 +75,7 @@ export async function GET(req: NextRequest) {
 
   await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS visibility text NOT NULL DEFAULT 'public'`);
   await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS species_tag text`);
+  await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS in_feed boolean NOT NULL DEFAULT true`);
 
   const rows = await query<DiscussionRow>(
     `${SELECT} WHERE ${VISIBLE_SQL}${speciesTag ? ` AND d.visibility = 'public' AND LOWER(d.species_tag) = LOWER($4)` : ""}
@@ -101,6 +102,7 @@ export async function POST(req: NextRequest) {
 
   await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS visibility text NOT NULL DEFAULT 'public'`);
   await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS species_tag text`);
+  await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS in_feed boolean NOT NULL DEFAULT true`);
 
   let body: Record<string, unknown>;
   try {
@@ -117,6 +119,8 @@ export async function POST(req: NextRequest) {
 
   const kind = body.kind === "ad" ? "ad" : body.kind === "tip" ? "tip" : "post";
   const visibility = body.visibility === "friends" ? "friends" : "public";
+  // Tips may opt out of the community feed (checkbox on the species page).
+  const inFeed = body.in_feed === false ? false : true;
   const speciesTag =
     typeof body.species_tag === "string" && body.species_tag.trim()
       ? body.species_tag.trim().slice(0, 60)
@@ -146,12 +150,12 @@ export async function POST(req: NextRequest) {
   }
 
   const rows = await query<DiscussionRow>(
-    `INSERT INTO fm_discussions (user_id, body, kind, photo_url, visibility, species_tag)
-     VALUES ($1, $2, $3, $4, $5, $6)
+    `INSERT INTO fm_discussions (user_id, body, kind, photo_url, visibility, species_tag, in_feed)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
      RETURNING *, 0 AS comment_count,
                    (SELECT name FROM fm_users WHERE id = $1) AS name,
                    (SELECT avatar_url FROM fm_users WHERE id = $1) AS avatar_url`,
-    [me.id, text, kind, photoUrl, visibility, speciesTag]
+    [me.id, text, kind, photoUrl, visibility, speciesTag, inFeed]
   );
   return NextResponse.json({ discussion: toItem(rows[0]) }, { status: 201 });
 }

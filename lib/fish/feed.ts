@@ -52,6 +52,8 @@ export async function ensureFeedColumns(): Promise<void> {
     `ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS visibility text NOT NULL DEFAULT 'public'`
   );
   await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS species_tag text`);
+  // Tips can opt out of the community feed (they always show on the species page).
+  await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS in_feed boolean NOT NULL DEFAULT true`);
   await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS photos jsonb`);
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS photos jsonb`);
   // Optional video per post/catch: { playback_id, duration } — video bytes live
@@ -203,7 +205,7 @@ export async function getFeed(opts: GetFeedOptions = {}): Promise<FeedPage> {
               d.created_at
        FROM fm_discussions d
        JOIN fm_users u ON u.id = d.user_id
-       WHERE d.kind IN ('post', 'tip') AND ${VISIBLE_TO("d")} ${postWhere}
+       WHERE d.kind IN ('post', 'tip') AND d.in_feed AND ${VISIBLE_TO("d")} ${postWhere}
      ) feed
      ${where}
      ORDER BY feed.created_at DESC, feed.id DESC
