@@ -5,10 +5,11 @@ import { fishUserFromRequest, unauthorized, badRequest, suspendedCheck } from "@
 import { getComments, addComment } from "@/lib/fish/feed";
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const comments = await getComments(params.id);
+  const me = await fishUserFromRequest(req).catch(() => null);
+  const comments = await getComments(params.id, me?.id);
   return NextResponse.json({ comments });
 }
 
@@ -28,6 +29,7 @@ export async function POST(
   }
   const text = typeof body.body === "string" ? body.body.trim().slice(0, 1000) : "";
   if (!text) return badRequest("Write something first.");
-  const comment = await addComment(params.id, me.id, text);
+  const parentId = typeof body.parent_id === "string" && body.parent_id.trim() ? body.parent_id.trim() : null;
+  const comment = await addComment(params.id, me.id, text, parentId);
   return NextResponse.json({ comment }, { status: 201 });
 }

@@ -33,9 +33,14 @@ export interface FeedItem {
 
 export interface FeedComment {
   id: string;
+  user_id?: string;
   user_name: string;
   avatar_url: string | null;
   body: string;
+  parent_id: string | null;
+  like_count: number;
+  dislike_count: number;
+  viewer_reaction: 1 | -1 | null;
   created_at: string;
 }
 
@@ -71,6 +76,21 @@ export async function ensureFeedColumns(): Promise<void> {
   )`);
   await query(
     `CREATE INDEX IF NOT EXISTS fm_post_reactions_post_idx ON fm_post_reactions(post_id)`
+  );
+  // Nested replies: a comment can reply to another comment on the same post.
+  await query(`ALTER TABLE fm_comments ADD COLUMN IF NOT EXISTS parent_id uuid REFERENCES fm_comments(id) ON DELETE CASCADE`);
+  await query(`CREATE INDEX IF NOT EXISTS fm_comments_parent_idx ON fm_comments(parent_id)`);
+  // Like/dislike on comments (same 1/-1 pattern as post reactions).
+  await query(`CREATE TABLE IF NOT EXISTS fm_comment_reactions (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    comment_id uuid NOT NULL REFERENCES fm_comments(id) ON DELETE CASCADE,
+    user_id uuid NOT NULL REFERENCES fm_users(id) ON DELETE CASCADE,
+    value smallint NOT NULL CHECK (value IN (1, -1)),
+    created_at timestamptz NOT NULL DEFAULT now(),
+    UNIQUE (comment_id, user_id)
+  )`);
+  await query(
+    `CREATE INDEX IF NOT EXISTS fm_comment_reactions_comment_idx ON fm_comment_reactions(comment_id)`
   );
   ensured = true;
 }
@@ -282,26 +302,89 @@ export async function getSpeciesTips(species: string, limit = 20): Promise<FeedI
   return rows.map(normalizeFeedItem);
 }
 
-export async function getComments(postId: string): Promise<FeedComment[]> {
-  return query<FeedComment>(
-    `SELECT cm.id, u.name AS user_name, u.avatar_url, cm.body, cm.created_at
+export async function getComments(postId: string, viewerId?: string): Promise<FeedComment[]> {
+  await ensureFeedColumns();
+  const rows = await query<FeedComment>(
+    `SELECT cm.id, cm.user_id::text AS user_id, u.name AS user_name, u.avatar_url, cm.body,
+            cm.parent_id::text AS parent_id,
+            (SELECT COUNT(*) FROM fm_comment_reactions r WHERE r.comment_id = cm.id AND r.value = 1)::int AS like_count,
+            (SELECT COUNT(*) FROM fm_comment_reactions r WHERE r.comment_id = cm.id AND r.value = -1)::int AS dislike_count,
+            (SELECT r.value FROM fm_comment_reactions r WHERE r.comment_id = cm.id AND r.user_id = $2::uuid)::smallint AS viewer_reaction,
+            cm.created_at
      FROM fm_comments cm
      JOIN fm_users u ON u.id = cm.user_id
      WHERE cm.post_id = $1
      ORDER BY cm.created_at ASC`,
-    [postId]
+    [postId, viewerId ?? null]
   );
+  return rows.map((c) => ({
+    ...c,
+    viewer_reaction: c.viewer_reaction === 1 || c.viewer_reaction === -1 ? c.viewer_reaction : null,
+  }));
 }
 
-export async function addComment(postId: string, userId: string, body: string): Promise<FeedComment> {
+export async function addComment(
+  postId: string,
+  userId: string,
+  body: string,
+  parentId?: string | null
+): Promise<FeedComment> {
+  await ensureFeedColumns();
+  // A reply must belong to a comment on the same post.
+  let parent: string | null = null;
+  if (parentId) {
+    const check = await queryOne<{ id: string }>(
+      `SELECT id::text AS id FROM fm_comments WHERE id = $1::uuid AND post_id = $2`,
+      [parentId, postId]
+    );
+    parent = check?.id ?? null;
+  }
   const rows = await query<FeedComment>(
-    `INSERT INTO fm_comments (post_id, user_id, body)
-     VALUES ($1, $2, $3)
+    `INSERT INTO fm_comments (post_id, user_id, body, parent_id)
+     VALUES ($1, $2, $3, $4::uuid)
      RETURNING id,
        (SELECT name FROM fm_users WHERE id = $2) AS user_name,
        (SELECT avatar_url FROM fm_users WHERE id = $2) AS avatar_url,
-       body, created_at`,
-    [postId, userId, body]
+       body, parent_id::text AS parent_id,
+       0 AS like_count, 0 AS dislike_count, NULL::smallint AS viewer_reaction,
+       created_at`,
+    [postId, userId, body, parent]
   );
-  return rows[0];
+  return { ...rows[0], viewer_reaction: null };
+}
+
+/** Toggle the viewer's like/dislike on a comment: 1 = like, -1 = dislike, null = remove. */
+export async function toggleCommentReaction(
+  commentId: string,
+  userId: string,
+  value: 1 | -1 | null
+): Promise<{ like_count: number; dislike_count: number; viewer_reaction: 1 | -1 | null }> {
+  await ensureFeedColumns();
+  if (value === null) {
+    await query(`DELETE FROM fm_comment_reactions WHERE comment_id = $1 AND user_id = $2`, [
+      commentId,
+      userId,
+    ]);
+  } else {
+    await query(
+      `INSERT INTO fm_comment_reactions (comment_id, user_id, value)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (comment_id, user_id) DO UPDATE SET value = EXCLUDED.value`,
+      [commentId, userId, value]
+    );
+  }
+  const row = await queryOne<{ like_count: number; dislike_count: number; viewer_reaction: number | null }>(
+    `SELECT COUNT(*) FILTER (WHERE value = 1)::int AS like_count,
+            COUNT(*) FILTER (WHERE value = -1)::int AS dislike_count,
+            (SELECT value FROM fm_comment_reactions WHERE comment_id = $1 AND user_id = $2)::int AS viewer_reaction
+     FROM fm_comment_reactions
+     WHERE comment_id = $1`,
+    [commentId, userId]
+  );
+  const vr = row?.viewer_reaction;
+  return {
+    like_count: row?.like_count ?? 0,
+    dislike_count: row?.dislike_count ?? 0,
+    viewer_reaction: vr === 1 || vr === -1 ? vr : null,
+  };
 }

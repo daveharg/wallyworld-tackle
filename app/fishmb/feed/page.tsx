@@ -182,6 +182,10 @@ interface FeedComment {
   user_name: string;
   avatar_url: string | null;
   body: string;
+  parent_id: string | null;
+  like_count: number;
+  dislike_count: number;
+  viewer_reaction: 1 | -1 | null;
   created_at: string;
 }
 
@@ -592,6 +596,9 @@ function Comments({ postId }: { postId: string }) {
   const [comments, setComments] = useState<FeedComment[]>([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
+  const [replyTo, setReplyTo] = useState<string | null>(null);
+  const [replyDraft, setReplyDraft] = useState("");
+  const [replyBusy, setReplyBusy] = useState(false);
   const loaded = useRef(false);
 
   useEffect(() => {
@@ -624,26 +631,160 @@ function Comments({ postId }: { postId: string }) {
     }
   };
 
-  return (
-    <div className="mt-3 pt-3 border-t border-pine/10 space-y-3">
-      {comments.map((c) => (
-        <div key={c.id} className="flex gap-2.5">
-          <Avatar name={c.user_name} url={c.avatar_url} />
-          <div className="bg-paper-deep rounded-2xl px-3.5 py-2.5 flex-1">
-            <p className="text-xs font-bold text-pine">
-              {c.user_id ? (
-                <Link href={`/fishmb/anglers/${c.user_id}`} className="hover:text-signal-dark">
-                  {c.user_name}
-                </Link>
-              ) : (
-                c.user_name
-              )}{" "}
-              <span className="font-normal text-pine/45">· {timeAgo(c.created_at)}</span>
-            </p>
-            <p className="text-sm text-pine/80 mt-0.5">{c.body}</p>
+  const sendReply = async (parentId: string) => {
+    if (!user) {
+      openLogin();
+      return;
+    }
+    if (!replyDraft.trim() || replyBusy) return;
+    setReplyBusy(true);
+    try {
+      const d = await fishFetch(`/api/fishmb/feed/${postId}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ body: replyDraft.trim(), parent_id: parentId }),
+      });
+      setComments([...comments, d.comment]);
+      setReplyDraft("");
+      setReplyTo(null);
+    } catch {
+      // non-fatal
+    } finally {
+      setReplyBusy(false);
+    }
+  };
+
+  const react = async (commentId: string, value: 1 | -1) => {
+    if (!user) {
+      openLogin();
+      return;
+    }
+    const c = comments.find((x) => x.id === commentId);
+    if (!c) return;
+    // Tapping the active reaction removes it (toggle).
+    const next = c.viewer_reaction === value ? null : value;
+    // Optimistic update.
+    setComments(
+      comments.map((x) =>
+        x.id === commentId
+          ? {
+              ...x,
+              viewer_reaction: next,
+              like_count: x.like_count + (next === 1 ? 1 : 0) - (x.viewer_reaction === 1 ? 1 : 0),
+              dislike_count: x.dislike_count + (next === -1 ? 1 : 0) - (x.viewer_reaction === -1 ? 1 : 0),
+            }
+          : x
+      )
+    );
+    try {
+      const d = await fishFetch(`/api/fishmb/feed/${postId}/comments/${commentId}/react`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ value: next }),
+      });
+      setComments(
+        comments.map((x) =>
+          x.id === commentId
+            ? { ...x, like_count: d.like_count, dislike_count: d.dislike_count, viewer_reaction: d.viewer_reaction }
+            : x
+        )
+      );
+    } catch {
+      // Revert on failure.
+      setComments(comments);
+    }
+  };
+
+  const topLevel = comments.filter((c) => !c.parent_id);
+  const repliesOf = (id: string) => comments.filter((c) => c.parent_id === id);
+
+  const renderComment = (c: FeedComment, nested: boolean) => (
+    <div key={c.id} className={nested ? "ml-10" : ""}>
+      <div className="flex gap-2.5">
+        <Avatar name={c.user_name} url={c.avatar_url} />
+        <div className="bg-paper-deep rounded-2xl px-3.5 py-2.5 flex-1 min-w-0">
+          <p className="text-xs font-bold text-pine">
+            {c.user_id ? (
+              <Link href={`/fishmb/anglers/${c.user_id}`} className="hover:text-signal-dark">
+                {c.user_name}
+              </Link>
+            ) : (
+              c.user_name
+            )}{" "}
+            <span className="font-normal text-pine/45">· {timeAgo(c.created_at)}</span>
+          </p>
+          <p className="text-sm text-pine/80 mt-0.5">{c.body}</p>
+          <div className="flex items-center gap-3 mt-1.5">
+            <button
+              onClick={() => react(c.id, 1)}
+              aria-label="Like comment"
+              className={`flex items-center gap-1 text-xs font-bold transition-colors ${
+                c.viewer_reaction === 1 ? "text-signal" : "text-pine/40 hover:text-pine"
+              }`}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill={c.viewer_reaction === 1 ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M7 10v11H4a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h3Zm2.5 10.5 4.5-9.5c.6-1.2 2.2-1.6 3.4-1H20a2 2 0 0 1 2 2.4l-1.5 7a2 2 0 0 1-2 1.6H9.5Z" />
+                <path d="M9.5 20.5v-9" />
+              </svg>
+              {c.like_count > 0 && <span>{c.like_count}</span>}
+            </button>
+            <button
+              onClick={() => react(c.id, -1)}
+              aria-label="Dislike comment"
+              className={`flex items-center gap-1 text-xs font-bold transition-colors ${
+                c.viewer_reaction === -1 ? "text-signal" : "text-pine/40 hover:text-pine"
+              }`}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill={c.viewer_reaction === -1 ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="rotate-180">
+                <path d="M7 10v11H4a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h3Zm2.5 10.5 4.5-9.5c.6-1.2 2.2-1.6 3.4-1H20a2 2 0 0 1 2 2.4l-1.5 7a2 2 0 0 1-2 1.6H9.5Z" />
+                <path d="M9.5 20.5v-9" />
+              </svg>
+              {c.dislike_count > 0 && <span>{c.dislike_count}</span>}
+            </button>
+            {!nested && (
+              <button
+                onClick={() => {
+                  if (!user) {
+                    openLogin();
+                    return;
+                  }
+                  setReplyTo(replyTo === c.id ? null : c.id);
+                  setReplyDraft("");
+                }}
+                className="text-xs font-bold text-pine/40 hover:text-pine transition-colors"
+              >
+                Reply
+              </button>
+            )}
           </div>
         </div>
-      ))}
+      </div>
+      {!nested && replyTo === c.id && (
+        <div className="flex gap-2 ml-10 mt-2">
+          <input
+            value={replyDraft}
+            onChange={(e) => setReplyDraft(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && sendReply(c.id)}
+            placeholder={`Reply to ${c.user_name}…`}
+            autoFocus
+            className="flex-1 bg-paper-deep border border-pine/15 rounded-full px-4 py-2 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal"
+          />
+          <button
+            onClick={() => sendReply(c.id)}
+            disabled={replyBusy}
+            className="bg-pine text-white text-xs font-bold uppercase tracking-wider px-4 rounded-full disabled:opacity-50"
+          >
+            Send
+          </button>
+        </div>
+      )}
+      {!nested && repliesOf(c.id).map((r) => renderComment(r, true))}
+    </div>
+  );
+
+  return (
+    <div className="mt-3 pt-3 border-t border-pine/10 space-y-3">
+      {topLevel.map((c) => renderComment(c, false))}
       <div className="flex gap-2">
         <input
           value={draft}
