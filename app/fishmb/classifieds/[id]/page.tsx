@@ -42,6 +42,53 @@ export default function ClassifiedDetailPage() {
   }, [id]);
 
   const isOwner = !!user && !!item && user.id === item.user_id;
+  const [shared, setShared] = useState(false);
+
+  const listingUrl = () =>
+    `${window.location.origin}/fishmb/classifieds/${id}`;
+
+  const shareToFeed = async () => {
+    if (!user) {
+      openLogin();
+      return;
+    }
+    if (!item || busy) return;
+    setBusy(true);
+    setNote(null);
+    try {
+      const price = item.price_cents != null ? ` — ${formatPrice(item.price_cents)}` : "";
+      await fishFetch("/api/fishmb/feed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          body: `🏷️ For sale on FishMB Classifieds: ${item.title}${price}\n\n${listingUrl()}`,
+          photos: item.photos.slice(0, 4),
+        }),
+      });
+      setShared(true);
+      setNote("Shared to your FishMB feed! 🎣");
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Could not share to feed.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const shareElsewhere = async () => {
+    if (!item) return;
+    const url = listingUrl();
+    const text = `🏷️ ${item.title}${item.price_cents != null ? ` — ${formatPrice(item.price_cents)}` : ""} (FishMB Classifieds)`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: item.title, text, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        setNote("Link copied — paste it anywhere! 📋");
+      }
+    } catch {
+      // User dismissed the share sheet; nothing to do.
+    }
+  };
 
   const messageSeller = async () => {
     if (!user) {
@@ -228,6 +275,38 @@ export default function ClassifiedDetailPage() {
           {note && (
             <p className="text-sm text-signal-dark mt-3 text-center">{note}</p>
           )}
+          {/* Share this listing */}
+          <div className="mt-4 pt-4 border-t border-pine/10">
+            <p className="text-xs font-bold uppercase tracking-wider text-pine/50 text-center mb-3">
+              Share this listing
+            </p>
+            <div className="flex gap-2.5">
+              <button
+                onClick={shareToFeed}
+                disabled={busy || shared}
+                className="flex-1 bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-xs px-4 py-3 rounded-full transition-colors disabled:opacity-50"
+              >
+                {shared ? "✓ Shared" : "📢 FishMB feed"}
+              </button>
+              <button
+                onClick={shareElsewhere}
+                className="flex-1 border border-pine/25 text-pine hover:bg-pine/5 font-bold uppercase tracking-wider text-xs px-4 py-3 rounded-full transition-colors"
+              >
+                ↗️ Share…
+              </button>
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                  typeof window !== "undefined" ? listingUrl() : ""
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Share on Facebook"
+                className="shrink-0 w-12 h-12 rounded-full bg-[#1877f2] text-white flex items-center justify-center text-xl hover:opacity-90 transition-opacity"
+              >
+                f
+              </a>
+            </div>
+          </div>
           {!user && (
             <p className="text-xs text-pine/50 text-center mt-3">
               You'll be asked to log in to message the seller.

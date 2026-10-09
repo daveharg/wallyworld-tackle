@@ -149,6 +149,35 @@ const TIPS = [
   "Cold front just rolled through? Slow down, fish tighter to cover, and don't leave fish to find fish.",
 ];
 
+/** Real, verified lake photos for the weekly posts (public/fishmb/weekly/photos.json). */
+function loadWeeklyPhotos() {
+  try {
+    return JSON.parse(readFileSync(join(root, "public", "fishmb", "weekly", "photos.json"), "utf8"));
+  } catch {
+    return {};
+  }
+}
+const WEEKLY_PHOTOS = loadWeeklyPhotos();
+
+/** Richer lake blurb assembled from the verified lake directory. */
+function lakeBlurb(lake) {
+  const lines = [];
+  if (lake.region) lines.push(`📍 ${lake.region} Manitoba`);
+  const species = (lake.species ?? []).slice(0, 5).join(", ");
+  if (species) lines.push(`🐟 ${species}`);
+  if (lake.size_text) lines.push(`🌊 ${lake.size_text}`);
+  if (lake.max_depth_text) lines.push(`⬇️ Max depth ${lake.max_depth_text}`);
+  const division = lake.regulations?.division;
+  if (division && !lake.regulations?.division_approximate) lines.push(`📋 ${division} — check 2026 regs before you go`);
+  const lodging = (lake.lodging ?? []).length;
+  if (lodging > 0) lines.push(`🏕️ ${lodging} verified ${lodging === 1 ? "lodge" : "lodges"} nearby`);
+  if (lake.description) {
+    const snippet = lake.description.split(/(?<=[.!?])\s/)[0]?.slice(0, 220);
+    if (snippet) lines.push(`\n${snippet}`);
+  }
+  return lines.join("\n");
+}
+
 async function contentPosts(userId) {
   if (await alreadyPosted(userId, "%🎣 FishMB Tip of the Week%")) {
     console.log("Tip post: already posted this week, skipping.");
@@ -159,18 +188,34 @@ async function contentPosts(userId) {
       `🎣 FishMB Tip of the Week\n\n${tip}\n\nGot a tip that's been working for you? Share it below! 👇`
     );
   }
+  // Lakes with real verified photos get the rich treatment.
+  const photoLakes = LAKES.filter((l) => WEEKLY_PHOTOS[l.id]);
   const walleyeLakes = LAKES.filter((l) => (l.species ?? []).some((s) => /walleye/i.test(s)));
   if (walleyeLakes.length > 0) {
     if (await alreadyPosted(userId, "%🌊 Lake of the Week%")) {
       console.log("Lake post: already posted this week, skipping.");
     } else {
-      const lake = walleyeLakes[weekNo % walleyeLakes.length];
-      const species = (lake.species ?? []).slice(0, 4).join(", ");
+      // Prefer a lake with a real photo; fall back to rotation.
+      const withPhoto = walleyeLakes.filter((l) => WEEKLY_PHOTOS[l.id]);
+      const pool = withPhoto.length > 0 ? withPhoto : walleyeLakes;
+      const lake = pool[weekNo % pool.length];
       await post(
         userId,
-        `🌊 Lake of the Week: ${lake.name}\n\n` +
-          (species ? `Species: ${species}.\n\n` : "") +
-          `Check the full lake page for 2026 regulations, stocking history, and nearby lodging — then get out there! 🎣`
+        `🌊 Lake of the Week: ${lake.name}\n\n${lakeBlurb(lake)}\n\nSee the full lake page for 2026 regulations, stocking history, and lodging — then get out there! 🎣`,
+        WEEKLY_PHOTOS[lake.id] ?? null
+      );
+    }
+  }
+  // Hot Spot of the Week — a featured fishing spot with a real photo.
+  if (photoLakes.length > 0) {
+    if (await alreadyPosted(userId, "%🔥 Hot Spot of the Week%")) {
+      console.log("Hot spot post: already posted this week, skipping.");
+    } else {
+      const lake = photoLakes[weekNo % photoLakes.length];
+      await post(
+        userId,
+        `🔥 Hot Spot of the Week: ${lake.name}\n\n${lakeBlurb(lake)}\n\nOne of Manitoba's premier fishing destinations — who's been out here lately? Drop your reports! 🎣`,
+        WEEKLY_PHOTOS[lake.id] ?? null
       );
     }
   }
