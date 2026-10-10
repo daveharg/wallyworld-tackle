@@ -182,9 +182,8 @@ interface FeedItem {
   comment_count: number;
   like_count: number;
   dislike_count: number;
-  laugh_count?: number;
   share_count?: number;
-  viewer_reaction: 1 | -1 | 2 | null;
+  viewer_reaction: 1 | -1 | null;
   created_at: string;
 }
 
@@ -551,14 +550,16 @@ function PhotoCarousel({ photos, bare }: { photos: string[]; bare?: boolean }) {
 function Reactions({
   item,
   onReacted,
+  onShare,
 }: {
   item: FeedItem;
-  onReacted: (id: string, r: { like_count: number; dislike_count: number; laugh_count: number; viewer_reaction: 1 | -1 | 2 | null }) => void;
+  onReacted: (id: string, r: { like_count: number; dislike_count: number; viewer_reaction: 1 | -1 | null }) => void;
+  onShare: (id: string) => void;
 }) {
   const { user, openLogin } = useFishAuth();
   const [busy, setBusy] = useState(false);
 
-  const react = async (value: 1 | -1 | 2) => {
+  const react = async (value: 1 | -1) => {
     if (!user) {
       openLogin();
       return;
@@ -581,7 +582,7 @@ function Reactions({
     }
   };
 
-  const btn = (value: 1 | -1 | 2, icon: React.ReactNode, count: number, label: string) => {
+  const btn = (value: 1 | -1, icon: React.ReactNode, count: number, label: string) => {
     const active = item.viewer_reaction === value;
     return (
       <button
@@ -612,20 +613,27 @@ function Reactions({
     </svg>
   );
 
-  const laugh = (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <path d="M8 14s1.5 2 4 2 4-2 4-2" />
-      <line x1="9" y1="9" x2="9.01" y2="9" />
-      <line x1="15" y1="9" x2="15.01" y2="9" />
-    </svg>
-  );
+  const share = () => {
+    onShare(item.id);
+  };
 
   return (
     <div className="flex items-center gap-4">
       {btn(1, thumbsUp, item.like_count, "Like")}
       {btn(-1, thumbsDown, item.dislike_count, "Dislike")}
-      {btn(2, laugh, item.laugh_count ?? 0, "Laugh")}
+      <button
+        onClick={share}
+        aria-label="Share"
+        className="flex items-center gap-1.5 text-sm font-bold px-2 py-1 rounded-full transition-colors text-pine/45 hover:text-pine"
+      >
+        <span className="opacity-70">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m22 2-7 20-4-9-9-4Z" />
+            <path d="M22 2 11 13" />
+          </svg>
+        </span>
+        <span className="tabular-nums">{item.share_count ?? 0}</span>
+      </button>
     </div>
   );
 }
@@ -1131,9 +1139,20 @@ function FeedPageInner() {
 
   const handleReacted = (
     id: string,
-    r: { like_count: number; dislike_count: number; laugh_count: number; viewer_reaction: 1 | -1 | 2 | null }
+    r: { like_count: number; dislike_count: number; viewer_reaction: 1 | -1 | null }
   ) => {
     setItems((prev) => prev.map((it) => (it.id === id ? { ...it, ...r } : it)));
+  };
+
+  const handleShare = async (id: string) => {
+    const url = `https://www.fishmb.ca/fishmb/share/${id}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareNote("Link copied — paste it anywhere.");
+    } catch {
+      setShareNote(url);
+    }
+    setTimeout(() => setShareNote(null), 3000);
   };
 
   // My tournaments for the "also enter in tournament" picker.
@@ -1786,27 +1805,7 @@ function FeedPageInner() {
                   );
                 })()}
                 <div className="mt-3 flex items-center justify-between">
-                  <Reactions item={item} onReacted={handleReacted} />
-                  <button
-                    onClick={async () => {
-                      const url = `https://www.fishmb.ca/fishmb/share/${item.id}`;
-                      try {
-                        await navigator.clipboard.writeText(url);
-                        setShareNote("Link copied — paste it anywhere.");
-                      } catch {
-                        setShareNote(url);
-                      }
-                      setTimeout(() => setShareNote(null), 3000);
-                    }}
-                    aria-label="Share"
-                    className="flex items-center gap-1.5 text-sm font-bold text-pine/45 hover:text-pine"
-                  >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="m22 2-7 20-4-9-9-4Z" />
-                      <path d="M22 2 11 13" />
-                    </svg>
-                    <span className="tabular-nums">{item.share_count ?? 0}</span>
-                  </button>
+                  <Reactions item={item} onReacted={handleReacted} onShare={handleShare} />
                   <button
                     onClick={() => toggleComments(item.id)}
                     aria-label="Comments"
