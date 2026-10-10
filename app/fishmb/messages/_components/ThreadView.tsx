@@ -71,6 +71,8 @@ export default function ThreadView({
   const [editName, setEditName] = useState("");
   const [editAvatar, setEditAvatar] = useState<string | null>(null);
   const [savingGroup, setSavingGroup] = useState(false);
+  const [addSearch, setAddSearch] = useState("");
+  const [friendOptions, setFriendOptions] = useState<{ id: string; name: string }[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
   const lastAtRef = useRef<string | null>(null);
   const secretsRef = useRef<{ user_id: string; shared: Uint8Array }[] | null>(null);
@@ -278,7 +280,16 @@ export default function ThreadView({
   const openGroupEditor = () => {
     setEditName(peer.name ?? "");
     setEditAvatar(peer.avatar_url ?? null);
+    setAddSearch("");
     setEditingGroup(true);
+    // Load friends for the add-member picker.
+    fishFetch("/api/fish/friends")
+      .then((d) => {
+        const list = ((d as { friends?: { id: string; name: string }[] }).friends ?? [])
+          .filter((f) => !peer.members.some((m) => m.user_id === f.id));
+        setFriendOptions(list);
+      })
+      .catch(() => {});
   };
 
   const uploadGroupAvatar = async (file: File) => {
@@ -328,6 +339,42 @@ export default function ThreadView({
     }
   };
 
+  const addMember = async (userId: string) => {
+    setSavingGroup(true);
+    try {
+      await fishFetch(`/api/fishmb/msg/conversations/${peer.id}/members`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId }),
+      });
+      const f = friendOptions.find((x) => x.id === userId);
+      if (f && !peer.members.some((m) => m.user_id === userId)) {
+        peer.members.push({ user_id: userId, name: f.name, avatar_url: null });
+      }
+      setAddSearch("");
+      setNote(null);
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Could not add member.");
+    } finally {
+      setSavingGroup(false);
+    }
+  };
+
+  const removeMember = async (userId: string) => {
+    setSavingGroup(true);
+    try {
+      await fishFetch(`/api/fishmb/msg/conversations/${peer.id}/members?user_id=${encodeURIComponent(userId)}`, {
+        method: "DELETE",
+      });
+      const idx = peer.members.findIndex((m) => m.user_id === userId);
+      if (idx >= 0) peer.members.splice(idx, 1);
+      setNote(null);
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Could not remove member.");
+    } finally {
+      setSavingGroup(false);
+    }
+  };
   const title = peer.is_group
     ? (peer.name ?? "Group chat")
     : (peer.members.find((m) => m.user_id !== myId)?.name ?? "Chat");
@@ -497,10 +544,54 @@ export default function ThreadView({
                     <span className="w-6 h-6 rounded-full bg-pine/10 flex items-center justify-center text-xs font-bold">
                       {m.name.charAt(0).toUpperCase()}
                     </span>
-                    {m.name}
-                    {m.user_id === myId && <span className="text-xs text-pine/45">(you)</span>}
+                    <span className="flex-1 truncate">{m.name}</span>
+                    {m.user_id === myId ? (
+                      <span className="text-xs text-pine/45">(you)</span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => removeMember(m.user_id)}
+                        aria-label={`Remove ${m.name}`}
+                        className="w-7 h-7 rounded-full bg-red-50 text-red-500 hover:bg-red-100 flex items-center justify-center text-sm font-bold"
+                      >
+                        ×
+                      </button>
+                    )}
                   </div>
                 ))}
+              </div>
+              {/* Add member */}
+              <div className="mt-3">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-pine/45 mb-2">
+                  Add member
+                </p>
+                <input
+                  value={addSearch}
+                  onChange={(e) => setAddSearch(e.target.value)}
+                  placeholder="Search friends…"
+                  className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-2.5 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal mb-2"
+                />
+                {addSearch.trim() && (
+                  <div className="space-y-1 max-h-32 overflow-y-auto">
+                    {friendOptions
+                      .filter((f) => f.name.toLowerCase().includes(addSearch.toLowerCase()))
+                      .slice(0, 5)
+                      .map((f) => (
+                        <button
+                          key={f.id}
+                          type="button"
+                          onClick={() => addMember(f.id)}
+                          className="w-full flex items-center gap-2 text-sm text-pine hover:bg-pine/5 rounded-xl px-2 py-1.5"
+                        >
+                          <span className="w-6 h-6 rounded-full bg-pine/10 flex items-center justify-center text-xs font-bold">
+                            {f.name.charAt(0).toUpperCase()}
+                          </span>
+                          {f.name}
+                          <span className="ml-auto text-signal-dark font-bold">+</span>
+                        </button>
+                      ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
