@@ -184,21 +184,83 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
     setUploading(true);
     setNote(null);
     try {
-      const token = localStorage.getItem(FISHMB_TOKEN_KEY);
-      const form = new FormData();
       const isVideo = file.type.startsWith("video/");
-      form.append("file", isVideo ? file : await compressImage(file));
-      const upRes = await fetch("/api/fish/photos/upload", {
-        method: "POST",
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-        body: form,
-      });
-      const up = await upRes.json();
-      if (!upRes.ok) throw new Error(up.error || "Upload failed.");
+      let mediaUrl: string;
+      if (isVideo) {
+        // Videos go through Mux direct upload (the photo endpoint rejects them).
+        const { upload_id, upload_url } = (await fishFetch("/api/fish/video/upload-url", {
+          method: "POST",
+        })) as { upload_id: string; upload_url: string };
+        let payload: ArrayBuffer;
+        try {
+          payload = await file.arrayBuffer();
+        } catch {
+          throw new Error("Couldn't read that video file — try saving it to the Files app first, then upload it.");
+        }
+        if (!payload.byteLength) {
+          throw new Error("That video file looks empty — try saving it to the Files app first, then upload it.");
+        }
+        let sentBytes = 0;
+        await new Promise<void>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open("PUT", upload_url);
+          xhr.upload.onprogress = (e) => {
+            if (e.lengthComputable) sentBytes = e.loaded;
+          };
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              if (sentBytes > 0 && sentBytes < payload.byteLength * 0.99) {
+                reject(new Error("Video upload was cut off — try again on Wi-Fi."));
+                return;
+              }
+              resolve();
+            } else {
+              reject(new Error(`Video upload failed (network ${xhr.status}).`));
+            }
+          };
+          xhr.onerror = () => reject(new Error("Video upload failed — check your connection and try again."));
+          xhr.onabort = () => reject(new Error("Video upload was interrupted — try again."));
+          xhr.ontimeout = () => reject(new Error("Video upload timed out — try again on Wi-Fi."));
+          xhr.timeout = 10 * 60 * 1000;
+          xhr.send(payload);
+        });
+        // Poll Mux until the video is converted and playable.
+        let playbackId: string | null = null;
+        for (let i = 0; i < 60; i++) {
+          await new Promise((r) => setTimeout(r, 5000));
+          const s = (await fishFetch(
+            `/api/fish/video/status?upload_id=${encodeURIComponent(upload_id)}`
+          )) as { status: string; playback_id?: string; error?: string };
+          if (s.status === "ready" && s.playback_id) {
+            playbackId = s.playback_id;
+            break;
+          }
+          if (s.status === "errored")
+            throw new Error(
+              s.error
+                ? `The video arrived damaged (${s.error}). Try again.`
+                : "The video arrived damaged and couldn't be processed. Try again."
+            );
+        }
+        if (!playbackId) throw new Error("Video is taking too long — try again.");
+        mediaUrl = `https://stream.mux.com/${playbackId}.m3u8`;
+      } else {
+        const token = localStorage.getItem(FISHMB_TOKEN_KEY);
+        const form = new FormData();
+        form.append("file", await compressImage(file));
+        const upRes = await fetch("/api/fish/photos/upload", {
+          method: "POST",
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          body: form,
+        });
+        const up = await upRes.json();
+        if (!upRes.ok) throw new Error(up.error || "Upload failed.");
+        mediaUrl = up.url;
+      }
       await fishFetch("/api/fishmb/story-drafts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ media_url: up.url, media_type: isVideo ? "video" : "photo" }),
+        body: JSON.stringify({ media_url: mediaUrl, media_type: isVideo ? "video" : "photo" }),
       });
       await loadDrafts();
     } catch (e) {
