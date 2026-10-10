@@ -178,7 +178,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
  {uploadingCover ? "Uploading…" : " Upload a cover photo for the tournament page"}
                 <input
                   type="file"
-                  accept="image/jpeg,image/png,image/webp"
+                  accept="image/*"
                   className="hidden"
                   disabled={uploadingCover}
                   onChange={(e) => {

@@ -97,7 +97,7 @@ export default function DashboardSettings({ afterSaveHref }: { afterSaveHref?: s
           {uploading ? "Uploading…" : "Change picture"}
           <input
             type="file"
-            accept="image/jpeg,image/png,image/webp"
+            accept="image/*"
             className="hidden"
             disabled={uploading}
             onChange={(e) => {

@@ -417,7 +417,7 @@ function EditTournament({ tournament, onSaved }: { tournament: Detail["tournamen
  {uploading ? "Uploading…" : " Upload a cover photo"}
               <input
                 type="file"
-                accept="image/jpeg,image/png,image/webp"
+                accept="image/*"
                 className="hidden"
                 disabled={uploading}
                 onChange={(e) => {

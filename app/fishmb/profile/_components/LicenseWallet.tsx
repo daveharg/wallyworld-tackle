@@ -186,7 +186,7 @@ export default function LicenseWallet({ embedded = false }: { embedded?: boolean
                 Replace
                 <input
                   type="file"
-                  accept="image/jpeg,image/png,application/pdf"
+                  accept="image/*,application/pdf"
                   className="hidden"
                   onChange={(e) => {
                     const f = e.target.files?.[0] ?? null;
@@ -260,7 +260,7 @@ export default function LicenseWallet({ embedded = false }: { embedded?: boolean
               </span>
               <input
                 type="file"
-                accept="image/jpeg,image/png,application/pdf"
+                accept="image/*,application/pdf"
                 onChange={(e) => setFile(e.target.files?.[0] ?? null)}
                 className="mt-1 block w-full text-sm text-pine/70 file:mr-4 file:py-2.5 file:px-5 file:rounded-full file:border-0 file:text-xs file:font-bold file:uppercase file:tracking-wider file:bg-pine file:text-white hover:file:bg-pine-deep"
               />
