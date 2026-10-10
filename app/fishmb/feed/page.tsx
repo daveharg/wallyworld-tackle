@@ -210,6 +210,27 @@ function timeAgo(iso: string): string {
 }
 
 /** Render URLs in post text as clickable links. */
+/** Long post bodies collapse with a "See more" expander. */
+function ExpandableText({ text }: { text: string }) {
+  const [expanded, setExpanded] = useState(false);
+  const LIMIT = 280;
+  if (text.length <= LIMIT) {
+    return <p className="text-pine/80 text-sm whitespace-pre-line">{linkify(text)}</p>;
+  }
+  return (
+    <p className="text-pine/80 text-sm whitespace-pre-line">
+      {linkify(expanded ? text : text.slice(0, LIMIT).trimEnd() + "…")}{" "}
+      <button
+        type="button"
+        onClick={() => setExpanded((e) => !e)}
+        className="text-signal-dark font-bold whitespace-nowrap"
+      >
+        {expanded ? "See less" : "See more"}
+      </button>
+    </p>
+  );
+}
+
 function linkify(text: string): React.ReactNode[] {
   const parts = text.split(/(https?:\/\/[^\s]+)/g);
   return parts.map((part, i) =>
@@ -1794,7 +1815,7 @@ function FeedPageInner() {
                     : item.body;
                   return (
                     <>
-                      {text && <p className="text-pine/80 text-sm whitespace-pre-line">{linkify(text)}</p>}
+                      {text && <ExpandableText text={text} />}
                       {item.spot_share && (
                         <SpotShareCard
                           spot={item.spot_share}

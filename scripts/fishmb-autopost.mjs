@@ -75,9 +75,10 @@ async function youtubePost(userId) {
   const videoLine = video
     ? `🎥 Watch: ${video.title}\nhttps://www.youtube.com/watch?v=${video.id}`
     : `Give them a watch: ${show.url}`;
+  const aboutLine = show.description ? `\n\nAbout ${show.name}: ${show.description}` : "";
   const body =
     `🎬 Manitoba Fishing Video of the Day\n\n` +
-    `Today's pick: ${show.name} — some of the best Manitoba fishing content on YouTube.\n\n` +
+    `Today's pick: ${show.name} — some of the best Manitoba fishing content on YouTube.${aboutLine}\n\n` +
     `${videoLine}\n\n` +
     `Know a Manitoba fishing channel we should feature? Drop it in the comments! 👇`;
   await post(userId, body);
