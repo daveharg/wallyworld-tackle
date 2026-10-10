@@ -13,7 +13,8 @@ import YouTubeEmbed, { extractYouTubeId } from "../_components/YouTubeEmbed";
 import { TournamentBuilder } from "../tournaments/_components/TournamentBuilder";
 import { JoinByCode } from "../tournaments/_components/JoinByCode";
 import StoriesRow from "./_components/StoriesRow";
-import CatchMapPicker from "./_components/CatchMapPicker";
+import dynamic from "next/dynamic";
+const CatchMapPicker = dynamic(() => import("./_components/CatchMapPicker"), { ssr: false });
 
 /** Tournament tab inside the + composer: build one here or join with a code. */
 /** Bottom sheet for the + composer: swipe down to dismiss, no X button. */
