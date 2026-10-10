@@ -165,6 +165,22 @@ export default function MapsHub() {
       // Best effort.
     }
   };
+  const [showMyCatches, setShowMyCatches] = useState(() => {
+    try {
+      return localStorage.getItem("fishmb-show-my-catches") === "1";
+    } catch {
+      return false;
+    }
+  });
+
+  const changeShowMyCatches = (v: boolean) => {
+    setShowMyCatches(v);
+    try {
+      localStorage.setItem("fishmb-show-my-catches", v ? "1" : "0");
+    } catch {
+      // Best effort.
+    }
+  };
   const [followDot, setFollowDot] = useState<string>(() => {
     try {
       return localStorage.getItem("fishmb-follow-dot") || "dot-blue";
@@ -557,13 +573,10 @@ export default function MapsHub() {
     nearbyTimer.current = setTimeout(() => loadNearbyCatches(center.lat, center.lng), 800);
   };
 
-  const catchPins: CatchPin[] = (
-    showPublicCatches
-      ? [...myCatches, ...nearbyCatches]
-      : catchScope === "mine"
-        ? myCatches
-        : nearbyCatches
-  ).map((c) => ({
+  const catchPins: CatchPin[] = [
+    ...(showMyCatches ? myCatches : []),
+    ...(showPublicCatches ? nearbyCatches : []),
+  ].map((c) => ({
     id: c.id,
     lat: c.lat,
     lng: c.lng,
@@ -1010,6 +1023,8 @@ export default function MapsHub() {
             onBiteChange={setBiteOn}
             showPublicCatches={showPublicCatches}
             onShowPublicCatchesChange={changeShowPublicCatches}
+            showMyCatches={showMyCatches}
+            onShowMyCatchesChange={changeShowMyCatches}
             followDot={followDot}
             onFollowDotChange={setFollowDot}
             trails={trails}

@@ -28,6 +28,8 @@ interface SettingsTabProps {
   onBiteChange: (v: boolean) => void;
   showPublicCatches: boolean;
   onShowPublicCatchesChange: (v: boolean) => void;
+  showMyCatches: boolean;
+  onShowMyCatchesChange: (v: boolean) => void;
   followDot: string;
   onFollowDotChange: (id: string) => void;
   trails: Trail[];
@@ -74,6 +76,8 @@ export default function SettingsTab({
   onBiteChange,
   showPublicCatches,
   onShowPublicCatchesChange,
+  showMyCatches,
+  onShowMyCatchesChange,
   followDot,
   onFollowDotChange,
   trails,
@@ -189,11 +193,29 @@ export default function SettingsTab({
           </p>
         )}
       </div>
-      <Section icon="" title="Catches on map" sub="Show public catches from other anglers as pins on the map.">
+      <Section icon="" title="Catches on map" sub="Show your catches and public catches from other anglers as pins on the map.">
+        <button
+          type="button"
+          onClick={() => onShowMyCatchesChange(!showMyCatches)}
+          className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3"
+        >
+          <span className="text-sm font-bold text-pine">Show my catches</span>
+          <span
+            className={`w-12 h-7 rounded-full p-1 transition-colors ${
+              showMyCatches ? "bg-signal" : "bg-pine/15"
+            }`}
+          >
+            <span
+              className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                showMyCatches ? "translate-x-5" : ""
+              }`}
+            />
+          </span>
+        </button>
         <button
           type="button"
           onClick={() => onShowPublicCatchesChange(!showPublicCatches)}
-          className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3"
+          className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3 mt-2"
         >
           <span className="text-sm font-bold text-pine">Show others' catches</span>
           <span
@@ -209,7 +231,7 @@ export default function SettingsTab({
           </span>
         </button>
         <p className="text-[11px] text-pine/45 mt-2">
-          Pins every public catch on the map so you can see where other anglers are landing fish.
+          Pins catches on the map so you can see where fish are being landed.
         </p>
       </Section>
       <Section icon="" title="Widgets" sub="Floating boxes you can drag anywhere on the map.">
