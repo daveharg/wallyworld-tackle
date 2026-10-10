@@ -959,6 +959,7 @@ function FeedPageInner() {
   const [shareNote, setShareNote] = useState<string | null>(null);
   const [visibility, setVisibility] = useState<"public" | "friends" | "followers" | "private">("public");
   const [shareLocation, setShareLocation] = useState(true);
+  const [saveLocation, setSaveLocation] = useState(true);
   const [personalRecord, setPersonalRecord] = useState(false);
   const [catchSpecies, setCatchSpecies] = useState("");
   const [catchLength, setCatchLength] = useState("");
@@ -1090,6 +1091,14 @@ function FeedPageInner() {
     }
     if (!action) lastActionRef.current = null;
   }, [searchParams, user, authLoading, load]);
+
+  // Auto-capture location when the catch composer opens (unless disabled).
+  useEffect(() => {
+    if (composerOpen && mode === "catch" && saveLocation && catchLat === null && !locating) {
+      saveCatchLocation();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [composerOpen, mode]);
 
   // Closing the composer clears the action params so the next tap re-fires.
   const closeComposer = useCallback(() => {
@@ -1483,7 +1492,7 @@ function FeedPageInner() {
           photo_measure_url: photoUrl,
           photo_hold_url: photoUrl,
           photos: urls,
-          visibility,
+          visibility: personalRecord ? "private" : visibility,
           share_location: shareLocation,
           personal_record: personalRecord,
           weather,
@@ -1519,6 +1528,8 @@ function FeedPageInner() {
       setCatchLat(null);
       setCatchLng(null);
       setShareLocation(true);
+      setSaveLocation(true);
+      setPersonalRecord(false);
       closeComposer();
       load();
     } catch (e) {
@@ -2170,11 +2181,20 @@ function FeedPageInner() {
                   </label>
                   <button
                     type="button"
-                    onClick={saveCatchLocation}
+                    onClick={() => {
+                      const next = !saveLocation;
+                      setSaveLocation(next);
+                      if (!next) {
+                        setCatchLat(null);
+                        setCatchLng(null);
+                      } else if (catchLat === null) {
+                        saveCatchLocation();
+                      }
+                    }}
                     disabled={locating}
                     className="text-sm font-bold text-signal-dark disabled:opacity-50"
                   >
- {locating ? " Getting location…" : " Save location"}
+ {locating ? " Getting location…" : saveLocation ? " Location on" : " Location off"}
                   </button>
                   <select
                     value={visibility}
@@ -2195,11 +2215,11 @@ function FeedPageInner() {
                 >
                   <span>
                     <span className="block text-sm font-bold text-pine">
-                      {personalRecord ? "Personal record only" : "Post to feed"}
+                      {personalRecord ? "Personal log" : "Post to feed"}
                     </span>
                     <span className="block text-xs text-pine/55 mt-0.5">
                       {personalRecord
-                        ? "Saved to your catch history only — won't appear in the feed. You can share it later from HQ → Stats."
+                        ? "Only you can see this catch. No verification required. You can share it later from HQ → Stats."
                         : "This catch will appear in the feed."}
                     </span>
                   </span>
