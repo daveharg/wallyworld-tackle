@@ -61,6 +61,12 @@ export default function MapsHub() {
   const [spots, setSpots] = useState<Spot[]>([]);
   const [loading, setLoading] = useState(true);
   const [spotsReady, setSpotsReady] = useState(false);
+  const [spotPopup, setSpotPopup] = useState<SpotPin | null>(null);
+  const [spotEditing, setSpotEditing] = useState(false);
+  const [spotEditName, setSpotEditName] = useState("");
+  const [spotEditNotes, setSpotEditNotes] = useState("");
+  const [spotEditIcon, setSpotEditIcon] = useState("pin");
+  const [spotSaving, setSpotSaving] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [myLoc, setMyLoc] = useState<{ lat: number; lng: number; speed: number | null } | null>(null);
   const [mapCenter, setMapCenter] = useState({ lat: 48, lng: -100 });
@@ -144,6 +150,41 @@ export default function MapsHub() {
   const [sharingId, setSharingId] = useState<string | null>(null);
 
   // ---- data loading ----
+  const reloadSpots = async () => {
+    try {
+      const d = await fishFetch("/api/fishmb/spots");
+      setSpots((d.spots ?? []) as Spot[]);
+    } catch {
+      // Keep existing spots on error.
+    }
+  };
+
+  const saveSpotEdit = async () => {
+    if (!spotPopup || spotSaving) return;
+    setSpotSaving(true);
+    try {
+      await fishFetch(`/api/fishmb/spots/${spotPopup.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: spotEditName.trim(),
+          notes: spotEditNotes.trim() || null,
+          icon: spotEditIcon,
+        }),
+      });
+      await reloadSpots();
+      setSpotEditing(false);
+      setSpotPopup(null);
+      setNote("Spot updated.");
+      setTimeout(() => setNote(null), 2500);
+    } catch {
+      setNote("Couldn't save — try again.");
+      setTimeout(() => setNote(null), 3000);
+    } finally {
+      setSpotSaving(false);
+    }
+  };
+
   useEffect(() => {
     (async () => {
       try {
@@ -580,6 +621,13 @@ export default function MapsHub() {
             catchPins={catchPins}
             basemap={basemap}
             onMoveEnd={onMoveEnd}
+            onSpotClick={(s) => {
+              setSpotPopup(s);
+              setSpotEditing(false);
+              setSpotEditName(s.name || "");
+              setSpotEditNotes(s.notes || "");
+              setSpotEditIcon(s.icon || "pin");
+            }}
           />
         </Suspense>
         {loading && (
@@ -831,6 +879,128 @@ export default function MapsHub() {
                 Cancel
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Spot info popup when a map pin is tapped */}
+      {spotPopup && (
+        <div
+          className="fixed inset-0 z-[1200] flex items-end sm:items-center justify-center p-4 bg-pine-deep/50 backdrop-blur-sm"
+          onClick={() => {
+            setSpotPopup(null);
+            setSpotEditing(false);
+          }}
+        >
+          <div
+            className="bg-paper rounded-3xl p-6 w-full max-w-sm shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {spotEditing ? (
+              <>
+                <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
+                  Edit spot
+                </h3>
+                <input
+                  value={spotEditName}
+                  onChange={(e) => setSpotEditName(e.target.value)}
+                  maxLength={80}
+                  placeholder="Spot name"
+                  className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold mb-2 focus:outline-none focus:border-signal"
+                />
+                <textarea
+                  value={spotEditNotes}
+                  onChange={(e) => setSpotEditNotes(e.target.value)}
+                  maxLength={500}
+                  placeholder="Notes (optional)"
+                  rows={3}
+                  className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm mb-3 focus:outline-none focus:border-signal"
+                />
+                <p className="text-xs font-bold uppercase tracking-wider text-pine/55 mb-2">
+                  Spot icon
+                </p>
+                <div className="flex gap-2 mb-4">
+                  {SPOT_ICON_CHOICES.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setSpotEditIcon(c.id)}
+                      title={c.label}
+                      aria-label={`Spot icon: ${c.label}`}
+                      className={`w-11 h-11 rounded-2xl border-2 text-xl flex items-center justify-center transition-colors ${
+                        spotEditIcon === c.id
+                          ? "border-signal bg-signal/10"
+                          : "border-pine/15 bg-white hover:border-pine/30"
+                      }`}
+                    >
+                      {c.emoji}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={saveSpotEdit}
+                    disabled={spotSaving}
+                    className="flex-1 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full disabled:opacity-50 transition-colors"
+                  >
+                    {spotSaving ? "Saving…" : "Save"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSpotEditing(false)}
+                    className="px-6 py-3 text-pine/60 font-bold uppercase tracking-wider text-sm"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-start justify-between mb-2">
+                  <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide flex-1 mr-2">
+                    {spotPopup.name || "Fishing spot"}
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSpotPopup(null);
+                      setSpotEditing(false);
+                    }}
+                    aria-label="Close"
+                    className="w-8 h-8 rounded-full bg-pine/10 text-pine/60 font-black flex items-center justify-center shrink-0"
+                  >
+                    ×
+                  </button>
+                </div>
+                {spotPopup.notes && (
+                  <p className="text-pine/70 text-sm mb-3 whitespace-pre-line">{spotPopup.notes}</p>
+                )}
+                <p className="text-pine/40 text-xs tabular-nums mb-4">
+                  {Number(spotPopup.lat).toFixed(5)}, {Number(spotPopup.lng).toFixed(5)}
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSpotEditing(true)}
+                    className="flex-1 bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const existing = spots.find((sp) => sp.id === spotPopup.id);
+                      if (existing) setGoTo(existing);
+                      setSpotPopup(null);
+                    }}
+                    className="flex-1 bg-signal/15 hover:bg-signal/25 text-signal-dark font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
+                  >
+                    🧭 Go to
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

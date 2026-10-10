@@ -52,6 +52,8 @@ interface SpotMapProps {
   goTo?: { lat: number; lng: number } | null;
   /** Fired after a recorded trail is saved, so the parent can refresh. */
   onTrailSaved?: () => void;
+  /** Fired when a spot marker is tapped — parent shows a custom popup. */
+  onSpotClick?: (spot: SpotPin) => void;
   /** GPS catch pins rendered on the map. */
   catchPins?: CatchPin[];
   /** Base map style. */
@@ -110,12 +112,15 @@ export default function SpotMap({
   overlayTrail,
   goTo,
   onTrailSaved,
+  onSpotClick,
   catchPins,
   basemap = "streets",
   onMoveEnd,
   fill = false,
 }: SpotMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const onSpotClickRef = useRef(onSpotClick);
+  onSpotClickRef.current = onSpotClick;
   const [map, setMap] = useState<any>(null);
   const [expanded, setExpanded] = useState(false);
   // Circular fill indicator shown at the press point during a long-press.
@@ -331,11 +336,8 @@ export default function SpotMap({
           iconSize: size,
           iconAnchor: anchor,
         });
-        const marker = L.marker([s.lat, s.lng], { icon }).bindPopup(
-          `<strong>${escapeHtml(s.name || "Fishing spot")}</strong><br/>${escapeHtml(
-            fmtDate(s.created_at)
-          )}${s.notes ? `<br/>${escapeHtml(s.notes)}` : ""}`
-        );
+        const marker = L.marker([s.lat, s.lng], { icon });
+        marker.on("click", () => onSpotClickRef.current?.(s));
         marker.addTo(layer);
         bounds.push([s.lat, s.lng]);
       }
