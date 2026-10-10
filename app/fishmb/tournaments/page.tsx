@@ -34,21 +34,25 @@ export default async function TournamentsPage() {
           ?
         </Link>
       </div>
-      <div className="flex flex-wrap gap-3 mb-10">
-        <Link
-          href="/fishmb/tournaments/create"
-          className="bg-signal hover:bg-signal-dark text-white font-black uppercase tracking-widest text-sm px-8 py-4 rounded-lg shadow-[0_4px_0_rgba(0,0,0,0.15)] hover:shadow-[0_2px_0_rgba(0,0,0,0.15)] hover:translate-y-[2px] transition-all"
-        >
-          Create a tournament
-        </Link>
-        <OrganizerButton />
-        <Link
-          href="/fishmb/tournaments/how-it-works"
-          className="bg-white border-2 border-pine/15 hover:border-pine/40 text-pine font-black uppercase tracking-widest text-sm px-8 py-4 rounded-lg shadow-[0_4px_0_rgba(0,0,0,0.08)] hover:shadow-[0_2px_0_rgba(0,0,0,0.08)] hover:translate-y-[2px] transition-all"
-        >
-          Learn more
-        </Link>
-        <JoinByCode />
+      <div className="flex flex-col gap-3 mb-10">
+        <div className="flex gap-3">
+          <Link
+            href="/fishmb/tournaments/create"
+            className="flex-1 text-center bg-signal hover:bg-signal-dark text-white font-black uppercase tracking-widest text-sm px-4 py-4 rounded-lg shadow-[0_4px_0_rgba(0,0,0,0.15)] hover:shadow-[0_2px_0_rgba(0,0,0,0.15)] hover:translate-y-[2px] transition-all"
+          >
+            Create a tournament
+          </Link>
+          <Link
+            href="/fishmb/tournaments/how-it-works"
+            className="flex-1 text-center bg-white border-2 border-pine/15 hover:border-pine/40 text-pine font-black uppercase tracking-widest text-sm px-4 py-4 rounded-lg shadow-[0_4px_0_rgba(0,0,0,0.08)] hover:shadow-[0_2px_0_rgba(0,0,0,0.08)] hover:translate-y-[2px] transition-all"
+          >
+            Learn more
+          </Link>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <OrganizerButton />
+          <JoinByCode />
+        </div>
       </div>
 
       {tournaments.length === 0 ? (
