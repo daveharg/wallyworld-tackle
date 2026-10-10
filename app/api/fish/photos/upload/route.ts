@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
   try {
     form = await req.formData();
   } catch {
-    return badRequest("Couldn't read your photo. If it's a screenshot, use the original camera photo instead — screenshots don't carry a timestamp.");
+    return badRequest("Couldn't read your photo. Try choosing it again.");
   }
   const file = form.get("file");
   if (!(file instanceof File)) return badRequest("No photo was attached. Try choosing it again.");
