@@ -2142,9 +2142,9 @@ function FeedPageInner() {
                       className="bg-paper-deep border border-pine/15 rounded-full px-3 py-2 text-xs font-bold text-pine focus:outline-none"
                       aria-label="Who can see this"
                     >
-                      <option value="public">Everyone</option>
-                      <option value="friends">Friends only</option>
-                      <option value="followers">Followers</option>
+                      <option value="public">Share to everyone</option>
+                      <option value="friends">Share to friends</option>
+                      <option value="followers">Share to followers</option>
                     </select>
                     <button
                       onClick={post}
@@ -2238,9 +2238,9 @@ function FeedPageInner() {
                     className="bg-paper-deep border border-pine/15 rounded-full px-3 py-2 text-xs font-bold text-pine focus:outline-none"
                     aria-label="Who can see this"
                   >
-                    <option value="public">Everyone</option>
-                    <option value="friends">Friends only</option>
-                    <option value="followers">Followers</option>
+                    <option value="public">Share to everyone</option>
+                    <option value="friends">Share to friends</option>
+                    <option value="followers">Share to followers</option>
                     <option value="private">Only me</option>
                   </select>
                 </div>
