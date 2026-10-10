@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
     lng,
     notes,
     icon: isSpotIconId(body.icon) ? body.icon : "pin",
+    lakeId: typeof body.lake_id === "string" && body.lake_id.trim() ? body.lake_id.trim() : null,
   });
   return NextResponse.json({ spot }, { status: 201 });
 }

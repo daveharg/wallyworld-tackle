@@ -6,13 +6,14 @@ import type { SpotPin } from "../../profile/_components/SpotMap";
 export interface Spot extends SpotPin {
   user_id: string;
   catch_id: string | null;
+  lake_id?: string | null;
 }
 
 interface SpotsTabProps {
   spots: Spot[];
   onSelect: (s: Spot) => void;
   onNavigate: (s: Spot) => void;
-  onEdit: (id: string, patch: { name: string; notes: string | null; icon: string }) => Promise<void>;
+  onEdit: (id: string, patch: { name: string; notes: string | null; icon: string; lake_id: string | null }) => Promise<void>;
   onDelete: (id: string) => void;
   onShare: (id: string) => void;
   sharingId: string | null;
@@ -50,6 +51,7 @@ export default function SpotsTab({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [editNotes, setEditNotes] = useState("");
+  const [editLakeId, setEditLakeId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [lakes, setLakes] = useState<LakeCoord[]>([]);
 
@@ -83,6 +85,7 @@ export default function SpotsTab({
     setEditingId(s.id);
     setEditName(s.name);
     setEditNotes(s.notes ?? "");
+    setEditLakeId(s.lake_id ?? null);
   };
 
   const saveEdit = async (id: string) => {
@@ -92,6 +95,7 @@ export default function SpotsTab({
         name: editName.trim() || "Fishing spot",
         notes: editNotes.trim() || null,
         icon: "pin",
+        lake_id: editLakeId,
       });
       setEditingId(null);
     } catch {
@@ -105,7 +109,9 @@ export default function SpotsTab({
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 
-  // Group spots by nearest lake (within 15 km); the rest under "Other spots".
+  // Group spots by lake: an explicit lake_id (set when the spot was saved, or
+  // chosen by the angler) always wins; otherwise fall back to nearest lake
+  // centre within 15 km; the rest under "Other spots".
   const nearestLake = (s: Spot): LakeCoord | null => {
     const lat = Number(s.lat);
     const lng = Number(s.lng);
@@ -122,10 +128,18 @@ export default function SpotsTab({
     return best;
   };
 
+  const lakeFor = (s: Spot): LakeCoord | null => {
+    if (s.lake_id) {
+      const explicit = lakes.find((l) => l.id === s.lake_id);
+      if (explicit) return explicit;
+    }
+    return nearestLake(s);
+  };
+
   const groups: { lake: LakeCoord | null; spots: Spot[] }[] = [];
   const groupById = new Map<string, { lake: LakeCoord | null; spots: Spot[] }>();
   for (const s of sorted) {
-    const lake = nearestLake(s);
+    const lake = lakeFor(s);
     const key = lake ? lake.id : "__other";
     let g = groupById.get(key);
     if (!g) {
@@ -184,6 +198,25 @@ export default function SpotsTab({
                         placeholder="Notes (optional)"
                         className={inputCls}
                       />
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-1.5">
+                          Lake
+                        </label>
+                        <select
+                          value={editLakeId ?? ""}
+                          onChange={(e) => setEditLakeId(e.target.value || null)}
+                          className={inputCls}
+                        >
+                          <option value="">Auto (nearest lake)</option>
+                          {[...lakes]
+                            .sort((a, b) => a.name.localeCompare(b.name))
+                            .map((l) => (
+                              <option key={l.id} value={l.id}>
+                                {l.name}
+                              </option>
+                            ))}
+                        </select>
+                      </div>
                       <div className="flex gap-2">
                         <button
                           type="button"

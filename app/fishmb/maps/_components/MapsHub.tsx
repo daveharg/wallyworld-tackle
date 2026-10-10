@@ -384,13 +384,13 @@ export default function MapsHub() {
 
   const editSpot = async (
     id: string,
-    patch: { name: string; notes: string | null; icon: string }
+    patch: { name: string; notes: string | null; icon: string; lake_id: string | null }
   ) => {
     try {
       const d = await fishFetch(`/api/fishmb/spots/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(patch),
+        body: JSON.stringify({ ...patch, lake_id: patch.lake_id }),
       });
       setSpots(spots.map((s) => (s.id === id ? (d.spot as Spot) : s)));
     } catch (e) {

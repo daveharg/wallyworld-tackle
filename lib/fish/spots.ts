@@ -19,6 +19,7 @@ export interface FishingSpot {
   notes: string | null;
   catch_id: string | null;
   icon: string;
+  lake_id: string | null;
   created_at: string;
 }
 
@@ -42,6 +43,10 @@ export async function ensureSpotsTable(): Promise<void> {
   );
   // Per-spot map icon (pin/fish/rock/weed). Added Oct 2026.
   await query(`ALTER TABLE fm_fishing_spots ADD COLUMN IF NOT EXISTS icon text NOT NULL DEFAULT 'pin'`);
+  // Explicit lake assignment — the angler's chosen lake for this spot, so it
+  // groups under the right lake even when a neighbouring lake's pin is closer.
+  // Added Oct 2026.
+  await query(`ALTER TABLE fm_fishing_spots ADD COLUMN IF NOT EXISTS lake_id text`);
   // Favorite lakes: the angler's saved lakes for quick map navigation on the
   // profile's fishing-spots section.
   await ensureFavoriteLakesTable();
@@ -99,7 +104,7 @@ export function isValidLng(v: unknown): v is number {
 
 export async function listSpots(userId: string): Promise<FishingSpot[]> {
   const rows = await query<FishingSpot>(
-    `SELECT id, user_id, name, lat, lng, notes, catch_id, icon, created_at
+    `SELECT id, user_id, name, lat, lng, notes, catch_id, icon, lake_id, created_at
        FROM fm_fishing_spots
       WHERE user_id = $1
       ORDER BY created_at DESC`,
@@ -110,12 +115,12 @@ export async function listSpots(userId: string): Promise<FishingSpot[]> {
 
 export async function createSpot(
   userId: string,
-  spot: { name: string; lat: number; lng: number; notes?: string | null; catchId?: string | null; icon?: string }
+  spot: { name: string; lat: number; lng: number; notes?: string | null; catchId?: string | null; icon?: string; lakeId?: string | null }
 ): Promise<FishingSpot> {
   const row = await queryOne<FishingSpot>(
-    `INSERT INTO fm_fishing_spots (user_id, name, lat, lng, notes, catch_id, icon)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)
-     RETURNING id, user_id, name, lat, lng, notes, catch_id, icon, created_at`,
+    `INSERT INTO fm_fishing_spots (user_id, name, lat, lng, notes, catch_id, icon, lake_id)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+     RETURNING id, user_id, name, lat, lng, notes, catch_id, icon, lake_id, created_at`,
     [
       userId,
       spot.name.trim().slice(0, 80) || "Fishing spot",
@@ -124,6 +129,7 @@ export async function createSpot(
       spot.notes?.trim().slice(0, 500) || null,
       spot.catchId ?? null,
       isSpotIconId(spot.icon) ? spot.icon : "pin",
+      spot.lakeId?.trim() || null,
     ]
   );
   if (!row) throw new Error("Could not create spot.");
@@ -133,7 +139,7 @@ export async function createSpot(
 export async function updateSpot(
   userId: string,
   spotId: string,
-  patch: { name?: string; notes?: string | null; icon?: string }
+  patch: { name?: string; notes?: string | null; icon?: string; lakeId?: string | null }
 ): Promise<FishingSpot | null> {
   const sets: string[] = [];
   const vals: unknown[] = [];
@@ -149,9 +155,13 @@ export async function updateSpot(
     vals.push(isSpotIconId(patch.icon) ? patch.icon : "pin");
     sets.push(`icon = $${vals.length}`);
   }
+  if (patch.lakeId !== undefined) {
+    vals.push(patch.lakeId?.trim() || null);
+    sets.push(`lake_id = $${vals.length}`);
+  }
   if (sets.length === 0) {
     return queryOne<FishingSpot>(
-      `SELECT id, user_id, name, lat, lng, notes, catch_id, icon, created_at
+      `SELECT id, user_id, name, lat, lng, notes, catch_id, icon, lake_id, created_at
          FROM fm_fishing_spots WHERE id = $${vals.length + 1} AND user_id = $${vals.length + 2}`,
       [spotId, userId]
     );
@@ -160,7 +170,7 @@ export async function updateSpot(
   return queryOne<FishingSpot>(
     `UPDATE fm_fishing_spots SET ${sets.join(", ")}
       WHERE id = $${vals.length - 1} AND user_id = $${vals.length}
-     RETURNING id, user_id, name, lat, lng, notes, catch_id, icon, created_at`,
+     RETURNING id, user_id, name, lat, lng, notes, catch_id, icon, lake_id, created_at`,
     vals
   );
 }

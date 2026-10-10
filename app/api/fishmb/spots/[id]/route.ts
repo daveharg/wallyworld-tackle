@@ -23,7 +23,7 @@ export async function PATCH(
   } catch {
     return badRequest("Invalid JSON body.");
   }
-  const patch: { name?: string; notes?: string | null; icon?: string } = {};
+  const patch: { name?: string; notes?: string | null; icon?: string; lakeId?: string | null } = {};
   if (body.name !== undefined) {
     if (typeof body.name !== "string") return badRequest("name must be a string.");
     patch.name = body.name.trim().slice(0, 80);
@@ -36,6 +36,11 @@ export async function PATCH(
   if (body.icon !== undefined) {
     if (!isSpotIconId(body.icon)) return badRequest("Invalid spot icon.");
     patch.icon = body.icon;
+  }
+  if (body.lake_id !== undefined) {
+    if (typeof body.lake_id !== "string" && body.lake_id !== null)
+      return badRequest("lake_id must be a string or null.");
+    patch.lakeId = body.lake_id;
   }
   const spot = await updateSpot(me.id, params.id, patch);
   if (!spot) return notFound();

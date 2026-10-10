@@ -723,7 +723,11 @@ export default function WeatherPage() {
               </div>
             </>
           ) : (
-            !err && <FishLoader label="Loading weather…" />
+            !err && (
+              <div className="flex items-center justify-center min-h-[60vh]">
+                <FishLoader label="Loading weather…" />
+              </div>
+            )
           )}
         </div>
       </div>
