@@ -90,18 +90,18 @@ export default function StoriesRow() {
         >
           {user.avatar_url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={user.avatar_url} alt="" className="w-full h-2/3 object-cover" />
+            <img src={user.avatar_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-2/3 bg-pine/10 flex items-center justify-center">
+            <div className="absolute inset-0 bg-pine/10 flex items-center justify-center">
               <span className="text-3xl font-bold text-pine/40">
                 {user.name.charAt(0).toUpperCase()}
               </span>
             </div>
           )}
-          <span className="absolute left-1/2 -translate-x-1/2 top-[calc(66.6%-20px)] w-10 h-10 rounded-full bg-signal text-white flex items-center justify-center text-2xl font-bold border-4 border-white">
+          <span className="absolute left-1/2 -translate-x-1/2 bottom-10 w-10 h-10 rounded-full bg-signal text-white flex items-center justify-center text-2xl font-bold border-4 border-white">
             +
           </span>
-          <span className="absolute bottom-0 inset-x-0 pt-6 pb-2 text-center text-xs font-bold text-pine bg-white">
+          <span className="absolute bottom-0 inset-x-0 pt-6 pb-2 text-center text-xs font-bold text-white bg-gradient-to-t from-black/60 to-transparent">
             Create story
           </span>
         </button>
