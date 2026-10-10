@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { fishFetch } from "../../_components/fishFetch";
 import { compressImage } from "../../_components/compressImage";
+import { getPhotoTakenAt } from "../../_components/exifDate";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 
 const inputCls =
@@ -75,6 +76,11 @@ export function SubmitEntry({
     }
     setBusy(true);
     try {
+      // 0. Check the bump board photo's taken-at time against the tournament window.
+      // (Read before compression — compression strips EXIF.)
+      const takenAt = await getPhotoTakenAt(bumpFile);
+      const capturedAt = takenAt ? takenAt.toISOString() : null;
+
       // 1. Upload the photos (compressed), bump board first.
       const token = localStorage.getItem(FISHMB_TOKEN_KEY);
       const photoUrls: string[] = [];
@@ -115,6 +121,7 @@ export function SubmitEntry({
           photo_urls: photoUrls,
           bump_photo_url: photoUrls[0],
           hold_photo_url: photoUrls[1] ?? null,
+          captured_at: capturedAt,
           species: fishSpecies.trim(),
           length_inches: length ? parseFloat(length) : null,
           latitude: lat,
