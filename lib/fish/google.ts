@@ -48,6 +48,7 @@ function b64urlToBuffer(s: string): Buffer {
 function allowedAudiences(): string[] {
   const ids = [
     process.env.GOOGLE_CLIENT_ID,
+    process.env.FISHMB_GOOGLE_CLIENT_ID,
     process.env.GOOGLE_IOS_CLIENT_ID,
     process.env.GOOGLE_WEB_CLIENT_ID,
   ];
