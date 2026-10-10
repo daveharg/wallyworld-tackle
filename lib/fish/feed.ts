@@ -62,6 +62,8 @@ export async function ensureFeedColumns(): Promise<void> {
   // on Mux (converted + served by them), we only keep the playback reference.
   await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS video jsonb`);
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS video jsonb`);
+  // Public caption shown with a catch on the feed (separate from private notes).
+  await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS feed_caption text`);
   // A shared fishing spot on a post: { name, lat, lng, notes, icon }.
   await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS spot_share jsonb`);
   // Comments can carry one photo.
