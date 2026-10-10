@@ -931,7 +931,7 @@ function Comments({ postId, uploadPhoto }: { postId: string; uploadPhoto: (f: Fi
 function FeedPageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { user, loading: authLoading, openLogin } = useFishAuth();
+  const { user, loading: authLoading, openLogin, logout } = useFishAuth();
   const [items, setItems] = useState<FeedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -1692,11 +1692,15 @@ function FeedPageInner() {
             <nav className="flex flex-col gap-1">
               {[
                 ["/fishmb", "Home"],
+                ["/fishmb/dashboard", "Angler HQ"],
+                ["/fishmb/dashboard?tab=stats", "My Stats"],
+                ["/fishmb/dashboard?tab=tournaments", "Tournaments"],
+                ["/fishmb/dashboard?tab=licence", "Licence"],
+                ["/fishmb/profile/edit", "Edit profile"],
                 ["/fishmb/lakes", "Lakes"],
                 ["/fishmb/lodges", "Lodges & Guides"],
                 ["/fishmb/regulations", "Regulations"],
                 ["/fishmb/hot-lakes", "Hot Lakes"],
-                ["/fishmb/tournaments", "Tournaments"],
                 ["/fishmb/tips", "Tips"],
                 ["/fishmb/feed", "The Feed"],
                 ["/fishmb/classifieds", "Classifieds"],
@@ -1710,6 +1714,16 @@ function FeedPageInner() {
                   {label}
                 </Link>
               ))}
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false);
+                  if (window.confirm("Log out of FishMB?")) logout();
+                }}
+                className="py-3 px-2 text-left text-red-600 font-bold border-b border-pine/10"
+              >
+                Log out
+              </button>
             </nav>
           </div>
         </div>
