@@ -1704,7 +1704,7 @@ function FeedPageInner() {
                 ["/fishmb/tips", "Tips"],
                 ["/fishmb/feed", "The Feed"],
                 ["/fishmb/classifieds", "Classifieds"],
-                ["/fishmb/profile", "View profile"],
+                ["/fishmb/dashboard?tab=profile", "View profile"],
               ].map(([href, label]) => (
                 <Link
                   key={href}

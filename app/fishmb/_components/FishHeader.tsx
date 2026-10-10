@@ -132,7 +132,7 @@ export default function FishHeader() {
  Angler HQ
               </Link>
               <Link
-                href="/fishmb/profile"
+                href="/fishmb/dashboard?tab=profile"
                 onClick={() => setOpen(false)}
                 className="py-2.5 text-sm font-bold uppercase tracking-wider text-signal"
               >
