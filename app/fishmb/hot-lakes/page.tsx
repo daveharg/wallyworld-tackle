@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { HotLakeCard } from "../_components/Cards";
 import { getHotLakes } from "@/lib/fishmb";
+import BackArrow from "../_components/BackArrow";
 
 export const metadata: Metadata = {
   title: "Hot lakes — what's biting now in Manitoba",
@@ -15,6 +16,7 @@ export default function HotLakesPage() {
   const hot = getHotLakes();
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 md:py-14">
+      <BackArrow />
       <p className="text-signal text-xs font-bold uppercase tracking-[0.24em] mb-2">
         Bite reports
       </p>

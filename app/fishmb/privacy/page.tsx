@@ -1,4 +1,5 @@
 import { LegalDoc } from "../_components/LegalDoc";
+import BackArrow from "../_components/BackArrow";
 
 export const metadata = {
   title: "Privacy Policy — FishMB",
@@ -7,7 +8,9 @@ export const metadata = {
 
 export default function PrivacyPage() {
   return (
-    <LegalDoc
+    <>
+      <BackArrow />
+      <LegalDoc
       title="Privacy Policy"
       updated="October 8, 2026"
       intro="FishMB is a community, not a data business. We collect the minimum needed to run the app, we don't sell your personal information, and your private spots stay private. Here's exactly what happens with your data."
@@ -153,5 +156,6 @@ export default function PrivacyPage() {
         },
       ]}
     />
+    </>
   );
 }

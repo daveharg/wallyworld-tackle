@@ -10,6 +10,7 @@ import DashboardStats from "./_components/DashboardStats";
 import DashboardProfile from "./_components/DashboardProfile";
 import DashboardLicence from "./_components/DashboardLicence";
 import DashboardTournaments from "./_components/DashboardTournaments";
+import BackArrow from "../_components/BackArrow";
 
 const TABS = [
  { id: "stats", label: "Stats", icon: "" },
@@ -87,6 +88,7 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 md:py-14">
+      <BackArrow />
       <h1 className="font-display font-bold uppercase text-pine text-4xl md:text-5xl tracking-wide mb-6">
         Angler HQ
       </h1>

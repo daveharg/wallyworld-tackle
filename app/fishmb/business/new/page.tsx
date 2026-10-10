@@ -8,6 +8,7 @@ import { useFishAuth } from "../../_components/FishAuth";
 import { fishFetch } from "../../_components/fishFetch";
 import { compressImage } from "../../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
+import BackArrow from "../../_components/BackArrow";
 
 export default function NewBusinessPage() {
   const { user, openLogin } = useFishAuth();
@@ -91,6 +92,7 @@ export default function NewBusinessPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10 md:py-14">
+      <BackArrow />
       <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide mb-2">
         List your business
       </h1>

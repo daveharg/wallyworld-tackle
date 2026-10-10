@@ -1,4 +1,5 @@
 import { LegalDoc } from "../_components/LegalDoc";
+import BackArrow from "../_components/BackArrow";
 
 export const metadata = {
   title: "Terms of Service — FishMB",
@@ -7,7 +8,9 @@ export const metadata = {
 
 export default function TermsPage() {
   return (
-    <LegalDoc
+    <>
+      <BackArrow />
+      <LegalDoc
       title="Terms of Service"
       updated="October 8, 2026"
       intro="Welcome to FishMB — Manitoba's fishing community. These terms are the rules of the dock: by creating an account or using the app, you agree to them. If you don't agree, don't use FishMB."
@@ -196,5 +199,6 @@ export default function TermsPage() {
         },
       ]}
     />
+    </>
   );
 }

@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
+import BackArrow from "../_components/BackArrow";
 import {
   CLASSIFIED_CATEGORIES,
   classifiedCategoryMeta,
@@ -110,6 +111,7 @@ export default function ClassifiedsPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 pt-4 md:pt-6 pb-32">
+      <BackArrow />
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-black text-pine tracking-tight">Classifieds</h1>
         <button

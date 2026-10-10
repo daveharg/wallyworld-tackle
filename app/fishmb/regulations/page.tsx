@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getZones, getGuideUrl, getLakes } from "@/lib/fishmb";
 import { LakeSearch } from "./_components/LakeSearch";
+import BackArrow from "../_components/BackArrow";
 
 export const metadata: Metadata = {
   title: "Manitoba fishing regulations 2026",
@@ -20,6 +21,7 @@ export default function RegulationsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 md:py-14">
+      <BackArrow />
       <p className="text-signal text-xs font-bold uppercase tracking-[0.24em] mb-2">
         2026 Manitoba Anglers&apos; Guide
       </p>

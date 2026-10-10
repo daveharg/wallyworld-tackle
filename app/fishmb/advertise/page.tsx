@@ -8,6 +8,7 @@ import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
 import { compressImage } from "../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
+import BackArrow from "../_components/BackArrow";
 
 const SLOTS = [
   {
@@ -87,6 +88,7 @@ export default function AdvertisePage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 md:py-14">
+      <BackArrow />
       <p className="text-signal text-xs font-bold uppercase tracking-[0.24em] mb-2">For businesses</p>
       <h1 className="font-display font-bold uppercase text-pine text-4xl md:text-5xl tracking-wide mb-3">
         Advertise on FishMB

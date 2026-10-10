@@ -5,6 +5,7 @@
 import { useEffect, useState } from "react";
 import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
+import BackArrow from "../_components/BackArrow";
 
 const inputCls =
   "w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal";
@@ -51,6 +52,7 @@ export default function ContactPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10 md:py-14">
+      <BackArrow />
       <p className="text-signal text-xs font-bold uppercase tracking-[0.24em] mb-2">
         Get in touch
       </p>

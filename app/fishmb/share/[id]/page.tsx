@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { query } from "@/lib/fish/db";
+import BackArrow from "../../_components/BackArrow";
 
 export const dynamic = "force-dynamic";
 
@@ -80,6 +81,7 @@ export default async function SharePage({ params }: { params: { id: string } }) 
 
   return (
     <div className="min-h-screen bg-paper flex items-center justify-center p-6">
+      <BackArrow />
       <div className="max-w-md w-full bg-white rounded-3xl border border-pine/10 shadow-xl overflow-hidden">
         {post.photo_url && (
           // eslint-disable-next-line @next/next/no-img-element

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
+import BackArrow from "../_components/BackArrow";
 
 interface Person {
   id: string;
@@ -152,6 +153,7 @@ export default function FriendsPage() {
 
   return (
     <div className="min-h-screen">
+      <BackArrow />
       {/* Centered header */}
       <div className="pt-8 pb-2 px-4">
         <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide text-center">Friends</h1>

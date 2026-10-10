@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import LodgeDirectory from "./_components/LodgeDirectory";
 import Classifieds from "./_components/Classifieds";
 import { getLodges } from "@/lib/fishmb";
+import BackArrow from "../_components/BackArrow";
 
 export const metadata: Metadata = {
   title: "Manitoba lodges & fishing guides",
@@ -23,6 +24,7 @@ export default function LodgesPage() {
   }));
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 md:py-14">
+      <BackArrow />
       <p className="text-signal text-xs font-bold uppercase tracking-[0.24em] mb-2">
         Lodges &amp; guides
       </p>

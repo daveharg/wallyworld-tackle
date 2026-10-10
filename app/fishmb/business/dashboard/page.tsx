@@ -11,6 +11,7 @@ import { fishFetch } from "../../_components/fishFetch";
 import { compressImage } from "../../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 import MyListings from "../../profile/_components/MyListings";
+import BackArrow from "../../_components/BackArrow";
 
 type Tab = "listings" | "business" | "tournaments" | "bookings" | "advertise";
 
@@ -178,6 +179,7 @@ export default function BusinessDashboardPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 md:py-14">
+      <BackArrow />
       <p className="text-gold font-bold uppercase tracking-[0.28em] text-sm mb-2">Business</p>
       <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide mb-8">
         Dashboard

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getTournamentByInvite } from "@/lib/fish/tournaments";
 import { JoinButton } from "../../_components/JoinButton";
 import { PrizePot, LicenceNotice } from "../../_components/PrizePot";
+import BackArrow from "../../../_components/BackArrow";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 60;
@@ -40,6 +41,7 @@ export default async function JoinTournamentPage({
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-10 md:py-14">
+      <BackArrow />
       {t.cover_photo_url && (
         <div className="rounded-3xl overflow-hidden mb-8">
           {/* eslint-disable-next-line @next/next/no-img-element */}
