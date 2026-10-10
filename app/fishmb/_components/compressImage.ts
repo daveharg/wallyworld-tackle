@@ -14,11 +14,14 @@ type Drawable = ImageBitmap | HTMLImageElement;
  * is web-displayable. Returns the original file untouched only if it is
  * already a small JPEG or if decoding fails entirely.
  * Never upscales.
+ *
+ * Set `forceReencode` to always run through canvas — useful for files with
+ * malformed EXIF segments that otherwise pass through untouched.
  */
-export async function compressImage(file: File): Promise<File> {
+export async function compressImage(file: File, forceReencode = false): Promise<File> {
   if (!file.type.startsWith("image/")) return file;
-  // Skip only if it's already a small web-ready JPEG.
-  if (file.type === "image/jpeg" && file.size <= 4_000_000) {
+  // Skip only if it's already a small web-ready JPEG (unless forced).
+  if (!forceReencode && file.type === "image/jpeg" && file.size <= 4_000_000) {
     try {
       const probe = await loadDrawable(file);
       const longEdge = Math.max(probe.width as number, probe.height as number);

@@ -34,8 +34,9 @@ export default function DashboardSettings({ afterSaveHref }: { afterSaveHref?: s
     setNote(null);
     try {
       const token = localStorage.getItem(FISHMB_TOKEN_KEY);
-      // Compress first (HEIC → JPEG, resize if large).
-      const compressed = await compressImage(file);
+      // Compress first (HEIC → JPEG, resize if large). Force re-encode to
+      // strip malformed EXIF that some photos carry.
+      const compressed = await compressImage(file, true);
       // Upload directly to Blob (bypasses serverless body limit).
       const blob = await upload(`fish-avatars/${Date.now()}-${compressed.name}`, compressed, {
         access: "public",
