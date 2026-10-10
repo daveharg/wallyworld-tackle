@@ -692,9 +692,8 @@ export default function MapsHub() {
 
       {/* Quick-add modal after a map long-press / tap-to-drop */}
       {quickAdd && (
-        <div
-          className="fixed inset-0 z-[1200] flex items-center justify-center p-4 bg-pine-deep/60 backdrop-blur-sm"
-          onClick={() => {
+        <QuickAddModal
+          onClose={() => {
             setQuickAdd(null);
             setQuickMode("choose");
           }}
@@ -804,8 +803,35 @@ export default function MapsHub() {
               </>
             )}
           </div>
-        </div>
+        </QuickAddModal>
       )}
+    </div>
+  );
+}
+
+/** Backdrop wrapper for the quick-add modal — locks the map behind it so
+ *  sliding on the popup can't pan the page underneath. */
+function QuickAddModal({
+  onClose,
+  children,
+}: {
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+  return (
+    <div
+      className="fixed inset-0 z-[1200] flex items-center justify-center p-4 bg-pine-deep/60 backdrop-blur-sm overscroll-contain"
+      style={{ touchAction: "none" }}
+      onClick={onClose}
+    >
+      {children}
     </div>
   );
 }

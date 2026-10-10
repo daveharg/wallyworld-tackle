@@ -51,6 +51,16 @@ function ComposerSheet({
     setDragY(0);
   };
 
+  // Lock the background page while the composer is open — sliding on the
+  // sheet must not scroll the feed behind it.
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-pine-deep/60" onClick={closeComposer} />
@@ -62,7 +72,7 @@ function ComposerSheet({
           transform: dragY > 0 ? `translateY(${dragY}px)` : undefined,
           transition: dragging ? "none" : "transform 0.2s ease-out",
         }}
-        className={`relative bg-white w-full rounded-t-3xl sm:rounded-3xl max-h-[92vh] overflow-y-auto ${
+        className={`relative bg-white w-full rounded-t-3xl sm:rounded-3xl max-h-[92vh] overflow-y-auto overscroll-contain ${
           mode === "tournament" ? "sm:max-w-3xl" : "sm:max-w-lg"
         }`}
       >
