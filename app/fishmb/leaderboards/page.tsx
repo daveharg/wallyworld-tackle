@@ -59,6 +59,8 @@ export default function LeaderboardsPage() {
   const [rows, setRows] = useState<Row[]>([]);
   const [tabs, setTabs] = useState<SpeciesTab[]>([]);
   const [loading, setLoading] = useState(true);
+  const [catOpen, setCatOpen] = useState(false);
+  const [speciesOpen, setSpeciesOpen] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -89,54 +91,96 @@ export default function LeaderboardsPage() {
         count toward the totals.
       </p>
 
-      {/* Category tabs */}
-      <div className="flex overflow-x-auto pb-2 mb-4 -mx-4 px-4">
-        {CATEGORIES.map((c, i) => (
-          <button
-            key={c.key}
-            onClick={() => setCategory(c.key)}
-            className={`shrink-0 flex items-center gap-2 px-5 py-2.5 text-sm font-bold uppercase tracking-wider transition-colors border-y border-pine/15 ${
-              i === 0 ? "rounded-l-xl border-l" : ""
-            } ${i === CATEGORIES.length - 1 ? "rounded-r-xl border-r" : ""} ${
-              i > 0 ? "border-l border-pine/15" : ""
-            } ${
-              category === c.key
-                ? "bg-pine text-white border-pine"
-                : "bg-white text-pine/70 hover:bg-pine/5"
-            }`}
-          >
-            <span>{c.icon}</span> {c.label}
-          </button>
-        ))}
+      {/* Category selector */}
+      <div className="mb-4">
+        <button
+          type="button"
+          onClick={() => {
+            setCatOpen(!catOpen);
+            setSpeciesOpen(false);
+          }}
+          className="w-full flex items-center justify-between bg-pine text-white rounded-2xl px-5 py-3.5 font-bold uppercase tracking-wider text-sm"
+        >
+          <span className="flex items-center gap-2">
+            <span>{CATEGORIES.find((c) => c.key === category)?.icon}</span>
+            {CATEGORIES.find((c) => c.key === category)?.label}
+          </span>
+          <span className="text-white/60 text-xs font-medium normal-case tracking-normal">
+            tap to change ▾
+          </span>
+        </button>
+        {catOpen && (
+          <div className="mt-2 bg-white border border-pine/15 rounded-2xl overflow-hidden shadow-lg">
+            {CATEGORIES.map((c) => (
+              <button
+                key={c.key}
+                type="button"
+                onClick={() => {
+                  setCategory(c.key);
+                  setCatOpen(false);
+                }}
+                className={`w-full flex items-center gap-2 px-5 py-3 text-sm font-bold uppercase tracking-wider text-left transition-colors ${
+                  category === c.key ? "bg-pine/10 text-pine" : "text-pine/70 hover:bg-pine/5"
+                }`}
+              >
+                <span>{c.icon}</span> {c.label}
+                {category === c.key && <span className="ml-auto text-signal">✓</span>}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Species tabs */}
-      <div className="flex overflow-x-auto pb-2 mb-4 -mx-4 px-4">
+      {/* Species selector */}
+      <div className="mb-4">
         <button
-          onClick={() => setSpecies("all")}
-          className={`shrink-0 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors border-y border-l border-pine/15 rounded-l-xl ${
-            species === "all"
-              ? "bg-signal text-white border-signal"
-              : "bg-white text-pine/70 hover:bg-pine/5"
-          }`}
+          type="button"
+          onClick={() => {
+            setSpeciesOpen(!speciesOpen);
+            setCatOpen(false);
+          }}
+          className="w-full flex items-center justify-between bg-signal text-white rounded-2xl px-5 py-3 font-bold uppercase tracking-wider text-xs"
         >
-          All species
+          <span>
+            {species === "all" ? "All species" : `${tabs.find((t) => t.key === species)?.display ?? species}`}
+          </span>
+          <span className="text-white/70 text-[11px] font-medium normal-case tracking-normal">
+            tap to change ▾
+          </span>
         </button>
-        {tabs.map((t, i) => (
-          <button
-            key={t.key}
-            onClick={() => setSpecies(t.key)}
-            className={`shrink-0 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors border-y border-pine/15 ${
-              i === tabs.length - 1 ? "rounded-r-xl border-r" : ""
-            } border-l border-pine/15 ${
-              species === t.key
-                ? "bg-signal text-white border-signal"
-                : "bg-white text-pine/70 hover:bg-pine/5"
-            }`}
-          >
-            {t.display} · {t.count}
-          </button>
-        ))}
+        {speciesOpen && (
+          <div className="mt-2 bg-white border border-pine/15 rounded-2xl overflow-hidden shadow-lg max-h-64 overflow-y-auto">
+            <button
+              type="button"
+              onClick={() => {
+                setSpecies("all");
+                setSpeciesOpen(false);
+              }}
+              className={`w-full px-5 py-3 text-xs font-bold uppercase tracking-wider text-left transition-colors ${
+                species === "all" ? "bg-signal/10 text-signal-dark" : "text-pine/70 hover:bg-pine/5"
+              }`}
+            >
+              All species
+              {species === "all" && <span className="ml-2 text-signal">✓</span>}
+            </button>
+            {tabs.map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => {
+                  setSpecies(t.key);
+                  setSpeciesOpen(false);
+                }}
+                className={`w-full px-5 py-3 text-xs font-bold uppercase tracking-wider text-left transition-colors ${
+                  species === t.key ? "bg-signal/10 text-signal-dark" : "text-pine/70 hover:bg-pine/5"
+                }`}
+              >
+                {t.display} · {t.count}
+                {species === t.key && <span className="ml-2 text-signal">✓</span>}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Above-average threshold */}
