@@ -71,7 +71,7 @@ export default function SpotsTab({
         onClick={onAddSpot}
         className="w-full mb-4 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3.5 rounded-full transition-colors shadow-lg"
       >
- Add a spot — tap the map
+ Add a spot — tap and hold the map
       </button>
 
       {spots.length === 0 ? (
