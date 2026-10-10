@@ -30,11 +30,22 @@ export async function POST(req: NextRequest) {
   }
   const mediaType = body.media_type === "video" ? "video" : "photo";
   const caption = typeof body.caption === "string" ? body.caption.trim().slice(0, 200) : null;
+  const overlays = Array.isArray(body.overlays)
+    ? body.overlays.slice(0, 10).map((o: Record<string, unknown>) => ({
+        text: String(o.text ?? "").slice(0, 100),
+        x: Math.max(0, Math.min(100, Number(o.x) || 50)),
+        y: Math.max(0, Math.min(100, Number(o.y) || 50)),
+        font: String(o.font ?? "bold"),
+        color: String(o.color ?? "#ffffff"),
+        bg: String(o.bg ?? "transparent"),
+        size: Math.max(12, Math.min(72, Number(o.size) || 28)),
+      }))
+    : [];
 
   const rows = await query<{ id: string }>(
-    `INSERT INTO fm_stories (user_id, media_url, media_type, caption)
-     VALUES ($1, $2, $3, $4) RETURNING id`,
-    [me.id, mediaUrl, mediaType, caption]
+    `INSERT INTO fm_stories (user_id, media_url, media_type, caption, overlays)
+     VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+    [me.id, mediaUrl, mediaType, caption, JSON.stringify(overlays)]
   );
   return NextResponse.json({ ok: true, id: rows[0].id });
 }

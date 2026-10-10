@@ -6,8 +6,7 @@
 import { useEffect, useRef, useState } from "react";
 import { fishFetch } from "../../_components/fishFetch";
 import { useFishAuth } from "../../_components/FishAuth";
-import { compressImage } from "../../_components/compressImage";
-import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
+import StoryCreator from "./StoryCreator";
 
 interface Story {
   id: string;
@@ -19,6 +18,7 @@ interface Story {
   caption: string | null;
   created_at: string;
   viewed: boolean;
+  overlays?: { text: string; x: number; y: number; font: string; color: string; bg: string; size: number }[];
 }
 
 export default function StoriesRow() {
@@ -26,10 +26,6 @@ export default function StoriesRow() {
   const [stories, setStories] = useState<Story[]>([]);
   const [viewing, setViewing] = useState<Story | null>(null);
   const [creating, setCreating] = useState(false);
-  const [caption, setCaption] = useState("");
-  const [uploading, setUploading] = useState(false);
-  const [note, setNote] = useState<string | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
     try {
@@ -61,35 +57,6 @@ export default function StoriesRow() {
       setViewing(null);
     } catch {
       // Best effort.
-    }
-  };
-
-  const createStory = async (file: File) => {
-    setUploading(true);
-    setNote(null);
-    try {
-      const token = localStorage.getItem(FISHMB_TOKEN_KEY);
-      const form = new FormData();
-      form.append("file", await compressImage(file));
-      const upRes = await fetch("/api/fish/photos/upload", {
-        method: "POST",
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-        body: form,
-      });
-      const up = await upRes.json();
-      if (!upRes.ok) throw new Error(up.error || "Upload failed.");
-      await fishFetch("/api/fishmb/stories", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ media_url: up.url, caption: caption.trim() || undefined }),
-      });
-      setCaption("");
-      setCreating(false);
-      await load();
-    } catch (e) {
-      setNote(e instanceof Error ? e.message : "Could not create story.");
-    } finally {
-      setUploading(false);
     }
   };
 
@@ -174,52 +141,15 @@ export default function StoriesRow() {
         ))}
       </div>
 
-      {/* Create story modal */}
+      {/* Full-screen story creator */}
       {creating && (
-        <div className="fixed inset-0 z-[1200] flex items-end sm:items-center justify-center bg-black/50 p-4" onClick={() => setCreating(false)}>
-          <div className="bg-paper rounded-3xl w-full max-w-sm p-6" onClick={(e) => e.stopPropagation()}>
-            <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
-              Create story
-            </h3>
-            <input
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              placeholder="Add a caption (optional)…"
-              maxLength={200}
-              className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal mb-4"
-            />
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*,video/*"
-              className="hidden"
-              onChange={(e) => {
-                const f = e.target.files?.[0];
-                if (f) void createStory(f);
-                e.target.value = "";
-              }}
-            />
-            <button
-              type="button"
-              onClick={() => fileRef.current?.click()}
-              disabled={uploading}
-              className="w-full py-3.5 rounded-full bg-signal text-white font-bold text-sm uppercase tracking-wider disabled:opacity-50"
-            >
-              {uploading ? "Uploading…" : "Pick photo or video"}
-            </button>
-            {note && <p className="text-sm text-red-600 mt-3 text-center">{note}</p>}
-            <p className="text-xs text-pine/45 mt-3 text-center">
-              Stories disappear after 24 hours.
-            </p>
-            <button
-              type="button"
-              onClick={() => setCreating(false)}
-              className="w-full mt-2 py-3 rounded-full border border-pine/20 text-pine font-bold text-sm uppercase tracking-wider"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
+        <StoryCreator
+          onClose={() => setCreating(false)}
+          onCreated={() => {
+            setCreating(false);
+            load();
+          }}
+        />
       )}
 
       {/* Story viewer */}
@@ -258,13 +188,32 @@ export default function StoriesRow() {
               ×
             </button>
           </div>
-          <div className="flex-1 flex items-center justify-center min-h-0" onClick={(e) => e.stopPropagation()}>
+          <div className="flex-1 flex items-center justify-center min-h-0 relative" onClick={(e) => e.stopPropagation()}>
             {viewing.media_type === "video" ? (
               <video src={viewing.media_url} controls autoPlay playsInline className="max-h-full max-w-full" />
             ) : (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={viewing.media_url} alt="" className="max-h-full max-w-full object-contain" />
             )}
+            {(viewing.overlays ?? []).map((o, i) => (
+              <span
+                key={i}
+                className="absolute whitespace-nowrap font-extrabold"
+                style={{
+                  left: `${o.x}%`,
+                  top: `${o.y}%`,
+                  transform: "translate(-50%, -50%)",
+                  color: o.color,
+                  background: o.bg,
+                  fontSize: `${o.size}px`,
+                  padding: o.bg !== "transparent" ? "4px 12px" : undefined,
+                  borderRadius: o.bg !== "transparent" ? "12px" : undefined,
+                  textShadow: o.bg === "transparent" ? "0 2px 8px rgba(0,0,0,0.6)" : undefined,
+                }}
+              >
+                {o.text}
+              </span>
+            ))}
           </div>
           {viewing.caption && (
             <p className="p-4 text-white text-center text-sm" onClick={(e) => e.stopPropagation()}>
