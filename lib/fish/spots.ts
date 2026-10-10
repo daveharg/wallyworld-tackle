@@ -4,7 +4,7 @@
 import { query, queryOne } from "./db";
 
 /** Allowed spot icon ids (must match the client SPOT_ICON_CHOICES). */
-export const SPOT_ICON_IDS = ["pin", "fish", "rock", "weed"] as const;
+export const SPOT_ICON_IDS = ["pin", "dot-red", "dot-blue", "dot-green", "dot-yellow", "dot-purple", "fish", "rock", "weed"] as const;
 
 export function isSpotIconId(v: unknown): v is (typeof SPOT_ICON_IDS)[number] {
   return typeof v === "string" && (SPOT_ICON_IDS as readonly string[]).includes(v);
