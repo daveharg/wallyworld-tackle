@@ -193,42 +193,9 @@ export default function StoriesRow() {
         const userStories = stories.filter((s) => s.user_id === viewing.user_id);
         const storyIdx = userStories.findIndex((s) => s.id === viewing.id);
         return (
-        <div className="fixed inset-0 z-[1300] bg-black flex flex-col" onClick={advanceStory}>
-          {/* Progress bars */}
-          <div className="flex gap-1 px-3 pt-3" onClick={(e) => e.stopPropagation()}>
-            {userStories.map((s) => (
-              <div key={s.id} className="flex-1 h-1 rounded-full bg-white/30 overflow-hidden">
-                <div
-                  className={`h-full rounded-full ${userStories.indexOf(s) <= storyIdx ? "bg-white" : "bg-transparent"}`}
-                />
-              </div>
-            ))}
-          </div>
-          <div className="flex items-center gap-3 p-4 text-white" onClick={(e) => e.stopPropagation()}>
-            {viewing.avatar_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={viewing.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover" />
-            ) : (
-              <span className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold">
-                {viewing.user_name.charAt(0).toUpperCase()}
-              </span>
-            )}
-            <div className="flex-1 min-w-0">
-              <p className="font-bold text-sm truncate">{viewing.user_name}</p>
-              <p className="text-xs text-white/60">
-                {new Date(viewing.created_at).toLocaleString()}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setViewing(null)}
-              aria-label="Close story"
-              className="text-white text-3xl leading-none"
-            >
-              ×
-            </button>
-          </div>
-          <div className="flex-1 flex items-center justify-center min-h-0 relative overflow-hidden">
+        <div className="fixed inset-0 z-[1300] bg-black" onClick={advanceStory}>
+          {/* Media fills the entire screen, edge to edge */}
+          <div className="absolute inset-0 overflow-hidden">
             <div
               className="absolute inset-0 flex items-center justify-center"
               style={{ transform: `scale(${viewing.zoom ?? 1})`, transformOrigin: "center" }}
@@ -239,14 +206,14 @@ export default function StoriesRow() {
                   controls
                   autoPlay
                   playsInline
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-cover"
                   onLoadedMetadata={(e) => {
                     if (viewing.volume != null) e.currentTarget.volume = viewing.volume;
                   }}
                 />
               ) : (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={viewing.media_url} alt="" className="w-full h-full object-contain" />
+                <img src={viewing.media_url} alt="" className="w-full h-full object-cover" />
               )}
             </div>
             {(viewing.overlays ?? []).map((o, i) => (
@@ -269,8 +236,45 @@ export default function StoriesRow() {
               </span>
             ))}
           </div>
+          {/* Overlay header: progress bars + profile, floating over the media */}
+          <div className="absolute top-0 inset-x-0 z-10" onClick={(e) => e.stopPropagation()}>
+            {/* Progress bars */}
+            <div className="flex gap-1 px-3" style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}>
+              {userStories.map((s) => (
+                <div key={s.id} className="flex-1 h-1 rounded-full bg-white/30 overflow-hidden">
+                  <div
+                    className={`h-full rounded-full ${userStories.indexOf(s) <= storyIdx ? "bg-white" : "bg-transparent"}`}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center gap-3 p-4 text-white">
+              {viewing.avatar_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={viewing.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover border-2 border-white/50" />
+              ) : (
+                <span className="w-10 h-10 rounded-full bg-white/20 border-2 border-white/50 flex items-center justify-center font-bold">
+                  {viewing.user_name.charAt(0).toUpperCase()}
+                </span>
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-sm truncate drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">{viewing.user_name}</p>
+                <p className="text-xs text-white/80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
+                  {new Date(viewing.created_at).toLocaleString()}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setViewing(null)}
+                aria-label="Close story"
+                className="text-white text-3xl leading-none drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]"
+              >
+                ×
+              </button>
+            </div>
+          </div>
           {viewing.caption && (
-            <p className="p-4 text-white text-center text-sm" onClick={(e) => e.stopPropagation()}>
+            <p className="absolute bottom-0 inset-x-0 z-10 p-4 text-white text-center text-sm drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]" onClick={(e) => e.stopPropagation()}>
               {viewing.caption}
             </p>
           )}
