@@ -26,6 +26,8 @@ interface SettingsTabProps {
   onTempChange: (v: boolean) => void;
   biteOn: boolean;
   onBiteChange: (v: boolean) => void;
+  showPublicCatches: boolean;
+  onShowPublicCatchesChange: (v: boolean) => void;
   followDot: string;
   onFollowDotChange: (id: string) => void;
   trails: Trail[];
@@ -70,6 +72,8 @@ export default function SettingsTab({
   onTempChange,
   biteOn,
   onBiteChange,
+  showPublicCatches,
+  onShowPublicCatchesChange,
   followDot,
   onFollowDotChange,
   trails,
@@ -185,6 +189,29 @@ export default function SettingsTab({
           </p>
         )}
       </div>
+      <Section icon="" title="Catches on map" sub="Show public catches from other anglers as pins on the map.">
+        <button
+          type="button"
+          onClick={() => onShowPublicCatchesChange(!showPublicCatches)}
+          className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3"
+        >
+          <span className="text-sm font-bold text-pine">Show others' catches</span>
+          <span
+            className={`w-12 h-7 rounded-full p-1 transition-colors ${
+              showPublicCatches ? "bg-signal" : "bg-pine/15"
+            }`}
+          >
+            <span
+              className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                showPublicCatches ? "translate-x-5" : ""
+              }`}
+            />
+          </span>
+        </button>
+        <p className="text-[11px] text-pine/45 mt-2">
+          Pins every public catch on the map so you can see where other anglers are landing fish.
+        </p>
+      </Section>
       <Section icon="" title="Widgets" sub="Floating boxes you can drag anywhere on the map.">
         <button
           type="button"

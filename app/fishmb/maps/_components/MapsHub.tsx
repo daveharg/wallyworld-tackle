@@ -149,6 +149,22 @@ export default function MapsHub() {
       return false;
     }
   });
+  const [showPublicCatches, setShowPublicCatches] = useState(() => {
+    try {
+      return localStorage.getItem("fishmb-show-public-catches") === "1";
+    } catch {
+      return false;
+    }
+  });
+
+  const changeShowPublicCatches = (v: boolean) => {
+    setShowPublicCatches(v);
+    try {
+      localStorage.setItem("fishmb-show-public-catches", v ? "1" : "0");
+    } catch {
+      // Best effort.
+    }
+  };
   const [followDot, setFollowDot] = useState<string>(() => {
     try {
       return localStorage.getItem("fishmb-follow-dot") || "dot-blue";
@@ -541,16 +557,20 @@ export default function MapsHub() {
     nearbyTimer.current = setTimeout(() => loadNearbyCatches(center.lat, center.lng), 800);
   };
 
-  const catchPins: CatchPin[] = (catchScope === "mine" ? myCatches : nearbyCatches).map(
-    (c) => ({
-      id: c.id,
-      lat: c.lat,
-      lng: c.lng,
-      species: c.species,
-      length_in: c.length_in,
-      mine: c.mine,
-    })
-  );
+  const catchPins: CatchPin[] = (
+    showPublicCatches
+      ? [...myCatches, ...nearbyCatches]
+      : catchScope === "mine"
+        ? myCatches
+        : nearbyCatches
+  ).map((c) => ({
+    id: c.id,
+    lat: c.lat,
+    lng: c.lng,
+    species: c.species,
+    length_in: c.length_in,
+    mine: c.mine,
+  }));
 
   const flyTo = (lat: number, lng: number, key: string, zoom = 13) => {
     setFocus({ lat, lng, key: `${key}:${Date.now()}`, zoom });
@@ -986,6 +1006,8 @@ export default function MapsHub() {
             onTempChange={setTempOn}
             biteOn={biteOn}
             onBiteChange={setBiteOn}
+            showPublicCatches={showPublicCatches}
+            onShowPublicCatchesChange={changeShowPublicCatches}
             followDot={followDot}
             onFollowDotChange={setFollowDot}
             trails={trails}
