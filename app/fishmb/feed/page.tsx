@@ -182,7 +182,9 @@ interface FeedItem {
   comment_count: number;
   like_count: number;
   dislike_count: number;
-  viewer_reaction: 1 | -1 | null;
+  laugh_count?: number;
+  share_count?: number;
+  viewer_reaction: 1 | -1 | 2 | null;
   created_at: string;
 }
 
@@ -610,10 +612,20 @@ function Reactions({
     </svg>
   );
 
+  const laugh = (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+      <line x1="9" y1="9" x2="9.01" y2="9" />
+      <line x1="15" y1="9" x2="15.01" y2="9" />
+    </svg>
+  );
+
   return (
     <div className="flex items-center gap-4">
       {btn(1, thumbsUp, item.like_count, "Like")}
       {btn(-1, thumbsDown, item.dislike_count, "Dislike")}
+      {btn(2, laugh, item.laugh_count ?? 0, "Laugh")}
     </div>
   );
 }
@@ -1119,7 +1131,7 @@ function FeedPageInner() {
 
   const handleReacted = (
     id: string,
-    r: { like_count: number; dislike_count: number; viewer_reaction: 1 | -1 | null }
+    r: { like_count: number; dislike_count: number; laugh_count: number; viewer_reaction: 1 | -1 | 2 | null }
   ) => {
     setItems((prev) => prev.map((it) => (it.id === id ? { ...it, ...r } : it)));
   };
