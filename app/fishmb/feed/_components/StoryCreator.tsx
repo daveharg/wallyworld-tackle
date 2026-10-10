@@ -687,7 +687,15 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
               {overlays
                 .map((o, i) => ({ o, i }))
                 .filter(({ o }) => activeDraft && o.clipIds.includes(activeDraft.id))
-                .map(({ o, i }) => (
+                .map(({ o, i }) => {
+                // When this overlay is being edited, show live values from the editor.
+                const isEditing = editingIdx === i;
+                const liveText = isEditing ? overlayText : o.text;
+                const liveFont = isEditing ? (editingOverlay?.font ?? o.font) : o.font;
+                const liveColor = isEditing ? (editingOverlay?.color ?? o.color) : o.color;
+                const liveBg = isEditing ? (editingOverlay?.bg ?? o.bg) : o.bg;
+                const liveSize = isEditing ? (editingOverlay?.size ?? o.size) : o.size;
+                return (
                 <div
                   key={i}
                   data-text-overlay
@@ -698,23 +706,24 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                 >
                   <span
                     style={{
-                      ...fontStyle(o.font),
-                      color: o.color,
-                      background: o.bg,
-                      fontSize: `${o.size}px`,
-                      padding: o.bg !== "transparent" ? "4px 12px" : undefined,
-                      borderRadius: o.bg !== "transparent" ? "12px" : undefined,
-                      WebkitTextStroke: o.font === "outline" ? `1.5px ${o.color}` : undefined,
+                      ...fontStyle(liveFont),
+                      color: liveColor,
+                      background: liveBg,
+                      fontSize: `${liveSize}px`,
+                      padding: liveBg !== "transparent" ? "4px 12px" : undefined,
+                      borderRadius: liveBg !== "transparent" ? "12px" : undefined,
+                      WebkitTextStroke: liveFont === "outline" ? `1.5px ${liveColor}` : undefined,
                       // Highlight box when selected for editing.
-                      outline: editingIdx === i ? "2px dashed #e8622c" : undefined,
-                      outlineOffset: editingIdx === i ? "4px" : undefined,
+                      outline: isEditing ? "2px dashed #e8622c" : undefined,
+                      outlineOffset: isEditing ? "4px" : undefined,
                     }}
                     className="whitespace-nowrap"
                   >
-                    {o.text}
+                    {liveText}
                   </span>
                 </div>
-              ))}
+                );
+                })}
             </div>
 
             {/* Timeline — drag to reorder clips */}
