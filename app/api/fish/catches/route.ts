@@ -25,6 +25,7 @@ export interface CatchRow {
   photos: string[] | null;
   visibility: "public" | "friends" | "private";
   note: string | null;
+  feed_caption: string | null;
   caught_at: string;
   created_at: string;
   lat: number | null;
@@ -48,7 +49,9 @@ function toItem(c: CatchRow, viewerId?: string) {
     photo_hold_url: c.photo_hold_url,
     photos: Array.isArray(c.photos) ? c.photos : [],
     visibility: c.visibility,
-    note: c.note,
+    // Private notes are only visible to the owner; the feed caption is public.
+    note: viewerId && c.user_id === viewerId ? c.note : null,
+    feed_caption: c.feed_caption ?? null,
     caught_at: c.caught_at,
     created_at: c.created_at,
     lat: showLocation ? c.lat : null,
@@ -154,6 +157,9 @@ export async function POST(req: NextRequest) {
   }
   if (photos.length === 0) photos = [photoMeasure];
   const note = typeof body.note === "string" ? body.note.trim().slice(0, 500) || null : null;
+  // Public caption shown with the catch on the feed (separate from private notes).
+  const feedCaption =
+    typeof body.feed_caption === "string" ? body.feed_caption.trim().slice(0, 500) || null : null;
   let caughtAt: string | null = null;
   if (body.caught_at !== undefined && body.caught_at !== null) {
     const d = new Date(String(body.caught_at));
@@ -215,13 +221,14 @@ export async function POST(req: NextRequest) {
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS share_location boolean DEFAULT true`);
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS weather jsonb`);
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS tournament_id uuid REFERENCES fm_tournaments(id) ON DELETE SET NULL`);
+  await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS feed_caption text`);
   const rows = await query<CatchRow>(
     `INSERT INTO fm_catches
-       (user_id, species, length_in, weight_lb, photo_measure_url, photo_hold_url, photos, visibility, note, caught_at, lat, lng, share_location, weather, personal_record, tournament_id)
-     VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9,COALESCE($10::timestamptz, now()),$11,$12,$13,$14::jsonb,$15,$16::uuid)
+       (user_id, species, length_in, weight_lb, photo_measure_url, photo_hold_url, photos, visibility, note, feed_caption, caught_at, lat, lng, share_location, weather, personal_record, tournament_id)
+     VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9,$10,COALESCE($11::timestamptz, now()),$12,$13,$14,$15::jsonb,$16,$17::uuid)
      RETURNING *, (SELECT name FROM fm_users WHERE id = $1) AS name,
                    (SELECT avatar_url FROM fm_users WHERE id = $1) AS avatar_url`,
-    [me.id, species, lengthIn, weightLb, photoMeasure, photoHold, JSON.stringify(photos), visibility, note, caughtAt, lat, lng, shareLocation, weather ? JSON.stringify(weather) : null, personalRecord, tournamentId]
+    [me.id, species, lengthIn, weightLb, photoMeasure, photoHold, JSON.stringify(photos), visibility, note, feedCaption, caughtAt, lat, lng, shareLocation, weather ? JSON.stringify(weather) : null, personalRecord, tournamentId]
   );
   const newCatch = rows[0];
 

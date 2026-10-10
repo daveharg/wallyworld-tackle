@@ -196,7 +196,7 @@ export async function getFeed(opts: GetFeedOptions = {}): Promise<FeedPage> {
               WHERE r.post_id = feed.id AND r.user_id = $1::uuid)::smallint AS viewer_reaction
      FROM (
        SELECT c.id, 'catch' AS kind, c.user_id, u.name AS user_name, u.avatar_url,
-              c.note AS body, c.photo_hold_url AS photo_url,
+              COALESCE(c.feed_caption, c.note) AS body, c.photo_hold_url AS photo_url,
               COALESCE(c.photos, '[]'::jsonb) AS photos,
               c.video AS video,
               NULL AS spot_share,

@@ -954,6 +954,7 @@ function FeedPageInner() {
   const [activeQ, setActiveQ] = useState("");
   const [mode, setMode] = useState<"post" | "catch">("post");
   const [draft, setDraft] = useState("");
+  const [feedCaption, setFeedCaption] = useState("");
   const [catchPhotos, setCatchPhotos] = useState<File[]>([]);
   const [postPhotos, setPostPhotos] = useState<File[]>([]);
   // Optional one video per post (60s max) — uploads straight to Mux.
@@ -1508,6 +1509,7 @@ function FeedPageInner() {
           tournament_id: tournamentId || null,
           weather,
           note: draft.trim() || null,
+          feed_caption: postToFeed ? feedCaption.trim() || null : null,
           lat: catchLat,
           lng: catchLng,
         }),
@@ -1541,6 +1543,7 @@ function FeedPageInner() {
       setShareLocation(true);
       setSaveLocation(true);
       setPostToFeed(true);
+      setFeedCaption("");
       closeComposer();
       load();
     } catch (e) {
@@ -2061,9 +2064,9 @@ function FeedPageInner() {
                 <textarea
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
-                  rows={3}
-                  placeholder="How's the bite? Share a report…"
-                  className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal resize-none"
+                  rows={6}
+                  placeholder="What's happening out there? Share fishing reports, ask questions, post tips, talk tackle, plan trips…"
+                  className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal resize-none min-h-[140px]"
                 />
                 {postPhotos.length > 0 && (
                   <div className="flex gap-2 mt-3 flex-wrap">
@@ -2182,7 +2185,7 @@ function FeedPageInner() {
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   rows={2}
-                  placeholder="Notes — where, how, on what…"
+                  placeholder="Private notes — where, how, on what… (only you see this)"
                   className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal resize-none mt-3"
                 />
                 {catchPhotos.length > 0 && (
@@ -2279,6 +2282,15 @@ function FeedPageInner() {
                     />
                   </span>
                 </button>
+                {postToFeed && (
+                  <textarea
+                    value={feedCaption}
+                    onChange={(e) => setFeedCaption(e.target.value)}
+                    rows={2}
+                    placeholder="Say something with your catch on the feed…"
+                    className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal resize-none mt-2"
+                  />
+                )}
                 {/* Location settings */}
                 <div className="mt-3">
                   <p className="text-xs font-bold uppercase tracking-wider text-pine/55 mb-2 px-1">
