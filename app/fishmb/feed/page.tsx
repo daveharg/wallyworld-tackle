@@ -980,6 +980,11 @@ function FeedPageInner() {
   const hasMoreRef = useRef(false);
   const loadingMoreRef = useRef(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  // Pull-to-refresh state.
+  const [pullDist, setPullDist] = useState(0);
+  const [pullRefreshing, setPullRefreshing] = useState(false);
+  const pullStartY = useRef<number | null>(null);
+  const pullActive = useRef(false);
   useEffect(() => { tabRef.current = tab; }, [tab]);
   useEffect(() => { friendsOnlyRef.current = friendsOnly; }, [friendsOnly]);
   useEffect(() => { activeQRef.current = activeQ; }, [activeQ]);
@@ -1538,8 +1543,73 @@ function FeedPageInner() {
     );
   }
 
+  // Pull down past the top to load new posts.
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    if (window.scrollY <= 0 && !pullRefreshing) {
+      pullStartY.current = e.touches[0].clientY;
+      pullActive.current = true;
+    }
+  }, [pullRefreshing]);
+
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!pullActive.current || pullStartY.current === null || pullRefreshing) return;
+    const dy = e.touches[0].clientY - pullStartY.current;
+    if (dy > 0 && window.scrollY <= 0) {
+      // Dampen the pull.
+      setPullDist(Math.min(120, dy * 0.5));
+    } else if (dy <= 0) {
+      setPullDist(0);
+    }
+  }, [pullRefreshing]);
+
+  const onTouchEnd = useCallback(() => {
+    if (!pullActive.current) return;
+    pullActive.current = false;
+    pullStartY.current = null;
+    if (pullDist > 60 && !pullRefreshing) {
+      setPullRefreshing(true);
+      setPullDist(60);
+      load().finally(() => {
+        setPullRefreshing(false);
+        setPullDist(0);
+      });
+    } else {
+      setPullDist(0);
+    }
+  }, [pullDist, pullRefreshing, load]);
+
   return (
-    <div className="max-w-2xl mx-auto px-4 pt-4 md:pt-6 pb-32">
+    <div
+      className="max-w-2xl mx-auto px-4 pt-4 md:pt-6 pb-32"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
+      {/* Pull-to-refresh indicator */}
+      <div
+        className="flex justify-center overflow-hidden transition-all"
+        style={{ height: pullDist, opacity: pullDist > 10 ? 1 : 0 }}
+      >
+        <div className="flex items-center gap-2 text-pine/60">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={pullRefreshing ? "animate-spin" : "transition-transform"}
+            style={!pullRefreshing ? { transform: `rotate(${pullDist * 3}deg)` } : undefined}
+          >
+            <path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6" />
+          </svg>
+          <span className="text-xs font-bold uppercase tracking-wider">
+            {pullRefreshing ? "Loading new posts…" : pullDist > 60 ? "Release to refresh" : "Pull to refresh"}
+          </span>
+        </div>
+      </div>
       {shareNote && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[1300] bg-pine-deep text-white text-sm font-bold rounded-full px-5 py-3 shadow-xl max-w-[90vw] truncate">
           {shareNote}
