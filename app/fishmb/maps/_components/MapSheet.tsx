@@ -26,7 +26,7 @@ interface Props {
 }
 
 const TOP: Record<SheetSnap, string> = {
-  mini: "top-[calc(100dvh-32px)]",
+  mini: "top-[calc(100dvh-120px)]",
   collapsed: "top-[calc(100dvh-225px)]",
   half: "top-[50dvh]",
   full: "top-3 md:top-[68px]",
