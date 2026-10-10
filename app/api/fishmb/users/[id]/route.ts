@@ -46,6 +46,22 @@ export async function GET(
   }
   const isSelf = viewerId === target.id;
 
+  // Follow status between viewer and target.
+  let following = false;
+  if (viewerId && !isSelf) {
+    try {
+      const { ensureFollowTables } = await import("@/lib/fish/feed");
+      await ensureFollowTables();
+      const fr = await query(
+        `SELECT 1 FROM fm_follows WHERE follower_id = $1 AND followee_id = $2`,
+        [viewerId, target.id]
+      );
+      following = fr.length > 0;
+    } catch {
+      // follows unavailable — non-fatal
+    }
+  }
+
   // Friendship between viewer and target (for photo visibility + add-friend UI).
   let friendship: { status: string; requester_id: string } | null = null;
   let areFriends = false;
@@ -104,6 +120,8 @@ export async function GET(
     is_self: isSelf,
     friendship_status: friendship?.status ?? null,
     friendship_incoming: friendship?.status === "pending" && friendship.requester_id === target.id,
+    following,
+    allow_follow: (target as { allow_follow?: boolean }).allow_follow ?? false,
     counts: {
       posts: parseInt(counts?.posts ?? "0", 10),
       catches: parseInt(counts?.catches ?? "0", 10),

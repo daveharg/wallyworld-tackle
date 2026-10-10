@@ -23,10 +23,12 @@ interface ProfileFriend {
 }
 
 interface ProfileData {
-  user: { id: string; name: string; avatar_url: string | null; bio: string | null };
+  user: { id: string; name: string; avatar_url: string | null; bio: string | null; allow_follow?: boolean };
   is_self: boolean;
   friendship_status: string | null;
   friendship_incoming: boolean;
+  following: boolean;
+  allow_follow: boolean;
   counts: { posts: number; catches: number; friends: number };
   photos: ProfilePhoto[];
   friends: ProfileFriend[];
@@ -112,6 +114,31 @@ export default function ProfileView({
     }
   };
 
+  const toggleFollow = async () => {
+    setActing(true);
+    setNote(null);
+    try {
+      if (data?.following) {
+        await fishFetch(`/api/fish/follows?user_id=${encodeURIComponent(userId)}`, {
+          method: "DELETE",
+        });
+      } else {
+        const d = await fishFetch("/api/fish/follows", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: userId }),
+        });
+        if ((d as { error?: string }).error) throw new Error((d as { error: string }).error);
+      }
+      const refreshed = await fishFetch(`/api/fishmb/users/${userId}`);
+      setData(refreshed);
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Could not update follow.");
+    } finally {
+      setActing(false);
+    }
+  };
+
   if (!data) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-16 text-center text-pine/50">
@@ -145,7 +172,7 @@ export default function ProfileView({
  Edit profile
               </Link>
             ) : (
-            <>
+            <div className="flex flex-wrap items-center gap-2">
               {data.friendship_status === "accepted" ? (
                   <span className="text-xs font-bold uppercase tracking-wider text-pine/50 bg-pine/10 rounded-full px-4 py-2">
  Friends 
@@ -163,7 +190,20 @@ export default function ProfileView({
                     {acting ? "Sending…" : "Add friend"}
                   </button>
                 )}
-              </>
+              {data.allow_follow && (
+                <button
+                  onClick={toggleFollow}
+                  disabled={acting}
+                  className={`font-bold uppercase tracking-wider text-xs px-5 py-2.5 rounded-full disabled:opacity-50 transition-colors ${
+                    data.following
+                      ? "bg-pine/10 text-pine/60 hover:text-pine"
+                      : "bg-pine text-white hover:bg-pine-deep"
+                  }`}
+                >
+                  {data.following ? "Following ✓" : "Follow"}
+                </button>
+              )}
+            </div>
             )}
           </div>
           <div className="flex gap-6 mb-3">

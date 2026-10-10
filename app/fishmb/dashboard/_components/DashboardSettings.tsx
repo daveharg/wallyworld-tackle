@@ -14,6 +14,7 @@ export default function DashboardSettings({ afterSaveHref }: { afterSaveHref?: s
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [accountType, setAccountType] = useState("personal");
+  const [allowFollow, setAllowFollow] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [note, setNote] = useState<string | null>(null);
@@ -23,6 +24,7 @@ export default function DashboardSettings({ afterSaveHref }: { afterSaveHref?: s
       setName(user.name ?? "");
       setBio((user as { bio?: string }).bio ?? "");
       setAccountType((user as { account_type?: string }).account_type ?? "personal");
+      setAllowFollow((user as { allow_follow?: boolean }).allow_follow ?? false);
     }
   }, [user]);
 
@@ -65,6 +67,7 @@ export default function DashboardSettings({ afterSaveHref }: { afterSaveHref?: s
           name: name.trim(),
           bio: bio.trim(),
           account_type: accountType,
+          allow_follow: allowFollow,
         }),
       });
       await refresh();
@@ -144,6 +147,31 @@ export default function DashboardSettings({ afterSaveHref }: { afterSaveHref?: s
         <p className="text-xs text-pine/45 mt-1">
           Business accounts can list a business page and advertise.
         </p>
+      </div>
+      <div>
+        <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-2">
+          Let people follow you
+        </label>
+        <button
+          type="button"
+          onClick={() => setAllowFollow((v) => !v)}
+          className="w-full flex items-center justify-between bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3"
+        >
+          <span className="text-sm text-pine text-left">
+            When on, anyone viewing your profile can follow you and see your posts in their Friends feed.
+          </span>
+          <span
+            className={`shrink-0 ml-3 w-12 h-7 rounded-full p-1 transition-colors ${
+              allowFollow ? "bg-signal" : "bg-pine/15"
+            }`}
+          >
+            <span
+              className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                allowFollow ? "translate-x-5" : ""
+              }`}
+            />
+          </span>
+        </button>
       </div>
       <button
         onClick={save}

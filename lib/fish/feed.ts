@@ -151,11 +151,15 @@ export async function getFeed(opts: GetFeedOptions = {}): Promise<FeedPage> {
   const params: unknown[] = [viewerId];
   let where = "";
   if (friendsOnly) {
+    await ensureFollowTables();
     where = `WHERE ($1::uuid IS NOT NULL AND (feed.user_id = $1::uuid OR EXISTS (
        SELECT 1 FROM fm_friendships f
        WHERE f.status = 'accepted'
          AND ((f.requester_id = $1::uuid AND f.addressee_id = feed.user_id)
-           OR (f.requester_id = feed.user_id AND f.addressee_id = $1::uuid)))))`;
+           OR (f.requester_id = feed.user_id AND f.addressee_id = $1::uuid)))
+       OR EXISTS (
+       SELECT 1 FROM fm_follows fo
+       WHERE fo.follower_id = $1::uuid AND fo.followee_id = feed.user_id)))`;
   }
   if (search) {
     params.push(likePattern(search));
@@ -394,4 +398,19 @@ export async function toggleCommentReaction(
     dislike_count: row?.dislike_count ?? 0,
     viewer_reaction: vr === 1 || vr === -1 ? vr : null,
   };
+}
+
+/** Ensure the follow-system tables/columns exist. */
+export async function ensureFollowTables(): Promise<void> {
+  await query(
+    `ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS allow_follow boolean NOT NULL DEFAULT false`
+  );
+  await query(`CREATE TABLE IF NOT EXISTS fm_follows (
+    follower_id uuid NOT NULL REFERENCES fm_users(id) ON DELETE CASCADE,
+    followee_id uuid NOT NULL REFERENCES fm_users(id) ON DELETE CASCADE,
+    created_at timestamptz NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (follower_id, followee_id),
+    CONSTRAINT fm_follows_no_self CHECK (follower_id <> followee_id)
+  )`);
+  await query(`CREATE INDEX IF NOT EXISTS fm_follows_followee_idx ON fm_follows(followee_id)`);
 }

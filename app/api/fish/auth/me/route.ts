@@ -61,6 +61,10 @@ export async function PATCH(req: NextRequest) {
     params.push(body.stats_public);
     updates.push(`stats_public = $${params.length}`);
   }
+  if (typeof body.allow_follow === "boolean") {
+    params.push(body.allow_follow);
+    updates.push(`allow_follow = $${params.length}`);
+  }
   if (typeof body.bio === "string") {
     params.push(body.bio.trim().slice(0, 500));
     updates.push(`bio = $${params.length}`);
