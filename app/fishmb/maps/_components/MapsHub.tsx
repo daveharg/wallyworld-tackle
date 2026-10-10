@@ -924,6 +924,13 @@ export default function MapsHub() {
           >
             {spotEditing ? (
               <>
+                <button
+                  type="button"
+                  onClick={() => setSpotEditing(false)}
+                  className="inline-flex items-center gap-1.5 text-pine/60 hover:text-pine font-bold text-sm mb-3 transition-colors"
+                >
+                  <span className="text-lg leading-none">‹</span> Back
+                </button>
                 <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
                   Edit spot
                 </h3>
