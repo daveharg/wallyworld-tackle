@@ -136,6 +136,8 @@ export function EntryKeys({ tournamentId }: { tournamentId: string }) {
     (k) => k.status === "unused"
   ).length;
   const sharedInUse = sharedKeys.length > 0;
+  // One key strategy per tournament: individual tickets OR one shared key, not both.
+  const lockedMode = individualKeys.length > 0 ? "individual" : sharedKeys.length > 0 ? "shared" : null;
 
   const statusBadge = (k: TKey) => {
     if (k.max_uses === null) {
@@ -201,20 +203,38 @@ export function EntryKeys({ tournamentId }: { tournamentId: string }) {
       )}
 
       <div className="flex gap-2 mb-5">
-        {(["individual", "shared"] as const).map((m) => (
-          <button
-            key={m}
-            onClick={() => setMode(m)}
-            className={`px-5 py-2.5 rounded-full text-sm font-bold uppercase tracking-wider transition-colors ${
-              mode === m
-                ? "bg-pine text-white"
-                : "bg-paper-deep text-pine/60 hover:text-pine"
-            }`}
-          >
-            {m === "individual" ? "Individual keys" : "One shared key"}
-          </button>
-        ))}
+        {([
+          { id: "individual", label: "Individual keys", hint: "One ticket per angler — can't be shared" },
+          { id: "shared", label: "One shared key", hint: "Anyone can share and join with it" },
+        ] as const).map((m) => {
+          const locked = lockedMode !== null && lockedMode !== m.id;
+          return (
+            <button
+              key={m.id}
+              onClick={() => !locked && setMode(m.id)}
+              disabled={locked}
+              title={locked ? `This tournament already uses ${lockedMode === "individual" ? "individual" : "a shared"} key${lockedMode === "individual" ? "s" : ""} — one key type per tournament.` : m.hint}
+              className={`px-5 py-2.5 rounded-full text-sm font-bold uppercase tracking-wider transition-colors ${
+                mode === m.id
+                  ? "bg-pine text-white"
+                  : locked
+                    ? "bg-paper-deep text-pine/30 cursor-not-allowed"
+                    : "bg-paper-deep text-pine/60 hover:text-pine"
+              }`}
+            >
+              {m.label}
+            </button>
+          );
+        })}
       </div>
+
+      {lockedMode && (
+        <p className="text-pine/55 text-sm mb-4 max-w-md">
+          {lockedMode === "individual"
+            ? "This tournament uses individual keys — one ticket per angler, each key works once and can't be shared."
+            : "This tournament uses one shared key — anyone with the code can join."}
+        </p>
+      )}
 
       {mode === "individual" ? (
         <div className="mb-6">

@@ -60,9 +60,21 @@ export async function POST(
     return badRequest("Invalid JSON body.");
   }
   const tid = params.id;
+  // One key strategy per tournament: individual tickets OR one shared key, not both.
+  const existing = await query<{ max_uses: number | null }>(
+    `SELECT max_uses FROM fm_tournament_keys WHERE tournament_id = $1 LIMIT 1`,
+    [tid]
+  );
+  const existingMode = existing.length === 0 ? null : existing[0].max_uses === null ? "shared" : "individual";
   if (body.shared === true) {
+    if (existingMode === "individual") {
+      return badRequest("This tournament already uses individual keys — one key type per tournament.");
+    }
     const keys = await generateTournamentKeys(tid, { shared: true });
     return NextResponse.json({ keys }, { status: 201 });
+  }
+  if (existingMode === "shared") {
+    return badRequest("This tournament already uses a shared key — one key type per tournament.");
   }
   const labels = Array.isArray(body.labels)
     ? (body.labels as unknown[])
