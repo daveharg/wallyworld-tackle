@@ -96,35 +96,37 @@ export default function DashboardTournaments() {
       <Link
         key={t.id}
         href={`/fishmb/tournaments/${t.id}`}
-        className="flex items-center gap-3 bg-white border border-pine/10 rounded-2xl p-4 hover:border-signal/40 transition-colors"
+        className="flex items-center gap-3 bg-white border border-pine/10 rounded-2xl px-4 py-3.5 hover:border-signal/40 transition-colors"
       >
-        <span className="w-11 h-11 rounded-full bg-gold/15 border border-gold/40 flex items-center justify-center text-xl shrink-0">
- 
-        </span>
         <span className="min-w-0 flex-1">
           <span className="block font-bold text-pine truncate">{t.name}</span>
           <span className="block text-xs text-pine/50 mt-0.5">
-            {fmtRange(t.starts_at, t.ends_at)} · {t.participant_count} angler{t.participant_count === 1 ? "" : "s"}
-            {mine ? " · organized by you" : ` · by ${t.organizer_name}`}
+            {fmtRange(t.starts_at, t.ends_at)}
+            {standing && (
+              <span className="font-bold text-signal-dark"> · #{standing.rank} of {standing.total}</span>
+            )}
           </span>
-          {standing && (
-            <span className="block text-xs font-bold text-signal-dark mt-1">
-              You're #{standing.rank} of {standing.total}
-            </span>
-          )}
         </span>
-        {mine && (
-          <span className="shrink-0 text-[10px] font-black uppercase tracking-wider bg-pine text-white rounded-full px-2.5 py-1">
-            Organizer
-          </span>
-        )}
+        <span className="text-pine/25 text-xl leading-none shrink-0">›</span>
       </Link>
     );
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <h3 className="text-xs font-black uppercase tracking-wider text-pine/45">
+            Your tournaments
+          </h3>
+          <Link
+            href="/fishmb/tournaments/how-it-works"
+            aria-label="How tournaments work"
+            className="w-5 h-5 rounded-full bg-pine/10 hover:bg-pine/20 text-pine/60 text-xs font-black flex items-center justify-center transition-colors"
+          >
+            ?
+          </Link>
+        </div>
         <Link
           href="/fishmb/tournaments/create"
           className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-5 py-2.5 rounded-full transition-colors"

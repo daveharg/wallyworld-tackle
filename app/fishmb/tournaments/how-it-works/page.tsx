@@ -146,6 +146,21 @@ export default function HowTournamentsWorkPage() {
       </div>
 
       <h2 className="font-display font-bold uppercase text-pine text-2xl tracking-wide mb-6">
+        Anti-cheat, built in
+      </h2>
+      <div className="grid md:grid-cols-2 gap-4 mb-14">
+        {cheat.map((c) => (
+          <div
+            key={c.title}
+            className="bg-pine/[0.04] border border-pine/10 rounded-3xl p-6"
+          >
+            <h3 className="font-bold text-pine mb-1.5">{c.title}</h3>
+            <p className="text-pine/65 text-sm leading-relaxed">{c.body}</p>
+          </div>
+        ))}
+      </div>
+
+      <h2 className="font-display font-bold uppercase text-pine text-2xl tracking-wide mb-6">
         Running a tournament
       </h2>
       <div className="space-y-4 mb-14">
@@ -161,21 +176,6 @@ export default function HowTournamentsWorkPage() {
               <h3 className="font-bold text-pine text-lg mb-1">{s.title}</h3>
               <p className="text-pine/65 text-sm leading-relaxed">{s.body}</p>
             </div>
-          </div>
-        ))}
-      </div>
-
-      <h2 className="font-display font-bold uppercase text-pine text-2xl tracking-wide mb-6">
-        Anti-cheat, built in
-      </h2>
-      <div className="grid md:grid-cols-2 gap-4 mb-14">
-        {cheat.map((c) => (
-          <div
-            key={c.title}
-            className="bg-pine/[0.04] border border-pine/10 rounded-3xl p-6"
-          >
-            <h3 className="font-bold text-pine mb-1.5">{c.title}</h3>
-            <p className="text-pine/65 text-sm leading-relaxed">{c.body}</p>
           </div>
         ))}
       </div>
