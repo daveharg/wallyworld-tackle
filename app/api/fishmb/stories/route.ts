@@ -43,11 +43,13 @@ export async function POST(req: NextRequest) {
     : [];
 
   const zoom = Math.max(0.5, Math.min(3, Number(body.zoom) || 1));
+  const volumeRaw = Number(body.volume);
+  const volume = Number.isFinite(volumeRaw) ? Math.max(0, Math.min(1, volumeRaw)) : null;
 
   const rows = await query<{ id: string }>(
-    `INSERT INTO fm_stories (user_id, media_url, media_type, caption, overlays, zoom)
-     VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
-    [me.id, mediaUrl, mediaType, caption, JSON.stringify(overlays), zoom]
+    `INSERT INTO fm_stories (user_id, media_url, media_type, caption, overlays, zoom, volume)
+     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+    [me.id, mediaUrl, mediaType, caption, JSON.stringify(overlays), zoom, volume]
   );
   return NextResponse.json({ ok: true, id: rows[0].id });
 }

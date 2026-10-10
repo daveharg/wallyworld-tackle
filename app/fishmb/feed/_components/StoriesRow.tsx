@@ -20,6 +20,7 @@ interface Story {
   viewed: boolean;
   overlays?: { text: string; x: number; y: number; font: string; color: string; bg: string; size: number }[];
   zoom?: number;
+  volume?: number | null;
 }
 
 export default function StoriesRow() {
@@ -233,7 +234,16 @@ export default function StoriesRow() {
               style={{ transform: `scale(${viewing.zoom ?? 1})`, transformOrigin: "center" }}
             >
               {viewing.media_type === "video" ? (
-                <video src={viewing.media_url} controls autoPlay playsInline className="w-full h-full object-contain" />
+                <video
+                  src={viewing.media_url}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="w-full h-full object-contain"
+                  onLoadedMetadata={(e) => {
+                    if (viewing.volume != null) e.currentTarget.volume = viewing.volume;
+                  }}
+                />
               ) : (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={viewing.media_url} alt="" className="w-full h-full object-contain" />

@@ -446,6 +446,7 @@ export async function ensureStoryTables(): Promise<void> {
   await query(`ALTER TABLE fm_stories ADD COLUMN IF NOT EXISTS is_public boolean NOT NULL DEFAULT false`);
   await query(`ALTER TABLE fm_stories ADD COLUMN IF NOT EXISTS overlays jsonb NOT NULL DEFAULT '[]'::jsonb`);
   await query(`ALTER TABLE fm_stories ADD COLUMN IF NOT EXISTS zoom double precision NOT NULL DEFAULT 1`);
+  await query(`ALTER TABLE fm_stories ADD COLUMN IF NOT EXISTS volume double precision`);
   // Story drafts — user's saved photos/videos for stories, kept as square boxes.
   await query(`CREATE TABLE IF NOT EXISTS fm_story_drafts (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -490,7 +491,7 @@ export async function getStories(viewerId: string | null): Promise<StoryItem[]> 
   await ensureFollowTables();
   const rows = await query<StoryItem & { created_at: string }>(
     `SELECT s.id, s.user_id, u.name AS user_name, u.avatar_url,
-            s.media_url, s.media_type, s.caption, s.created_at, s.overlays, s.zoom,
+            s.media_url, s.media_type, s.caption, s.created_at, s.overlays, s.zoom, s.volume,
             EXISTS(SELECT 1 FROM fm_story_views v
                     WHERE v.story_id = s.id AND v.viewer_id = $1::uuid) AS viewed
        FROM fm_stories s

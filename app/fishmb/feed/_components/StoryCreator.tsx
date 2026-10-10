@@ -59,13 +59,15 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
   const [editingOverlay, setEditingOverlay] = useState<TextOverlay | null>(null);
   const [overlayText, setOverlayText] = useState("");
   const [dragIdx, setDragIdx] = useState<number | null>(null);
-  // Reel state — ordered clips, active clip for preview, per-clip zoom.
+  // Reel state — ordered clips, active clip for preview, per-clip zoom/volume.
   const [clipOrder, setClipOrder] = useState<string[]>([]);
   const [activeClip, setActiveClip] = useState(0);
   const [clipZooms, setClipZooms] = useState<Record<string, number>>({});
+  const [clipVolumes, setClipVolumes] = useState<Record<string, number>>({});
   const previewRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const clips = clipOrder
     .map((id) => drafts.find((d) => d.id === id))
@@ -75,6 +77,12 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
   const setActiveZoom = (z: number) => {
     if (!activeDraft) return;
     setClipZooms((m) => ({ ...m, [activeDraft.id]: z }));
+  };
+  const activeVolume = activeDraft ? (clipVolumes[activeDraft.id] ?? 0.5) : 0.5;
+  const setActiveVolume = (v: number) => {
+    if (!activeDraft) return;
+    setClipVolumes((m) => ({ ...m, [activeDraft.id]: v }));
+    if (videoRef.current) videoRef.current.volume = v;
   };
 
   // Drag a text overlay around the preview with pointer events.
@@ -347,6 +355,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
             media_type: d.media_type,
             overlays: clipOverlays,
             zoom: clipZooms[d.id] ?? 1,
+            volume: d.media_type === "video" ? (clipVolumes[d.id] ?? 0.5) : null,
           }),
         });
       }
@@ -538,7 +547,17 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                   style={{ transform: `scale(${activeZoom})`, transformOrigin: "center" }}
                 >
                   {activeDraft.media_type === "video" ? (
-                    <video src={activeDraft.media_url} className="w-full h-full object-contain" muted playsInline loop autoPlay />
+                    <video
+                      ref={videoRef}
+                      src={activeDraft.media_url}
+                      className="w-full h-full object-contain"
+                      playsInline
+                      loop
+                      autoPlay
+                      onLoadedMetadata={(e) => {
+                        e.currentTarget.volume = activeVolume;
+                      }}
+                    />
                   ) : (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={activeDraft.media_url} alt="" className="w-full h-full object-contain" />
@@ -658,6 +677,29 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                 </button>
               )}
             </div>
+
+            {/* Volume control — videos only */}
+            {activeDraft?.media_type === "video" && (
+              <div className="px-4 pt-1 pb-2 flex items-center gap-3">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-pine/60 shrink-0">
+                  <path d="M11 5L6 9H2v6h4l5 4V5z" />
+                  <path d="M15.5 8.5a5 5 0 0 1 0 7" />
+                </svg>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={activeVolume}
+                  onChange={(e) => setActiveVolume(parseFloat(e.target.value))}
+                  className="flex-1 accent-[#e8622c]"
+                  aria-label="Video volume"
+                />
+                <span className="text-xs font-bold text-pine/50 w-10 text-right">
+                  {Math.round(activeVolume * 100)}%
+                </span>
+              </div>
+            )}
 
             {/* Text input */}
             <div className="p-4 space-y-3">
