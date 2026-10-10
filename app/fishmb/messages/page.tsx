@@ -414,7 +414,7 @@ function MessagesPageInner() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 md:py-10">
-      <div className="flex items-center justify-between mb-6">
+      <div className="relative flex items-center justify-between mb-6">
         {/* User avatar */}
         <div className="w-12 h-12 rounded-full bg-pine/10 flex items-center justify-center shrink-0">
           {user?.avatar_url ? (
@@ -427,7 +427,7 @@ function MessagesPageInner() {
           )}
         </div>
         {/* Title */}
-        <h1 className="font-bold text-pine text-xl tracking-tight">
+        <h1 className="absolute left-1/2 -translate-x-1/2 font-bold text-pine text-xl tracking-tight">
           Chats
         </h1>
         {/* Camera + compose pill */}
