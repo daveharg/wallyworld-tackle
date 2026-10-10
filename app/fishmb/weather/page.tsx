@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import LocationPicker, { WxLoc } from "./_components/LocationPicker";
+import FishLoader from "../_components/FishLoader";
 
 /* ------------------------------------------------------------------ */
 /* WMO weather-code → label + emoji                                     */
@@ -722,7 +723,7 @@ export default function WeatherPage() {
               </div>
             </>
           ) : (
-            !err && <div className="mt-8 h-40 rounded-3xl bg-pine/5 animate-pulse" />
+            !err && <FishLoader label="Loading weather…" />
           )}
         </div>
       </div>
