@@ -2312,6 +2312,11 @@ function FeedPageInner() {
                         </option>
                       ))}
                     </select>
+                    {tournamentId && (
+                      <p className="text-xs text-signal-dark font-bold mt-2 bg-signal/10 border border-signal/30 rounded-2xl px-4 py-2.5">
+                        Tournament entry: include a clear photo showing the fish length on a measuring device. Entries are verified before counting.
+                      </p>
+                    )}
                   </div>
                 )}
                 <button
