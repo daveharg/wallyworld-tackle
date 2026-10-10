@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useFishAuth } from "../../_components/FishAuth";
 import { fishFetch } from "../../_components/fishFetch";
@@ -9,6 +10,9 @@ import { PayoutEditor } from "./PayoutEditor";
 import { RULE_TEMPLATES } from "./ruleTemplates";
 import type { PayoutTier } from "@/lib/fish/tournaments";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
+import type { ZoneBox, ZonePoint } from "./ZoneMapPicker";
+
+const ZoneMapPicker = dynamic(() => import("./ZoneMapPicker"), { ssr: false });
 
 interface LakeOpt {
   id: string;
@@ -44,10 +48,13 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
   const [venueName, setVenueName] = useState("");
   const [venueAddress, setVenueAddress] = useState("");
   const [customZone, setCustomZone] = useState(false);
-  const [gpsNorth, setGpsNorth] = useState("60.1");
-  const [gpsSouth, setGpsSouth] = useState("48.9");
-  const [gpsEast, setGpsEast] = useState("-88.9");
-  const [gpsWest, setGpsWest] = useState("-102.1");
+  const [zoneBox, setZoneBox] = useState<ZoneBox>({
+    north: 60.1,
+    south: 48.9,
+    east: -88.9,
+    west: -102.1,
+  });
+  const [zonePolygon, setZonePolygon] = useState<ZonePoint[] | null>(null);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -117,10 +124,11 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
           venue_address: venueAddress.trim() || null,
           ...(customZone
             ? {
-                gps_north: parseFloat(gpsNorth),
-                gps_south: parseFloat(gpsSouth),
-                gps_east: parseFloat(gpsEast),
-                gps_west: parseFloat(gpsWest),
+                gps_north: zoneBox.north,
+                gps_south: zoneBox.south,
+                gps_east: zoneBox.east,
+                gps_west: zoneBox.west,
+                ...(zonePolygon && zonePolygon.length >= 3 ? { zone_polygon: zonePolygon } : {}),
               }
             : {}),
         }),
@@ -213,24 +221,14 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
               Catches outside your zone are rejected. Leave off for all of Manitoba.
             </p>
             {customZone && (
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className={labelCls}>North (lat)</label>
-                  <input type="number" step="any" value={gpsNorth} onChange={(e) => setGpsNorth(e.target.value)} className={inputCls} />
-                </div>
-                <div>
-                  <label className={labelCls}>South (lat)</label>
-                  <input type="number" step="any" value={gpsSouth} onChange={(e) => setGpsSouth(e.target.value)} className={inputCls} />
-                </div>
-                <div>
-                  <label className={labelCls}>East (lng)</label>
-                  <input type="number" step="any" value={gpsEast} onChange={(e) => setGpsEast(e.target.value)} className={inputCls} />
-                </div>
-                <div>
-                  <label className={labelCls}>West (lng)</label>
-                  <input type="number" step="any" value={gpsWest} onChange={(e) => setGpsWest(e.target.value)} className={inputCls} />
-                </div>
-              </div>
+              <ZoneMapPicker
+                initialBox={zoneBox}
+                initialPolygon={zonePolygon}
+                onChange={(b, p) => {
+                  setZoneBox(b);
+                  setZonePolygon(p);
+                }}
+              />
             )}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

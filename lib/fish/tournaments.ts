@@ -101,6 +101,7 @@ export interface Tournament {
   gps_south: number | null;
   gps_east: number | null;
   gps_west: number | null;
+  zone_polygon: { lat: number; lng: number }[] | null;
   created_at: string;
   participant_count: number;
   entry_count: number;

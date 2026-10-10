@@ -133,12 +133,39 @@ export async function POST(
   const lng = typeof body.longitude === "number" ? body.longitude : null;
   const acc = typeof body.gps_accuracy === "number" ? body.gps_accuracy : null;
   if (lat !== null && lng !== null) {
-    const bounds =
-      t.gps_north != null && t.gps_south != null && t.gps_east != null && t.gps_west != null
-        ? { north: t.gps_north, south: t.gps_south, east: t.gps_east, west: t.gps_west }
-        : MANITOBA_BOUNDS;
-    if (!gpsInBounds(lat, lng, bounds)) {
-      return badRequest("That location is outside the tournament's fishing zone.");
+    // Point-in-polygon (ray casting) for hand-drawn zones.
+    const pointInPolygon = (
+      la: number,
+      ln: number,
+      poly: { lat: number; lng: number }[]
+    ): boolean => {
+      let inside = false;
+      for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+        const xi = poly[i].lng;
+        const yi = poly[i].lat;
+        const xj = poly[j].lng;
+        const yj = poly[j].lat;
+        if (yi > la !== yj > la && ln < ((xj - xi) * (la - yi)) / (yj - yi) + xi) {
+          inside = !inside;
+        }
+      }
+      return inside;
+    };
+    const poly = Array.isArray(t.zone_polygon) && t.zone_polygon.length >= 3
+      ? t.zone_polygon
+      : null;
+    if (poly) {
+      if (!pointInPolygon(lat, lng, poly)) {
+        return badRequest("That location is outside the tournament's fishing zone.");
+      }
+    } else {
+      const bounds =
+        t.gps_north != null && t.gps_south != null && t.gps_east != null && t.gps_west != null
+          ? { north: t.gps_north, south: t.gps_south, east: t.gps_east, west: t.gps_west }
+          : MANITOBA_BOUNDS;
+      if (!gpsInBounds(lat, lng, bounds)) {
+        return badRequest("That location is outside the tournament's fishing zone.");
+      }
     }
   }
   const notes = typeof body.notes === "string" ? body.notes.trim().slice(0, 500) : "";
