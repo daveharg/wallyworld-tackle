@@ -52,6 +52,12 @@ export function SubmitEntry({
     if (bumpPreview) URL.revokeObjectURL(bumpPreview);
     setBumpFile(f);
     setBumpPreview(f ? URL.createObjectURL(f) : null);
+    // Screenshots can't be timestamp-verified for tournaments.
+    if (f && f.type === "image/png" && f.name.toLowerCase().includes("screenshot")) {
+      setError("That's a screenshot — tournaments need the original camera photo so we can verify when it was taken.");
+    } else {
+      setError(null);
+    }
   };
 
   const setHold = (f: File | null) => {
