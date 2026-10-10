@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { fishFetch } from "../../_components/fishFetch";
 import type { SavedLake } from "./types";
 
@@ -98,14 +99,17 @@ export default function LakeSheetHeader({
             )}
           </p>
         </div>
-        <div className="flex-1 bg-paper-deep border border-pine/10 rounded-2xl px-4 py-3">
+        <Link
+          href={`/fishmb/maps/lake/${lake.id}/catches`}
+          className="flex-1 bg-paper-deep border border-pine/10 rounded-2xl px-4 py-3 hover:border-signal/40 transition-colors"
+        >
           <p className="text-[11px] font-black uppercase tracking-[0.14em] text-pine/45 mb-1">
             Your catches
           </p>
           <p className="text-lg font-extrabold text-pine">
             {catchCount !== null ? catchCount : "—"}
           </p>
-        </div>
+        </Link>
       </div>
     </div>
   );
