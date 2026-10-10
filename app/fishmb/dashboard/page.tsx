@@ -94,13 +94,13 @@ export default function DashboardPage() {
             key={t.id}
             type="button"
             onClick={() => setTab(t.id)}
-            className={`aspect-square rounded-3xl border flex flex-col items-center justify-center gap-2 transition-colors ${
+            className={`rounded-3xl border flex flex-col items-center justify-center gap-1.5 py-5 transition-colors ${
               tab === t.id
                 ? "bg-pine text-white border-pine shadow-lg"
                 : "bg-white text-pine border-pine/10 hover:border-signal/40"
             }`}
           >
-            <span className="text-4xl leading-none">{t.icon}</span>
+            <span className="text-3xl leading-none">{t.icon}</span>
             <span className="font-bold uppercase tracking-wider text-xs">{t.label}</span>
           </button>
         ))}
