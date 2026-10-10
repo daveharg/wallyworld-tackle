@@ -115,6 +115,20 @@ export async function GET(
     [target.id]
   );
 
+  // Posts tab: the user's feed posts (and tips). Friends-only visible to
+  // owner and accepted friends; everyone else gets public.
+  const posts = await query(
+    `SELECT d.id, d.body, d.photo_url, d.photos, d.video, d.visibility,
+            d.species_tag, d.created_at,
+            (SELECT COUNT(*) FROM fm_comments cm WHERE cm.post_id = d.id)::int AS comment_count
+       FROM fm_discussions d
+      WHERE d.user_id = $1 AND d.kind IN ('post', 'tip') AND d.in_feed
+        AND (d.visibility = 'public' ${canSeeFriendsOnly ? "OR d.visibility = 'friends'" : ""})
+      ORDER BY d.created_at DESC
+      LIMIT 20`,
+    [target.id]
+  );
+
   return NextResponse.json({
     user: target,
     is_self: isSelf,
@@ -129,5 +143,6 @@ export async function GET(
     },
     photos: photos.map((p) => ({ url: p.photo_url, created_at: p.created_at })),
     friends,
+    posts,
   });
 }

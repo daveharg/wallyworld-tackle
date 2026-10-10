@@ -23,6 +23,18 @@ interface ProfileFriend {
   avatar_url: string | null;
 }
 
+interface ProfilePost {
+  id: string;
+  body: string | null;
+  photo_url: string | null;
+  photos: string[] | null;
+  video: { playback_id: string; duration: number | null } | null;
+  visibility: string;
+  species_tag: string | null;
+  created_at: string;
+  comment_count: number;
+}
+
 interface ProfileData {
   user: { id: string; name: string; avatar_url: string | null; bio: string | null; allow_follow?: boolean };
   is_self: boolean;
@@ -33,6 +45,7 @@ interface ProfileData {
   counts: { posts: number; catches: number; friends: number };
   photos: ProfilePhoto[];
   friends: ProfileFriend[];
+  posts: ProfilePost[];
 }
 
 function Avatar({ url, name, size }: { url: string | null; name: string; size: string }) {
@@ -57,7 +70,7 @@ export default function ProfileView({
 }) {
   const [data, setData] = useState<ProfileData | null>(null);
   const { user: me } = useFishAuth();
-  const [tab, setTab] = useState<"photos" | "friends">("photos");
+  const [tab, setTab] = useState<"posts" | "photos" | "friends">("posts");
   const [acting, setActing] = useState(false);
   const [note, setNote] = useState<string | null>(null);
 
@@ -243,7 +256,7 @@ export default function ProfileView({
 
       {/* Tabs */}
       <div className="flex gap-2 border-b border-pine/10 mb-6">
-        {(["photos", "friends"] as const).map((t) => (
+        {(["posts", "photos", "friends"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -253,12 +266,47 @@ export default function ProfileView({
                 : "text-pine/45 hover:text-pine"
             }`}
           >
- {t === "photos" ? ` Photos (${data.photos.length})` : ` Friends (${data.friends.length})`}
+            {t === "posts"
+              ? ` Posts (${data.posts.length})`
+              : t === "photos"
+                ? ` Photos (${data.photos.length})`
+                : ` Friends (${data.friends.length})`}
           </button>
         ))}
       </div>
 
-      {tab === "photos" ? (
+      {tab === "posts" ? (
+        data.posts.length > 0 ? (
+          <div className="space-y-4">
+            {data.posts.map((p) => (
+              <article key={p.id} className="bg-white border border-pine/10 rounded-3xl p-4">
+                {p.body && <p className="text-pine text-sm whitespace-pre-wrap mb-3">{p.body}</p>}
+                {p.photo_url && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={p.photo_url} alt="" loading="lazy" className="w-full rounded-2xl object-cover max-h-96" />
+                )}
+                {p.photos && p.photos.length > 0 && (
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    {p.photos.slice(0, 4).map((url, i) => (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img key={i} src={url} alt="" loading="lazy" className="w-full aspect-square object-cover rounded-xl" />
+                    ))}
+                  </div>
+                )}
+                <div className="flex items-center gap-4 mt-3 text-xs text-pine/50">
+                  <span>{new Date(p.created_at).toLocaleDateString()}</span>
+                  <span>💬 {p.comment_count}</span>
+                  {p.visibility === "friends" && <span>👥 Friends</span>}
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-pine/50 py-12">
+            {data.is_self ? "Your posts will show up here." : "No posts yet."}
+          </p>
+        )
+      ) : tab === "photos" ? (
         data.photos.length > 0 ? (
           <div className="grid grid-cols-3 gap-1.5 md:gap-3">
             {data.photos.map((p, i) => (
