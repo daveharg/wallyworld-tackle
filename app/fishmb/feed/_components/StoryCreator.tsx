@@ -441,10 +441,10 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                   style={{ transform: `scale(${activeZoom})`, transformOrigin: "center" }}
                 >
                   {activeDraft.media_type === "video" ? (
-                    <video src={activeDraft.media_url} className="w-full h-full object-cover" muted playsInline loop autoPlay />
+                    <video src={activeDraft.media_url} className="w-full h-full object-contain" muted playsInline loop autoPlay />
                   ) : (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={activeDraft.media_url} alt="" className="w-full h-full object-cover" />
+                    <img src={activeDraft.media_url} alt="" className="w-full h-full object-contain" />
                   )}
                 </div>
               )}

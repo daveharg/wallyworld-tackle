@@ -233,10 +233,10 @@ export default function StoriesRow() {
               style={{ transform: `scale(${viewing.zoom ?? 1})`, transformOrigin: "center" }}
             >
               {viewing.media_type === "video" ? (
-                <video src={viewing.media_url} controls autoPlay playsInline className="w-full h-full object-cover" />
+                <video src={viewing.media_url} controls autoPlay playsInline className="w-full h-full object-contain" />
               ) : (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={viewing.media_url} alt="" className="w-full h-full object-cover" />
+                <img src={viewing.media_url} alt="" className="w-full h-full object-contain" />
               )}
             </div>
             {(viewing.overlays ?? []).map((o, i) => (
