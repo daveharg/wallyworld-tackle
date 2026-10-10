@@ -65,23 +65,31 @@ export default async function TournamentsPage() {
           </p>
         </div>
       ) : (
-        <div className="space-y-2">
-          {tournaments.map((t) => (
-            <Link
-              key={t.id}
-              href={`/fishmb/tournaments/${t.id}`}
-              className="flex items-center gap-3 bg-white border border-pine/10 rounded-2xl px-4 py-3.5 hover:border-signal/40 transition-colors"
-            >
-              <span className="min-w-0 flex-1">
-                <span className="block font-bold text-pine truncate">{t.name}</span>
-                <span className="block text-xs text-pine/50 mt-0.5">
-                  {t.participant_count} anglers · {t.entry_count} fish
+        <>
+          <h2 className="font-display font-bold uppercase text-pine text-3xl tracking-wide mb-2">
+            App tournaments
+          </h2>
+          <p className="text-pine/60 text-sm mb-6 max-w-2xl">
+            Run on FishMB — catch-photo format with anti-cheat built in.
+          </p>
+          <div className="space-y-2">
+            {tournaments.map((t) => (
+              <Link
+                key={t.id}
+                href={`/fishmb/tournaments/${t.id}`}
+                className="flex items-center gap-3 bg-white border border-pine/10 rounded-2xl px-4 py-3.5 hover:border-signal/40 transition-colors"
+              >
+                <span className="min-w-0 flex-1">
+                  <span className="block font-bold text-pine truncate">{t.name}</span>
+                  <span className="block text-xs text-pine/50 mt-0.5">
+                    {t.participant_count} anglers · {t.entry_count} fish
+                  </span>
                 </span>
-              </span>
-              <span className="text-pine/25 text-xl leading-none shrink-0">›</span>
-            </Link>
-          ))}
-        </div>
+                <span className="text-pine/25 text-xl leading-none shrink-0">›</span>
+              </Link>
+            ))}
+          </div>
+        </>
       )}
 
       {/* Traditional (non-digital) Manitoba tournaments */}
