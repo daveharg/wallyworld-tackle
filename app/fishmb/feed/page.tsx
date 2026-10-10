@@ -1477,8 +1477,59 @@ function FeedPageInner() {
           {shareNote}
         </div>
       )}
-      {/* Feed section header — tap the title to switch sections */}
-      <div className="flex items-center justify-between mb-4">        <div className="relative">
+      {/* Mobile top section — FishMB logo, profile circle, 3 feed tabs */}
+      <div className="md:hidden">
+        <div className="flex items-center justify-between mb-3">
+          <Link href="/fishmb/dashboard?tab=profile" aria-label="Your profile">
+            {user?.avatar_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={user.avatar_url} alt={user.name} className="w-10 h-10 rounded-full object-cover" />
+            ) : (
+              <span className="w-10 h-10 rounded-full bg-pine/10 text-pine flex items-center justify-center font-bold text-lg">
+                {(user?.name ?? "?").charAt(0).toUpperCase()}
+              </span>
+            )}
+          </Link>
+          <span className="font-display font-black text-2xl tracking-tight">
+            <span className="text-pine">Fish</span><span className="text-signal-dark">MB</span>
+          </span>
+          <button
+            onClick={() => setSearchOpen(true)}
+            aria-label="Search the feed"
+            className="w-10 h-10 flex items-center justify-center rounded-full text-pine/70 hover:text-pine"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
+          </button>
+        </div>
+        <div className="flex justify-around border-b border-pine/10 mb-4">
+          {(
+            [
+              ["community", "Main", "/fishmb/feed"],
+              ["catches", "Catches", "/fishmb/feed?kind=catch"],
+              ["friends", "Friends", "/fishmb/feed?friends=1"],
+            ] as const
+          ).map(([id, label, href]) => {
+            const active =
+              (id === "friends" && friendsOnly) ||
+              (id === "catches" && tab === "catch" && !friendsOnly) ||
+              (id === "community" && tab !== "catch" && !friendsOnly);
+            return (
+              <button
+                key={id}
+                onClick={() => router.push(href)}
+                className={`flex-1 pb-2 text-base font-bold ${active ? "text-pine border-b-2 border-pine" : "text-pine/40"}`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      {/* Desktop feed section header — tap the title to switch sections */}
+      <div className="hidden md:flex items-center justify-between mb-4">        <div className="relative">
           <button
             onClick={() => setSectionMenuOpen((o) => !o)}
             aria-haspopup="menu"
