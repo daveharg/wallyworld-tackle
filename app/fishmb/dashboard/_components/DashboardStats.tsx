@@ -120,9 +120,17 @@ export default function DashboardStats() {
       </div>
 
       <div>
-        <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
- Friends' stats
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide">
+            Friends' stats
+          </h2>
+          <Link
+            href="/fishmb/friends"
+            className="text-signal-dark font-bold text-sm uppercase tracking-wider hover:underline"
+          >
+            + Add friends
+          </Link>
+        </div>
         {friends.length === 0 ? (
           <div className="bg-white border border-pine/10 rounded-3xl p-6 text-center">
             <p className="text-pine/70 font-bold">No friends yet</p>
