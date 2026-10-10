@@ -92,6 +92,13 @@ export default function MapsHub() {
   const initPlaced = useRef(false);
   const urlPlaced = useRef(false);
 
+  // (0,0) is "Null Island" — never a real spot or GPS fix. Treat as invalid
+  // so the map can't get stuck in the ocean.
+  const isRealCoord = (lat: number, lng: number) =>
+    Number.isFinite(lat) &&
+    Number.isFinite(lng) &&
+    !(Math.abs(lat) < 0.001 && Math.abs(lng) < 0.001);
+
   // Spots: picking + quick add
   const [picking, setPicking] = useState(false);
   const [quickAdd, setQuickAdd] = useState<{ lat: number; lng: number } | null>(null);
@@ -125,12 +132,16 @@ export default function MapsHub() {
         setSpots(list);
         // Initial placement: latest saved spot wins. If no spots, GPS takes over.
         if (!urlPlaced.current && !initPlaced.current && list.length > 0) {
-          const latest = [...list].sort(
+          const sorted = [...list].sort(
             (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-          )[0];
-          const lat = Number(latest.lat);
-          const lng = Number(latest.lng);
-          if (Number.isFinite(lat) && Number.isFinite(lng)) {
+          );
+          // Use the latest spot with real coordinates (skip Null Island spots).
+          const latest = sorted.find((s) =>
+            isRealCoord(Number(s.lat), Number(s.lng))
+          );
+          if (latest) {
+            const lat = Number(latest.lat);
+            const lng = Number(latest.lng);
             initPlaced.current = true;
             setFocus({ lat, lng, key: `spot:init:${latest.id}`, zoom: 14 });
             setMapCenter({ lat, lng });
@@ -169,7 +180,7 @@ export default function MapsHub() {
           speed: pos.coords.speed,
         };
         setMyLoc(loc);
-        if (!initPlaced.current && !urlPlaced.current) {
+        if (!initPlaced.current && !urlPlaced.current && isRealCoord(loc.lat, loc.lng)) {
           initPlaced.current = true;
           setFocus({ lat: loc.lat, lng: loc.lng, key: `gps:init`, zoom: 11 });
           setMapCenter({ lat: loc.lat, lng: loc.lng });
@@ -195,6 +206,12 @@ export default function MapsHub() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        if (!isRealCoord(loc.lat, loc.lng)) {
+          setLocating(false);
+          setNote("Couldn't get your location — check permission in Settings.");
+          setTimeout(() => setNote(null), 4000);
+          return;
+        }
         setMyLoc((prev) => ({ ...loc, speed: prev?.speed ?? null }));
         setMapCenter(loc);
         setFocus({ lat: loc.lat, lng: loc.lng, key: `gps:manual:${Date.now()}`, zoom: 12 });
