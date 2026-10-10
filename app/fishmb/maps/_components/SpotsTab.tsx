@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { SpotPin } from "../../profile/_components/SpotMap";
 
 export interface Spot extends SpotPin {
@@ -22,7 +22,21 @@ interface SpotsTabProps {
 const inputCls =
   "w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal";
 
-/** Saved spots tab — one clean box per spot, newest first. */
+/** Approx km between two lat/lng points. */
+function kmBetween(aLat: number, aLng: number, bLat: number, bLng: number): number {
+  const dLat = (aLat - bLat) * 111;
+  const dLng = (aLng - bLng) * 111 * Math.cos((bLat * Math.PI) / 180);
+  return Math.hypot(dLat, dLng);
+}
+
+interface LakeCoord {
+  id: string;
+  name: string;
+  lat: number;
+  lng: number;
+}
+
+/** Saved spots tab — grouped by nearest lake, newest first within each group. */
 export default function SpotsTab({
   spots,
   onSelect,
@@ -37,6 +51,33 @@ export default function SpotsTab({
   const [editName, setEditName] = useState("");
   const [editNotes, setEditNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const [lakes, setLakes] = useState<LakeCoord[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const [coordsRes, metaRes] = await Promise.all([
+          fetch("/fishmb/lake-coords.json"),
+          fetch("/fish-manitoba/data.json"),
+        ]);
+        const coords = (await coordsRes.json()) as Record<string, { lat: number; lng: number }>;
+        const meta = (await metaRes.json()) as { lakes?: { id: string; name: string }[] };
+        const nameById = new Map((meta.lakes ?? []).map((l) => [l.id, l.name]));
+        setLakes(
+          Object.entries(coords)
+            .filter(([, c]) => Number.isFinite(c.lat) && Number.isFinite(c.lng))
+            .map(([id, c]) => ({
+              id,
+              name: nameById.get(id) ?? id,
+              lat: c.lat,
+              lng: c.lng,
+            }))
+        );
+      } catch {
+        // Lake grouping stays off; spots list flat.
+      }
+    })();
+  }, []);
 
   const startEdit = (s: Spot) => {
     setEditingId(s.id);
@@ -64,6 +105,43 @@ export default function SpotsTab({
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 
+  // Group spots by nearest lake (within 15 km); the rest under "Other spots".
+  const nearestLake = (s: Spot): LakeCoord | null => {
+    const lat = Number(s.lat);
+    const lng = Number(s.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || lakes.length === 0) return null;
+    let best: LakeCoord | null = null;
+    let bestD = 15;
+    for (const l of lakes) {
+      const d = kmBetween(lat, lng, l.lat, l.lng);
+      if (d < bestD) {
+        bestD = d;
+        best = l;
+      }
+    }
+    return best;
+  };
+
+  const groups: { lake: LakeCoord | null; spots: Spot[] }[] = [];
+  const groupById = new Map<string, { lake: LakeCoord | null; spots: Spot[] }>();
+  for (const s of sorted) {
+    const lake = nearestLake(s);
+    const key = lake ? lake.id : "__other";
+    let g = groupById.get(key);
+    if (!g) {
+      g = { lake, spots: [] };
+      groupById.set(key, g);
+      groups.push(g);
+    }
+    g.spots.push(s);
+  }
+  // Lake groups alphabetically; "Other spots" last.
+  groups.sort((a, b) => {
+    if (!a.lake) return 1;
+    if (!b.lake) return -1;
+    return a.lake.name.localeCompare(b.lake.name);
+  });
+
   return (
     <div className="pt-1">
       <button
@@ -82,8 +160,14 @@ export default function SpotsTab({
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {sorted.map((s) =>
+        <div className="space-y-5">
+          {groups.map((g) => (
+            <div key={g.lake ? g.lake.id : "__other"}>
+              <p className="text-[11px] font-black uppercase tracking-[0.14em] text-pine/45 mb-2 px-1">
+                {g.lake ? g.lake.name : "Other spots"}
+              </p>
+              <div className="space-y-2.5">
+                {g.spots.map((s) =>
             editingId === s.id ? (
                     <div key={s.id} className="bg-white border border-signal/40 rounded-2xl p-4 space-y-2">
                       <input
@@ -171,6 +255,9 @@ export default function SpotsTab({
                     </div>
                   )
                 )}
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>
