@@ -233,7 +233,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
               </div>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>Starts *</label>
               <input type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} className={inputCls} />
@@ -279,7 +279,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
             </div>
             <textarea value={rules} onChange={(e) => setRules(e.target.value)} rows={6} placeholder="Catch-photo rules, measuring requirements, boundaries, prizes… or pick a template above." className={inputCls} />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>Entry fee per angler ($)</label>
               <input
