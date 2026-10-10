@@ -592,7 +592,7 @@ export default function MapsHub() {
 
       {/* Go-to navigation bar */}
       {goTo && (
-        <div className="absolute top-16 left-3 z-20 flex items-center gap-2 bg-pine/90 backdrop-blur text-white rounded-full pl-4 pr-2 py-2 shadow-xl max-w-[55vw]">
+        <div className="absolute top-28 left-3 z-20 flex items-center gap-2 bg-pine/90 backdrop-blur text-white rounded-full pl-4 pr-2 py-2 shadow-xl max-w-[55vw]">
           <div className="flex-1 min-w-0">
             <p className="font-bold text-xs truncate leading-tight">{goTo.name || "Fishing spot"}</p>
             <p className="text-[11px] text-white/70 tabular-nums leading-tight">

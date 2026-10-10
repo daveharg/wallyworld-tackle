@@ -1858,7 +1858,7 @@ function FeedPageInner() {
                 {catchNote && <p className="text-sm text-signal-dark mt-3">{catchNote}</p>}
                 {videoErr && <p className="text-sm text-signal-dark mt-3">{videoErr}</p>}
               </>
-            ) : mode === "catch" ? (
+            ) : (
               <>
                 <div className="grid grid-cols-2 gap-3">
                   <input
