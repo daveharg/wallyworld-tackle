@@ -108,6 +108,19 @@ export default function MapsHub() {
   const [quickNotes, setQuickNotes] = useState("");
   const [quickIcon, setQuickIcon] = useState("pin");
   const [quickSaving, setQuickSaving] = useState(false);
+  const [quickReady, setQuickReady] = useState(false);
+
+  // After a long-press opens the sheet, wait for the finger to lift before
+  // the buttons become tappable — otherwise the touch-up fires a phantom tap.
+  useEffect(() => {
+    if (!quickAdd) {
+      setQuickReady(false);
+      return;
+    }
+    setQuickReady(false);
+    const t = setTimeout(() => setQuickReady(true), 600);
+    return () => clearTimeout(t);
+  }, [quickAdd]);
   const [sharedSpot, setSharedSpot] = useState<SpotPin | null>(null);
 
   // Trails + navigation
@@ -724,6 +737,7 @@ export default function MapsHub() {
                 <div className="flex flex-col gap-2.5">
                   <button
                     type="button"
+                    disabled={!quickReady}
                     onClick={() => {
                       const lat = quickAdd.lat;
                       const lng = quickAdd.lng;
@@ -731,14 +745,15 @@ export default function MapsHub() {
                       setQuickMode("choose");
                       router.push(`/fishmb/feed?log=catch&lat=${lat}&lng=${lng}`);
                     }}
-                    className="w-full bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-4 rounded-2xl transition-colors"
+                    className="w-full bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-4 rounded-2xl transition-colors disabled:opacity-50"
                   >
                     Log a catch here
                   </button>
                   <button
                     type="button"
+                    disabled={!quickReady}
                     onClick={() => setQuickMode("mark")}
-                    className="w-full bg-pine text-white font-bold uppercase tracking-wider text-sm px-6 py-4 rounded-2xl transition-colors"
+                    className="w-full bg-pine text-white font-bold uppercase tracking-wider text-sm px-6 py-4 rounded-2xl transition-colors disabled:opacity-50"
                   >
                     Mark this spot
                   </button>
