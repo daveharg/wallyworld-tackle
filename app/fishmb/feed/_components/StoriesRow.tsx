@@ -289,7 +289,7 @@ export default function StoriesRow() {
                     setConfirmDelete(true);
                   }}
                   aria-label="Delete story"
-                  className="w-9 h-9 rounded-full bg-black/40 flex items-center justify-center text-white/90 hover:text-white hover:bg-black/60 transition-colors"
+                  className="w-9 h-9 mr-3 rounded-full bg-black/40 flex items-center justify-center text-white/90 hover:text-white hover:bg-black/60 transition-colors"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
