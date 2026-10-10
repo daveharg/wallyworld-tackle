@@ -98,7 +98,7 @@ const PLUS_ACTIONS = [
   { href: "/fishmb/feed?log=catch", icon: ACTION_ICONS.catch, label: "Log a catch" },
   { href: "/fishmb/feed?compose=1", icon: ACTION_ICONS.post, label: "Share a post" },
   { href: "/fishmb/dashboard", icon: ACTION_ICONS.dashboard, label: "Angler HQ" },
-  { href: "/fishmb/tournaments", icon: ACTION_ICONS.trophy, label: "Tournaments" },
+  { href: "/fishmb/dashboard?tab=tournaments", icon: ACTION_ICONS.trophy, label: "Tournaments" },
 ];
 
 const LEFT: Item[] = [

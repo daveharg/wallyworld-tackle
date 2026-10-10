@@ -3,6 +3,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useFishAuth } from "../_components/FishAuth";
 import DashboardStats from "./_components/DashboardStats";
@@ -21,7 +22,12 @@ type TabId = (typeof TABS)[number]["id"];
 
 export default function DashboardPage() {
   const { user, openLogin } = useFishAuth();
-  const [tab, setTab] = useState<TabId>("stats");
+  const searchParams = useSearchParams();
+  const initialTab = ((): TabId => {
+    const t = searchParams.get("tab");
+    return t === "tournaments" || t === "licence" || t === "settings" ? t : "stats";
+  })();
+  const [tab, setTab] = useState<TabId>(initialTab);
 
   if (!user) {
     const perks = [
