@@ -75,7 +75,27 @@ export default function MapsHub() {
   const [allLakes, setAllLakes] = useState<{ id: string; name: string; region?: string }[]>([]);
   const [note, setNote] = useState<string | null>(null);
   const [myLoc, setMyLoc] = useState<{ lat: number; lng: number; speed: number | null } | null>(null);
-  const [mapCenter, setMapCenter] = useState({ lat: 48, lng: -100 });
+  const [mapCenter, setMapCenter] = useState(() => {
+    try {
+      const raw = localStorage.getItem("fishmb-map-center");
+      if (raw) {
+        const p = JSON.parse(raw);
+        if (typeof p.lat === "number" && typeof p.lng === "number") return p;
+      }
+    } catch {
+      // Use default.
+    }
+    return { lat: 48, lng: -100 };
+  });
+
+  // Persist the map's last location.
+  useEffect(() => {
+    try {
+      localStorage.setItem("fishmb-map-center", JSON.stringify(mapCenter));
+    } catch {
+      // Best effort.
+    }
+  }, [mapCenter]);
   const [focus, setFocus] = useState<{
     lat: number;
     lng: number;
@@ -101,10 +121,34 @@ export default function MapsHub() {
       // Storage unavailable — non-fatal.
     }
   };
-  const [windOn, setWindOn] = useState(false);
-  const [speedOn, setSpeedOn] = useState(false);
-  const [tempOn, setTempOn] = useState(false);
-  const [biteOn, setBiteOn] = useState(false);
+  const [windOn, setWindOn] = useState(() => {
+    try {
+      return localStorage.getItem("fishmb-widget-wind") === "1";
+    } catch {
+      return false;
+    }
+  });
+  const [speedOn, setSpeedOn] = useState(() => {
+    try {
+      return localStorage.getItem("fishmb-widget-speed") === "1";
+    } catch {
+      return false;
+    }
+  });
+  const [tempOn, setTempOn] = useState(() => {
+    try {
+      return localStorage.getItem("fishmb-widget-temp") === "1";
+    } catch {
+      return false;
+    }
+  });
+  const [biteOn, setBiteOn] = useState(() => {
+    try {
+      return localStorage.getItem("fishmb-widget-bite") === "1";
+    } catch {
+      return false;
+    }
+  });
   const [followDot, setFollowDot] = useState<string>(() => {
     try {
       return localStorage.getItem("fishmb-follow-dot") || "dot-blue";
@@ -120,6 +164,17 @@ export default function MapsHub() {
       // Best effort.
     }
   }, [followDot]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("fishmb-widget-wind", windOn ? "1" : "0");
+      localStorage.setItem("fishmb-widget-speed", speedOn ? "1" : "0");
+      localStorage.setItem("fishmb-widget-temp", tempOn ? "1" : "0");
+      localStorage.setItem("fishmb-widget-bite", biteOn ? "1" : "0");
+    } catch {
+      // Best effort.
+    }
+  }, [windOn, speedOn, tempOn, biteOn]);
   const initPlaced = useRef(false);
   const urlPlaced = useRef(false);
 
