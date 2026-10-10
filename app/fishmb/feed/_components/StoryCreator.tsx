@@ -903,7 +903,8 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                 )}
               </div>
 
-              {/* Font styles */}
+              {/* Font styles — only when editing text */}
+              {(editingIdx !== null || overlayText.trim()) && (
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-pine/50 mb-2">Style</p>
                 <div className="flex gap-2 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
@@ -921,8 +922,10 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                   ))}
                 </div>
               </div>
+              )}
 
-              {/* Colors */}
+              {/* Colors — only when editing text */}
+              {(editingIdx !== null || overlayText.trim()) && (
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-pine/50 mb-2">Color</p>
                 <div className="flex gap-2 flex-wrap">
@@ -937,8 +940,10 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                   ))}
                 </div>
               </div>
+              )}
 
-              {/* Backgrounds */}
+              {/* Backgrounds — only when editing text */}
+              {(editingIdx !== null || overlayText.trim()) && (
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-pine/50 mb-2">Background</p>
                 <div className="flex gap-2 flex-wrap">
@@ -955,6 +960,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                   ))}
                 </div>
               </div>
+              )}
 
               {/* Current overlays — tap clips to choose when text shows */}
               {overlays.length > 0 && (
