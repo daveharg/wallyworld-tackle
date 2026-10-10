@@ -821,7 +821,10 @@ export default function SpotMap({
         `leaflet-container` class L.map() adds, which blanks every tile
         (all Leaflet tile CSS is scoped under .leaflet-container).
       */}
-      <div className={expanded || fill ? "h-full w-full" : "h-[300px] md:h-[380px] w-full z-0"}>
+      <div
+        className={expanded || fill ? "h-full w-full select-none" : "h-[300px] md:h-[380px] w-full z-0 select-none"}
+        style={{ WebkitTouchCallout: "none", WebkitTapHighlightColor: "transparent" }}
+      >
         <div ref={containerRef} className="h-full w-full" />
       </div>
 
