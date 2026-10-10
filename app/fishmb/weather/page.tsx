@@ -277,6 +277,46 @@ interface DayForecast {
   label: string;
   color: string;
   note: string;
+  avgPressure: number;
+  avgTrend: number;
+  hours: number;
+}
+
+/** Human-readable reasons behind a rest-of-day / tomorrow outlook. */
+function dayReasons(title: string, d: DayForecast): string[] {
+  const reasons: string[] = [];
+  const p = d.avgPressure;
+  const t = d.avgTrend;
+  reasons.push(
+    `Based on ${d.hours} forecast hour${d.hours === 1 ? "" : "s"} for ${title.toLowerCase()}.`
+  );
+  if (p >= 1009 && p <= 1022) {
+    reasons.push(
+      `Average pressure ${p.toFixed(0)} hPa — in the 1009–1022 sweet spot where fish feed most actively.`
+    );
+  } else if (p >= 1005 && p <= 1026) {
+    reasons.push(
+      `Average pressure ${p.toFixed(0)} hPa — near the ideal range.`
+    );
+  } else if (p > 1030 || p < 1000) {
+    reasons.push(
+      `Average pressure ${p.toFixed(0)} hPa — outside the comfort zone, which drags the rating down.`
+    );
+  }
+  if (t <= -1) {
+    reasons.push(
+      `Pressure trending down (${t.toFixed(1)} hPa/3h) — falling pressure ahead of a front often triggers feeding.`
+    );
+  } else if (t >= 1) {
+    reasons.push(
+      `Pressure trending up (${t.toFixed(1)} hPa/3h) — rising pressure after a front can slow the bite.`
+    );
+  } else {
+    reasons.push(
+      `Pressure holding steady (${t >= 0 ? "+" : ""}${t.toFixed(1)} hPa/3h) — stable conditions.`
+    );
+  }
+  return reasons;
 }
 
 interface BestWindow {
@@ -360,6 +400,21 @@ function fishingForecast(
   const tomAvg = avg(tomorrowScores);
   const tomInfo = scoreLabel(tomAvg);
 
+  // Average pressure + trend for a set of scored hours (for explanations).
+  const avgPT = (list: { idx: number }[]) => {
+    if (!list.length) return { p: 0, t: 0 };
+    let ps = 0, ts = 0;
+    for (const s of list) {
+      const ix = s.idx;
+      const p = hourlyPressure[ix] ?? 0;
+      ps += p;
+      ts += p - (hourlyPressure[Math.max(0, ix - 3)] ?? 0);
+    }
+    return { p: ps / list.length, t: ts / list.length };
+  };
+  const restPT = avgPT(restToday);
+  const tomPT = avgPT(tomorrowScores);
+
   // Best 3-hour windows: sliding window over the scored hours.
   const windows: BestWindow[] = [];
   for (let i = 0; i + 2 < scores.length; i += 1) {
@@ -387,6 +442,9 @@ function fishingForecast(
   return {
     restOfDay: {
       ...restInfo,
+      avgPressure: restPT.p,
+      avgTrend: restPT.t,
+      hours: restToday.length,
       note:
         restToday.length === 0
           ? "Day's about done."
@@ -398,6 +456,9 @@ function fishingForecast(
     },
     tomorrow: {
       ...tomInfo,
+      avgPressure: tomPT.p,
+      avgTrend: tomPT.t,
+      hours: tomorrowScores.length,
       note:
         tomAvg >= 70
           ? "Looks like a good day to fish."
@@ -430,6 +491,7 @@ export default function WeatherPage() {
   const [err, setErr] = useState<string | null>(null);
   const [explainer, setExplainer] = useState<string | null>(null);
   const [bestExplainIdx, setBestExplainIdx] = useState<number | null>(null);
+  const [dayExplain, setDayExplain] = useState<"rest" | "tomorrow" | null>(null);
   const [windFull, setWindFull] = useState(false);
 
   // Remember the last-viewed spot between visits.
@@ -607,9 +669,13 @@ export default function WeatherPage() {
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2.5 mt-3">
-                  <div className="rounded-2xl bg-pine/[0.04] border border-pine/10 px-3 py-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setDayExplain("rest")}
+                    className="text-left rounded-2xl bg-pine/[0.04] border border-pine/10 px-3 py-2.5 active:scale-[0.98] transition"
+                  >
                     <p className="text-[10px] font-black uppercase tracking-[0.14em] text-pine/45">
-                      Rest of today
+                      Rest of today <span className="text-pine/40 font-normal">ⓘ</span>
                     </p>
                     <p className="text-sm font-extrabold mt-0.5" style={{ color: derived.forecast.restOfDay.color }}>
                       {derived.forecast.restOfDay.label}
@@ -617,10 +683,14 @@ export default function WeatherPage() {
                     <p className="text-[11px] text-pine/55 mt-0.5 leading-snug">
                       {derived.forecast.restOfDay.note}
                     </p>
-                  </div>
-                  <div className="rounded-2xl bg-pine/[0.04] border border-pine/10 px-3 py-2.5">
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDayExplain("tomorrow")}
+                    className="text-left rounded-2xl bg-pine/[0.04] border border-pine/10 px-3 py-2.5 active:scale-[0.98] transition"
+                  >
                     <p className="text-[10px] font-black uppercase tracking-[0.14em] text-pine/45">
-                      Tomorrow
+                      Tomorrow <span className="text-pine/40 font-normal">ⓘ</span>
                     </p>
                     <p className="text-sm font-extrabold mt-0.5" style={{ color: derived.forecast.tomorrow.color }}>
                       {derived.forecast.tomorrow.label}
@@ -628,7 +698,7 @@ export default function WeatherPage() {
                     <p className="text-[11px] text-pine/55 mt-0.5 leading-snug">
                       {derived.forecast.tomorrow.note}
                     </p>
-                  </div>
+                  </button>
                 </div>
                 {derived.forecast.bestTimes.length > 0 && (
                   <div className="mt-2.5 rounded-2xl bg-pine/[0.04] border border-pine/10 px-3 py-2.5">
@@ -832,6 +902,41 @@ export default function WeatherPage() {
               {EXPLAINERS[explainer].body.map((p, i) => (
                 <p key={i} className="text-sm text-pine/75 leading-relaxed">{p}</p>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rest-of-day / tomorrow explainer modal */}
+      {dayExplain !== null && derived && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4" role="dialog" aria-modal="true">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setDayExplain(null)} />
+          <div className="relative w-full max-w-md bg-white border border-pine/10 rounded-3xl p-6 max-h-[80vh] overflow-y-auto">
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="text-lg font-black text-pine">
+                Why {dayExplain === "rest" ? "rest of today" : "tomorrow"} is rated{" "}
+                <span style={{ color: derived.forecast[dayExplain === "rest" ? "restOfDay" : "tomorrow"].color }}>
+                  {derived.forecast[dayExplain === "rest" ? "restOfDay" : "tomorrow"].label}
+                </span>?
+              </h3>
+              <button
+                onClick={() => setDayExplain(null)}
+                aria-label="Close"
+                className="w-9 h-9 shrink-0 rounded-full bg-pine/5 flex items-center justify-center text-lg text-pine"
+              >
+ 
+              </button>
+            </div>
+            <div className="mt-3 space-y-3">
+              {dayReasons(
+                dayExplain === "rest" ? "Rest of today" : "Tomorrow",
+                derived.forecast[dayExplain === "rest" ? "restOfDay" : "tomorrow"]
+              ).map((r, i) => (
+                <p key={i} className="text-sm text-pine/75 leading-relaxed">{r}</p>
+              ))}
+              <p className="text-xs text-pine/50 leading-relaxed">
+                The rating averages every forecast hour's score — built from pressure level and 3-hour pressure trend.
+              </p>
             </div>
           </div>
         </div>
