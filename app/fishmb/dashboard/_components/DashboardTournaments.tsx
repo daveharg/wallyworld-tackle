@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useFishAuth } from "../../_components/FishAuth";
 import { fishFetch } from "../../_components/fishFetch";
+import { JoinByCode } from "../../tournaments/_components/JoinByCode";
 
 interface MyTournament {
   id: string;
@@ -189,6 +190,14 @@ export default function DashboardTournaments() {
         >
           ＋ Start one
         </Link>
+      </div>
+
+      {/* Join with a code */}
+      <div className="bg-white border border-pine/10 rounded-3xl p-5">
+        <h3 className="text-xs font-black uppercase tracking-wider text-pine/45 mb-3">
+          Join with a code
+        </h3>
+        <JoinByCode />
       </div>
 
       {loading ? (

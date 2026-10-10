@@ -138,8 +138,8 @@ export default function FriendsPage() {
     );
   }
 
-  const requestedIds = new Set([
-    ...(bundle?.friends.map((f) => f.id) ?? []),
+  const friendIds = new Set(bundle?.friends.map((f) => f.id) ?? []);
+  const pendingIds = new Set([
     ...(bundle?.pending_outgoing.map((f) => f.id) ?? []),
     ...(bundle?.pending_incoming.map((f) => f.id) ?? []),
   ]);
