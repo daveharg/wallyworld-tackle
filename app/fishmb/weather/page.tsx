@@ -283,6 +283,42 @@ interface BestWindow {
   start: string;
   end: string;
   score: number;
+  avgPressure: number;
+  avgTrend: number;
+}
+
+/** Human-readable reasons why a best-time window scored well. */
+function windowReasons(w: BestWindow): string[] {
+  const reasons: string[] = [];
+  const p = w.avgPressure;
+  const t = w.avgTrend;
+  if (p >= 1009 && p <= 1022) {
+    reasons.push(
+      `Pressure sits at ${p.toFixed(0)} hPa — right in the 1009–1022 sweet spot where fish feed most actively.`
+    );
+  } else if (p >= 1005 && p <= 1026) {
+    reasons.push(
+      `Pressure near ${p.toFixed(0)} hPa — close to the ideal range, comfortable for feeding fish.`
+    );
+  }
+  if (t <= -2) {
+    reasons.push(
+      `Pressure is falling fast (${t.toFixed(1)} hPa/3h) — fish often feed hard ahead of an incoming front.`
+    );
+  } else if (t <= -1) {
+    reasons.push(
+      `Pressure easing down (${t.toFixed(1)} hPa/3h) — a gentle drop that can turn the bite on.`
+    );
+  } else if (t >= 2) {
+    reasons.push(
+      `Pressure rising (${t.toFixed(1)} hPa/3h) — post-front conditions; fish may be sluggish, work slow and deep.`
+    );
+  } else {
+    reasons.push(
+      `Pressure steady (${t >= 0 ? "+" : ""}${t.toFixed(1)} hPa/3h) — stable conditions, fish settle into a pattern.`
+    );
+  }
+  return reasons;
 }
 
 function fishingForecast(
@@ -328,10 +364,15 @@ function fishingForecast(
   const windows: BestWindow[] = [];
   for (let i = 0; i + 2 < scores.length; i += 1) {
     const wAvg = (scores[i].score + scores[i + 1].score + scores[i + 2].score) / 3;
+    const idxs = [scores[i].idx, scores[i + 1].idx, scores[i + 2].idx];
+    const pressures = idxs.map((ix) => hourlyPressure[ix] ?? 0);
+    const trends = idxs.map((ix) => (hourlyPressure[ix] ?? 0) - (hourlyPressure[Math.max(0, ix - 3)] ?? 0));
     windows.push({
       start: fmtHour(hourlyTime[scores[i].idx] ?? ""),
       end: fmtHour(hourlyTime[scores[i + 2].idx] ?? ""),
       score: wAvg,
+      avgPressure: pressures.reduce((a, b) => a + b, 0) / 3,
+      avgTrend: trends.reduce((a, b) => a + b, 0) / 3,
     });
   }
   windows.sort((a, b) => b.score - a.score);
@@ -388,6 +429,7 @@ export default function WeatherPage() {
   const [data, setData] = useState<WxData | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [explainer, setExplainer] = useState<string | null>(null);
+  const [bestExplainIdx, setBestExplainIdx] = useState<number | null>(null);
   const [windFull, setWindFull] = useState(false);
 
   // Remember the last-viewed spot between visits.
@@ -593,14 +635,18 @@ export default function WeatherPage() {
                     <p className="text-[10px] font-black uppercase tracking-[0.14em] text-pine/45">
                       Best times to fish
                     </p>
-                    <p className="text-sm font-bold text-pine mt-1">
+                    <div className="mt-1 flex flex-wrap items-center gap-2">
                       {derived.forecast.bestTimes.map((w, i) => (
-                        <span key={i}>
-                          {i > 0 && <span className="text-pine/40 font-normal"> · </span>}
-                          {w.start}–{w.end}
-                        </span>
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => setBestExplainIdx(i)}
+                          className="text-sm font-bold text-pine bg-white border border-pine/15 rounded-full px-3 py-1.5 active:scale-95 transition"
+                        >
+                          {w.start}–{w.end} <span className="text-pine/40 font-normal">ⓘ</span>
+                        </button>
                       ))}
-                    </p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -786,6 +832,35 @@ export default function WeatherPage() {
               {EXPLAINERS[explainer].body.map((p, i) => (
                 <p key={i} className="text-sm text-pine/75 leading-relaxed">{p}</p>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Best-times explainer modal */}
+      {bestExplainIdx !== null && derived && derived.forecast.bestTimes[bestExplainIdx] && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4" role="dialog" aria-modal="true">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setBestExplainIdx(null)} />
+          <div className="relative w-full max-w-md bg-white border border-pine/10 rounded-3xl p-6 max-h-[80vh] overflow-y-auto">
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="text-lg font-black text-pine">
+                Why {derived.forecast.bestTimes[bestExplainIdx].start}–{derived.forecast.bestTimes[bestExplainIdx].end}?
+              </h3>
+              <button
+                onClick={() => setBestExplainIdx(null)}
+                aria-label="Close"
+                className="w-9 h-9 shrink-0 rounded-full bg-pine/5 flex items-center justify-center text-lg text-pine"
+              >
+ 
+              </button>
+            </div>
+            <div className="mt-3 space-y-3">
+              {windowReasons(derived.forecast.bestTimes[bestExplainIdx]).map((r, i) => (
+                <p key={i} className="text-sm text-pine/75 leading-relaxed">{r}</p>
+              ))}
+              <p className="text-xs text-pine/50 leading-relaxed">
+                Windows are scored from hourly pressure and 3-hour pressure trend — the two strongest bite predictors in the forecast.
+              </p>
             </div>
           </div>
         </div>
