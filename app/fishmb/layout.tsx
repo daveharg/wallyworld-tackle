@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     title: "FishMB — Manitoba's fishing app: maps, catches, tournaments & community",
     description:
       "Your Manitoba fishing companion — predicting fish activity, interactive lake maps, log your catches, join tournaments, and connect with local anglers.",
-    url: "https://www.fishmb.ca/fishmb",
+    url: "https://www.fishmb.ca/fishmb/feed",
     images: [
       {
         url: "https://www.fishmb.ca/fishmb/og-share.png",

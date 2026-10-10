@@ -1535,14 +1535,7 @@ function FeedPageInner() {
 
 
   // Members-only feed: signed-out visitors (and guests) get the pitch, not the posts.
-  if (!authLoading && (!user || user.is_anonymous)) {
-    return (
-      <div className="max-w-2xl mx-auto px-4 pt-4 md:pt-6 pb-32">
-        <FeedSignupWall onJoin={openLogin} />
-      </div>
-    );
-  }
-
+  // NOTE: all hooks must stay above this early return (Rules of Hooks).
   // Pull down past the top to load new posts.
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     if (window.scrollY <= 0 && !pullRefreshing) {
@@ -1577,6 +1570,14 @@ function FeedPageInner() {
       setPullDist(0);
     }
   }, [pullDist, pullRefreshing, load]);
+
+  if (!authLoading && (!user || user.is_anonymous)) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 pt-4 md:pt-6 pb-32">
+        <FeedSignupWall onJoin={openLogin} />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -1718,7 +1719,11 @@ function FeedPageInner() {
                 type="button"
                 onClick={() => {
                   setMenuOpen(false);
-                  if (window.confirm("Log out of FishMB?")) logout();
+                  if (window.confirm("Log out of FishMB?")) {
+                    logout();
+                    // Clean reload into the logged-out feed view.
+                    window.location.href = "/fishmb/feed";
+                  }
                 }}
                 className="py-3 px-2 text-left text-red-600 font-bold border-b border-pine/10"
               >
