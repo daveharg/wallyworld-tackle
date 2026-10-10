@@ -1008,6 +1008,9 @@ function FeedPageInner() {
       : null;
     const actionKey = action ? `${action}:${searchParams.toString()}` : null;
     if (action && lastActionRef.current !== actionKey) {
+      // Wait for auth to finish loading — otherwise a logged-in user looks
+      // logged-out for a split second and gets a bogus login prompt.
+      if (authLoading) return;
       lastActionRef.current = actionKey;
       if (!user) {
         openLogin();
@@ -1024,7 +1027,7 @@ function FeedPageInner() {
       }
     }
     if (!action) lastActionRef.current = null;
-  }, [searchParams, user, load]);
+  }, [searchParams, user, authLoading, load]);
 
   // Closing the composer clears the action params so the next tap re-fires.
   const closeComposer = useCallback(() => {
