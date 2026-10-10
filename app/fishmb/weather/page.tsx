@@ -644,17 +644,34 @@ export default function WeatherPage() {
 
           {derived ? (
             <>
-              <div className="mt-4 flex items-end justify-between">
-                <div>
-                  <div className="text-7xl font-black tracking-tight">{Math.round(derived.c.temperature_2m)}°</div>
-                  <p className="mt-1 text-pine/60 text-sm">
-                    {derived.wmo.icon} {derived.wmo.label} · Feels {Math.round(derived.c.apparent_temperature)}°
-                  </p>
+              <div className="mt-4">
+                <div className="flex items-end justify-between">
+                  <div>
+                    <div className="text-7xl font-black tracking-tight">{Math.round(derived.c.temperature_2m)}°</div>
+                    <p className="mt-1 text-pine/60 text-sm">
+                      {derived.wmo.icon} {derived.wmo.label} · Feels {Math.round(derived.c.apparent_temperature)}°
+                    </p>
+                  </div>
                 </div>
-                <div className="text-right text-xs text-pine/60 space-y-1">
-                  <p>H {data && derived ? Math.round(data.daily.temperature_2m_max[derived.todayIdx] ?? 0) : "—"}°</p>
-                  <p>L {data && derived ? Math.round(data.daily.temperature_2m_min[derived.todayIdx] ?? 0) : "—"}°</p>
-                  <p>{derived.c.relative_humidity_2m}%</p>
+                <div className="grid grid-cols-3 gap-2.5 mt-4">
+                  <div className="rounded-2xl bg-white/70 border border-pine/10 px-3 py-3 text-center">
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-pine/45">High</p>
+                    <p className="text-2xl font-black text-pine mt-0.5">
+                      {data && derived ? Math.round(data.daily.temperature_2m_max[derived.todayIdx] ?? 0) : "—"}°
+                    </p>
+                  </div>
+                  <div className="rounded-2xl bg-white/70 border border-pine/10 px-3 py-3 text-center">
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-pine/45">Low</p>
+                    <p className="text-2xl font-black text-pine mt-0.5">
+                      {data && derived ? Math.round(data.daily.temperature_2m_min[derived.todayIdx] ?? 0) : "—"}°
+                    </p>
+                  </div>
+                  <div className="rounded-2xl bg-white/70 border border-pine/10 px-3 py-3 text-center">
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-pine/45">Humidity</p>
+                    <p className="text-2xl font-black text-pine mt-0.5">
+                      {derived.c.relative_humidity_2m}%
+                    </p>
+                  </div>
                 </div>
               </div>
 
