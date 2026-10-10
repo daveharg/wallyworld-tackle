@@ -12,7 +12,7 @@ import {
   listTournaments,
   getTournament,
 } from "@/lib/fish/tournaments";
-import { queryOne } from "@/lib/fish/db";
+import { query, queryOne } from "@/lib/fish/db";
 
 export async function GET(req: NextRequest) {
   await ensureTournamentTables();
