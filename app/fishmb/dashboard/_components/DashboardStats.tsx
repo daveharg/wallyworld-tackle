@@ -28,6 +28,8 @@ interface Catch {
   caught_at: string;
   tournament_id: string | null;
   tournament_name: string | null;
+  visibility?: string;
+  personal_record?: boolean;
 }
 
 function LeaderboardList({ rows, unit }: { rows: LeaderRow[]; unit: string }) {
@@ -83,7 +85,30 @@ export default function DashboardStats() {
   const [topAnglers, setTopAnglers] = useState<LeaderRow[]>([]);
   const [topFriends, setTopFriends] = useState<LeaderRow[]>([]);
   const [catches, setCatches] = useState<Catch[]>([]);
-  const [catchFilter, setCatchFilter] = useState<"all" | "tournament" | "regular">("all");
+  const [catchFilter, setCatchFilter] = useState<"all" | "shared" | "not-shared" | "tournament">("all");
+  const [sharingId, setSharingId] = useState<string | null>(null);
+
+  const shareCatch = async (c: Catch) => {
+    if (sharingId) return;
+    setSharingId(c.id);
+    try {
+      await fishFetch(`/api/fish/catches/${c.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ personal_record: false, visibility: "public" }),
+      });
+      setCatches((prev) =>
+        prev.map((x) => (x.id === c.id ? { ...x, personal_record: false, visibility: "public" } : x))
+      );
+    } catch {
+      // Leave the catch as-is on failure.
+    } finally {
+      setSharingId(null);
+    }
+  };
+
+  const isShared = (c: Catch) =>
+    c.tournament_id == null && c.personal_record !== true && c.visibility !== "private";
 
   useEffect(() => {
     fishFetch("/api/fish/friends")
@@ -218,11 +243,12 @@ export default function DashboardStats() {
         <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
           My catches
         </h2>
-        <div className="flex gap-2 mb-4">
+        <div className="flex gap-2 mb-4 flex-wrap">
           {(
             [
               { id: "all", label: "All" },
-              { id: "regular", label: "Regular" },
+              { id: "shared", label: "Shared" },
+              { id: "not-shared", label: "Not shared" },
               { id: "tournament", label: "Tournament" },
             ] as const
           ).map((f) => (
@@ -246,7 +272,9 @@ export default function DashboardStats() {
               ? true
               : catchFilter === "tournament"
                 ? c.tournament_id != null
-                : c.tournament_id == null
+                : catchFilter === "shared"
+                  ? isShared(c)
+                  : !isShared(c) && c.tournament_id == null
           );
           if (filtered.length === 0) {
             return (
@@ -288,6 +316,16 @@ export default function DashboardStats() {
                       <p className="text-[10px] font-bold text-signal-dark uppercase tracking-wide truncate mt-0.5">
                         🏆 {c.tournament_name}
                       </p>
+                    )}
+                    {c.tournament_id == null && !isShared(c) && (
+                      <button
+                        type="button"
+                        onClick={() => shareCatch(c)}
+                        disabled={sharingId === c.id}
+                        className="mt-1.5 w-full bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-[10px] px-3 py-1.5 rounded-full disabled:opacity-40 transition-colors"
+                      >
+                        {sharingId === c.id ? "Sharing…" : "📤 Share to feed"}
+                      </button>
                     )}
                   </div>
                 </div>

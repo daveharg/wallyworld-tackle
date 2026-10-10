@@ -64,19 +64,22 @@ export async function GET(req: NextRequest) {
   let where: string;
   let params: unknown[];
   if (!me) {
-    where = `c.visibility = 'public'`;
+    where = `c.visibility = 'public' AND c.personal_record = false`;
     params = [];
   } else {
     // Public catches, friends' catches (both directions), and your own.
+    // Personal records are excluded from the feed (they live in your catch history).
     where = `(
-      c.visibility = 'public'
-      OR c.user_id = $1
-      OR (c.visibility = 'friends' AND EXISTS (
-            SELECT 1 FROM fm_friendships f
-             WHERE f.status = 'accepted'
-               AND ((f.requester_id = $1 AND f.addressee_id = c.user_id)
-                 OR (f.addressee_id = $1 AND f.requester_id = c.user_id))
-          ))
+      c.personal_record = false AND (
+        c.visibility = 'public'
+        OR c.user_id = $1
+        OR (c.visibility = 'friends' AND EXISTS (
+              SELECT 1 FROM fm_friendships f
+               WHERE f.status = 'accepted'
+                 AND ((f.requester_id = $1 AND f.addressee_id = c.user_id)
+                   OR (f.addressee_id = $1 AND f.requester_id = c.user_id))
+            ))
+      )
     )`;
     params = [me.id];
   }
@@ -177,6 +180,9 @@ export async function POST(req: NextRequest) {
   // Whether the catch location may appear on other anglers' maps.
   const shareLocation = body.share_location === undefined ? true : body.share_location === true;
 
+  // Personal record: saved to catch history/stats but excluded from the feed.
+  const personalRecord = body.personal_record === true;
+
   // Optional weather snapshot captured at log time (temp °C, condition code, wind kph).
   let weather: { temp_c: number; code: number; wind_kph: number } | null = null;
   if (body.weather && typeof body.weather === "object") {
@@ -197,11 +203,11 @@ export async function POST(req: NextRequest) {
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS weather jsonb`);
   const rows = await query<CatchRow>(
     `INSERT INTO fm_catches
-       (user_id, species, length_in, weight_lb, photo_measure_url, photo_hold_url, photos, visibility, note, caught_at, lat, lng, share_location, weather)
-     VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9,COALESCE($10::timestamptz, now()),$11,$12,$13,$14::jsonb)
+       (user_id, species, length_in, weight_lb, photo_measure_url, photo_hold_url, photos, visibility, note, caught_at, lat, lng, share_location, weather, personal_record)
+     VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9,COALESCE($10::timestamptz, now()),$11,$12,$13,$14::jsonb,$15)
      RETURNING *, (SELECT name FROM fm_users WHERE id = $1) AS name,
                    (SELECT avatar_url FROM fm_users WHERE id = $1) AS avatar_url`,
-    [me.id, species, lengthIn, weightLb, photoMeasure, photoHold, JSON.stringify(photos), visibility, note, caughtAt, lat, lng, shareLocation, weather ? JSON.stringify(weather) : null]
+    [me.id, species, lengthIn, weightLb, photoMeasure, photoHold, JSON.stringify(photos), visibility, note, caughtAt, lat, lng, shareLocation, weather ? JSON.stringify(weather) : null, personalRecord]
   );
   const newCatch = rows[0];
 

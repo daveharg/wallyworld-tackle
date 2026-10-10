@@ -959,6 +959,7 @@ function FeedPageInner() {
   const [shareNote, setShareNote] = useState<string | null>(null);
   const [visibility, setVisibility] = useState<"public" | "friends" | "followers" | "private">("public");
   const [shareLocation, setShareLocation] = useState(true);
+  const [personalRecord, setPersonalRecord] = useState(false);
   const [catchSpecies, setCatchSpecies] = useState("");
   const [catchLength, setCatchLength] = useState("");
   const [catchLat, setCatchLat] = useState<number | null>(null);
@@ -1484,6 +1485,7 @@ function FeedPageInner() {
           photos: urls,
           visibility,
           share_location: shareLocation,
+          personal_record: personalRecord,
           weather,
           note: draft.trim() || null,
           lat: catchLat,
@@ -2186,6 +2188,33 @@ function FeedPageInner() {
                     <option value="private">Only me</option>
                   </select>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setPersonalRecord(!personalRecord)}
+                  className="w-full flex items-center justify-between mt-2 bg-pine/5 border border-pine/10 rounded-2xl px-4 py-3 text-left"
+                >
+                  <span>
+                    <span className="block text-sm font-bold text-pine">
+                      {personalRecord ? "Personal record only" : "Post to feed"}
+                    </span>
+                    <span className="block text-xs text-pine/55 mt-0.5">
+                      {personalRecord
+                        ? "Saved to your catch history only — won't appear in the feed. You can share it later from HQ → Stats."
+                        : "This catch will appear in the feed."}
+                    </span>
+                  </span>
+                  <span
+                    className={`shrink-0 w-12 h-7 rounded-full p-1 transition-colors ${
+                      personalRecord ? "bg-pine/15" : "bg-signal"
+                    }`}
+                  >
+                    <span
+                      className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                        personalRecord ? "" : "translate-x-5"
+                      }`}
+                    />
+                  </span>
+                </button>
                 {catchLat !== null && catchLng !== null && (
                   <div className="flex items-center justify-between mt-2 bg-pine/5 border border-pine/10 rounded-2xl px-4 py-2.5">
                     <p className="text-sm text-pine font-bold">
