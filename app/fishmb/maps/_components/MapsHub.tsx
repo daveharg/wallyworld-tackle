@@ -576,10 +576,10 @@ export default function MapsHub() {
 
       {/* Go-to navigation bar */}
       {goTo && (
-        <div className="absolute top-3 left-3 right-3 z-20 flex items-center gap-3 bg-pine text-white rounded-2xl px-4 py-3 shadow-xl">
+        <div className="absolute top-16 left-3 z-20 flex items-center gap-2 bg-pine/90 backdrop-blur text-white rounded-full pl-4 pr-2 py-2 shadow-xl max-w-[55vw]">
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-sm truncate">{goTo.name || "Fishing spot"}</p>
-            <p className="text-xs text-white/70 tabular-nums">
+            <p className="font-bold text-xs truncate leading-tight">{goTo.name || "Fishing spot"}</p>
+            <p className="text-[11px] text-white/70 tabular-nums leading-tight">
               {myLoc
                 ? `${formatDist(
                     haversineM(myLoc.lat, myLoc.lng, Number(goTo.lat), Number(goTo.lng))
@@ -593,9 +593,9 @@ export default function MapsHub() {
             type="button"
             onClick={() => setGoTo(null)}
             aria-label="Stop navigating"
-            className="text-white/70 hover:text-white font-black px-1"
+            className="shrink-0 w-7 h-7 rounded-full bg-white/15 flex items-center justify-center text-white/80 hover:text-white font-black text-sm"
           >
- 
+            ×
           </button>
         </div>
       )}
