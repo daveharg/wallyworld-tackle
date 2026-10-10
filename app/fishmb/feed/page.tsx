@@ -1924,10 +1924,10 @@ function FeedPageInner() {
                 )}
                 <div className="flex items-center justify-between mt-3 gap-2 flex-wrap">
                   <div className="flex items-center gap-3">
-                    <label className="text-sm font-bold text-signal-dark cursor-pointer">
+                    <label className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-white bg-pine hover:bg-pine-deep px-3.5 py-2 rounded-full cursor-pointer transition-colors">
                       {postPhotos.length > 0
- ? ` ${postPhotos.length}/4 photos`
- : " Add photos (up to 4)"}
+                        ? `${postPhotos.length}/4 photos`
+                        : "Add photos"}
                       <input
                         type="file"
                         accept="image/*"
@@ -1941,8 +1941,8 @@ function FeedPageInner() {
                       />
                     </label>
                     {!postVideo ? (
-                      <label className="text-sm font-bold text-signal-dark cursor-pointer">
- Add video (60s)
+                      <label className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-white bg-pine hover:bg-pine-deep px-3.5 py-2 rounded-full cursor-pointer transition-colors">
+                        Add video
                         <input
                           type="file"
                           accept="video/*"
@@ -2040,10 +2040,10 @@ function FeedPageInner() {
                   </div>
                 )}
                 <div className="flex items-center justify-between mt-3 gap-2 flex-wrap">
-                  <label className="text-sm font-bold text-signal-dark cursor-pointer">
+                  <label className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-white bg-pine hover:bg-pine-deep px-3.5 py-2 rounded-full cursor-pointer transition-colors">
                     {catchPhotos.length > 0
- ? ` ${catchPhotos.length}/4 photos *`
- : " Add photos (up to 4) *"}
+                    ? `${catchPhotos.length}/4 photos *`
+                    : "Add photos *"}
                     <input
                       type="file"
                       accept="image/*"

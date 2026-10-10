@@ -69,7 +69,7 @@ export default function ProfileView({
   editor?: React.ReactNode;
 }) {
   const [data, setData] = useState<ProfileData | null>(null);
-  const { user: me } = useFishAuth();
+  const { user: me, logout } = useFishAuth();
   const [tab, setTab] = useState<"posts" | "photos" | "friends">("posts");
   const [acting, setActing] = useState(false);
   const [note, setNote] = useState<string | null>(null);
@@ -180,12 +180,23 @@ export default function ProfileView({
               {user.name}
             </h1>
             {data.is_self ? (
-              <Link
-                href="/fishmb/profile/edit"
-                className="text-xs font-bold uppercase tracking-wider text-pine/60 hover:text-pine bg-pine/10 hover:bg-pine/15 rounded-full px-4 py-2 transition-colors"
-              >
- Edit profile
-              </Link>
+              <>
+                <Link
+                  href="/fishmb/profile/edit"
+                  className="text-xs font-bold uppercase tracking-wider text-pine/60 hover:text-pine bg-pine/10 hover:bg-pine/15 rounded-full px-4 py-2 transition-colors"
+                >
+   Edit profile
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.confirm("Log out of FishMB?")) logout();
+                  }}
+                  className="text-xs font-bold uppercase tracking-wider text-signal-dark/70 hover:text-signal-dark bg-signal/10 hover:bg-signal/15 rounded-full px-4 py-2 transition-colors"
+                >
+                  Log out
+                </button>
+              </>
             ) : (
             <div className="flex flex-wrap items-center gap-2">
               {data.friendship_status === "accepted" ? (
