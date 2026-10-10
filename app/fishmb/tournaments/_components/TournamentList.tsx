@@ -58,10 +58,13 @@ export function TournamentList({ tournaments }: { tournaments: Tournament[] }) {
   const renderBox = (t: Tournament) => {
     const timing = getTiming(t);
     const role = statuses.get(t.id);
+    const isLive = timing.label === "Live";
+    // Live tournaments you're in get the dedicated live hub page.
+    const href = isLive && role ? `/fishmb/tournaments/${t.id}/live` : `/fishmb/tournaments/${t.id}`;
     return (
       <Link
         key={t.id}
-        href={`/fishmb/tournaments/${t.id}`}
+        href={href}
         className="flex items-center gap-3 bg-white border border-pine/10 rounded-2xl px-4 py-3.5 hover:border-signal/40 transition-colors"
       >
         <span className="min-w-0 flex-1">
