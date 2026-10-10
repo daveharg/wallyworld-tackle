@@ -485,7 +485,7 @@ function AnglersDashboard({ tournamentId, inviteCode, entryFeeCents }: { tournam
   const [anglers, setAnglers] = useState<Angler[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<"all" | "unpaid" | "unchecked">("all");
+  const [filter, setFilter] = useState<"all" | "unpaid" | "unchecked">("unpaid");
   const [noteEdits, setNoteEdits] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState<string | null>(null);
 
