@@ -7,11 +7,11 @@ export const metadata: Metadata = {
   // absolute bypasses the root layout's "%s | Wallyworld Tackle" title template
   title: { absolute: "FishMB — Manitoba's fishing app: maps, catches, tournaments & community" },
   description:
-    "Your Manitoba fishing companion — interactive lake maps, log your catches, join tournaments, check the fish-activity forecast, and connect with local anglers.",
+    "Your Manitoba fishing companion — predicting fish activity, interactive lake maps, log your catches, join tournaments, and connect with local anglers.",
   openGraph: {
     title: "FishMB — Manitoba's fishing app: maps, catches, tournaments & community",
     description:
-      "Your Manitoba fishing companion — interactive lake maps, log your catches, join tournaments, check the fish-activity forecast, and connect with local anglers.",
+      "Your Manitoba fishing companion — predicting fish activity, interactive lake maps, log your catches, join tournaments, and connect with local anglers.",
     url: "https://www.fishmb.ca",
     siteName: "FishMB",
     images: [
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: "FishMB — Manitoba's fishing app: maps, catches, tournaments & community",
     description:
-      "Your Manitoba fishing companion — interactive lake maps, log your catches, join tournaments, check the fish-activity forecast, and connect with local anglers.",
+      "Your Manitoba fishing companion — predicting fish activity, interactive lake maps, log your catches, join tournaments, and connect with local anglers.",
     images: ["https://www.fishmb.ca/fishmb/icon-512.png"],
   },
 };

@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     template: "%s | FishMB",
   },
   description:
-    "Your Manitoba fishing companion — interactive lake maps, log your catches, join tournaments, check the fish-activity forecast, and connect with local anglers.",
+    "Your Manitoba fishing companion — predicting fish activity, interactive lake maps, log your catches, join tournaments, and connect with local anglers.",
   keywords: [
     "Manitoba fishing",
     "Manitoba lakes",
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     siteName: "FishMB",
     title: "FishMB — Manitoba's fishing app: maps, catches, tournaments & community",
     description:
-      "Your Manitoba fishing companion — interactive lake maps, log your catches, join tournaments, check the fish-activity forecast, and connect with local anglers.",
+      "Your Manitoba fishing companion — predicting fish activity, interactive lake maps, log your catches, join tournaments, and connect with local anglers.",
     url: "https://www.fishmb.ca/fishmb",
     images: [
       {
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: "FishMB — Manitoba's fishing app: maps, catches, tournaments & community",
     description:
-      "Your Manitoba fishing companion — interactive lake maps, log your catches, join tournaments, check the fish-activity forecast, and connect with local anglers.",
+      "Your Manitoba fishing companion — predicting fish activity, interactive lake maps, log your catches, join tournaments, and connect with local anglers.",
     images: ["https://www.fishmb.ca/fishmb/icon-512.png"],
   },
   manifest: "/fishmb/manifest.json",
