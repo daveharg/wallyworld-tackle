@@ -902,7 +902,7 @@ function FeedPageInner() {
   const [videoErr, setVideoErr] = useState<string | null>(null);
   const [posting, setPosting] = useState(false);
   const [shareNote, setShareNote] = useState<string | null>(null);
-  const [visibility, setVisibility] = useState<"public" | "friends" | "private">("public");
+  const [visibility, setVisibility] = useState<"public" | "friends" | "followers" | "private">("public");
   const [shareLocation, setShareLocation] = useState(true);
   const [catchSpecies, setCatchSpecies] = useState("");
   const [catchLength, setCatchLength] = useState("");
@@ -1688,6 +1688,7 @@ function FeedPageInner() {
                     <p className="text-[11px] text-white/85 drop-shadow">
                       {timeAgo(item.created_at)}
  {item.visibility === "friends" && " · friends"}
+                      {item.visibility === "followers" && " · followers"}
                     </p>
                   </div>
                 </div>
@@ -1725,6 +1726,7 @@ function FeedPageInner() {
                     <p className="text-xs text-pine/45">
                       {timeAgo(item.created_at)}
  {item.visibility === "friends" && " · friends only"}
+                      {item.visibility === "followers" && " · followers only"}
                     </p>
                   </div>
                   {item.kind === "catch" && (
@@ -1940,12 +1942,13 @@ function FeedPageInner() {
                   <div className="flex items-center gap-2">
                     <select
                       value={visibility === "private" ? "public" : visibility}
-                      onChange={(e) => setVisibility(e.target.value as "public" | "friends")}
+                      onChange={(e) => setVisibility(e.target.value as "public" | "friends" | "followers")}
                       className="bg-paper-deep border border-pine/15 rounded-full px-3 py-2 text-xs font-bold text-pine focus:outline-none"
                       aria-label="Who can see this"
                     >
                       <option value="public">Everyone</option>
                       <option value="friends">Friends only</option>
+                      <option value="followers">Followers</option>
                     </select>
                     <button
                       onClick={post}
@@ -2029,12 +2032,13 @@ function FeedPageInner() {
                   </button>
                   <select
                     value={visibility}
-                    onChange={(e) => setVisibility(e.target.value as "public" | "friends" | "private")}
+                    onChange={(e) => setVisibility(e.target.value as "public" | "friends" | "followers" | "private")}
                     className="bg-paper-deep border border-pine/15 rounded-full px-3 py-2 text-xs font-bold text-pine focus:outline-none"
                     aria-label="Who can see this"
                   >
                     <option value="public">Everyone</option>
                     <option value="friends">Friends only</option>
+                    <option value="followers">Followers</option>
                     <option value="private">Only me</option>
                   </select>
                 </div>

@@ -118,6 +118,10 @@ const VISIBLE_TO = (alias: string) => `
        WHERE f.status = 'accepted'
          AND ((f.requester_id = $1::uuid AND f.addressee_id = ${alias}.user_id)
            OR (f.requester_id = ${alias}.user_id AND f.addressee_id = $1::uuid))
+     ))
+     OR (${alias}.visibility = 'followers' AND EXISTS (
+       SELECT 1 FROM fm_follows fo
+       WHERE fo.follower_id = $1::uuid AND fo.followee_id = ${alias}.user_id
      )))))`;
 
 /** Escape LIKE wildcards so a search for "100%" doesn't match everything. */
