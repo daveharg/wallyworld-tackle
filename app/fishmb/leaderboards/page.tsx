@@ -7,6 +7,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { fishFetch } from "../_components/fishFetch";
+import BackButton from "../_components/BackButton";
 
 type Category = "best" | "biggest" | "most" | "masters" | "above";
 
@@ -75,6 +76,7 @@ export default function LeaderboardsPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10 md:py-14">
+      <BackButton />
       <p className="text-signal font-bold uppercase tracking-[0.28em] text-sm mb-3">
         Bragging rights
       </p>
