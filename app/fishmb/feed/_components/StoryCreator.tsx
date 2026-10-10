@@ -76,11 +76,23 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
   const audioCtxRef = useRef<AudioContext | null>(null);
   const gainNodeRef = useRef<GainNode | null>(null);
   const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
+  const routedVideoRef = useRef<HTMLVideoElement | null>(null);
 
-  // Set up Web Audio routing for the active video so the volume slider works on iOS.
-  const ensureAudioRouting = () => {
+  // Set up Web Audio routing for the active video so the slider changes the
+  // ACTUAL audible volume on iOS. NOTE: the <video> must carry
+  // crossOrigin="anonymous" — without it, cross-origin (Mux) media routes
+  // as silence through createMediaElementSource.
+  const ensureAudioRouting = (volume: number) => {
     const vid = videoRef.current;
     if (!vid) return;
+    if (routedVideoRef.current === vid) {
+      // Already routed (React reuses the same <video> node across clips) —
+      // just sync the gain to this clip's volume.
+      if (gainNodeRef.current && audioCtxRef.current) {
+        gainNodeRef.current.gain.setTargetAtTime(volume, audioCtxRef.current.currentTime, 0.01);
+      }
+      return;
+    }
     try {
       if (!audioCtxRef.current) {
         const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -88,17 +100,20 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
       }
       const ctx = audioCtxRef.current;
       if (ctx.state === "suspended") void ctx.resume();
-      // Create source node once per video element.
-      if (!sourceNodeRef.current || (sourceNodeRef.current as unknown as { mediaElement?: HTMLVideoElement }).mediaElement !== vid) {
-        try {
-          sourceNodeRef.current?.disconnect();
-        } catch { /* noop */ }
-        sourceNodeRef.current = ctx.createMediaElementSource(vid);
-        gainNodeRef.current = ctx.createGain();
-        sourceNodeRef.current.connect(gainNodeRef.current);
-        gainNodeRef.current.connect(ctx.destination);
-        gainNodeRef.current.gain.value = activeVolume;
-      }
+      try {
+        sourceNodeRef.current?.disconnect();
+      } catch { /* noop */ }
+      try {
+        gainNodeRef.current?.disconnect();
+      } catch { /* noop */ }
+      // createMediaElementSource throws if this element was already routed —
+      // routedVideoRef guards that, but a remount can theoretically beat it.
+      sourceNodeRef.current = ctx.createMediaElementSource(vid);
+      gainNodeRef.current = ctx.createGain();
+      sourceNodeRef.current.connect(gainNodeRef.current);
+      gainNodeRef.current.connect(ctx.destination);
+      gainNodeRef.current.gain.value = volume;
+      routedVideoRef.current = vid;
     } catch {
       // Web Audio unavailable — fall back to video.volume.
     }
@@ -113,13 +128,12 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
     if (!activeDraft) return;
     setClipZooms((m) => ({ ...m, [activeDraft.id]: z }));
   };
-  // Reset audio routing when switching clips (new video element).
+  // Sync the gain when switching clips (the same <video> node is reused).
   useEffect(() => {
-    sourceNodeRef.current = null;
-    gainNodeRef.current = null;
-    // Set up routing for the new video once it's in the DOM.
     const t = window.setTimeout(() => {
-      if (activeDraft?.media_type === "video") ensureAudioRouting();
+      if (activeDraft?.media_type === "video") {
+        ensureAudioRouting(clipVolumes[activeDraft.id] ?? 0.5);
+      }
     }, 100);
     return () => window.clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -130,14 +144,12 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
     setClipVolumes((m) => ({ ...m, [activeDraft.id]: v }));
     const vid = videoRef.current;
     if (vid) {
+      // Route through Web Audio FIRST so the slider changes the actual
+      // audible volume on iOS, then unmute and keep it playing so the
+      // change is heard live.
+      ensureAudioRouting(v);
       vid.muted = false;
-      vid.volume = v;
-      // Route through Web Audio so the slider actually changes volume on iOS.
-      ensureAudioRouting();
-      if (gainNodeRef.current && audioCtxRef.current) {
-        gainNodeRef.current.gain.setTargetAtTime(v, audioCtxRef.current.currentTime, 0.01);
-      }
-      // Ensure it's playing so the user hears the change.
+      vid.volume = v; // fallback for browsers without Web Audio routing
       vid.play().catch(() => {});
     }
   };
@@ -669,6 +681,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                     <video
                       ref={videoRef}
                       src={activeDraft.media_url}
+                      crossOrigin="anonymous"
                       className="w-full h-full object-contain"
                       playsInline
                       loop
@@ -680,7 +693,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                       }}
                       onPlay={() => {
                         // Set up Web Audio routing when playback starts.
-                        ensureAudioRouting();
+                        ensureAudioRouting(activeVolume);
                       }}
                     />
                   ) : (
