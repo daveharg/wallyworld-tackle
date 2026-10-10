@@ -126,13 +126,121 @@ export function FishAuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 function LoginModal({ onClose, onDone }: { onClose: () => void; onDone: (u: FishAuthUser, isNew: boolean) => void }) {
-  const btnRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   // 13+ self-declaration + terms acceptance — both required before Google activates.
   const [ageOk, setAgeOk] = useState(false);
   const [termsOk, setTermsOk] = useState(false);
   const canContinue = ageOk && termsOk;
+
+  // PKCE helpers for Google OAuth (no iframe, no GSI button — avoids the "locked" state).
+  const base64UrlEncode = (buf: ArrayBuffer) => {
+    const bytes = new Uint8Array(buf);
+    let s = "";
+    for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+    return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  };
+  const generateVerifier = () => {
+    const arr = new Uint8Array(32);
+    crypto.getRandomValues(arr);
+    return base64UrlEncode(arr.buffer);
+  };
+  const challengeFromVerifier = async (v: string) => {
+    const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(v));
+    return base64UrlEncode(digest);
+  };
+
+  const signInWithGoogle = async () => {
+    if (!canContinue || busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const verifier = generateVerifier();
+      const challenge = await challengeFromVerifier(verifier);
+      const state = generateVerifier();
+      try {
+        sessionStorage.setItem("fishmb-oauth-verifier", verifier);
+        sessionStorage.setItem("fishmb-oauth-state", state);
+      } catch { /* noop */ }
+
+      const redirectUri = `${window.location.origin}/fishmb/auth/callback`;
+      const params = new URLSearchParams({
+        client_id: FISHMB_GOOGLE_CLIENT_ID,
+        redirect_uri: redirectUri,
+        response_type: "code",
+        scope: "openid email profile",
+        code_challenge: challenge,
+        code_challenge_method: "S256",
+        state,
+        prompt: "select_account",
+      });
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+      const popup = window.open(authUrl, "fishmb-google-signin", "width=500,height=600");
+      if (!popup) throw new Error("Popup blocked. Allow popups for FishMB to sign in.");
+
+      // Wait for the popup to send us the authorization code.
+      const code: string = await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          window.removeEventListener("message", onMessage);
+          reject(new Error("Sign-in timed out. Try again."));
+        }, 120000);
+        const onMessage = (e: MessageEvent) => {
+          if (e.origin !== window.location.origin) return;
+          const d = e.data as { type?: string; code?: string; error?: string; state?: string };
+          if (d?.type !== "fishmb-oauth") return;
+          clearTimeout(timeout);
+          window.removeEventListener("message", onMessage);
+          if (d.error) reject(new Error(d.error));
+          else if (d.code) resolve(d.code);
+          else reject(new Error("Sign-in failed. Try again."));
+        };
+        window.addEventListener("message", onMessage);
+        const poll = setInterval(() => {
+          if (popup.closed) {
+            clearInterval(poll);
+            clearTimeout(timeout);
+            window.removeEventListener("message", onMessage);
+            reject(new Error("Sign-in was cancelled."));
+          }
+        }, 500);
+      });
+
+      // Exchange the code for tokens (PKCE — no client secret needed).
+      const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          client_id: FISHMB_GOOGLE_CLIENT_ID,
+          code,
+          code_verifier: verifier,
+          grant_type: "authorization_code",
+          redirect_uri: redirectUri,
+        }).toString(),
+      });
+      const tokens = await tokenRes.json();
+      if (!tokenRes.ok || !tokens.id_token) {
+        throw new Error(tokens.error_description || "Could not complete Google sign-in.");
+      }
+
+      // Send the ID token to our backend (same as before).
+      const res = await fetch("/api/fish/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id_token: tokens.id_token, age_confirmed: true, terms_accepted: true }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Sign-in failed.");
+      try {
+        localStorage.setItem(FISHMB_TOKEN_KEY, data.token);
+        localStorage.setItem("fishmb-terms-ok", "1");
+      } catch { /* noop */ }
+      onDone(data.user, data.is_new_user === true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Sign-in failed.");
+    } finally {
+      setBusy(false);
+    }
+  };
 
   // Remember a previous acceptance so returning users don't check twice.
   useEffect(() => {
@@ -146,70 +254,9 @@ function LoginModal({ onClose, onDone }: { onClose: () => void; onDone: (u: Fish
     }
   }, []);
 
-  useEffect(() => {
-    if (!canContinue) return;
-    let cancelled = false;
-    const handleCredential = async (resp: { credential: string }) => {
-      setBusy(true);
-      setError(null);
-      try {
-        const res = await fetch("/api/fish/auth/google", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id_token: resp.credential, age_confirmed: true, terms_accepted: true }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Sign-in failed.");
-        try {
-          localStorage.setItem(FISHMB_TOKEN_KEY, data.token);
-          localStorage.setItem("fishmb-terms-ok", "1");
-        } catch {
-          // storage unavailable — non-fatal
-        }
-        onDone(data.user, data.is_new_user === true);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Sign-in failed.");
-      } finally {
-        setBusy(false);
-      }
-    };
-    const init = () => {
-      if (cancelled || !window.google || !btnRef.current) return;
-      window.google.accounts.id.initialize({
-        client_id: FISHMB_GOOGLE_CLIENT_ID,
-        callback: handleCredential,
-        auto_select: false,
-        cancel_on_tap_outside: true,
-      });
-      window.google.accounts.id.renderButton(btnRef.current, {
-        theme: "outline",
-        size: "large",
-        text: "signin_with",
-        width: 280,
-      });
-      // One Tap for users already signed in to Google — avoids the
-      // "locked button" state where the GSI button shows the email
-      // but doesn't respond to clicks.
-      try {
-        window.google.accounts.id.prompt();
-      } catch {
-        // One Tap unavailable — button remains the fallback.
-      }
-    };
-    if (window.google) {
-      init();
-    } else {
-      const s = document.createElement("script");
-      s.src = "https://accounts.google.com/gsi/client";
-      s.async = true;
-      s.defer = true;
-      s.onload = init;
-      document.head.appendChild(s);
-    }
-    return () => {
-      cancelled = true;
-    };
-  }, [onDone, canContinue]);
+  // Remember a previous acceptance so returning users don't check twice.
+  // (GSI button removed — using PKCE popup flow via signInWithGoogle instead,
+  // which doesn't suffer from the "locked button" iframe state.)
 
   return (
     <div
@@ -262,40 +309,25 @@ function LoginModal({ onClose, onDone }: { onClose: () => void; onDone: (u: Fish
           </span>
         </label>
         {canContinue ? (
-          <div ref={btnRef} className="flex justify-center min-h-[44px]" />
+          <button
+            type="button"
+            onClick={signInWithGoogle}
+            disabled={busy}
+            className="w-full flex items-center justify-center gap-3 bg-white border-2 border-pine/15 hover:border-signal rounded-3xl px-5 py-4 font-bold text-pine transition-colors disabled:opacity-50"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            {busy ? "Signing you in…" : "Sign in with Google"}
+          </button>
         ) : (
           <p className="text-xs text-pine/50 mb-2">
             Check both boxes above to continue with Google.
           </p>
         )}
-        {canContinue && (
-          <button
-            onClick={() => {
-              // Reset Google's button state — fixes the "locked" state where
-              // the button shows your email but won't respond to taps.
-              try {
-                window.google?.accounts.id.disableAutoSelect();
-              } catch { /* noop */ }
-              setError(null);
-              const btn = btnRef.current;
-              if (btn) {
-                btn.innerHTML = "";
-                try {
-                  window.google?.accounts.id.renderButton(btn, {
-                    theme: "outline",
-                    size: "large",
-                    text: "signin_with",
-                    width: 280,
-                  });
-                } catch { /* noop */ }
-              }
-            }}
-            className="mt-3 text-xs font-bold text-pine/40 hover:text-pine underline"
-          >
-            Button not working? Tap to reset it
-          </button>
-        )}
-        {busy && <p className="text-sm text-pine/60 mt-4">Signing you in…</p>}
         {error && <p className="text-sm text-signal-dark mt-4">{error}</p>}
         <button
           onClick={onClose}
