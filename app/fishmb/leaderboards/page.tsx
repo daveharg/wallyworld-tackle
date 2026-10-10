@@ -88,15 +88,19 @@ export default function LeaderboardsPage() {
       </p>
 
       {/* Category tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-2 mb-4 -mx-4 px-4">
-        {CATEGORIES.map((c) => (
+      <div className="flex overflow-x-auto pb-2 mb-4 -mx-4 px-4">
+        {CATEGORIES.map((c, i) => (
           <button
             key={c.key}
             onClick={() => setCategory(c.key)}
-            className={`shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold uppercase tracking-wider transition-colors ${
+            className={`shrink-0 flex items-center gap-2 px-5 py-2.5 text-sm font-bold uppercase tracking-wider transition-colors border-y border-pine/15 ${
+              i === 0 ? "rounded-l-xl border-l" : ""
+            } ${i === CATEGORIES.length - 1 ? "rounded-r-xl border-r" : ""} ${
+              i > 0 ? "border-l border-pine/15" : ""
+            } ${
               category === c.key
-                ? "bg-pine text-white"
-                : "bg-white border border-pine/15 text-pine/70 hover:border-pine/40"
+                ? "bg-pine text-white border-pine"
+                : "bg-white text-pine/70 hover:bg-pine/5"
             }`}
           >
             <span>{c.icon}</span> {c.label}
@@ -105,25 +109,27 @@ export default function LeaderboardsPage() {
       </div>
 
       {/* Species tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-2 mb-4 -mx-4 px-4">
+      <div className="flex overflow-x-auto pb-2 mb-4 -mx-4 px-4">
         <button
           onClick={() => setSpecies("all")}
-          className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors ${
+          className={`shrink-0 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors border-y border-l border-pine/15 rounded-l-xl ${
             species === "all"
-              ? "bg-signal text-white"
-              : "bg-white border border-pine/15 text-pine/70 hover:border-pine/40"
+              ? "bg-signal text-white border-signal"
+              : "bg-white text-pine/70 hover:bg-pine/5"
           }`}
         >
           All species
         </button>
-        {tabs.map((t) => (
+        {tabs.map((t, i) => (
           <button
             key={t.key}
             onClick={() => setSpecies(t.key)}
-            className={`shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors ${
+            className={`shrink-0 px-4 py-2 text-xs font-bold uppercase tracking-wider transition-colors border-y border-pine/15 ${
+              i === tabs.length - 1 ? "rounded-r-xl border-r" : ""
+            } border-l border-pine/15 ${
               species === t.key
-                ? "bg-signal text-white"
-                : "bg-white border border-pine/15 text-pine/70 hover:border-pine/40"
+                ? "bg-signal text-white border-signal"
+                : "bg-white text-pine/70 hover:bg-pine/5"
             }`}
           >
             {t.display} · {t.count}
@@ -172,8 +178,14 @@ export default function LeaderboardsPage() {
               }`}
             >
               <span
-                className={`font-display font-bold text-xl w-8 text-center shrink-0 ${
-                  i === 0 ? "text-gold" : i === 1 ? "text-pine/60" : i === 2 ? "text-signal-dark" : "text-pine/35"
+                className={`w-9 h-9 rounded-lg flex items-center justify-center font-black text-base shrink-0 ${
+                  i === 0
+                    ? "bg-gold/20 text-gold"
+                    : i === 1
+                      ? "bg-pine/10 text-pine/60"
+                      : i === 2
+                        ? "bg-signal/10 text-signal-dark"
+                        : "bg-pine/5 text-pine/35"
                 }`}
               >
                 {i + 1}
