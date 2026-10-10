@@ -92,6 +92,7 @@ export interface Tournament {
   auto_approve_entries: boolean;
   photo_mode: string;
   hide_locations: boolean;
+  require_hold_photo: boolean;
   participants_seen_at: string | null;
   cover_photo_url: string | null;
   venue_name: string | null;
@@ -251,6 +252,9 @@ export async function ensureTournamentTables(): Promise<void> {
   // (friendly tournaments — just the fish on the measuring board, no posed
   // photo with the fish required; extra photos stay optional).
   await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS photo_mode text NOT NULL DEFAULT 'standard'`);
+  // Require the "holding the fish" photo in addition to the bump board photo.
+  // Bump board is always required; this controls the second photo.
+  await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS require_hold_photo boolean NOT NULL DEFAULT false`);
   // Location privacy: when true, exact catch GPS is hidden from other anglers
   // (organizer still sees it for verification); everyone else only sees that
   // the catch was confirmed inside the tournament area.

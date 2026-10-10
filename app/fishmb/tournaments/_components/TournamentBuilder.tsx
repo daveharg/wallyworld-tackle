@@ -39,6 +39,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
   const [autoApprove, setAutoApprove] = useState(false);
   const [hideLocations, setHideLocations] = useState(false);
   const [photoMode, setPhotoMode] = useState("standard");
+  const [requireHoldPhoto, setRequireHoldPhoto] = useState(false);
   const [coverPhotoUrl, setCoverPhotoUrl] = useState<string | null>(null);
   const [venueName, setVenueName] = useState("");
   const [venueAddress, setVenueAddress] = useState("");
@@ -109,6 +110,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
           payouts,
           auto_approve_entries: autoApprove,
           photo_mode: photoMode,
+          require_hold_photo: requireHoldPhoto,
           hide_locations: hideLocations,
           cover_photo_url: coverPhotoUrl,
           venue_name: venueName.trim() || null,
@@ -339,6 +341,21 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
               For friendly tournaments where anglers don&apos;t want to pose with the fish — a
               photo with the fish stays optional either way.
             </p>
+            <button
+              type="button"
+              onClick={() => setRequireHoldPhoto(!requireHoldPhoto)}
+              className="w-full flex items-center justify-between bg-white border border-pine/15 rounded-2xl px-4 py-3 mt-2"
+            >
+              <span className="text-sm font-bold text-pine text-left">
+                Require holding photo
+                <span className="block text-xs font-normal text-pine/50 mt-0.5">
+                  Bump board photo is always required — this also requires a photo holding the fish.
+                </span>
+              </span>
+              <span className={`shrink-0 w-12 h-7 rounded-full p-1 transition-colors ${requireHoldPhoto ? "bg-signal" : "bg-pine/15"}`}>
+                <span className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${requireHoldPhoto ? "translate-x-5" : ""}`} />
+              </span>
+            </button>
           </div>
           <div className="flex items-start gap-3 bg-white border border-pine/15 rounded-2xl p-4">
             <input

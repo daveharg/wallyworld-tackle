@@ -35,20 +35,20 @@ export async function POST(req: NextRequest) {
   try {
     form = await req.formData();
   } catch {
-    return badRequest("Expected multipart form data with a 'file' field.");
+    return badRequest("Couldn't read your photo. Try choosing it again.");
   }
   const file = form.get("file");
-  if (!(file instanceof File)) return badRequest("Missing 'file' field.");
-  if (file.size === 0) return badRequest("File is empty.");
+  if (!(file instanceof File)) return badRequest("No photo was attached. Try choosing it again.");
+  if (file.size === 0) return badRequest("That photo looks empty. Try choosing a different one.");
   if (file.size > MAX_BYTES) {
     return NextResponse.json(
-      { error: "File too large. Maximum is 8MB." },
+      { error: "That photo is too large. Try a smaller one (max 8MB)." },
       { status: 413 }
     );
   }
   const ext = ALLOWED[file.type];
   if (!ext) {
-    return badRequest("Unsupported image type. Use JPEG, PNG or WebP.");
+    return badRequest("That file isn't a photo. Use JPEG, PNG or WebP.");
   }
 
   const blob = await put(`fish-catches/${me.id}/${randomUUID()}.${ext}`, file, {

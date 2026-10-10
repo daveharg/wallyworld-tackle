@@ -114,6 +114,7 @@ export async function POST(req: NextRequest) {
       ? body.photo_mode
       : "standard";
   const hideLocations = body.hide_locations === true;
+  const requireHoldPhoto = body.require_hold_photo === true;
   const gpsBounds =
     typeof body.gps_north === "number" &&
     typeof body.gps_south === "number" &&
@@ -125,10 +126,10 @@ export async function POST(req: NextRequest) {
       : null;
   const created = await queryOne<{ id: string }>(
     `INSERT INTO fm_tournaments
-       (name, description, organizer_id, lake_ids, species, starts_at, ends_at, rules, scoring, invite_code, max_participants, entry_fee_cents, payouts, auto_approve_entries, cover_photo_url, venue_name, venue_address, photo_mode, hide_locations, gps_north, gps_south, gps_east, gps_west)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23)
+       (name, description, organizer_id, lake_ids, species, starts_at, ends_at, rules, scoring, invite_code, max_participants, entry_fee_cents, payouts, auto_approve_entries, cover_photo_url, venue_name, venue_address, photo_mode, hide_locations, gps_north, gps_south, gps_east, gps_west, require_hold_photo)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24)
      RETURNING id`,
-    [name, description, me.id, lakeIds, species, start.toISOString(), end.toISOString(), rules, scoring, inviteCode, maxParticipants, entryFeeCents, JSON.stringify(payouts), body.auto_approve_entries === true, coverPhotoUrl, venueName, venueAddress, photoMode, hideLocations, gpsBounds?.north ?? null, gpsBounds?.south ?? null, gpsBounds?.east ?? null, gpsBounds?.west ?? null]
+    [name, description, me.id, lakeIds, species, start.toISOString(), end.toISOString(), rules, scoring, inviteCode, maxParticipants, entryFeeCents, JSON.stringify(payouts), body.auto_approve_entries === true, coverPhotoUrl, venueName, venueAddress, photoMode, hideLocations, gpsBounds?.north ?? null, gpsBounds?.south ?? null, gpsBounds?.east ?? null, gpsBounds?.west ?? null, requireHoldPhoto]
   );
   // The organizer is automatically a participant.
   await queryOne(

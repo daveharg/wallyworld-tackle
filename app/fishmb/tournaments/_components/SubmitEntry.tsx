@@ -8,18 +8,22 @@ import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 const inputCls =
   "w-full bg-white border border-pine/20 rounded-2xl px-4 py-3 text-pine focus:outline-none focus:border-signal";
 
-/** Catch submission: up to 4 photos + species + length + GPS. Server stamps the time. */
+/** Catch submission: bump board photo (required) + holding photo (optional/required by organizer). */
 export function SubmitEntry({
   tournamentId,
   species,
   photoMode,
+  requireHoldPhoto = false,
 }: {
   tournamentId: string;
   species: string[];
   photoMode?: string | null;
+  requireHoldPhoto?: boolean;
 }) {
-  const [files, setFiles] = useState<File[]>([]);
-  const [previews, setPreviews] = useState<string[]>([]);
+  const [bumpFile, setBumpFile] = useState<File | null>(null);
+  const [bumpPreview, setBumpPreview] = useState<string | null>(null);
+  const [holdFile, setHoldFile] = useState<File | null>(null);
+  const [holdPreview, setHoldPreview] = useState<string | null>(null);
   const [fishSpecies, setFishSpecies] = useState(species[0] || "");
   const [length, setLength] = useState("");
   const [notes, setNotes] = useState("");
@@ -43,29 +47,26 @@ export function SubmitEntry({
     );
   }
 
-  const addFiles = (picked: FileList | null) => {
-    if (!picked) return;
-    const next = [...files, ...Array.from(picked)].slice(0, 4);
-    setFiles(next);
-    setPreviews((prev) => {
-      prev.forEach((u) => URL.revokeObjectURL(u));
-      return next.map((f) => URL.createObjectURL(f));
-    });
+  const setBump = (f: File | null) => {
+    if (bumpPreview) URL.revokeObjectURL(bumpPreview);
+    setBumpFile(f);
+    setBumpPreview(f ? URL.createObjectURL(f) : null);
   };
 
-  const removeFile = (i: number) => {
-    const next = files.filter((_, j) => j !== i);
-    setFiles(next);
-    setPreviews((prev) => {
-      URL.revokeObjectURL(prev[i]);
-      return next.map((f, j) => (j < i ? prev[j] : URL.createObjectURL(f)));
-    });
+  const setHold = (f: File | null) => {
+    if (holdPreview) URL.revokeObjectURL(holdPreview);
+    setHoldFile(f);
+    setHoldPreview(f ? URL.createObjectURL(f) : null);
   };
 
   const submit = async () => {
     setError(null);
-    if (files.length === 0) {
-      setError("A photo of your catch is required.");
+    if (!bumpFile) {
+      setError("Add a photo of the fish on your bump board — that's the one that counts.");
+      return;
+    }
+    if (requireHoldPhoto && !holdFile) {
+      setError("This tournament also needs a photo of you holding the fish.");
       return;
     }
     if (!fishSpecies.trim()) {
@@ -74,10 +75,11 @@ export function SubmitEntry({
     }
     setBusy(true);
     try {
-      // 1. Upload the photos (compressed), one at a time.
+      // 1. Upload the photos (compressed), bump board first.
       const token = localStorage.getItem(FISHMB_TOKEN_KEY);
       const photoUrls: string[] = [];
-      for (const file of files) {
+      const toUpload = [bumpFile, holdFile].filter((f): f is File => f !== null);
+      for (const file of toUpload) {
         const form = new FormData();
         form.append("file", await compressImage(file));
         const upRes = await fetch("/api/fish/photos/upload", {
@@ -111,6 +113,8 @@ export function SubmitEntry({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           photo_urls: photoUrls,
+          bump_photo_url: photoUrls[0],
+          hold_photo_url: photoUrls[1] ?? null,
           species: fishSpecies.trim(),
           length_inches: length ? parseFloat(length) : null,
           latitude: lat,
@@ -138,53 +142,73 @@ export function SubmitEntry({
     );
   }
 
+  const photoSlot = (
+    label: string,
+    required: boolean,
+    file: File | null,
+    preview: string | null,
+    onPick: (f: File | null) => void,
+    hint: string,
+  ) => (
+    <div>
+      <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/60 mb-1.5">
+        {label} {required ? "*" : <span className="normal-case font-normal">(optional)</span>}
+      </label>
+      <p className="text-xs text-pine/60 bg-pine/5 border border-pine/10 rounded-2xl px-3.5 py-2.5 mb-2">
+        {hint}
+      </p>
+      {preview ? (
+        <div className="relative w-32 h-32 rounded-2xl overflow-hidden border border-pine/20">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={preview} alt={label} className="w-full h-full object-cover" />
+          <button
+            type="button"
+            onClick={() => onPick(null)}
+            aria-label={`Remove ${label}`}
+            className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-pine-deep/80 text-white text-sm font-bold leading-none"
+          >
+            ×
+          </button>
+        </div>
+      ) : (
+        <label className="flex items-center justify-center w-32 h-32 rounded-2xl border-2 border-dashed border-pine/25 bg-pine/5 text-pine/50 text-sm font-bold cursor-pointer hover:border-pine/40">
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0] ?? null;
+              onPick(f);
+              e.target.value = "";
+            }}
+          />
+          + Add photo
+        </label>
+      )}
+    </div>
+  );
+
   return (
     <div className="bg-white border border-pine/15 rounded-3xl p-6 space-y-4">
       <h3 className="font-display font-bold uppercase text-pine text-lg tracking-wide">Log a catch</h3>
-      <div>
-        <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/60 mb-1.5">
-          Photos * <span className="normal-case font-normal">(up to 4)</span>
-        </label>
-        {photoMode === "measure_only" && (
-          <p className="text-xs text-pine/60 bg-pine/5 border border-pine/10 rounded-2xl px-3.5 py-2.5 mb-2">
- Just the fish on your measuring board — no posed photo with the fish needed. Extra
-            photos are optional.
-          </p>
-        )}
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={(e) => {
-            addFiles(e.target.files);
-            e.target.value = "";
-          }}
-          className="text-sm text-pine/70"
-        />
-        {previews.length > 0 && (
-          <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
-            {previews.map((src, i) => (
-              <div key={i} className="relative shrink-0 w-20 h-20 rounded-xl overflow-hidden border border-pine/20">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt={`Catch photo ${i + 1}`} className="w-full h-full object-cover" />
-                <button
-                  type="button"
-                  onClick={() => removeFile(i)}
-                  aria-label={`Remove photo ${i + 1}`}
-                  className="absolute top-1 right-1 w-6 h-6 rounded-full bg-pine-deep/80 text-white text-xs font-bold leading-none"
-                >
- 
-                </button>
-                {i === 0 && (
-                  <span className="absolute bottom-1 left-1 bg-gold text-pine-deep text-[10px] font-bold px-1.5 py-0.5 rounded">
-                    Main
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      {photoSlot(
+        "Bump board photo",
+        true,
+        bumpFile,
+        bumpPreview,
+        setBump,
+        "Fish on your measuring board, nose against the fence — this is the photo that scores."
+      )}
+      {photoSlot(
+        "Holding photo",
+        requireHoldPhoto,
+        holdFile,
+        holdPreview,
+        setHold,
+        requireHoldPhoto
+          ? "You holding the fish — required by the organizer for this tournament."
+          : "You holding the fish — optional, but a nice touch."
+      )}
       <div>
         <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/60 mb-1.5">Species *</label>
         <input value={fishSpecies} onChange={(e) => setFishSpecies(e.target.value)} list="tourney-species" className={inputCls} />
