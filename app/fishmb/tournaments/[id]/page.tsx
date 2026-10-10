@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BackButton from "../_components/BackButton";
 import { notFound } from "next/navigation";
 import { getTournament, getLeaderboard } from "@/lib/fish/tournaments";
 import { getLakes } from "@/lib/fishmb";
@@ -26,9 +27,7 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 md:py-14">
-      <Link href="/fishmb/tournaments" className="text-sm font-bold text-signal uppercase tracking-wider">
-        ← All tournaments
-      </Link>
+      <BackButton label="Back" />
 
       {/* Cover hero */}
       {t.cover_photo_url ? (
