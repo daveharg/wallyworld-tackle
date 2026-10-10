@@ -370,6 +370,7 @@ export default function ThreadView({
   };
 
   const addMember = async (userId: string) => {
+    const wasGroup = peer.is_group;
     setSavingGroup(true);
     try {
       await fishFetch(`/api/fishmb/msg/conversations/${peer.id}/members`, {
@@ -381,11 +382,19 @@ export default function ThreadView({
       if (f && !peer.members.some((m) => m.user_id === userId)) {
         peer.members.push({ user_id: userId, name: f.name, avatar_url: f.avatar_url ?? null });
       }
+      // If this was a 1-on-1, it's now a group.
+      if (peer.members.length > 2) {
+        peer.is_group = true;
+      }
       // Remove from pickers so they don't show again.
       setFriendOptions((prev) => prev.filter((x) => x.id !== userId));
       setAllUserResults((prev) => prev.filter((x) => x.id !== userId));
       setAddSearch("");
       setNote(null);
+      // Close the picker after converting a 1-on-1 (it's now a group).
+      if (!wasGroup && peer.is_group) {
+        setEditingGroup(false);
+      }
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not add member.");
     } finally {
@@ -488,13 +497,32 @@ export default function ThreadView({
           ‹
         </button>
         <div className="flex-1 min-w-0 flex flex-col items-center">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => peer.is_group ? openGroupEditor() : undefined}
+              className="flex flex-col items-center gap-1 min-w-0"
+              aria-label={peer.is_group ? "Edit group" : title}
+            >
+              {peerAvatar("w-11 h-11", "text-lg")}
+            </button>
+            {!peer.is_group && (
+              <button
+                type="button"
+                onClick={() => openGroupEditor()}
+                className="w-8 h-8 rounded-full bg-signal hover:bg-signal-dark text-white text-xl font-bold flex items-center justify-center shrink-0 transition-colors"
+                aria-label="Add person to chat"
+              >
+                +
+              </button>
+            )}
+          </div>
           <button
             type="button"
             onClick={() => peer.is_group ? openGroupEditor() : undefined}
-            className="flex flex-col items-center gap-1 min-w-0"
+            className="flex flex-col items-center gap-1 min-w-0 mt-1"
             aria-label={peer.is_group ? "Edit group" : title}
           >
-            {peerAvatar("w-11 h-11", "text-lg")}
             <span className="font-bold text-pine text-[17px] leading-tight truncate max-w-full">
               {title}
               {peer.is_group && <span className="text-pine/30 text-sm"> ›</span>}
@@ -507,12 +535,14 @@ export default function ThreadView({
         <span className="w-8 md:hidden shrink-0" />
       </div>
 
-      {editingGroup && peer.is_group && (
+      {editingGroup && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-4" onClick={() => setEditingGroup(false)}>
           <div className="bg-paper rounded-3xl w-full max-w-sm p-6" onClick={(e) => e.stopPropagation()}>
             <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
-              Edit group
+              {peer.is_group ? "Edit group" : "Add to chat"}
             </h3>
+            {peer.is_group && (
+              <>
             <div className="flex flex-col items-center mb-4">
               <button
                 type="button"
@@ -567,6 +597,8 @@ export default function ThreadView({
                 {savingGroup ? "Saving…" : "Save"}
               </button>
             </div>
+              </>
+            )}
             <div className="mt-5 pt-4 border-t border-pine/10">
               <p className="text-[11px] font-bold uppercase tracking-wider text-pine/45 mb-2">
                 {peer.members.length} members
