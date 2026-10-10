@@ -24,17 +24,19 @@ function LeaderboardList({ rows, unit }: { rows: LeaderRow[]; unit: string }) {
     return <p className="text-pine/50 text-sm">No rankings yet — log a catch to get on the board.</p>;
   }
   return (
-    <div className="bg-white border border-pine/10 rounded-3xl overflow-hidden divide-y divide-pine/8">
+    <div className="bg-white border border-pine/10 rounded-2xl overflow-hidden">
       {rows.map((r, i) => (
         <Link
           key={r.user_id}
           href={`/fishmb/anglers/${r.user_id}`}
-          className="flex items-center gap-3 px-4 py-3 hover:bg-pine/[0.03] transition-colors"
+          className={`flex items-center gap-3 px-4 py-3 hover:bg-pine/[0.03] transition-colors ${
+            i > 0 ? "border-t border-pine/8" : ""
+          }`}
         >
           <span
-            className={`w-7 h-7 shrink-0 rounded-full flex items-center justify-center text-xs font-black ${
+            className={`w-8 h-8 shrink-0 rounded-lg flex items-center justify-center text-sm font-black ${
               i === 0
-                ? "bg-gold/15 text-gold"
+                ? "bg-gold/20 text-gold"
                 : i === 1
                   ? "bg-pine/10 text-pine/70"
                   : i === 2
