@@ -28,12 +28,27 @@ export default function BiteWidget({ lat, lng }: { lat: number; lng: number }) {
 
   useEffect(() => {
     let cancelled = false;
+    // Use the weather section's location so the prediction matches it exactly.
+    let wLat = lat;
+    let wLng = lng;
+    try {
+      const raw = localStorage.getItem("fishmb-wx-current");
+      if (raw) {
+        const c = JSON.parse(raw);
+        if (typeof c.lat === "number" && typeof c.lon === "number") {
+          wLat = c.lat;
+          wLng = c.lon;
+        }
+      }
+    } catch {
+      // Fall back to GPS.
+    }
     const t = setTimeout(async () => {
       try {
         const r = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(
+          `https://api.open-meteo.com/v1/forecast?latitude=${wLat.toFixed(
             3
-          )}&longitude=${lng.toFixed(3)}&hourly=pressure_msl&current=pressure_msl&timezone=auto&forecast_days=2`
+          )}&longitude=${wLng.toFixed(3)}&hourly=pressure_msl&current=pressure_msl&timezone=auto&forecast_days=2`
         );
         const d = await r.json();
         const now = d?.current?.pressure_msl;
