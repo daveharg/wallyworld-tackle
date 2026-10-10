@@ -96,12 +96,37 @@ export default function HowTournamentsWorkPage() {
       <h1 className="font-display font-bold uppercase text-pine text-4xl md:text-5xl tracking-wide mb-4">
         How tournaments work
       </h1>
-      <p className="text-pine/65 mb-10 max-w-2xl">
+      <p className="text-pine/65 mb-8 max-w-2xl">
         Real anti-cheat on every catch — phone-timestamped photos, GPS stamps,
         tournament-waters checks, duplicate-photo detection and organizer
         review. No entry caps, no platform cut, and FishMB never touches the
         money.
       </p>
+
+      <div className="bg-signal/10 border border-signal/40 rounded-2xl p-6 mb-10 max-w-2xl">
+        <p className="font-bold text-pine uppercase tracking-wider text-xs mb-1.5">
+          Know the law
+        </p>
+        <p className="text-pine/70 text-sm leading-relaxed">
+          In Manitoba, fishing tournaments with{" "}
+          <strong>more than 25 participants</strong> need a provincial
+          tournament licence.{" "}
+          <a
+            href="https://www.manitobaelicensing.ca"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-signal-dark font-bold underline"
+          >
+            Get a licence at manitobaelicensing.ca
+          </a>
+          .
+        </p>
+        <p className="text-pine/55 text-xs mt-2">
+          FishMB is a listings and leaderboard tool only — organizers are
+          responsible for running a legal event. We are not responsible if you
+          break the law.
+        </p>
+      </div>
 
       <h2 className="font-display font-bold uppercase text-pine text-2xl tracking-wide mb-6">
         Anti-cheat, built in
@@ -192,31 +217,6 @@ export default function HowTournamentsWorkPage() {
         tap to confirm each angler once their money is in, and they&apos;ll see
         the confirmation on the tournament page.
       </p>
-
-      <div className="bg-signal/10 border border-signal/40 rounded-2xl p-6 mb-10 max-w-2xl">
-        <p className="font-bold text-pine uppercase tracking-wider text-xs mb-1.5">
-          Know the law
-        </p>
-        <p className="text-pine/70 text-sm leading-relaxed">
-          In Manitoba, fishing tournaments with{" "}
-          <strong>more than 25 participants</strong> need a provincial
-          tournament licence.{" "}
-          <a
-            href="https://www.manitobaelicensing.ca"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-signal-dark font-bold underline"
-          >
-            Get a licence at manitobaelicensing.ca
-          </a>
-          .
-        </p>
-        <p className="text-pine/55 text-xs mt-2">
-          FishMB is a listings and leaderboard tool only — organizers are
-          responsible for running a legal event. We are not responsible if you
-          break the law.
-        </p>
-      </div>
 
       <div className="flex flex-wrap gap-3">
         <Link
