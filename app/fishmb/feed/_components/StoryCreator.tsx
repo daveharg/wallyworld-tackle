@@ -68,6 +68,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
   const previewRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const textInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const clips = clipOrder
@@ -112,6 +113,8 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
         setOverlayText(o.text);
         setEditingOverlay(o);
         setEditingIdx(tap.idx);
+        // Focus the text input so the keyboard opens.
+        setTimeout(() => textInputRef.current?.focus(), 100);
       }
     }
   };
@@ -732,6 +735,25 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
               )}
             </div>
 
+            {/* Text size — with the other sliders */}
+            {(editingIdx !== null || overlayText.trim()) && (
+              <div className="px-4 pt-1 pb-2 flex items-center gap-3">
+                <span className="text-pine/60 text-sm font-bold shrink-0 w-8">Aa</span>
+                <input
+                  type="range"
+                  min={16}
+                  max={64}
+                  value={editingOverlay?.size ?? 28}
+                  onChange={(e) => setEditingOverlay((o) => ({ ...(o ?? { text: "", x: 50, y: 50, font: "bold", color: "#ffffff", bg: "transparent", clipIds: [] }), size: Number(e.target.value) }))}
+                  className="flex-1 accent-[#e8622c]"
+                  aria-label="Text size"
+                />
+                <span className="text-xs font-bold text-pine/50 w-10 text-right">
+                  {editingOverlay?.size ?? 28}px
+                </span>
+              </div>
+            )}
+
             {/* Volume control — videos only */}
             {activeDraft?.media_type === "video" && (
               <div className="px-4 pt-1 pb-2 flex items-center gap-3">
@@ -759,6 +781,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
             <div className="p-4 space-y-3">
               <div className="flex gap-2">
                 <input
+                  ref={textInputRef}
                   value={overlayText}
                   onChange={(e) => setOverlayText(e.target.value)}
                   placeholder={clips.length > 1 ? `Add text to clip ${activeClip + 1}…` : "Add text…"}
@@ -833,19 +856,6 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                     </button>
                   ))}
                 </div>
-              </div>
-
-              {/* Size */}
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-pine/50 mb-2">Size</p>
-                <input
-                  type="range"
-                  min={16}
-                  max={64}
-                  value={editingOverlay?.size ?? 28}
-                  onChange={(e) => setEditingOverlay((o) => ({ ...(o ?? { text: "", x: 50, y: 50, font: "bold", color: "#ffffff", bg: "transparent", clipIds: [] }), size: Number(e.target.value) }))}
-                  className="w-full"
-                />
               </div>
 
               {/* Current overlays — tap clips to choose when text shows */}
