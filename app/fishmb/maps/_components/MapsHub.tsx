@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type {
@@ -65,6 +66,7 @@ export default function MapsHub() {
   const [loading, setLoading] = useState(true);
   const [spotsReady, setSpotsReady] = useState(false);
   const [spotPopup, setSpotPopup] = useState<SpotPin | null>(null);
+  const [selectedCatch, setSelectedCatch] = useState<MapCatch | null>(null);
   const [spotEditing, setSpotEditing] = useState(false);
   const [spotEditName, setSpotEditName] = useState("");
   const [spotEditNotes, setSpotEditNotes] = useState("");
@@ -662,6 +664,29 @@ export default function MapsHub() {
     }
   };
 
+  const shareSpotToFriend = async (spot: SpotPin) => {
+    const url = `https://www.fishmb.ca/fishmb/maps?spot=${spot.lat},${spot.lng}&name=${encodeURIComponent(
+      spot.name || "Fishing spot"
+    )}`;
+    const text = `📍 ${spot.name || "Fishing spot"} — check out this fishing spot on FishMB!`;
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({ title: text, text, url });
+      } catch {
+        // User cancelled the share sheet.
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(`${text}\n${url}`);
+        setNote("Spot link copied — paste it to your friend!");
+        setTimeout(() => setNote(null), 3500);
+      } catch {
+        setNote("Copy this link to share: " + url);
+        setTimeout(() => setNote(null), 5000);
+      }
+    }
+  };
+
   const shareSpot = async (id: string) => {
     if (
       !window.confirm(
@@ -772,6 +797,13 @@ export default function MapsHub() {
             goTo={goTo ? { lat: Number(goTo.lat), lng: Number(goTo.lng) } : null}
             onTrailSaved={loadTrails}
             catchPins={catchPins}
+            onCatchClick={(pin) => {
+              const full =
+                myCatches.find((c) => c.id === pin.id) ??
+                nearbyCatches.find((c) => c.id === pin.id) ??
+                null;
+              if (full) setSelectedCatch(full);
+            }}
             basemap={basemap}
             onMoveEnd={onMoveEnd}
             panTo={followPan}
@@ -1080,16 +1112,18 @@ export default function MapsHub() {
       {/* Spot info popup when a map pin is tapped */}
       {spotPopup && (
         <div
-          className="fixed inset-0 z-[1200] flex items-end sm:items-center justify-center p-4 bg-pine-deep/50 backdrop-blur-sm"
+          className="fixed inset-0 z-[1200] flex items-end justify-center bg-pine-deep/50 backdrop-blur-sm"
           onClick={() => {
             setSpotPopup(null);
             setSpotEditing(false);
           }}
         >
           <div
-            className="bg-paper rounded-3xl p-6 w-full max-w-sm shadow-2xl"
+            className="bg-paper rounded-t-3xl p-6 pt-3 w-full sm:max-w-md shadow-2xl max-h-[85vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Drag handle */}
+            <div className="w-10 h-1.5 bg-pine/20 rounded-full mx-auto mb-4" />
             {spotEditing ? (
               <>
                 <button
@@ -1241,8 +1275,93 @@ export default function MapsHub() {
                     🧭 Go to
                   </button>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => shareSpotToFriend(spotPopup)}
+                  className="w-full mt-2 bg-white border border-pine/20 hover:border-pine/40 text-pine font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
+                >
+                  📤 Share to a friend
+                </button>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Catch detail sheet — tap a catch pin on the map */}
+      {selectedCatch && (
+        <div
+          className="fixed inset-0 z-[1200] flex items-end justify-center bg-pine-deep/50 backdrop-blur-sm"
+          onClick={() => setSelectedCatch(null)}
+        >
+          <div
+            className="bg-paper rounded-t-3xl p-6 pt-3 w-full sm:max-w-md shadow-2xl max-h-[85vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-10 h-1.5 bg-pine/20 rounded-full mx-auto mb-4" />
+            {/* Angler header — profile pic top-left, tap to view profile */}
+            <Link
+              href={selectedCatch.mine ? "/fishmb/dashboard?tab=profile" : `/fishmb/anglers/${selectedCatch.user_id}`}
+              className="flex items-center gap-3 mb-4"
+            >
+              {selectedCatch.avatar_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={selectedCatch.avatar_url}
+                  alt={selectedCatch.user_name}
+                  className="w-12 h-12 rounded-full object-cover border-2 border-white shadow"
+                />
+              ) : (
+                <span className="w-12 h-12 rounded-full bg-pine text-white font-black flex items-center justify-center text-lg border-2 border-white shadow">
+                  {(selectedCatch.user_name || "?").charAt(0).toUpperCase()}
+                </span>
+              )}
+              <span className="flex-1 min-w-0">
+                <span className="block font-bold text-pine truncate">
+                  {selectedCatch.mine ? "You" : selectedCatch.user_name}
+                </span>
+                <span className="block text-xs text-pine/50">
+                  {new Date(selectedCatch.caught_at).toLocaleDateString("en-CA", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </span>
+              </span>
+              <span className="text-pine/30 text-lg">›</span>
+            </Link>
+            {/* Catch photo */}
+            {selectedCatch.photo_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={selectedCatch.photo_url}
+                alt={selectedCatch.species}
+                className="w-full rounded-2xl object-cover max-h-72 mb-4"
+              />
+            ) : null}
+            {/* Catch details */}
+            <h3 className="font-display font-bold uppercase text-pine text-2xl tracking-wide mb-1">
+              {selectedCatch.species}
+            </h3>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {selectedCatch.length_in ? (
+                <span className="bg-pine/5 rounded-full px-3 py-1.5 text-sm font-bold text-pine">
+                  📏 {selectedCatch.length_in}&Prime;
+                </span>
+              ) : null}
+              {selectedCatch.weight_lb ? (
+                <span className="bg-pine/5 rounded-full px-3 py-1.5 text-sm font-bold text-pine">
+                  ⚖️ {selectedCatch.weight_lb} lb
+                </span>
+              ) : null}
+            </div>
+            <button
+              type="button"
+              onClick={() => setSelectedCatch(null)}
+              className="w-full bg-pine/5 hover:bg-pine/10 text-pine font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}

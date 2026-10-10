@@ -62,6 +62,8 @@ interface SpotMapProps {
   followDot?: string;
   /** GPS catch pins rendered on the map. */
   catchPins?: CatchPin[];
+  /** Fired when a catch pin is tapped — parent shows a detail sheet. */
+  onCatchClick?: (pin: CatchPin) => void;
   /** Base map style. */
   basemap?: BasemapId;
   /** Fired (debounced by Leaflet) whenever the map stops moving. */
@@ -122,6 +124,7 @@ export default function SpotMap({
   panTo,
   followDot = "dot-blue",
   catchPins,
+  onCatchClick,
   basemap = "streets",
   onMoveEnd,
   fill = false,
@@ -406,18 +409,22 @@ export default function SpotMap({
           iconSize: [32, 32],
           iconAnchor: [16, 16],
         });
-        L.marker([c.lat, c.lng], { icon })
-          .bindPopup(
+        const marker = L.marker([c.lat, c.lng], { icon });
+        if (onCatchClick) {
+          marker.on("click", () => onCatchClick(c));
+        } else {
+          marker.bindPopup(
             `<strong>${escapeHtml(c.species)}</strong>${
               c.length_in ? `<br/>${c.length_in}&Prime;` : ""
             }`
-          )
-          .addTo(layer);
+          );
+        }
+        marker.addTo(layer);
       }
       layer.addTo(map);
       catchLayerRef.current = layer;
     })();
-  }, [catchPins, map]);
+  }, [catchPins, map, onCatchClick]);
 
   // Live GPS person marker — follows you whenever we have a fix.
   // Single persistent marker (no duplicates): we reuse one Leaflet marker and
