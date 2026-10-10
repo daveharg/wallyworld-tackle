@@ -146,6 +146,7 @@ function MessagesPageInner() {
   const [newSearching, setNewSearching] = useState(false);
   const [newPicks, setNewPicks] = useState<string[]>([]);
   const [groupName, setGroupName] = useState("");
+  const [chatTab, setChatTab] = useState<"friends" | "other">("friends");
   const [note, setNote] = useState<string | null>(null);
   const [sheetConvo, setSheetConvo] = useState<Convo | null>(null);
   const pressTimer = useRef<number | null>(null);
@@ -370,6 +371,20 @@ function MessagesPageInner() {
     return other?.name ?? "Chat";
   };
 
+  // Split conversations: Friends tab (1:1 with friends + all groups),
+  // Other tab (1:1 with non-friends).
+  const friendIds = new Set(friends.map((f) => f.id));
+  const isFriendConvo = (c: Convo): boolean => {
+    if (c.is_group) return true;
+    const other = c.members.find((m) => m.user_id !== user?.id);
+    return other ? friendIds.has(other.user_id) : false;
+  };
+  const friendsConvos = convos.filter(isFriendConvo);
+  const otherConvos = convos.filter((c) => !isFriendConvo(c));
+  const friendsUnread = friendsConvos.reduce((sum, c) => sum + (c.unread ?? 0), 0);
+  const otherUnread = otherConvos.reduce((sum, c) => sum + (c.unread ?? 0), 0);
+  const visibleConvos = chatTab === "friends" ? friendsConvos : otherConvos;
+
   if (!user) {
     const perks = [
       {
@@ -480,10 +495,37 @@ function MessagesPageInner() {
             </span>
           )}
         </div>
-        {/* Title */}
-        <h1 className="absolute left-1/2 -translate-x-1/2 font-bold text-pine text-xl tracking-tight">
-          Chats
-        </h1>
+        {/* Friends / Other tabs */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1 bg-pine/5 rounded-full p-1">
+          <button
+            type="button"
+            onClick={() => setChatTab("friends")}
+            className={`relative flex items-center gap-1.5 px-5 py-2 rounded-full font-bold text-sm transition-colors ${
+              chatTab === "friends" ? "bg-white text-pine shadow-sm" : "text-pine/50"
+            }`}
+          >
+            Friends
+            {friendsUnread > 0 && (
+              <span className="min-w-5 h-5 px-1 rounded-full bg-signal text-white text-[11px] font-black flex items-center justify-center">
+                {friendsUnread > 99 ? "99+" : friendsUnread}
+              </span>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => setChatTab("other")}
+            className={`relative flex items-center gap-1.5 px-5 py-2 rounded-full font-bold text-sm transition-colors ${
+              chatTab === "other" ? "bg-white text-pine shadow-sm" : "text-pine/50"
+            }`}
+          >
+            Other
+            {otherUnread > 0 && (
+              <span className="min-w-5 h-5 px-1 rounded-full bg-signal text-white text-[11px] font-black flex items-center justify-center">
+                {otherUnread > 99 ? "99+" : otherUnread}
+              </span>
+            )}
+          </button>
+        </div>
         {/* New chat button */}
         <button
           type="button"
@@ -507,11 +549,15 @@ function MessagesPageInner() {
       <div className="md:grid md:grid-cols-[320px_1fr] md:gap-6">
         {/* Conversation list */}
         <div className={peer ? "hidden md:block" : ""}>
-          {convos.length === 0 ? (
+          {visibleConvos.length === 0 ? (
             <div className="bg-white border border-pine/10 rounded-3xl p-8 text-center">
-              <p className="text-pine/70 font-bold">No conversations yet</p>
+              <p className="text-pine/70 font-bold">
+                {chatTab === "friends" ? "No friend chats yet" : "No other chats"}
+              </p>
               <p className="text-pine/50 text-sm mt-1 mb-4">
-                Start one with a fishing friend.
+                {chatTab === "friends"
+                  ? "Start one with a fishing friend."
+                  : "Chats with anglers who aren't friends yet show up here."}
               </p>
               <button
                 type="button"
@@ -524,8 +570,8 @@ function MessagesPageInner() {
           ) : (
             <div>
               {(() => {
-                const pinned = convos.filter((c) => c.pinned_at);
-                const rest = convos.filter((c) => !c.pinned_at);
+                const pinned = visibleConvos.filter((c) => c.pinned_at);
+                const rest = visibleConvos.filter((c) => !c.pinned_at);
                 const avatar = (c: Convo, title: string, size: string, text: string) => {
                   const other = c.is_group
                     ? null
