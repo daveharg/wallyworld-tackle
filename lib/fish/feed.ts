@@ -434,6 +434,7 @@ export async function ensureStoryTables(): Promise<void> {
     viewed_at timestamptz NOT NULL DEFAULT NOW(),
     PRIMARY KEY (story_id, viewer_id)
   )`);
+  await query(`ALTER TABLE fm_stories ADD COLUMN IF NOT EXISTS is_public boolean NOT NULL DEFAULT false`);
 }
 
 export interface StoryItem {
@@ -461,6 +462,7 @@ export async function getStories(viewerId: string | null): Promise<StoryItem[]> 
        JOIN fm_users u ON u.id = s.user_id
       WHERE s.expires_at > NOW()
         AND ($1::uuid IS NULL
+             OR s.is_public
              OR s.user_id = $1::uuid
              OR EXISTS (SELECT 1 FROM fm_friendships f
                         WHERE f.status = 'accepted'
