@@ -29,11 +29,16 @@ export interface CatchRow {
   created_at: string;
   lat: number | null;
   lng: number | null;
+  share_location: boolean | null;
+  tournament_id: string | null;
+  tournament_name: string | null;
   name: string;
   avatar_url: string | null;
 }
 
-function toItem(c: CatchRow) {
+function toItem(c: CatchRow, viewerId?: string) {
+  // Location is only shared if the catcher allowed it (or it's your own catch).
+  const showLocation = c.share_location !== false || (viewerId && c.user_id === viewerId);
   return {
     id: c.id,
     species: c.species,
@@ -46,14 +51,19 @@ function toItem(c: CatchRow) {
     note: c.note,
     caught_at: c.caught_at,
     created_at: c.created_at,
-    lat: c.lat,
-    lng: c.lng,
+    lat: showLocation ? c.lat : null,
+    lng: showLocation ? c.lng : null,
+    tournament_id: c.tournament_id,
+    tournament_name: c.tournament_name,
     user: { id: c.user_id, name: c.name, avatar_url: c.avatar_url },
   };
 }
 
-const SELECT = `SELECT c.*, u.name, u.avatar_url FROM fm_catches c
-                JOIN fm_users u ON u.id = c.user_id`;
+const SELECT = `SELECT c.*, u.name, u.avatar_url,
+                t.name AS tournament_name
+                FROM fm_catches c
+                JOIN fm_users u ON u.id = c.user_id
+                LEFT JOIN fm_tournaments t ON t.id = c.tournament_id`;
 
 export async function GET(req: NextRequest) {
   const me = await fishUserFromRequest(req);
@@ -93,7 +103,7 @@ export async function GET(req: NextRequest) {
     params
   );
   return NextResponse.json({
-    catches: rows.map(toItem),
+    catches: rows.map((c) => toItem(c, me?.id)),
     total: Number(total?.n ?? 0),
     limit,
     offset,
@@ -183,6 +193,9 @@ export async function POST(req: NextRequest) {
   // Personal record: saved to catch history/stats but excluded from the feed.
   const personalRecord = body.personal_record === true;
 
+  // Optional tournament link (for feed display of tournament stats).
+  const tournamentId = typeof body.tournament_id === "string" && body.tournament_id ? body.tournament_id : null;
+
   // Optional weather snapshot captured at log time (temp °C, condition code, wind kph).
   let weather: { temp_c: number; code: number; wind_kph: number } | null = null;
   if (body.weather && typeof body.weather === "object") {
@@ -201,13 +214,14 @@ export async function POST(req: NextRequest) {
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS lng double precision`);
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS share_location boolean DEFAULT true`);
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS weather jsonb`);
+  await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS tournament_id uuid REFERENCES fm_tournaments(id) ON DELETE SET NULL`);
   const rows = await query<CatchRow>(
     `INSERT INTO fm_catches
-       (user_id, species, length_in, weight_lb, photo_measure_url, photo_hold_url, photos, visibility, note, caught_at, lat, lng, share_location, weather, personal_record)
-     VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9,COALESCE($10::timestamptz, now()),$11,$12,$13,$14::jsonb,$15)
+       (user_id, species, length_in, weight_lb, photo_measure_url, photo_hold_url, photos, visibility, note, caught_at, lat, lng, share_location, weather, personal_record, tournament_id)
+     VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9,COALESCE($10::timestamptz, now()),$11,$12,$13,$14::jsonb,$15,$16::uuid)
      RETURNING *, (SELECT name FROM fm_users WHERE id = $1) AS name,
                    (SELECT avatar_url FROM fm_users WHERE id = $1) AS avatar_url`,
-    [me.id, species, lengthIn, weightLb, photoMeasure, photoHold, JSON.stringify(photos), visibility, note, caughtAt, lat, lng, shareLocation, weather ? JSON.stringify(weather) : null, personalRecord]
+    [me.id, species, lengthIn, weightLb, photoMeasure, photoHold, JSON.stringify(photos), visibility, note, caughtAt, lat, lng, shareLocation, weather ? JSON.stringify(weather) : null, personalRecord, tournamentId]
   );
   const newCatch = rows[0];
 

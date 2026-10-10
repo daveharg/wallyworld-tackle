@@ -179,6 +179,10 @@ interface FeedItem {
   length_in: number | null;
   species_tag?: string | null;
   visibility?: string;
+  tournament_id?: string | null;
+  tournament_name?: string | null;
+  lat?: number | null;
+  lng?: number | null;
   comment_count: number;
   like_count: number;
   dislike_count: number;
@@ -1495,6 +1499,7 @@ function FeedPageInner() {
           visibility: personalRecord ? "private" : visibility,
           share_location: shareLocation,
           personal_record: personalRecord,
+          tournament_id: tournamentId || null,
           weather,
           note: draft.trim() || null,
           lat: catchLat,
@@ -1910,6 +1915,34 @@ function FeedPageInner() {
                     {item.species}
                     {item.length_in ? ` · ${Number(item.length_in).toFixed(1)}″` : ""}
                   </p>
+                )}
+                {item.kind === "catch" && item.lat != null && item.lng != null && (
+                  <Link
+                    href={`/fishmb/maps?lat=${item.lat}&lng=${item.lng}`}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-signal-dark hover:text-signal mb-2"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                      <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    View on map
+                  </Link>
+                )}
+                {item.kind === "catch" && item.tournament_id && (
+                  <Link
+                    href={`/fishmb/tournaments/${item.tournament_id}`}
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-accentTeal hover:text-accentTeal/80 mb-2 ml-3"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                      <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                      <path d="M4 22h16" />
+                      <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                      <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                      <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                    </svg>
+                    {item.tournament_name || "Tournament"} — view stats
+                  </Link>
                 )}
                 {item.body && (() => {
                   const text = ytId
