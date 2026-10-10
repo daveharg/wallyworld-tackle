@@ -24,6 +24,7 @@ interface TextOverlay {
   color: string;
   bg: string;
   size: number;
+  clipIds: string[];
 }
 
 const FONTS = [
@@ -58,8 +59,23 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
   const [editingOverlay, setEditingOverlay] = useState<TextOverlay | null>(null);
   const [overlayText, setOverlayText] = useState("");
   const [dragIdx, setDragIdx] = useState<number | null>(null);
+  // Reel state — ordered clips, active clip for preview, per-clip zoom.
+  const [clipOrder, setClipOrder] = useState<string[]>([]);
+  const [activeClip, setActiveClip] = useState(0);
+  const [clipZooms, setClipZooms] = useState<Record<string, number>>({});
   const previewRef = useRef<HTMLDivElement>(null);
+  const timelineRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  const clips = clipOrder
+    .map((id) => drafts.find((d) => d.id === id))
+    .filter((d): d is Draft => Boolean(d));
+  const activeDraft = clips[activeClip] ?? null;
+  const activeZoom = activeDraft ? (clipZooms[activeDraft.id] ?? 1) : 1;
+  const setActiveZoom = (z: number) => {
+    if (!activeDraft) return;
+    setClipZooms((m) => ({ ...m, [activeDraft.id]: z }));
+  };
 
   // Drag a text overlay around the preview with pointer events.
   const onOverlayPointerDown = (e: React.PointerEvent, i: number) => {
@@ -80,15 +96,14 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
 
   const endDrag = () => setDragIdx(null);
 
-  // Photo zoom — scale the media to fill the story box.
-  const [zoom, setZoom] = useState(1);
+  // Photo zoom — scale the media to fill the story box (per clip).
   const pinchRef = useRef<{ dist: number; zoom: number } | null>(null);
 
   const onPreviewTouchStart = (e: React.TouchEvent) => {
     if (e.touches.length === 2) {
       const dx = e.touches[0].clientX - e.touches[1].clientX;
       const dy = e.touches[0].clientY - e.touches[1].clientY;
-      pinchRef.current = { dist: Math.hypot(dx, dy), zoom };
+      pinchRef.current = { dist: Math.hypot(dx, dy), zoom: activeZoom };
     }
   };
 
@@ -99,13 +114,58 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
       const dist = Math.hypot(dx, dy);
       if (dist > 0) {
         const next = Math.min(3, Math.max(1, pinchRef.current.zoom * (dist / pinchRef.current.dist)));
-        setZoom(next);
+        setActiveZoom(next);
       }
     }
   };
 
   const onPreviewTouchEnd = () => {
     pinchRef.current = null;
+  };
+
+  // Timeline drag-to-reorder.
+  const [timelineDrag, setTimelineDrag] = useState<number | null>(null);
+
+  const onTimelinePointerDown = (e: React.PointerEvent, idx: number) => {
+    e.preventDefault();
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    setTimelineDrag(idx);
+  };
+
+  const onTimelinePointerMove = (e: React.PointerEvent) => {
+    if (timelineDrag === null) return;
+    const el = timelineRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const thumbW = 72; // thumbnail width + gap
+    const target = Math.max(0, Math.min(clips.length - 1, Math.floor((e.clientX - rect.left + el.scrollLeft) / thumbW)));
+    if (target !== timelineDrag) {
+      setClipOrder((order) => {
+        const next = [...order];
+        const [moved] = next.splice(timelineDrag, 1);
+        next.splice(target, 0, moved);
+        return next;
+      });
+      setActiveClip((a) => {
+        if (a === timelineDrag) return target;
+        if (timelineDrag < a && target >= a) return a - 1;
+        if (timelineDrag > a && target <= a) return a + 1;
+        return a;
+      });
+      setTimelineDrag(target);
+    }
+  };
+
+  const endTimelineDrag = () => setTimelineDrag(null);
+
+  const toggleOverlayClip = (overlayIdx: number, clipId: string) => {
+    setOverlays((list) =>
+      list.map((o, i) =>
+        i === overlayIdx
+          ? { ...o, clipIds: o.clipIds.includes(clipId) ? o.clipIds.filter((c) => c !== clipId) : [...o.clipIds, clipId] }
+          : o
+      )
+    );
   };
 
   const loadDrafts = async () => {
@@ -182,11 +242,14 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
       setNote("Pick at least one photo or video first.");
       return;
     }
+    // Preserve selection order as the reel timeline.
+    setClipOrder(drafts.filter((d) => selected.has(d.id)).map((d) => d.id));
+    setActiveClip(0);
     setStep("edit");
   };
 
   const addOverlay = () => {
-    if (!overlayText.trim()) return;
+    if (!overlayText.trim() || !activeDraft) return;
     setOverlays((list) => [
       ...list,
       {
@@ -197,6 +260,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
         color: editingOverlay?.color ?? "#ffffff",
         bg: editingOverlay?.bg ?? "transparent",
         size: editingOverlay?.size ?? 28,
+        clipIds: [activeDraft.id],
       },
     ]);
     setOverlayText("");
@@ -206,15 +270,18 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
     setPosting(true);
     setNote(null);
     try {
-      for (const d of selectedDrafts) {
+      for (const d of clips) {
+        const clipOverlays = overlays
+          .filter((o) => o.clipIds.includes(d.id))
+          .map(({ clipIds, ...rest }) => rest);
         await fishFetch("/api/fishmb/stories", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             media_url: d.media_url,
             media_type: d.media_type,
-            overlays,
-            zoom,
+            overlays: clipOverlays,
+            zoom: clipZooms[d.id] ?? 1,
           }),
         });
       }
@@ -259,41 +326,49 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
 
       {step === "pick" ? (
         <>
-          {/* Tool buttons */}
-          <div className="flex gap-3 overflow-x-auto px-4 py-3" style={{ scrollbarWidth: "none" }}>
-            <button
-              onClick={startEdit}
-              className="shrink-0 w-24 py-3 rounded-2xl bg-pine/5 flex flex-col items-center gap-1"
-            >
-              <span className="text-xl font-bold">Aa</span>
-              <span className="text-xs font-bold text-pine/70">Text</span>
-            </button>
-            <button
-              onClick={() => setNote("Music isn't available yet — licensed music needs deals with the record labels, which we don't have. Your stories post without music for now.")}
-              className="shrink-0 w-24 py-3 rounded-2xl bg-pine/5 flex flex-col items-center gap-1"
-            >
-              <span className="text-xl"></span>
-              <span className="text-xs font-bold text-pine/70">Music</span>
-            </button>
-            <div className="shrink-0 w-24 py-3 rounded-2xl bg-pine/5 flex flex-col items-center gap-1 opacity-40">
-              <span className="text-xl">▦</span>
-              <span className="text-xs font-bold text-pine/70">Templates</span>
-            </div>
-            <div className="shrink-0 w-24 py-3 rounded-2xl bg-pine/5 flex flex-col items-center gap-1 opacity-40">
-              <span className="text-xl">∞</span>
-              <span className="text-xs font-bold text-pine/70">Boomerang</span>
-            </div>
-          </div>
-
           {/* Camera roll bar */}
-          <div className="flex items-center justify-between px-4 py-2">
+          <div className="flex items-center justify-between px-4 py-3">
             <span className="font-bold text-pine/60">Camera roll ▾</span>
-            <button
-              onClick={() => setMulti((m) => !m)}
-              className={`px-4 py-2 rounded-full text-sm font-bold ${multi ? "bg-pine text-white" : "bg-pine/10 text-pine"}`}
-            >
-               Select multiple
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  const input = document.createElement("input");
+                  input.type = "file";
+                  input.accept = "video/*";
+                  input.onchange = () => {
+                    const f = input.files?.[0];
+                    if (f) void uploadDraft(f);
+                  };
+                  input.click();
+                }}
+                disabled={uploading}
+                className="px-4 py-2 rounded-full text-sm font-bold bg-pine/10 text-pine disabled:opacity-50"
+              >
+                ＋ Video
+              </button>
+              <button
+                onClick={() => {
+                  const input = document.createElement("input");
+                  input.type = "file";
+                  input.accept = "image/*";
+                  input.onchange = () => {
+                    const f = input.files?.[0];
+                    if (f) void uploadDraft(f);
+                  };
+                  input.click();
+                }}
+                disabled={uploading}
+                className="px-4 py-2 rounded-full text-sm font-bold bg-pine/10 text-pine disabled:opacity-50"
+              >
+                ＋ Photo
+              </button>
+              <button
+                onClick={() => setMulti((m) => !m)}
+                className={`px-4 py-2 rounded-full text-sm font-bold ${multi ? "bg-pine text-white" : "bg-pine/10 text-pine"}`}
+              >
+                Select multiple
+              </button>
+            </div>
           </div>
 
           {note && <p className="px-4 py-2 text-sm text-amber-700 bg-amber-50">{note}</p>}
@@ -375,12 +450,12 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
         </>
       ) : (
         <>
-          {/* Edit step — text overlays */}
+          {/* Edit step — reel editor */}
           <div className="flex-1 overflow-y-auto">
-            {/* Preview */}
+            {/* Preview — active clip */}
             <div
               ref={previewRef}
-              className="relative bg-black aspect-[9/16] max-h-[50vh] mx-auto touch-none select-none overflow-hidden"
+              className="relative bg-black aspect-[9/16] max-h-[42vh] mx-auto touch-none select-none overflow-hidden"
               onPointerMove={onPreviewPointerMove}
               onPointerUp={endDrag}
               onPointerCancel={endDrag}
@@ -388,20 +463,30 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
               onTouchMove={onPreviewTouchMove}
               onTouchEnd={onPreviewTouchEnd}
             >
-              {selectedDrafts[0] && (
+              {activeDraft && (
                 <div
                   className="absolute inset-0"
-                  style={{ transform: `scale(${zoom})`, transformOrigin: "center" }}
+                  style={{ transform: `scale(${activeZoom})`, transformOrigin: "center" }}
                 >
-                  {selectedDrafts[0].media_type === "video" ? (
-                    <video src={selectedDrafts[0].media_url} className="w-full h-full object-cover" muted playsInline />
+                  {activeDraft.media_type === "video" ? (
+                    <video src={activeDraft.media_url} className="w-full h-full object-cover" muted playsInline loop autoPlay />
                   ) : (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={selectedDrafts[0].media_url} alt="" className="w-full h-full object-cover" />
+                    <img src={activeDraft.media_url} alt="" className="w-full h-full object-cover" />
                   )}
                 </div>
               )}
-              {overlays.map((o, i) => (
+              {/* Clip number badge */}
+              {clips.length > 1 && (
+                <span className="absolute top-2 left-2 bg-black/60 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+                  {activeClip + 1} / {clips.length}
+                </span>
+              )}
+              {/* Text overlays for the active clip */}
+              {overlays
+                .map((o, i) => ({ o, i }))
+                .filter(({ o }) => activeDraft && o.clipIds.includes(activeDraft.id))
+                .map(({ o, i }) => (
                 <div
                   key={i}
                   className="absolute cursor-grab active:cursor-grabbing"
@@ -426,23 +511,72 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
               ))}
             </div>
 
+            {/* Timeline — drag to reorder clips */}
+            {clips.length > 1 && (
+              <div className="px-4 pt-3">
+                <p className="text-xs font-bold uppercase tracking-wider text-pine/50 mb-2">
+                  Reel timeline — drag to reorder
+                </p>
+                <div
+                  ref={timelineRef}
+                  className="flex gap-2 overflow-x-auto pb-2 touch-none select-none"
+                  style={{ scrollbarWidth: "none" }}
+                  onPointerMove={onTimelinePointerMove}
+                  onPointerUp={endTimelineDrag}
+                  onPointerCancel={endTimelineDrag}
+                >
+                  {clips.map((d, idx) => {
+                    const hasText = overlays.some((o) => o.clipIds.includes(d.id));
+                    return (
+                      <div
+                        key={d.id}
+                        onPointerDown={(e) => onTimelinePointerDown(e, idx)}
+                        onClick={() => setActiveClip(idx)}
+                        className={`relative shrink-0 w-16 h-24 rounded-xl overflow-hidden border-2 cursor-grab active:cursor-grabbing ${
+                          idx === activeClip ? "border-signal" : "border-transparent"
+                        } ${timelineDrag === idx ? "opacity-60 scale-105" : ""}`}
+                      >
+                        {d.media_type === "video" ? (
+                          <video src={d.media_url} className="w-full h-full object-cover pointer-events-none" muted playsInline />
+                        ) : (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={d.media_url} alt="" className="w-full h-full object-cover pointer-events-none" draggable={false} />
+                        )}
+                        <span className="absolute bottom-1 left-1 bg-black/60 text-white text-[10px] font-bold px-1.5 rounded">
+                          {idx + 1}
+                        </span>
+                        {d.media_type === "video" && (
+                          <span className="absolute top-1 right-1 bg-black/60 text-white text-[10px] px-1 rounded">▶</span>
+                        )}
+                        {hasText && (
+                          <span className="absolute top-1 left-1 bg-black/60 text-white text-[10px] font-bold px-1.5 rounded">
+                            Aa
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {/* Zoom control */}
-            <div className="px-4 pb-2 flex items-center gap-3">
+            <div className="px-4 pt-2 pb-2 flex items-center gap-3">
               <span className="text-pine/60 text-lg leading-none">−</span>
               <input
                 type="range"
                 min={1}
                 max={3}
                 step={0.05}
-                value={zoom}
-                onChange={(e) => setZoom(parseFloat(e.target.value))}
+                value={activeZoom}
+                onChange={(e) => setActiveZoom(parseFloat(e.target.value))}
                 className="flex-1 accent-[#e8622c]"
                 aria-label="Photo zoom"
               />
               <span className="text-pine/60 text-lg leading-none">＋</span>
-              {zoom > 1 && (
+              {activeZoom > 1 && (
                 <button
-                  onClick={() => setZoom(1)}
+                  onClick={() => setActiveZoom(1)}
                   className="text-xs font-bold uppercase tracking-wider text-pine/50"
                 >
                   Reset
@@ -456,7 +590,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                 <input
                   value={overlayText}
                   onChange={(e) => setOverlayText(e.target.value)}
-                  placeholder="Add text…"
+                  placeholder={clips.length > 1 ? `Add text to clip ${activeClip + 1}…` : "Add text…"}
                   maxLength={100}
                   className="flex-1 bg-pine/5 border border-pine/15 rounded-full px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal"
                 />
@@ -476,7 +610,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                   {FONTS.map((f) => (
                     <button
                       key={f.id}
-                      onClick={() => setEditingOverlay((o) => ({ ...(o ?? { text: "", x: 50, y: 50, color: "#ffffff", bg: "transparent", size: 28 }), font: f.id }))}
+                      onClick={() => setEditingOverlay((o) => ({ ...(o ?? { text: "", x: 50, y: 50, color: "#ffffff", bg: "transparent", size: 28, clipIds: [] }), font: f.id }))}
                       className={`shrink-0 px-4 py-2.5 rounded-2xl border-2 text-sm ${
                         (editingOverlay?.font ?? "bold") === f.id ? "border-signal bg-signal/10" : "border-pine/10"
                       }`}
@@ -495,7 +629,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                   {COLORS.map((c) => (
                     <button
                       key={c}
-                      onClick={() => setEditingOverlay((o) => ({ ...(o ?? { text: "", x: 50, y: 50, font: "bold", bg: "transparent", size: 28 }), color: c }))}
+                      onClick={() => setEditingOverlay((o) => ({ ...(o ?? { text: "", x: 50, y: 50, font: "bold", bg: "transparent", size: 28, clipIds: [] }), color: c }))}
                       className={`w-9 h-9 rounded-full border-2 ${(editingOverlay?.color ?? "#ffffff") === c ? "border-signal" : "border-pine/15"}`}
                       style={{ background: c }}
                       aria-label={`Color ${c}`}
@@ -511,7 +645,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                   {BACKGROUNDS.map((b) => (
                     <button
                       key={b.id}
-                      onClick={() => setEditingOverlay((o) => ({ ...(o ?? { text: "", x: 50, y: 50, font: "bold", color: "#ffffff", size: 28 }), bg: b.value }))}
+                      onClick={() => setEditingOverlay((o) => ({ ...(o ?? { text: "", x: 50, y: 50, font: "bold", color: "#ffffff", size: 28, clipIds: [] }), bg: b.value }))}
                       className={`px-4 py-2 rounded-full text-xs font-bold border-2 ${
                         (editingOverlay?.bg ?? "transparent") === b.value ? "border-signal" : "border-pine/15"
                       }`}
@@ -530,26 +664,60 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                   min={16}
                   max={64}
                   value={editingOverlay?.size ?? 28}
-                  onChange={(e) => setEditingOverlay((o) => ({ ...(o ?? { text: "", x: 50, y: 50, font: "bold", color: "#ffffff", bg: "transparent" }), size: Number(e.target.value) }))}
+                  onChange={(e) => setEditingOverlay((o) => ({ ...(o ?? { text: "", x: 50, y: 50, font: "bold", color: "#ffffff", bg: "transparent", clipIds: [] }), size: Number(e.target.value) }))}
                   className="w-full"
                 />
               </div>
 
-              {/* Current overlays */}
+              {/* Current overlays — tap clips to choose when text shows */}
               {overlays.length > 0 && (
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-pine/50 mb-2">Added ({overlays.length})</p>
-                  <div className="space-y-1">
+                  <p className="text-xs font-bold uppercase tracking-wider text-pine/50 mb-2">
+                    Text ({overlays.length}) — tap clips to set when it shows
+                  </p>
+                  <div className="space-y-2">
                     {overlays.map((o, i) => (
-                      <div key={i} className="flex items-center gap-2 bg-pine/5 rounded-xl px-3 py-2">
-                        <span className="flex-1 text-sm text-pine truncate" style={fontStyle(o.font)}>{o.text}</span>
-                        <button
-                          onClick={() => setOverlays((list) => list.filter((_, j) => j !== i))}
-                          className="text-red-500 font-bold"
-                          aria-label="Remove text"
-                        >
-                          ×
-                        </button>
+                      <div key={i} className="bg-pine/5 rounded-xl px-3 py-2">
+                        <div className="flex items-center gap-2">
+                          <span className="flex-1 text-sm text-pine truncate" style={fontStyle(o.font)}>{o.text}</span>
+                          <button
+                            onClick={() => setOverlays((list) => list.filter((_, j) => j !== i))}
+                            className="text-red-500 font-bold"
+                            aria-label="Remove text"
+                          >
+                            ×
+                          </button>
+                        </div>
+                        {clips.length > 1 && (
+                          <div className="flex gap-1.5 mt-2 flex-wrap">
+                            {clips.map((d, idx) => (
+                              <button
+                                key={d.id}
+                                onClick={() => toggleOverlayClip(i, d.id)}
+                                className={`w-7 h-7 rounded-lg text-[11px] font-bold ${
+                                  o.clipIds.includes(d.id)
+                                    ? "bg-signal text-white"
+                                    : "bg-pine/10 text-pine/50"
+                                }`}
+                                aria-label={`Show on clip ${idx + 1}`}
+                              >
+                                {idx + 1}
+                              </button>
+                            ))}
+                            <button
+                              onClick={() =>
+                                setOverlays((list) =>
+                                  list.map((ov, j) =>
+                                    j === i ? { ...ov, clipIds: clips.map((d) => d.id) } : ov
+                                  )
+                                )
+                              }
+                              className="px-2.5 h-7 rounded-lg text-[11px] font-bold bg-pine/10 text-pine/60"
+                            >
+                              All
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -571,7 +739,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
               disabled={posting}
               className="flex-1 py-4 rounded-full bg-signal text-white font-bold uppercase tracking-wider disabled:opacity-50"
             >
-              {posting ? "Posting…" : selectedDrafts.length > 1 ? `Post ${selectedDrafts.length} stories` : "Post story"}
+              {posting ? "Posting…" : clips.length > 1 ? `Post ${clips.length}-clip reel` : "Post story"}
             </button>
           </div>
           {note && <p className="px-4 pb-2 text-sm text-red-600 text-center">{note}</p>}
