@@ -30,6 +30,28 @@ interface Catch {
   tournament_name: string | null;
   visibility?: string;
   personal_record?: boolean;
+  lat: number | null;
+  lng: number | null;
+}
+
+type CatchSort = "size" | "species" | "newest" | "oldest";
+
+function sortCatches(list: Catch[], sort: CatchSort): Catch[] {
+  const arr = [...list];
+  const sizeOf = (c: Catch) => parseFloat(c.length_in ?? "0") || 0;
+  switch (sort) {
+    case "size":
+      // Largest first, then species A–Z.
+      return arr.sort((a, b) => sizeOf(b) - sizeOf(a) || a.species.localeCompare(b.species));
+    case "species":
+      // Species A–Z, then largest first.
+      return arr.sort((a, b) => a.species.localeCompare(b.species) || sizeOf(b) - sizeOf(a));
+    case "oldest":
+      return arr.sort((a, b) => new Date(a.caught_at).getTime() - new Date(b.caught_at).getTime());
+    case "newest":
+    default:
+      return arr.sort((a, b) => new Date(b.caught_at).getTime() - new Date(a.caught_at).getTime());
+  }
 }
 
 function LeaderboardList({ rows, unit }: { rows: LeaderRow[]; unit: string }) {
@@ -86,6 +108,8 @@ export default function DashboardStats() {
   const [topFriends, setTopFriends] = useState<LeaderRow[]>([]);
   const [catches, setCatches] = useState<Catch[]>([]);
   const [catchFilter, setCatchFilter] = useState<"all" | "shared" | "not-shared" | "personal" | "tournament">("all");
+  const [catchSort, setCatchSort] = useState<CatchSort>("size");
+  const [catchesExpanded, setCatchesExpanded] = useState(false);
   const [sharingId, setSharingId] = useState<string | null>(null);
 
   const shareCatch = async (c: Catch) => {
@@ -267,6 +291,31 @@ export default function DashboardStats() {
             </button>
           ))}
         </div>
+        {/* Sort options */}
+        <div className="flex gap-2 mb-3 flex-wrap items-center">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-pine/45">Sort:</span>
+          {(
+            [
+              { id: "size", label: "Size" },
+              { id: "species", label: "Species" },
+              { id: "newest", label: "Newest" },
+              { id: "oldest", label: "Oldest" },
+            ] as const
+          ).map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => setCatchSort(s.id)}
+              className={`px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider transition-colors ${
+                catchSort === s.id
+                  ? "bg-pine text-white"
+                  : "bg-white border border-pine/15 text-pine/70"
+              }`}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
         {(() => {
           const filtered = catches.filter((c) =>
             catchFilter === "all"
@@ -286,59 +335,78 @@ export default function DashboardStats() {
               </p>
             );
           }
+          const sorted = sortCatches(filtered, catchSort);
+          const visible = catchesExpanded ? sorted : sorted.slice(0, 3);
           return (
-            <div className="grid grid-cols-3 gap-2">
-              {filtered.map((c) => (
-                <div
-                  key={`${c.tournament_id ?? "r"}:${c.id}`}
-                  className="relative bg-white border border-pine/10 rounded-2xl overflow-hidden"
-                >
-                  {c.photo_hold_url || c.photo_measure_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={c.photo_hold_url ?? c.photo_measure_url ?? ""}
-                      alt={c.species}
-                      className="w-full aspect-square object-cover"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <div className="w-full aspect-square bg-pine/5 flex items-center justify-center text-3xl">
-                      🐟
+            <>
+              <div className="flex flex-col gap-2">
+                {visible.map((c) => (
+                  <div
+                    key={`${c.tournament_id ?? "r"}:${c.id}`}
+                    className="flex items-center gap-3 bg-white border border-pine/10 rounded-2xl p-2.5"
+                  >
+                    {/* Thumbnail */}
+                    {c.photo_hold_url || c.photo_measure_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={c.photo_hold_url ?? c.photo_measure_url ?? ""}
+                        alt={c.species}
+                        className="w-14 h-14 rounded-xl object-cover shrink-0"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-14 h-14 rounded-xl bg-pine/5 flex items-center justify-center text-2xl shrink-0">
+                        🐟
+                      </div>
+                    )}
+                    {/* Species + size + meta */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-pine truncate">
+                        {c.species}
+                        {c.length_in ? <span className="font-normal text-pine/60"> · {c.length_in}"</span> : null}
+                      </p>
+                      <p className="text-[11px] text-pine/50 truncate">
+                        {new Date(c.caught_at).toLocaleDateString("en-CA", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                        {c.tournament_name ? ` · 🏆 ${c.tournament_name}` : ""}
+                        {c.personal_record === true ? " · 🔒 Personal" : ""}
+                      </p>
+                      {c.tournament_id == null && !isShared(c) && (
+                        <button
+                          type="button"
+                          onClick={() => shareCatch(c)}
+                          disabled={sharingId === c.id}
+                          className="mt-1 text-[11px] font-bold text-signal-dark disabled:opacity-40"
+                        >
+                          {sharingId === c.id ? "Sharing…" : "📤 Share to feed"}
+                        </button>
+                      )}
                     </div>
-                  )}
-                  <div className="p-2">
-                    <p className="text-xs font-bold text-pine truncate">{c.species}</p>
-                    <p className="text-[11px] text-pine/50">
-                      {c.length_in ? `${c.length_in}" · ` : ""}
-                      {new Date(c.caught_at).toLocaleDateString("en-CA", {
-                        month: "short",
-                        day: "numeric",
-                      })}
-                    </p>
-                    {c.tournament_name && (
-                      <p className="text-[10px] font-bold text-signal-dark uppercase tracking-wide truncate mt-0.5">
-                        🏆 {c.tournament_name}
-                      </p>
-                    )}
-                    {c.personal_record === true && (
-                      <p className="text-[10px] font-bold text-pine/60 uppercase tracking-wide truncate mt-0.5">
-                        🔒 Personal log
-                      </p>
-                    )}
-                    {c.tournament_id == null && !isShared(c) && (
-                      <button
-                        type="button"
-                        onClick={() => shareCatch(c)}
-                        disabled={sharingId === c.id}
-                        className="mt-1.5 w-full bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-[10px] px-3 py-1.5 rounded-full disabled:opacity-40 transition-colors"
+                    {/* Go to location */}
+                    {c.lat !== null && c.lat !== undefined && c.lng !== null && c.lng !== undefined ? (
+                      <Link
+                        href={`/fishmb/maps?lat=${c.lat}&lng=${c.lng}`}
+                        className="shrink-0 text-[11px] font-bold text-pine/60 hover:text-pine bg-pine/5 hover:bg-pine/10 rounded-full px-3 py-2 whitespace-nowrap"
                       >
-                        {sharingId === c.id ? "Sharing…" : "📤 Share to feed"}
-                      </button>
-                    )}
+                        📍 Map
+                      </Link>
+                    ) : null}
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+              {sorted.length > 3 && (
+                <button
+                  type="button"
+                  onClick={() => setCatchesExpanded((v) => !v)}
+                  className="mt-3 w-full text-sm font-bold text-pine/60 hover:text-pine bg-pine/5 hover:bg-pine/10 rounded-2xl py-2.5 transition-colors"
+                >
+                  {catchesExpanded ? "Show less" : `Show ${sorted.length - 3} more`}
+                </button>
+              )}
+            </>
           );
         })()}
       </div>

@@ -18,9 +18,12 @@ export async function GET(req: NextRequest) {
     caught_at: string;
     visibility: string;
     personal_record: boolean;
+    lat: number | null;
+    lng: number | null;
   }>(
     `SELECT id, species, length_in, photo_hold_url, photo_measure_url, caught_at,
-            visibility, COALESCE(personal_record, false) AS personal_record
+            visibility, COALESCE(personal_record, false) AS personal_record,
+            lat, lng
      FROM fm_catches WHERE user_id = $1 ORDER BY caught_at DESC LIMIT 100`,
     [me.id]
   );
