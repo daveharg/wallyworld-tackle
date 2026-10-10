@@ -125,8 +125,8 @@ function PressureGauge({ value }: { value: number }) {
         const lx = cx + 58 * Math.cos(rad(a)), ly = cy - 58 * Math.sin(rad(a));
         return (
           <g key={p}>
-            <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#ffffff" strokeOpacity="0.45" strokeWidth="1.5" />
-            <text x={lx} y={ly} textAnchor="middle" dominantBaseline="central" fontSize="8.5" fill="#ffffff" opacity="0.6">
+            <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#12322b" strokeOpacity="0.45" strokeWidth="1.5" />
+            <text x={lx} y={ly} textAnchor="middle" dominantBaseline="central" fontSize="8.5" fill="#12322b" opacity="0.6">
               {p}
             </text>
           </g>
@@ -140,17 +140,17 @@ function PressureGauge({ value }: { value: number }) {
         dominantBaseline="central"
         fontSize="7.5"
         fontWeight="800"
-        fill="#ffffff"
+        fill="#12322b"
       >
         IDEAL
       </text>
       {/* Needle */}
-      <line x1={cx} y1={cy} x2={cx + 64 * Math.cos(rad(angle))} y2={cy - 64 * Math.sin(rad(angle))} stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" />
-      <circle cx={cx} cy={cy} r="5" fill="#ffffff" />
-      <text x={cx} y={cy + 28} textAnchor="middle" fontSize="16" fontWeight="900" fill="#ffffff">
+      <line x1={cx} y1={cy} x2={cx + 64 * Math.cos(rad(angle))} y2={cy - 64 * Math.sin(rad(angle))} stroke="#12322b" strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx={cx} cy={cy} r="5" fill="#12322b" />
+      <text x={cx} y={cy + 28} textAnchor="middle" fontSize="16" fontWeight="900" fill="#12322b">
         {value.toFixed(1)}
       </text>
-      <text x={cx} y={cy + 41} textAnchor="middle" fontSize="8.5" fill="#ffffff" opacity="0.65">
+      <text x={cx} y={cy + 41} textAnchor="middle" fontSize="8.5" fill="#12322b" opacity="0.65">
         hPa
       </text>
     </svg>
@@ -178,11 +178,11 @@ function PressureHistory({ times, pressures, nowTime }: { times: string[]; press
   return (
     <svg viewBox={`0 0 ${W} ${H + 14}`} className="w-full mt-2">
       {ticks.map((i) => (
-        <line key={i} x1={x(i)} y1={PAD} x2={x(i)} y2={H - PAD} stroke="#ffffff" strokeOpacity="0.12" strokeWidth="1" />
+        <line key={i} x1={x(i)} y1={PAD} x2={x(i)} y2={H - PAD} stroke="#12322b" strokeOpacity="0.12" strokeWidth="1" />
       ))}
-      <path d={d} fill="none" stroke="#7dd3fc" strokeWidth="2" />
-      <line x1={nx} y1={PAD} x2={nx} y2={H - PAD} stroke="#ffffff" strokeOpacity="0.5" strokeWidth="1" strokeDasharray="3 2" />
-      <text x={W - 2} y={H + 11} textAnchor="end" fontSize="8" fill="#ffffff" opacity="0.45">7-day pressure history</text>
+      <path d={d} fill="none" stroke="#0284c7" strokeWidth="2" />
+      <line x1={nx} y1={PAD} x2={nx} y2={H - PAD} stroke="#12322b" strokeOpacity="0.5" strokeWidth="1" strokeDasharray="3 2" />
+      <text x={W - 2} y={H + 11} textAnchor="end" fontSize="8" fill="#12322b" opacity="0.45">7-day pressure history</text>
     </svg>
   );
 }
@@ -516,33 +516,33 @@ export default function WeatherPage() {
   }, [coords]);
 
   return (
-    <div className="min-h-screen bg-[#0b1a15] text-white pb-32">
+    <div className="min-h-screen bg-white text-pine pb-32">
       {/* Hero */}
       <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#123a2e] via-[#0e2a22] to-[#0b1a15]" />
-        <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-emerald-400/10 blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-b from-sky-100/60 via-white to-white" />
+        <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-sky-200/40 blur-3xl" />
         <div className="relative max-w-2xl mx-auto px-5 pt-6">
           <div className="flex items-center justify-between">
             <button onClick={() => setPickerOpen(true)} className="text-left group">
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-200/60">FishMB Weather</p>
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-pine/50">FishMB Weather</p>
               <h1 className="text-lg font-black">
- {coords.label} <span className="text-white/40 text-sm group-active:text-white/70">▾</span>
+ {coords.label} <span className="text-pine/40 text-sm group-active:text-pine/60">▾</span>
               </h1>
             </button>
           </div>
 
-          {err && <p className="mt-6 text-sm text-red-300">{err}</p>}
+          {err && <p className="mt-6 text-sm text-red-600">{err}</p>}
 
           {derived ? (
             <>
               <div className="mt-4 flex items-end justify-between">
                 <div>
                   <div className="text-7xl font-black tracking-tight">{Math.round(derived.c.temperature_2m)}°</div>
-                  <p className="mt-1 text-emerald-100/80 text-sm">
+                  <p className="mt-1 text-pine/60 text-sm">
                     {derived.wmo.icon} {derived.wmo.label} · Feels {Math.round(derived.c.apparent_temperature)}°
                   </p>
                 </div>
-                <div className="text-right text-xs text-emerald-100/70 space-y-1">
+                <div className="text-right text-xs text-pine/60 space-y-1">
                   <p>H {data && derived ? Math.round(data.daily.temperature_2m_max[derived.todayIdx] ?? 0) : "—"}°</p>
                   <p>L {data && derived ? Math.round(data.daily.temperature_2m_min[derived.todayIdx] ?? 0) : "—"}°</p>
                   <p>{derived.c.relative_humidity_2m}%</p>
@@ -550,49 +550,49 @@ export default function WeatherPage() {
               </div>
 
               {/* Fish activity banner */}
-              <div className="mt-5 rounded-3xl bg-white/[0.07] border border-white/10 p-4">
+              <div className="mt-5 rounded-3xl bg-pine/[0.04] border border-pine/10 p-4">
                 <div className="flex items-center gap-3">
                   <span className="w-3 h-3 rounded-full shrink-0" style={{ background: derived.outlook.color }} />
                   <div>
                     <p className="text-sm font-black">
                       Fish activity: <span style={{ color: derived.outlook.color }}>{derived.outlook.label}</span>
                     </p>
-                    <p className="text-xs text-white/60 mt-0.5">{derived.outlook.note}</p>
+                    <p className="text-xs text-pine/60 mt-0.5">{derived.outlook.note}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2.5 mt-3">
-                  <div className="rounded-2xl bg-white/[0.05] border border-white/10 px-3 py-2.5">
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-white/45">
+                  <div className="rounded-2xl bg-pine/[0.04] border border-pine/10 px-3 py-2.5">
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-pine/45">
                       Rest of today
                     </p>
                     <p className="text-sm font-extrabold mt-0.5" style={{ color: derived.forecast.restOfDay.color }}>
                       {derived.forecast.restOfDay.label}
                     </p>
-                    <p className="text-[11px] text-white/55 mt-0.5 leading-snug">
+                    <p className="text-[11px] text-pine/55 mt-0.5 leading-snug">
                       {derived.forecast.restOfDay.note}
                     </p>
                   </div>
-                  <div className="rounded-2xl bg-white/[0.05] border border-white/10 px-3 py-2.5">
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-white/45">
+                  <div className="rounded-2xl bg-pine/[0.04] border border-pine/10 px-3 py-2.5">
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-pine/45">
                       Tomorrow
                     </p>
                     <p className="text-sm font-extrabold mt-0.5" style={{ color: derived.forecast.tomorrow.color }}>
                       {derived.forecast.tomorrow.label}
                     </p>
-                    <p className="text-[11px] text-white/55 mt-0.5 leading-snug">
+                    <p className="text-[11px] text-pine/55 mt-0.5 leading-snug">
                       {derived.forecast.tomorrow.note}
                     </p>
                   </div>
                 </div>
                 {derived.forecast.bestTimes.length > 0 && (
-                  <div className="mt-2.5 rounded-2xl bg-white/[0.05] border border-white/10 px-3 py-2.5">
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-white/45">
+                  <div className="mt-2.5 rounded-2xl bg-pine/[0.04] border border-pine/10 px-3 py-2.5">
+                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-pine/45">
                       Best times to fish
                     </p>
-                    <p className="text-sm font-bold text-white mt-1">
+                    <p className="text-sm font-bold text-pine mt-1">
                       {derived.forecast.bestTimes.map((w, i) => (
                         <span key={i}>
-                          {i > 0 && <span className="text-white/40 font-normal"> · </span>}
+                          {i > 0 && <span className="text-pine/40 font-normal"> · </span>}
                           {w.start}–{w.end}
                         </span>
                       ))}
@@ -602,7 +602,7 @@ export default function WeatherPage() {
               </div>
             </>
           ) : (
-            !err && <div className="mt-8 h-40 rounded-3xl bg-white/5 animate-pulse" />
+            !err && <div className="mt-8 h-40 rounded-3xl bg-pine/5 animate-pulse" />
           )}
         </div>
       </div>
@@ -611,19 +611,19 @@ export default function WeatherPage() {
         <div className="max-w-2xl mx-auto px-5 space-y-4 mt-5">
           {/* Fishing-conditions cards */}
           <div className="grid grid-cols-2 gap-3">
-            <button onClick={() => setExplainer("pressure")} className="text-left rounded-3xl bg-white/[0.07] border border-white/10 p-4 active:scale-[0.98] transition">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white/50">Pressure</p>
+            <button onClick={() => setExplainer("pressure")} className="text-left rounded-3xl bg-pine/[0.04] border border-pine/10 p-4 active:scale-[0.98] transition">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-pine/50">Pressure</p>
               <div className="mt-1 -mb-1"><PressureGauge value={derived.c.pressure_msl} /></div>
-              <p className="text-[11px] text-white/60">
+              <p className="text-[11px] text-pine/60">
                 {derived.trend <= -0.5 ? "↘ falling" : derived.trend >= 0.5 ? "↗ rising" : "→ steady"} · {Math.abs(derived.trend).toFixed(1)} hPa/3h
               </p>
-              <p className="text-[10px] text-emerald-200/50 mt-1 underline underline-offset-2">How to read it for fishing</p>
+              <p className="text-[10px] text-pine/50 mt-1 underline underline-offset-2">How to read it for fishing</p>
             </button>
 
-            <button onClick={() => setExplainer("wind")} className="text-left rounded-3xl bg-white/[0.07] border border-white/10 p-4 active:scale-[0.98] transition">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white/50">Wind</p>
+            <button onClick={() => setExplainer("wind")} className="text-left rounded-3xl bg-pine/[0.04] border border-pine/10 p-4 active:scale-[0.98] transition">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-pine/50">Wind</p>
               <div className="flex items-center gap-3 mt-2">
-                <div className="relative w-14 h-14 rounded-full border border-white/20 shrink-0">
+                <div className="relative w-14 h-14 rounded-full border border-pine/20 shrink-0">
                   <span
                     className="absolute inset-0 flex items-start justify-center text-lg"
                     style={{ transform: `rotate(${derived.c.wind_direction_10m}deg)` }}
@@ -632,62 +632,62 @@ export default function WeatherPage() {
                   <span className="absolute inset-0 flex items-center justify-center text-[10px] font-black">{compass(derived.c.wind_direction_10m)}</span>
                 </div>
                 <div>
-                  <p className="text-2xl font-black">{Math.round(derived.c.wind_speed_10m)}<span className="text-xs font-bold text-white/50"> km/h</span></p>
-                  <p className="text-[11px] text-white/60">Gusts {Math.round(derived.c.wind_gusts_10m)} km/h</p>
+                  <p className="text-2xl font-black">{Math.round(derived.c.wind_speed_10m)}<span className="text-xs font-bold text-pine/50"> km/h</span></p>
+                  <p className="text-[11px] text-pine/60">Gusts {Math.round(derived.c.wind_gusts_10m)} km/h</p>
                 </div>
               </div>
-              <p className="text-[10px] text-emerald-200/50 mt-2 underline underline-offset-2">How to read it for fishing</p>
+              <p className="text-[10px] text-pine/50 mt-2 underline underline-offset-2">How to read it for fishing</p>
             </button>
 
-            <button onClick={() => setExplainer("cloud")} className="text-left rounded-3xl bg-white/[0.07] border border-white/10 p-4 active:scale-[0.98] transition">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white/50">Cloud cover</p>
-              <p className="text-3xl font-black mt-2">{derived.c.cloud_cover}<span className="text-sm font-bold text-white/50">%</span></p>
-              <p className="text-[11px] text-white/60 mt-1">
+            <button onClick={() => setExplainer("cloud")} className="text-left rounded-3xl bg-pine/[0.04] border border-pine/10 p-4 active:scale-[0.98] transition">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-pine/50">Cloud cover</p>
+              <p className="text-3xl font-black mt-2">{derived.c.cloud_cover}<span className="text-sm font-bold text-pine/50">%</span></p>
+              <p className="text-[11px] text-pine/60 mt-1">
                 {derived.c.cloud_cover >= 70 ? "Overcast — prime low light" : derived.c.cloud_cover >= 30 ? "Partly cloudy — watch the sun breaks" : "Clear — fish shade and depth"}
               </p>
-              <p className="text-[10px] text-emerald-200/50 mt-1 underline underline-offset-2">How to read it for fishing</p>
+              <p className="text-[10px] text-pine/50 mt-1 underline underline-offset-2">How to read it for fishing</p>
             </button>
 
-            <button onClick={() => setExplainer("moon")} className="text-left rounded-3xl bg-white/[0.07] border border-white/10 p-4 active:scale-[0.98] transition">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white/50">Moon</p>
+            <button onClick={() => setExplainer("moon")} className="text-left rounded-3xl bg-pine/[0.04] border border-pine/10 p-4 active:scale-[0.98] transition">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-pine/50">Moon</p>
               <div className="flex items-center gap-3 mt-2">
                 <p className="text-4xl">{moon.icon}</p>
                 <div>
                   <p className="text-sm font-black">{moon.name}</p>
-                  <p className="text-[11px] text-white/60">{moon.illum}% lit</p>
+                  <p className="text-[11px] text-pine/60">{moon.illum}% lit</p>
                 </div>
               </div>
-              <p className="text-[11px] text-white/60 mt-1">
+              <p className="text-[11px] text-pine/60 mt-1">
                 {moon.idx === 4 ? "Full moon — strongest solunar feed windows" : moon.idx === 0 ? "New moon — often the best daytime bite" : "Feed windows peak near full & new moons"}
               </p>
-              <p className="text-[10px] text-emerald-200/50 mt-1 underline underline-offset-2">How to read it for fishing</p>
+              <p className="text-[10px] text-pine/50 mt-1 underline underline-offset-2">How to read it for fishing</p>
             </button>
 
-            <button onClick={() => setExplainer("front")} className="text-left rounded-3xl bg-white/[0.07] border border-white/10 p-4 active:scale-[0.98] transition col-span-2">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white/50">Storm front</p>
+            <button onClick={() => setExplainer("front")} className="text-left rounded-3xl bg-pine/[0.04] border border-pine/10 p-4 active:scale-[0.98] transition col-span-2">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-pine/50">Storm front</p>
               <div className="flex items-center gap-3 mt-2">
                 <p className="text-3xl">{derived.front.icon}</p>
                 <div>
                   <p className="text-sm font-black" style={{ color: derived.front.color }}>{derived.front.label}</p>
-                  <p className="text-[11px] text-white/60">3h trend {derived.trend >= 0 ? "+" : ""}{derived.trend.toFixed(1)} hPa</p>
+                  <p className="text-[11px] text-pine/60">3h trend {derived.trend >= 0 ? "+" : ""}{derived.trend.toFixed(1)} hPa</p>
                 </div>
               </div>
               {derived.frontAgoH !== null && (
-                <p className="text-[11px] text-white/70 mt-1">
+                <p className="text-[11px] text-pine/60 mt-1">
  Cold front came through ~{derived.frontAgoH < 24 ? `${Math.round(derived.frontAgoH)}h` : `${Math.round(derived.frontAgoH / 24)}d`} ago
                   ({derived.frontDrop.toFixed(0)} hPa drop). Bite can stay off for days after — fish slow and deep.
                 </p>
               )}
               {data && <PressureHistory times={data.hourly.time} pressures={data.hourly.pressure_msl} nowTime={data.current.time} />}
-              <p className="text-[10px] text-emerald-200/50 mt-1 underline underline-offset-2">How to read it for fishing</p>
+              <p className="text-[10px] text-pine/50 mt-1 underline underline-offset-2">How to read it for fishing</p>
             </button>
           </div>
 
           {/* Live wind map */}
-          <section className="rounded-3xl overflow-hidden border border-white/10 bg-white/[0.05]">
+          <section className="rounded-3xl overflow-hidden border border-pine/10 bg-pine/[0.04]">
             <div className="flex items-center justify-between px-4 pt-3 pb-2">
               <h2 className="text-sm font-black">Live wind map</h2>
-              <span className="text-[10px] text-white/40">windy.com</span>
+              <span className="text-[10px] text-pine/40">windy.com</span>
             </div>
             <button
               onClick={() => setWindFull(true)}
@@ -704,13 +704,13 @@ export default function WeatherPage() {
  Full screen
               </span>
             </button>
-            <p className="px-4 py-2.5 text-[11px] text-white/50">
+            <p className="px-4 py-2.5 text-[11px] text-pine/50">
               Live wind over your waters. Tap the map for full screen — zoom in to your lake, fish the windy side of structure where bait stacks up.
             </p>
           </section>
 
           {/* Hourly */}
-          <section className="rounded-3xl bg-white/[0.05] border border-white/10 p-4">
+          <section className="rounded-3xl bg-pine/[0.04] border border-pine/10 p-4">
             <h2 className="text-sm font-black mb-3">Next 24 hours</h2>
             <div className="flex gap-4 overflow-x-auto pb-1 -mx-1 px-1">
               {data.hourly.time.slice(derived.nowHourIdx, derived.nowHourIdx + 24).map((t, i) => {
@@ -718,10 +718,10 @@ export default function WeatherPage() {
                 const gi = derived.nowHourIdx + i;
                 return (
                   <div key={t} className="flex flex-col items-center gap-1 min-w-12 text-center">
-                    <span className="text-[10px] text-white/50 font-bold">{i === 0 ? "Now" : `${hr}:00`}</span>
+                    <span className="text-[10px] text-pine/50 font-bold">{i === 0 ? "Now" : `${hr}:00`}</span>
                     <span className="text-lg">{wmo(data.hourly.weather_code[gi] ?? 0).icon}</span>
                     <span className="text-xs font-black">{Math.round(data.hourly.temperature_2m[gi])}°</span>
-                    <span className="text-[10px] text-sky-300/80">{Math.round(data.hourly.precipitation_probability[gi] ?? 0)}%</span>
+                    <span className="text-[10px] text-sky-600">{Math.round(data.hourly.precipitation_probability[gi] ?? 0)}%</span>
                   </div>
                 );
               })}
@@ -729,7 +729,7 @@ export default function WeatherPage() {
           </section>
 
           {/* 7-day */}
-          <section className="rounded-3xl bg-white/[0.05] border border-white/10 p-4">
+          <section className="rounded-3xl bg-pine/[0.04] border border-pine/10 p-4">
             <h2 className="text-sm font-black mb-2">7-day</h2>
             {data.daily.time.slice(derived.todayIdx, derived.todayIdx + 7).map((t, i) => {
               const gi = derived.todayIdx + i;
@@ -737,18 +737,18 @@ export default function WeatherPage() {
               const day = i === 0 ? "Today" : d.toLocaleDateString("en-CA", { weekday: "short" });
               const w = wmo(data.daily.weather_code[gi]);
               return (
-                <div key={t} className="flex items-center gap-3 py-2.5 border-b border-white/5 last:border-0">
-                  <span className="w-16 text-xs font-bold text-white/70">{day}</span>
+                <div key={t} className="flex items-center gap-3 py-2.5 border-b border-pine/5 last:border-0">
+                  <span className="w-16 text-xs font-bold text-pine/60">{day}</span>
                   <span className="text-lg">{w.icon}</span>
-                  <span className="flex-1 text-[11px] text-white/50">{w.label}</span>
-                  <span className="text-xs text-white/50">{Math.round(data.daily.temperature_2m_min[gi])}°</span>
+                  <span className="flex-1 text-[11px] text-pine/50">{w.label}</span>
+                  <span className="text-xs text-pine/50">{Math.round(data.daily.temperature_2m_min[gi])}°</span>
                   <span className="text-xs font-black w-10 text-right">{Math.round(data.daily.temperature_2m_max[gi])}°</span>
                 </div>
               );
             })}
           </section>
 
-          <p className="text-[10px] text-white/30 text-center pb-2">
+          <p className="text-[10px] text-pine/30 text-center pb-2">
             Weather by Open-Meteo · Wind map by Windy · Always check conditions before heading out
           </p>
         </div>
@@ -767,20 +767,20 @@ export default function WeatherPage() {
       {explainer && EXPLAINERS[explainer] && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4" role="dialog" aria-modal="true">
           <div className="absolute inset-0 bg-black/60" onClick={() => setExplainer(null)} />
-          <div className="relative w-full max-w-md bg-[#10231c] border border-white/10 rounded-3xl p-6 max-h-[80vh] overflow-y-auto">
+          <div className="relative w-full max-w-md bg-white border border-pine/10 rounded-3xl p-6 max-h-[80vh] overflow-y-auto">
             <div className="flex items-start justify-between gap-3">
               <h3 className="text-lg font-black">{EXPLAINERS[explainer].title}</h3>
               <button
                 onClick={() => setExplainer(null)}
                 aria-label="Close"
-                className="w-9 h-9 shrink-0 rounded-full bg-white/10 flex items-center justify-center text-lg"
+                className="w-9 h-9 shrink-0 rounded-full bg-pine/5 flex items-center justify-center text-lg text-pine"
               >
  
               </button>
             </div>
             <div className="mt-3 space-y-3">
               {EXPLAINERS[explainer].body.map((p, i) => (
-                <p key={i} className="text-sm text-white/75 leading-relaxed">{p}</p>
+                <p key={i} className="text-sm text-pine/75 leading-relaxed">{p}</p>
               ))}
             </div>
           </div>

@@ -162,18 +162,18 @@ export default function LocationPicker({
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" role="dialog" aria-modal="true" aria-label="Choose weather location">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative w-full sm:max-w-md bg-[#10231c] border border-white/10 rounded-t-3xl sm:rounded-3xl p-5 max-h-[85vh] overflow-y-auto">
+      <div className="relative w-full sm:max-w-md bg-white border border-pine/10 rounded-t-3xl sm:rounded-3xl p-5 max-h-[85vh] overflow-y-auto">
         <div className="flex items-start justify-between gap-3">
           <div>
             <h3 className="text-lg font-black">Weather location</h3>
-            <p className="text-xs text-white/55 mt-1">
-              Showing weather for: <span className="font-bold text-emerald-200">{current.name}</span>
+            <p className="text-xs text-pine/55 mt-1">
+              Showing weather for: <span className="font-bold text-pine">{current.name}</span>
             </p>
           </div>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="w-9 h-9 shrink-0 rounded-full bg-white/10 flex items-center justify-center text-lg"
+            className="w-9 h-9 shrink-0 rounded-full bg-pine/5 flex items-center justify-center text-lg"
           >
  
           </button>
@@ -183,28 +183,28 @@ export default function LocationPicker({
           <>
             <div className="mt-4 space-y-2">
               {saved.length === 0 && (
-                <p className="text-sm text-white/50">No saved spots yet — add your places below.</p>
+                <p className="text-sm text-pine/50">No saved spots yet — add your places below.</p>
               )}
               {saved.map((l) => (
                 <div
                   key={l.name}
                   className={`flex items-center gap-2 rounded-2xl border px-4 py-3 ${
                     l.name === current.name
-                      ? "border-emerald-300/60 bg-emerald-300/10"
-                      : "border-white/10 bg-white/[0.05]"
+                      ? "border-pine/40 bg-pine/5"
+                      : "border-pine/10 bg-pine/[0.04]"
                   }`}
                 >
                   <button onClick={() => choose(l)} className="flex-1 text-left">
                     <span className="text-sm font-bold block">{l.name}</span>
-                    <span className="text-[11px] text-white/45">
+                    <span className="text-[11px] text-pine/45">
                       {l.lat.toFixed(2)}, {l.lon.toFixed(2)}
                     </span>
                   </button>
-                  {l.name === current.name && <span className="text-emerald-300 text-sm"></span>}
+                  {l.name === current.name && <span className="text-pine text-sm"></span>}
                   <button
                     onClick={() => remove(l.name)}
                     aria-label={`Remove ${l.name}`}
-                    className="w-8 h-8 rounded-full bg-white/10 text-white/60 text-sm"
+                    className="w-8 h-8 rounded-full bg-pine/5 text-pine/60 text-sm"
                   >
  
                   </button>
@@ -215,13 +215,13 @@ export default function LocationPicker({
               <button
                 onClick={useGps}
                 disabled={locating}
-                className="rounded-2xl bg-white/10 border border-white/10 px-4 py-3 text-sm font-bold disabled:opacity-50"
+                className="rounded-2xl bg-pine/5 border border-pine/10 px-4 py-3 text-sm font-bold disabled:opacity-50"
               >
  {locating ? "Locating…" : " Use my GPS"}
               </button>
               <button
                 onClick={() => setMode("add")}
-                className="rounded-2xl bg-emerald-400/90 text-[#0b1a15] px-4 py-3 text-sm font-black"
+                className="rounded-2xl bg-pine text-white px-4 py-3 text-sm font-black"
               >
                 ＋ Add a location
               </button>
@@ -231,7 +231,7 @@ export default function LocationPicker({
           <>
             <button
               onClick={() => setMode("list")}
-              className="mt-3 text-xs font-bold text-emerald-200/70"
+              className="mt-3 text-xs font-bold text-pine/70"
             >
               ← Back to saved spots
             </button>
@@ -240,23 +240,23 @@ export default function LocationPicker({
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search lakes & towns…"
-              className="mt-2 w-full bg-white/10 border border-white/15 rounded-2xl px-4 py-3 text-sm placeholder:text-white/35 focus:outline-none focus:border-emerald-300/60"
+              className="mt-2 w-full bg-pine/5 border border-pine/15 rounded-2xl px-4 py-3 text-sm placeholder:text-pine/35 focus:outline-none focus:border-pine/40"
             />
             <div className="mt-2 space-y-1.5">
               {results.map((l) => (
                 <button
                   key={`${l.kind}-${l.name}`}
                   onClick={() => choose(l)}
-                  className="w-full text-left rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-2.5 hover:bg-white/10 flex items-center justify-between gap-2"
+                  className="w-full text-left rounded-2xl border border-pine/10 bg-pine/[0.04] px-4 py-2.5 hover:bg-pine/5 flex items-center justify-between gap-2"
                 >
                   <span className="text-sm font-bold">{l.name}</span>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/40 shrink-0">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-pine/40 shrink-0">
  {l.kind === "town" ? " Town" : " Lake"}
                   </span>
                 </button>
               ))}
               {q.trim().length >= 2 && results.length === 0 && (
-                <p className="text-sm text-white/50 px-1">No places match “{q.trim()}”.</p>
+                <p className="text-sm text-pine/50 px-1">No places match “{q.trim()}”.</p>
               )}
             </div>
           </>
