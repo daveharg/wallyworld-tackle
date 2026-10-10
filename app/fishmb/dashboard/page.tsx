@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useFishAuth } from "../_components/FishAuth";
 import DashboardStats from "./_components/DashboardStats";
-import DashboardSettings from "./_components/DashboardSettings";
+import DashboardProfile from "./_components/DashboardProfile";
 import DashboardLicence from "./_components/DashboardLicence";
 import DashboardTournaments from "./_components/DashboardTournaments";
 
@@ -15,7 +15,7 @@ const TABS = [
  { id: "stats", label: "Stats", icon: "" },
  { id: "tournaments", label: "Tournaments", icon: "" },
  { id: "licence", label: "Licence", icon: "" },
- { id: "settings", label: "Settings", icon: "" },
+ { id: "profile", label: "Profile", icon: "" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -25,7 +25,7 @@ export default function DashboardPage() {
   const searchParams = useSearchParams();
   const initialTab = ((): TabId => {
     const t = searchParams.get("tab");
-    return t === "tournaments" || t === "licence" || t === "settings" ? t : "stats";
+    return t === "tournaments" || t === "licence" || t === "profile" ? t : "stats";
   })();
   const [tab, setTab] = useState<TabId>(initialTab);
 
@@ -112,7 +112,7 @@ export default function DashboardPage() {
       {tab === "stats" && <DashboardStats />}
       {tab === "tournaments" && <DashboardTournaments />}
       {tab === "licence" && <DashboardLicence />}
-      {tab === "settings" && <DashboardSettings />}
+      {tab === "profile" && <DashboardProfile />}
     </div>
   );
 }
