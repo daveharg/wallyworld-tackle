@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type TouchEvent } from "react";
+import { useEffect, useRef, useState, type TouchEvent } from "react";
 import type { SheetTab } from "./types";
 
 export type { SheetTab };
@@ -134,6 +134,14 @@ export default function MapSheet({
     dragTarget.current = null;
     fromHeader.current = false;
   };
+
+  // When the sheet settles back to collapsed, scroll content to the top
+  // so it always reopens showing the tabs — never mid-scroll.
+  useEffect(() => {
+    if (snap === "collapsed" || snap === "mini") {
+      scrollRef.current?.scrollTo({ top: 0 });
+    }
+  }, [snap]);
 
   // Tapping a tab only switches the tab — the sheet itself only moves
   // when the user slides/drags it.
