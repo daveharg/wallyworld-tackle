@@ -68,7 +68,8 @@ export default function FishingStats({ userId, hideTitle }: { userId: string; hi
 
   const tiles: [string, number, string][] = [
     ["Catches", stats.total_catches, "catches"],
-    ["Tournament catches", stats.tournament_catches, "tournament-catches"],
+    ["✓ Verified", stats.tournament_catches, "tournament-catches"],
+    ["Non-verified", stats.total_catches - stats.tournament_catches, "catches-nonverified"],
     ["Species", stats.species_count, "species"],
     ["Tournaments", stats.tournaments_joined, "tournaments"],
     ["Wins", stats.tournament_wins, "wins"],
