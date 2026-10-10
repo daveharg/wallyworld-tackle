@@ -50,7 +50,6 @@ const BACKGROUNDS = [
 export default function StoryCreator({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [multi, setMulti] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [posting, setPosting] = useState(false);
   const [note, setNote] = useState<string | null>(null);
@@ -227,10 +226,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
     setSelected((s) => {
       const next = new Set(s);
       if (next.has(id)) next.delete(id);
-      else {
-        if (!multi) next.clear();
-        next.add(id);
-      }
+      else next.add(id);
       return next;
     });
   };
@@ -329,46 +325,22 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
           {/* Camera roll bar */}
           <div className="flex items-center justify-between px-4 py-3">
             <span className="font-bold text-pine/60">Camera roll ▾</span>
-            <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  const input = document.createElement("input");
-                  input.type = "file";
-                  input.accept = "video/*";
-                  input.onchange = () => {
-                    const f = input.files?.[0];
-                    if (f) void uploadDraft(f);
-                  };
-                  input.click();
-                }}
-                disabled={uploading}
-                className="px-4 py-2 rounded-full text-sm font-bold bg-pine/10 text-pine disabled:opacity-50"
-              >
-                ＋ Video
-              </button>
-              <button
-                onClick={() => {
-                  const input = document.createElement("input");
-                  input.type = "file";
-                  input.accept = "image/*";
-                  input.onchange = () => {
-                    const f = input.files?.[0];
-                    if (f) void uploadDraft(f);
-                  };
-                  input.click();
-                }}
-                disabled={uploading}
-                className="px-4 py-2 rounded-full text-sm font-bold bg-pine/10 text-pine disabled:opacity-50"
-              >
-                ＋ Photo
-              </button>
-              <button
-                onClick={() => setMulti((m) => !m)}
-                className={`px-4 py-2 rounded-full text-sm font-bold ${multi ? "bg-pine text-white" : "bg-pine/10 text-pine"}`}
-              >
-                Select multiple
-              </button>
-            </div>
+            <button
+              onClick={() => {
+                const input = document.createElement("input");
+                input.type = "file";
+                input.accept = "image/*,video/*";
+                input.onchange = () => {
+                  const f = input.files?.[0];
+                  if (f) void uploadDraft(f);
+                };
+                input.click();
+              }}
+              disabled={uploading}
+              className="px-4 py-2 rounded-full text-sm font-bold bg-pine/10 text-pine disabled:opacity-50"
+            >
+              ＋ Add
+            </button>
           </div>
 
           {note && <p className="px-4 py-2 text-sm text-amber-700 bg-amber-50">{note}</p>}
