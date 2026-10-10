@@ -17,9 +17,19 @@ export default async function TournamentsPage() {
       <p className="text-signal font-bold uppercase tracking-[0.28em] text-sm mb-3">
         Compete
       </p>
-      <h1 className="font-display font-bold uppercase text-pine text-4xl md:text-5xl tracking-wide mb-4">
-        Fishing tournaments
-      </h1>
+      <div className="flex items-center gap-3 mb-4">
+        <h1 className="font-display font-bold uppercase text-pine text-4xl md:text-5xl tracking-wide">
+          Fishing tournaments
+        </h1>
+        <Link
+          href="/fishmb/tournaments/how-it-works"
+          aria-label="How tournaments work"
+          title="How tournaments work"
+          className="w-9 h-9 shrink-0 rounded-full bg-pine/10 hover:bg-pine/20 flex items-center justify-center text-pine font-black text-lg transition-colors"
+        >
+          ?
+        </Link>
+      </div>
       <p className="text-pine/65 max-w-2xl mb-6">
         Run your own catch-photo tournament with real anti-cheat — phone-timestamped
         catches, GPS stamps, tournament-waters checks, duplicate-photo detection and
@@ -43,7 +53,7 @@ export default async function TournamentsPage() {
       </div>
 
       {tournaments.length === 0 ? (
-        <div className="bg-white border border-pine/10 rounded-3xl p-10 text-center">
+        <div className="bg-white border border-pine/10 rounded-2xl p-10 text-center">
           <p className="text-pine/60 text-lg mb-2">No tournaments yet.</p>
           <p className="text-pine/50 text-sm">
             Be the first — set one up for your lake, club or crew in a couple
@@ -51,32 +61,20 @@ export default async function TournamentsPage() {
           </p>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="space-y-2">
           {tournaments.map((t) => (
             <Link
               key={t.id}
               href={`/fishmb/tournaments/${t.id}`}
-              className="bg-white border border-pine/10 rounded-3xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all"
+              className="flex items-center gap-3 bg-white border border-pine/10 rounded-2xl px-4 py-3.5 hover:border-signal/40 transition-colors"
             >
-              <p className="text-signal font-bold uppercase tracking-[0.2em] text-xs mb-2">
-                {t.status}
-              </p>
-              <h2 className="font-display font-bold text-pine text-2xl uppercase tracking-wide mb-1">
-                {t.name}
-              </h2>
-              <p className="text-pine/55 text-sm mb-3">
-                by {t.organizer_name} · {t.participant_count} anglers ·{" "}
-                {t.entry_count} fish
-              </p>
-              <p className="text-pine/70 text-sm line-clamp-2 mb-3">
-                {t.description || "No description yet."}
-              </p>
-              {t.lake_ids.length > 0 && (
-                <p className="text-pine/50 text-xs">
-                  {t.lake_ids.slice(0, 3).map((id) => lakeNames.get(id) || id).join(" · ")}
-                  {t.lake_ids.length > 3 ? ` +${t.lake_ids.length - 3} more` : ""}
-                </p>
-              )}
+              <span className="min-w-0 flex-1">
+                <span className="block font-bold text-pine truncate">{t.name}</span>
+                <span className="block text-xs text-pine/50 mt-0.5">
+                  {t.participant_count} anglers · {t.entry_count} fish
+                </span>
+              </span>
+              <span className="text-pine/25 text-xl leading-none shrink-0">›</span>
             </Link>
           ))}
         </div>
@@ -100,20 +98,15 @@ export default async function TournamentsPage() {
                 href={t.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-paper-deep border border-pine/10 rounded-3xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all"
+                className="flex items-center gap-3 bg-white border border-pine/10 rounded-2xl px-4 py-3.5 hover:border-signal/40 transition-colors"
               >
-                <p className="text-signal font-bold uppercase tracking-[0.2em] text-xs mb-2">
-                  {t.dates}
-                </p>
-                <h3 className="font-display font-bold text-pine text-2xl uppercase tracking-wide mb-1">
-                  {t.name}
-                </h3>
-                <p className="text-pine/55 text-sm mb-3 font-bold">{t.location}</p>
-                <p className="text-pine/70 text-sm line-clamp-3 mb-3">{t.description}</p>
-                {t.entry && <p className="text-pine/55 text-sm">Entry: {t.entry}</p>}
-                <span className="text-signal-dark text-sm font-bold uppercase tracking-wider mt-3 inline-block">
-                  Details →
+                <span className="min-w-0 flex-1">
+                  <span className="block font-bold text-pine truncate">{t.name}</span>
+                  <span className="block text-xs text-pine/50 mt-0.5">
+                    {t.dates} · {t.location}
+                  </span>
                 </span>
+                <span className="text-pine/25 text-xl leading-none shrink-0">›</span>
               </a>
             ))}
           </div>

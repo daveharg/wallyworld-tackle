@@ -94,39 +94,31 @@ export default function HowTournamentsWorkPage() {
       <h1 className="font-display font-bold uppercase text-pine text-4xl md:text-5xl tracking-wide mb-4">
         How tournaments work
       </h1>
-      <p className="text-pine/65 mb-6 max-w-2xl">
-        Run your own catch-photo tournament with real anti-cheat — or join one.
-        No entry caps, no platform cut, and FishMB never touches the money.
+      <p className="text-pine/65 mb-10 max-w-2xl">
+        Real anti-cheat on every catch — phone-timestamped photos, GPS stamps,
+        tournament-waters checks, duplicate-photo detection and organizer
+        review. No entry caps, no platform cut, and FishMB never touches the
+        money.
       </p>
 
-      <div className="bg-signal/10 border border-signal/40 rounded-3xl p-6 mb-10 max-w-2xl">
-        <p className="font-bold text-pine uppercase tracking-wider text-xs mb-1.5">
- Know the law
-        </p>
-        <p className="text-pine/70 text-sm leading-relaxed">
-          In Manitoba, fishing tournaments with{" "}
-          <strong>more than 25 participants</strong> need a provincial
-          tournament licence.{" "}
-          <a
-            href="https://www.manitobaelicensing.ca"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-signal-dark font-bold underline"
+      <h2 className="font-display font-bold uppercase text-pine text-2xl tracking-wide mb-6">
+        Anti-cheat, built in
+      </h2>
+      <div className="grid md:grid-cols-2 gap-4 mb-14">
+        {cheat.map((c) => (
+          <div
+            key={c.title}
+            className="bg-pine/[0.04] border border-pine/10 rounded-2xl p-6"
           >
-            Get a licence at manitobaelicensing.ca
-          </a>
-          .
-        </p>
-        <p className="text-pine/55 text-xs mt-2">
-          FishMB is a listings and leaderboard tool only — organizers are
-          responsible for running a legal event. We are not responsible if you
-          break the law.
-        </p>
+            <h3 className="font-bold text-pine mb-1.5">{c.title}</h3>
+            <p className="text-pine/65 text-sm leading-relaxed">{c.body}</p>
+          </div>
+        ))}
       </div>
 
-      <div className="bg-gold/10 border border-gold/30 rounded-3xl p-6 mb-10 max-w-2xl">
+      <div className="bg-gold/10 border border-gold/30 rounded-2xl p-6 mb-14 max-w-2xl">
         <p className="font-display font-bold uppercase text-pine tracking-wide mb-3">
- Example: a June friends challenge
+          Example: a June friends challenge
         </p>
         <p className="text-pine/70 text-sm leading-relaxed">
           Say you and five friends want to compete all through June for the
@@ -146,30 +138,15 @@ export default function HowTournamentsWorkPage() {
       </div>
 
       <h2 className="font-display font-bold uppercase text-pine text-2xl tracking-wide mb-6">
-        Anti-cheat, built in
-      </h2>
-      <div className="grid md:grid-cols-2 gap-4 mb-14">
-        {cheat.map((c) => (
-          <div
-            key={c.title}
-            className="bg-pine/[0.04] border border-pine/10 rounded-3xl p-6"
-          >
-            <h3 className="font-bold text-pine mb-1.5">{c.title}</h3>
-            <p className="text-pine/65 text-sm leading-relaxed">{c.body}</p>
-          </div>
-        ))}
-      </div>
-
-      <h2 className="font-display font-bold uppercase text-pine text-2xl tracking-wide mb-6">
         Running a tournament
       </h2>
       <div className="space-y-4 mb-14">
         {steps.map((s) => (
           <div
             key={s.n}
-            className="bg-white border border-pine/10 rounded-3xl p-6 flex gap-5"
+            className="bg-white border border-pine/10 rounded-2xl p-6 flex gap-5"
           >
-            <span className="shrink-0 w-10 h-10 rounded-full bg-signal text-white font-display font-bold text-lg flex items-center justify-center">
+            <span className="shrink-0 w-10 h-10 rounded-lg bg-signal text-white font-display font-bold text-lg flex items-center justify-center">
               {s.n}
             </span>
             <div>
@@ -191,7 +168,7 @@ export default function HowTournamentsWorkPage() {
         {dashboard.map((d) => (
           <div
             key={d.title}
-            className="bg-white border border-pine/10 rounded-3xl p-6"
+            className="bg-white border border-pine/10 rounded-2xl p-6"
           >
             <h3 className="font-bold text-pine mb-1">{d.title}</h3>
             <p className="text-pine/65 text-sm leading-relaxed">{d.body}</p>
@@ -213,6 +190,31 @@ export default function HowTournamentsWorkPage() {
         tap to confirm each angler once their money is in, and they&apos;ll see
         the confirmation on the tournament page.
       </p>
+
+      <div className="bg-signal/10 border border-signal/40 rounded-2xl p-6 mb-10 max-w-2xl">
+        <p className="font-bold text-pine uppercase tracking-wider text-xs mb-1.5">
+          Know the law
+        </p>
+        <p className="text-pine/70 text-sm leading-relaxed">
+          In Manitoba, fishing tournaments with{" "}
+          <strong>more than 25 participants</strong> need a provincial
+          tournament licence.{" "}
+          <a
+            href="https://www.manitobaelicensing.ca"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-signal-dark font-bold underline"
+          >
+            Get a licence at manitobaelicensing.ca
+          </a>
+          .
+        </p>
+        <p className="text-pine/55 text-xs mt-2">
+          FishMB is a listings and leaderboard tool only — organizers are
+          responsible for running a legal event. We are not responsible if you
+          break the law.
+        </p>
+      </div>
 
       <div className="flex flex-wrap gap-3">
         <Link
