@@ -63,7 +63,7 @@ export default function MapsHub() {
   const [spotsReady, setSpotsReady] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [myLoc, setMyLoc] = useState<{ lat: number; lng: number; speed: number | null } | null>(null);
-  const [mapCenter, setMapCenter] = useState({ lat: 53.5, lng: -96.5 });
+  const [mapCenter, setMapCenter] = useState({ lat: 48, lng: -100 });
   const [focus, setFocus] = useState<{
     lat: number;
     lng: number;
@@ -230,14 +230,18 @@ export default function MapsHub() {
       setFocus({ lat: la, lng: ln, key: pin.id, zoom: 15 });
       return;
     }
-    const qLat = Number(searchParams.get("lat"));
-    const qLng = Number(searchParams.get("lng"));
-    if (Number.isFinite(qLat) && Number.isFinite(qLng)) {
-      const qZoom = Math.min(Math.max(Number(searchParams.get("z")) || 11, 3), 18);
-      urlPlaced.current = true;
-      setFocus({ lat: qLat, lng: qLng, key: `url:${qLat},${qLng}`, zoom: qZoom });
-      setMapCenter({ lat: qLat, lng: qLng });
-      return;
+    const rawLat = searchParams.get("lat");
+    const rawLng = searchParams.get("lng");
+    if (rawLat && rawLng) {
+      const qLat = Number(rawLat);
+      const qLng = Number(rawLng);
+      if (Number.isFinite(qLat) && Number.isFinite(qLng) && (qLat !== 0 || qLng !== 0)) {
+        const qZoom = Math.min(Math.max(Number(searchParams.get("z")) || 11, 3), 18);
+        urlPlaced.current = true;
+        setFocus({ lat: qLat, lng: qLng, key: `url:${qLat},${qLng}`, zoom: qZoom });
+        setMapCenter({ lat: qLat, lng: qLng });
+        return;
+      }
     }
     // No URL location — the spots effect centres on the latest saved spot,
     // otherwise the GPS effect centres on the current location.
