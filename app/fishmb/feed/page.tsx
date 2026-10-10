@@ -1696,7 +1696,6 @@ function FeedPageInner() {
                 ["/fishmb/dashboard?tab=stats", "My Stats"],
                 ["/fishmb/dashboard?tab=tournaments", "Tournaments"],
                 ["/fishmb/dashboard?tab=licence", "Licence"],
-                ["/fishmb/profile/edit", "Edit profile"],
                 ["/fishmb/lakes", "Lakes"],
                 ["/fishmb/lodges", "Lodges & Guides"],
                 ["/fishmb/regulations", "Regulations"],
@@ -1704,6 +1703,7 @@ function FeedPageInner() {
                 ["/fishmb/tips", "Tips"],
                 ["/fishmb/feed", "The Feed"],
                 ["/fishmb/classifieds", "Classifieds"],
+                ["/fishmb/profile", "View profile"],
               ].map(([href, label]) => (
                 <Link
                   key={href}
