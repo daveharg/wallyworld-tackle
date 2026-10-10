@@ -69,6 +69,12 @@ export default function LakesTab({
   onFlyToLake: (lake: SavedLake) => void;
   onSelectLake: (lake: SavedLake) => void;
 }) {
+  // Top Manitoba lakes by Master Angler entries (Hunt Fish Manitoba 2025 data).
+  const RECOMMENDED = [
+    { id: "lake-winnipeg", name: "Lake Winnipeg", region: "Interlake", entries: 1120 },
+    { id: "west-shoal-lake", name: "West Shoal Lake", region: "Interlake", entries: 1118 },
+    { id: "gunisao-lake", name: "Gunisao Lake", region: "Northern", entries: 801 },
+  ];
   const [cards, setCards] = useState<LakeCardData[]>([]);
   const [allLakes, setAllLakes] = useState<{ id: string; name: string; region?: string }[]>([]);
   const [adding, setAdding] = useState(false);
@@ -241,6 +247,48 @@ export default function LakesTab({
           ))}
         </div>
       )}
+
+      {/* Recommended lakes — top Master Angler producers */}
+      <div className="mt-6">
+        <div className="px-4 mb-2">
+          <h3 className="text-xs font-black uppercase tracking-wider text-pine/45">
+            Recommended lakes
+          </h3>
+          <p className="text-[11px] text-pine/50 mt-0.5">
+            Top Master Angler producers in Manitoba
+          </p>
+        </div>
+        <div className="-mx-4 space-y-2.5">
+          {RECOMMENDED.filter((r) => !cards.some((c) => c.id === r.id)).map((lake) => (
+            <button
+              key={lake.id}
+              type="button"
+              onClick={() => handleSelect({ id: lake.id, name: lake.name, region: lake.region, lat: null, lng: null })}
+              className="w-full text-left bg-white border-y border-pine/10 px-5 py-3 active:bg-pine/5"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-extrabold text-pine text-[16px] leading-tight truncate">
+                    {lake.name}
+                  </p>
+                  <p className="text-[11px] text-pine/50 font-semibold mt-0.5">
+                    {lake.region}
+                  </p>
+                </div>
+                <div className="shrink-0 text-right">
+                  <p className="text-[15px] font-extrabold text-signal">
+                    {lake.entries.toLocaleString()}
+                  </p>
+                  <p className="text-[11px] font-bold text-pine/55 mt-0.5">
+                    Master Anglers
+                  </p>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Small add-lake button below the last lake */}
       <div className="mt-3 px-4">
         {adding ? (
