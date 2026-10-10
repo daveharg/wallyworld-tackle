@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState, type TouchEvent } from "react";
 import type { SheetTab } from "./types";
 
 export type { SheetTab };
@@ -51,132 +51,86 @@ export default function MapSheet({
 }: Props) {
   const [dragDy, setDragDy] = useState(0);
   const [dragging, setDragging] = useState(false);
-  const sheetRef = useRef<HTMLDivElement>(null);
+  const startY = useRef<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
-  // Refs mirrored for the native touch handlers below.
-  const snapRef = useRef(snap);
-  snapRef.current = snap;
-  const detailRef = useRef(detailMode);
-  detailRef.current = detailMode;
-  const dragDyRef = useRef(0);
-  const targetRef = useRef<SheetSnap | null>(null);
+  const dragTarget = useRef<SheetSnap | null>(null);
+  const fromHeader = useRef(false);
 
-  const commitSnap = (t: SheetSnap | null, dy: number) => {
-    if (t && Math.abs(dy) > 60) onSnapChange(t);
-    setDragDy(0);
-    dragDyRef.current = 0;
-    targetRef.current = null;
-    setDragging(false);
+  const onTouchStart = (e: TouchEvent) => {
+    startY.current = e.touches[0].clientY;
+    dragTarget.current = null;
+    // Touches starting on the grabber/header — or on a detail title marked
+    // with data-sheet-drag — always drag the sheet, never scroll the content.
+    const target = e.target as HTMLElement;
+    fromHeader.current = !!(
+      (headerRef.current && headerRef.current.contains(target)) ||
+      target.closest("[data-sheet-drag]")
+    );
+    setDragging(true);
   };
 
-  /**
-   * Gesture rule (Dave's spec): if the page has enough content to scroll,
-   * it scrolls normally — only once you're at the very top and keep
-   * pulling down does the sheet shrink. If the content isn't scrollable,
-   * any pull moves the sheet directly. Touches starting on the grabber /
-   * header always move the sheet.
-   *
-   * Native (non-passive) listeners so we can preventDefault the moment we
-   * decide the gesture is a sheet drag — this stops iOS rubber-banding
-   * from fighting the sheet movement.
-   */
-  useEffect(() => {
-    const el = sheetRef.current;
-    if (!el) return;
+  const onTouchMove = (e: TouchEvent) => {
+    if (startY.current === null) return;
+    const dy = e.touches[0].clientY - startY.current;
+    const scroller = scrollRef.current;
+    const atTop = fromHeader.current || !scroller || scroller.scrollTop <= 0;
 
-    let startY: number | null = null;
-    let sheetDrag = false; // locked for the rest of this gesture once true
-    let fromHeader = false;
-
-    const pickTarget = (dy: number): SheetSnap | null => {
-      const s = snapRef.current;
-      const detail = detailRef.current;
-      if (s === "mini") {
-        return dy < -8 ? "collapsed" : null;
-      }
-      if (s === "collapsed") {
-        if (dy < -8) return detail ? "half" : "full";
-        if (dy > 8) return "mini";
-        return null;
-      }
-      if (s === "half") {
-        if (dy < -8) return "full";
-        if (dy > 8) return "collapsed";
-        return null;
-      }
-      // full
-      if (dy > 8) return detail ? "half" : "collapsed";
-      return null;
-    };
-
-    const onStart = (e: TouchEvent) => {
-      startY = e.touches[0].clientY;
-      sheetDrag = false;
-      targetRef.current = null;
-      const t = e.target as HTMLElement;
-      fromHeader =
-        !!headerRef.current?.contains(t) || !!t.closest("[data-sheet-drag]");
-      setDragging(true);
-    };
-
-    const onMove = (e: TouchEvent) => {
-      if (startY === null) return;
-      const dy = e.touches[0].clientY - startY;
-      const sc = scrollRef.current;
-
-      if (!sheetDrag) {
-        if (fromHeader) {
-          // Grabber/header: always a sheet drag.
-          sheetDrag = Math.abs(dy) > 8;
-        } else if (sc && sc.scrollHeight > sc.clientHeight + 4) {
-          // Scrollable content: hijack only when pulling past an edge.
-          const atTop = sc.scrollTop <= 0;
-          const atBottom = sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 4;
-          if (dy > 8 && atTop) sheetDrag = true; // pull down at top → shrink
-          else if (dy < -8 && atBottom && snapRef.current !== "full")
-            sheetDrag = true; // pull up at bottom → expand
-        } else {
-          // Not scrollable: any vertical drag moves the sheet.
-          sheetDrag = Math.abs(dy) > 8;
-        }
-      }
-
-      if (sheetDrag) {
-        // Stop native scroll / rubber-band — the sheet owns this gesture now.
-        e.preventDefault();
-        targetRef.current = pickTarget(dy);
-        dragDyRef.current = targetRef.current ? dy : 0;
-        setDragDy(dragDyRef.current);
+    if (snap === "mini") {
+      // Mini peek: drag up to reopen the peek.
+      if (dy < -8) {
+        dragTarget.current = "collapsed";
+        setDragDy(dy);
       } else {
-        if (dragDyRef.current !== 0) {
-          dragDyRef.current = 0;
-          setDragDy(0);
-        }
+        setDragDy(0);
       }
-    };
+    } else if (snap === "collapsed") {
+      // Peek: drag up to open — back to the lake detail if one is open.
+      if (dy < -8) {
+        dragTarget.current = detailMode ? "half" : "full";
+        setDragDy(dy);
+      } else if (dy > 8) {
+        // Drag down → mini peek (grabber only).
+        dragTarget.current = "mini";
+        setDragDy(dy);
+      } else {
+        setDragDy(0);
+      }
+    } else if (snap === "half") {
+      if (dy < -8 && atTop) {
+        // Drag up → full page.
+        dragTarget.current = "full";
+        setDragDy(dy);
+      } else if (dy > 8 && atTop) {
+        // Drag down → full map view.
+        dragTarget.current = "collapsed";
+        setDragDy(dy);
+      } else {
+        setDragDy(0);
+      }
+    } else {
+      // Full: drag down anywhere to step back down — but only when the
+      // content is scrolled to the top, otherwise let the list scroll.
+      if (dy > 8 && atTop) {
+        dragTarget.current = detailMode ? "half" : "collapsed";
+        setDragDy(dy);
+      } else if (dragTarget.current === null) {
+        setDragDy(0);
+      }
+    }
+  };
 
-    const onEnd = () => {
-      if (startY === null) return;
-      commitSnap(targetRef.current, dragDyRef.current);
-      startY = null;
-      sheetDrag = false;
-      fromHeader = false;
-    };
-
-    el.addEventListener("touchstart", onStart, { passive: true });
-    el.addEventListener("touchmove", onMove, { passive: false });
-    el.addEventListener("touchend", onEnd);
-    el.addEventListener("touchcancel", onEnd);
-    return () => {
-      el.removeEventListener("touchstart", onStart);
-      el.removeEventListener("touchmove", onMove);
-      el.removeEventListener("touchend", onEnd);
-      el.removeEventListener("touchcancel", onEnd);
-    };
-    // onSnapChange is stable (MapsHub useCallback); snap/detail read via refs.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const onTouchEnd = () => {
+    const target = dragTarget.current;
+    if (target && Math.abs(dragDy) > 60) {
+      onSnapChange(target);
+    }
+    setDragDy(0);
+    setDragging(false);
+    startY.current = null;
+    dragTarget.current = null;
+    fromHeader.current = false;
+  };
 
   // Tapping a tab only switches the tab — the sheet itself only moves
   // when the user slides/drags it.
@@ -186,7 +140,6 @@ export default function MapSheet({
 
   return (
     <div
-      ref={sheetRef}
       className={`fixed inset-x-0 bg-paper rounded-t-3xl shadow-2xl border-t border-x border-pine/10 flex flex-col overflow-hidden ${
         snap === "full" ? "z-50" : "z-30"
       } ${TOP[snap]} bottom-0`}
@@ -194,6 +147,9 @@ export default function MapSheet({
         transform: dragDy !== 0 ? `translateY(${dragDy}px)` : undefined,
         transition: dragging ? "none" : "top 0.32s ease, transform 0.32s ease",
       }}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
     >
       {/* Grabber + header zone — always drags the sheet */}
       <div ref={headerRef} style={{ touchAction: "pan-x" }}>
