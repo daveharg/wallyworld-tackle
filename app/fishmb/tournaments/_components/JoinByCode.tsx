@@ -31,7 +31,7 @@ export function JoinByCode() {
           onKeyDown={(e) => e.key === "Enter" && go()}
           placeholder="Invite code"
           maxLength={8}
-          className="w-36 bg-white border border-pine/20 rounded-full px-4 py-3 text-sm font-bold uppercase tracking-[0.2em] text-pine placeholder:text-pine/35 focus:outline-none focus:border-signal"
+          className="flex-1 min-w-0 bg-white border border-pine/20 rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-pine placeholder:text-pine/35 focus:outline-none focus:border-signal"
         />
         <button
           onClick={go}

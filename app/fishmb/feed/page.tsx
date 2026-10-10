@@ -21,8 +21,8 @@ function ComposerSheet({
   closeComposer,
   children,
 }: {
-  mode: "post" | "catch" | "tournament";
-  setMode: (m: "post" | "catch" | "tournament") => void;
+  mode: "post" | "catch";
+  setMode: (m: "post" | "catch") => void;
   setCatchNote: (s: string | null) => void;
   closeComposer: () => void;
   children: React.ReactNode;
@@ -73,7 +73,7 @@ function ComposerSheet({
           transition: dragging ? "none" : "transform 0.2s ease-out",
         }}
         className={`relative bg-white w-full rounded-t-3xl sm:rounded-3xl max-h-[92vh] overflow-y-auto overscroll-contain ${
-          mode === "tournament" ? "sm:max-w-3xl" : "sm:max-w-lg"
+          "sm:max-w-lg"
         }`}
       >
         {/* Drag handle — swipe down here to dismiss */}
@@ -84,7 +84,6 @@ function ComposerSheet({
               [
                 ["post", "Share a post"],
  ["catch", " Log a catch"],
- ["tournament", " Tournament"],
               ] as const
             ).map(([v, label]) => (
               <button
@@ -889,7 +888,7 @@ function FeedPageInner() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [q, setQ] = useState("");
   const [activeQ, setActiveQ] = useState("");
-  const [mode, setMode] = useState<"post" | "catch" | "tournament">("post");
+  const [mode, setMode] = useState<"post" | "catch">("post");
   const [draft, setDraft] = useState("");
   const [catchPhotos, setCatchPhotos] = useState<File[]>([]);
   const [postPhotos, setPostPhotos] = useState<File[]>([]);
@@ -2026,8 +2025,6 @@ function FeedPageInner() {
                 </button>
                 {catchNote && <p className="text-sm text-pine mt-3">{catchNote}</p>}
               </>
-            ) : (
-              <TournamentPanel />
             )}
         </ComposerSheet>
       )}
