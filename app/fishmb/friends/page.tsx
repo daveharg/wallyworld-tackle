@@ -277,33 +277,37 @@ export default function FriendsPage() {
               <p className="text-pine/55 text-center py-8">No anglers found.</p>
             )}
             <ul className="divide-y divide-pine/10">
-              {results.map((p) => (
+              {results.map((p) => {
+                const isFriend = friendIds.has(p.id);
+                const isPending = pendingIds.has(p.id);
+                return (
                 <li key={p.id} className="py-4">
                   <div className="flex items-center gap-4">
                     <Link href={`/fishmb/anglers/${p.id}`}>
-                      <Avatar p={p} size={80} />
+                      <Avatar p={p} size={56} />
                     </Link>
                     <Link href={`/fishmb/anglers/${p.id}`} className="flex-1 min-w-0">
-                      <span className="block font-bold text-pine text-xl truncate">{p.name}</span>
+                      <span className="block font-bold text-pine text-lg truncate">{p.name}</span>
+                      {isFriend && (
+                        <span className="text-xs font-bold uppercase tracking-wider text-pine/45">Friend</span>
+                      )}
+                      {isPending && (
+                        <span className="text-xs font-bold uppercase tracking-wider text-pine/45">Requested</span>
+                      )}
                     </Link>
-                  </div>
-                  <div className="mt-3 pl-24">
-                    {requestedIds.has(p.id) ? (
-                      <span className="block text-center text-sm font-bold uppercase tracking-wider text-pine/40 bg-pine/10 py-3 rounded-2xl">
-                        Requested
-                      </span>
-                    ) : (
+                    {!isFriend && !isPending && (
                       <button
                         onClick={() => request(p.id)}
                         disabled={busy === p.id}
-                        className="w-full bg-signal hover:bg-signal-dark text-white font-bold text-lg py-3 rounded-2xl disabled:opacity-50 transition-colors"
+                        className="bg-signal hover:bg-signal-dark text-white font-bold text-sm uppercase tracking-wider px-5 py-2.5 rounded-full disabled:opacity-50 transition-colors shrink-0"
                       >
-                        {busy === p.id ? "…" : "Add friend"}
+                        {busy === p.id ? "…" : "Add"}
                       </button>
                     )}
                   </div>
                 </li>
-              ))}
+                );
+              })}
             </ul>
           </div>
         )}
