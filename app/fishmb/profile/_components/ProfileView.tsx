@@ -50,9 +50,10 @@ interface ProfileData {
 }
 
 function Avatar({ url, name, size }: { url: string | null; name: string; size: string }) {
-  if (url) {
+  const [failed, setFailed] = useState(false);
+  if (url && !failed) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={url} alt={name} className={`${size} rounded-full object-cover border-2 border-gold`} />;
+    return <img src={url} alt={name} onError={() => setFailed(true)} className={`${size} rounded-full object-cover border-2 border-gold`} />;
   }
   return (
     <div className={`${size} rounded-full bg-pine/10 flex items-center justify-center font-bold text-pine text-2xl`}>
