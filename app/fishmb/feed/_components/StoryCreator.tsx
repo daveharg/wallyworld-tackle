@@ -66,6 +66,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
   const [clipZooms, setClipZooms] = useState<Record<string, number>>({});
   const [clipVolumes, setClipVolumes] = useState<Record<string, number>>({});
   const [expiresHours, setExpiresHours] = useState(24);
+  const [saveAsReel, setSaveAsReel] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -459,6 +460,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
             zoom: clipZooms[d.id] ?? 1,
             volume: d.media_type === "video" ? (clipVolumes[d.id] ?? 0.5) : null,
             expires_hours: expiresHours,
+            is_reel: saveAsReel,
           }),
         });
       }
@@ -1023,27 +1025,52 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
 
           {/* Bottom bar */}
           <div className="px-4 pt-3 border-t border-pine/10">
-            <div className="flex items-center gap-3 mb-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-pine/50 shrink-0">
-                Visible for
-              </span>
-              <div className="flex gap-1.5 flex-wrap">
-                {[6, 12, 24, 48, 72].map((h) => (
-                  <button
-                    key={h}
-                    type="button"
-                    onClick={() => setExpiresHours(h)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
-                      expiresHours === h
-                        ? "bg-pine text-white"
-                        : "bg-pine/10 text-pine/60 hover:bg-pine/15"
-                    }`}
-                  >
-                    {h}h
-                  </button>
-                ))}
+            {!saveAsReel && (
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-xs font-bold uppercase tracking-wider text-pine/50 shrink-0">
+                  Visible for
+                </span>
+                <div className="flex gap-1.5 flex-wrap">
+                  {[6, 12, 24, 48, 72, 168].map((h) => (
+                    <button
+                      key={h}
+                      type="button"
+                      onClick={() => setExpiresHours(h)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
+                        expiresHours === h
+                          ? "bg-pine text-white"
+                          : "bg-pine/10 text-pine/60 hover:bg-pine/15"
+                      }`}
+                    >
+                      {h >= 168 ? "1 week" : `${h}h`}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
+            <label className="flex items-center gap-3 mb-3 cursor-pointer">
+              <button
+                type="button"
+                role="switch"
+                aria-checked={saveAsReel}
+                onClick={() => setSaveAsReel((v) => !v)}
+                className={`w-11 h-6 rounded-full transition-colors relative ${
+                  saveAsReel ? "bg-signal" : "bg-pine/20"
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${
+                    saveAsReel ? "left-[22px]" : "left-0.5"
+                  }`}
+                />
+              </button>
+              <span className="text-sm font-bold text-pine">
+                Save as reel
+                <span className="block text-xs font-medium text-pine/50">
+                  Permanent — shows on your profile
+                </span>
+              </span>
+            </label>
             <div className="flex gap-2 pb-4">
               <button
                 onClick={() => setStep("pick")}

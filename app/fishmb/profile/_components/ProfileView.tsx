@@ -11,6 +11,7 @@ import { useFishAuth } from "../../_components/FishAuth";
 import FishingStats from "./FishingStats";
 import MyListings from "./MyListings";
 import BackArrow from "../../_components/BackArrow";
+import ProfileReels from "./ProfileReels";
 
 interface ProfilePhoto {
   url: string;
@@ -70,7 +71,14 @@ export default function ProfileView({
 }) {
   const [data, setData] = useState<ProfileData | null>(null);
   const { user: me, logout } = useFishAuth();
-  const [tab, setTab] = useState<"posts" | "photos" | "friends">("posts");
+  const [tab, setTab] = useState<"posts" | "photos" | "friends" | "reels">("posts");
+  const [reels, setReels] = useState<{ id: string; media_url: string; media_type: string; caption: string | null }[]>([]);
+
+  useEffect(() => {
+    fishFetch(`/api/fishmb/reels?user_id=${userId}`)
+      .then((d) => setReels((d as { reels: typeof reels }).reels ?? []))
+      .catch(() => {});
+  }, [userId]);
   const [acting, setActing] = useState(false);
   const [note, setNote] = useState<string | null>(null);
 
@@ -266,12 +274,12 @@ export default function ProfileView({
       {data.is_self && <MyListings />}
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-pine/10 mb-6">
-        {(["posts", "photos", "friends"] as const).map((t) => (
+      <div className="flex gap-2 border-b border-pine/10 mb-6 overflow-x-auto">
+        {(["posts", "photos", "reels", "friends"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`pb-3 px-4 text-sm font-bold uppercase tracking-wider transition-colors ${
+            className={`pb-3 px-4 text-sm font-bold uppercase tracking-wider transition-colors whitespace-nowrap ${
               tab === t
                 ? "text-signal-dark border-b-2 border-signal -mb-px"
                 : "text-pine/45 hover:text-pine"
@@ -281,7 +289,9 @@ export default function ProfileView({
               ? ` Posts (${data.posts.length})`
               : t === "photos"
                 ? ` Photos (${data.photos.length})`
-                : ` Friends (${data.friends.length})`}
+                : t === "reels"
+                  ? ` Reels (${reels.length})`
+                  : ` Friends (${data.friends.length})`}
           </button>
         ))}
       </div>
@@ -336,6 +346,8 @@ export default function ProfileView({
             {data.is_self ? "Your catch and post photos will show up here." : "No photos yet."}
           </p>
         )
+      ) : tab === "reels" ? (
+        <ProfileReels reels={reels} isSelf={data.is_self} />
       ) : data.friends.length > 0 ? (
         <div className="grid sm:grid-cols-2 gap-3">
           {data.friends.map((f) => (

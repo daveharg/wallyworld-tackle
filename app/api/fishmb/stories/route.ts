@@ -46,15 +46,17 @@ export async function POST(req: NextRequest) {
   const volumeRaw = Number(body.volume);
   const volume = Number.isFinite(volumeRaw) ? Math.max(0, Math.min(1, volumeRaw)) : null;
   // How long the story stays visible (hours). Default 24, min 1, max 168 (7 days).
+  // Reels never expire.
+  const isReel = body.is_reel === true;
   const expiresHoursRaw = Number(body.expires_hours);
   const expiresHours = Number.isFinite(expiresHoursRaw)
     ? Math.max(1, Math.min(168, Math.round(expiresHoursRaw)))
     : 24;
 
   const rows = await query<{ id: string }>(
-    `INSERT INTO fm_stories (user_id, media_url, media_type, caption, overlays, zoom, volume, expires_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, NOW() + ($8 || ' hours')::interval) RETURNING id`,
-    [me.id, mediaUrl, mediaType, caption, JSON.stringify(overlays), zoom, volume, String(expiresHours)]
+    `INSERT INTO fm_stories (user_id, media_url, media_type, caption, overlays, zoom, volume, expires_at, is_reel)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, ${isReel ? "NULL" : "NOW() + ($8 || ' hours')::interval"}, $9) RETURNING id`,
+    [me.id, mediaUrl, mediaType, caption, JSON.stringify(overlays), zoom, volume, String(expiresHours), isReel]
   );
   return NextResponse.json({ ok: true, id: rows[0].id });
 }

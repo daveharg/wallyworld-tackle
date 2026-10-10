@@ -447,6 +447,9 @@ export async function ensureStoryTables(): Promise<void> {
   await query(`ALTER TABLE fm_stories ADD COLUMN IF NOT EXISTS overlays jsonb NOT NULL DEFAULT '[]'::jsonb`);
   await query(`ALTER TABLE fm_stories ADD COLUMN IF NOT EXISTS zoom double precision NOT NULL DEFAULT 1`);
   await query(`ALTER TABLE fm_stories ADD COLUMN IF NOT EXISTS volume double precision`);
+  await query(`ALTER TABLE fm_stories ADD COLUMN IF NOT EXISTS is_reel boolean NOT NULL DEFAULT false`);
+  // Reels never expire — allow NULL expires_at.
+  await query(`ALTER TABLE fm_stories ALTER COLUMN expires_at DROP NOT NULL`);
   // Story drafts — user's saved photos/videos for stories, kept as square boxes.
   await query(`CREATE TABLE IF NOT EXISTS fm_story_drafts (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -485,7 +488,7 @@ export interface StoryItem {
   zoom: number;
 }
 
-/** Stories from friends + followed users (+ own), newest first, unexpired. */
+/** Stories from friends + followed users (+ own), newest first, unexpired. Reels excluded. */
 export async function getStories(viewerId: string | null): Promise<StoryItem[]> {
   await ensureStoryTables();
   await ensureFollowTables();
@@ -496,7 +499,8 @@ export async function getStories(viewerId: string | null): Promise<StoryItem[]> 
                     WHERE v.story_id = s.id AND v.viewer_id = $1::uuid) AS viewed
        FROM fm_stories s
        JOIN fm_users u ON u.id = s.user_id
-      WHERE s.expires_at > NOW()
+      WHERE NOT s.is_reel
+        AND (s.expires_at IS NULL OR s.expires_at > NOW())
         AND ($1::uuid IS NULL
              OR s.is_public
              OR s.user_id = $1::uuid
@@ -512,4 +516,21 @@ export async function getStories(viewerId: string | null): Promise<StoryItem[]> 
     [viewerId]
   );
   return rows.map((r) => ({ ...r, viewed: Boolean(r.viewed) }));
+}
+
+/** Reels for a user — permanent, newest first. */
+export async function getReels(userId: string): Promise<StoryItem[]> {
+  await ensureStoryTables();
+  const rows = await query<StoryItem & { created_at: string }>(
+    `SELECT s.id, s.user_id, u.name AS user_name, u.avatar_url,
+            s.media_url, s.media_type, s.caption, s.created_at, s.overlays, s.zoom, s.volume,
+            false AS viewed
+       FROM fm_stories s
+       JOIN fm_users u ON u.id = s.user_id
+      WHERE s.is_reel AND s.user_id = $1::uuid
+      ORDER BY s.created_at DESC
+      LIMIT 50`,
+    [userId]
+  );
+  return rows.map((r) => ({ ...r, viewed: false }));
 }
