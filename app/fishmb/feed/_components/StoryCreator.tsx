@@ -57,7 +57,28 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
   const [overlays, setOverlays] = useState<TextOverlay[]>([]);
   const [editingOverlay, setEditingOverlay] = useState<TextOverlay | null>(null);
   const [overlayText, setOverlayText] = useState("");
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // Drag a text overlay around the preview with pointer events.
+  const onOverlayPointerDown = (e: React.PointerEvent, i: number) => {
+    e.preventDefault();
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    setDragIdx(i);
+  };
+
+  const onPreviewPointerMove = (e: React.PointerEvent) => {
+    if (dragIdx === null) return;
+    const el = previewRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = Math.min(95, Math.max(5, ((e.clientX - rect.left) / rect.width) * 100));
+    const y = Math.min(95, Math.max(5, ((e.clientY - rect.top) / rect.height) * 100));
+    setOverlays((list) => list.map((o, idx) => (idx === dragIdx ? { ...o, x, y } : o)));
+  };
+
+  const endDrag = () => setDragIdx(null);
 
   const loadDrafts = async () => {
     try {
@@ -328,7 +349,13 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
           {/* Edit step — text overlays */}
           <div className="flex-1 overflow-y-auto">
             {/* Preview */}
-            <div className="relative bg-black aspect-[9/16] max-h-[50vh] mx-auto">
+            <div
+              ref={previewRef}
+              className="relative bg-black aspect-[9/16] max-h-[50vh] mx-auto touch-none select-none"
+              onPointerMove={onPreviewPointerMove}
+              onPointerUp={endDrag}
+              onPointerCancel={endDrag}
+            >
               {selectedDrafts[0] && (
                 selectedDrafts[0].media_type === "video" ? (
                   <video src={selectedDrafts[0].media_url} className="w-full h-full object-contain" muted playsInline />
@@ -340,8 +367,9 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
               {overlays.map((o, i) => (
                 <div
                   key={i}
-                  className="absolute"
-                  style={{ left: `${o.x}%`, top: `${o.y}%`, transform: "translate(-50%, -50%)" }}
+                  className="absolute cursor-grab active:cursor-grabbing"
+                  style={{ left: `${o.x}%`, top: `${o.y}%`, transform: "translate(-50%, -50%)", touchAction: "none" }}
+                  onPointerDown={(e) => onOverlayPointerDown(e, i)}
                 >
                   <span
                     style={{
