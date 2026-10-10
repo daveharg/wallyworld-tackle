@@ -27,6 +27,7 @@ import SettingsTab from "./SettingsTab";
 import MapSearch from "./MapSearch";
 import DraggableWidget from "./DraggableWidget";
 import WindWidget from "./WindWidget";
+import TempWidget from "./TempWidget";
 import type { MapCatch, SavedLake } from "./types";
 
 const SpotMap = dynamic(
@@ -101,6 +102,7 @@ export default function MapsHub() {
   };
   const [windOn, setWindOn] = useState(false);
   const [speedOn, setSpeedOn] = useState(false);
+  const [tempOn, setTempOn] = useState(false);
   const [followDot, setFollowDot] = useState<string>(() => {
     try {
       return localStorage.getItem("fishmb-follow-dot") || "dot-blue";
@@ -729,6 +731,13 @@ export default function MapsHub() {
         </DraggableWidget>
       )}
 
+      {/* Temp widget — draggable, shows current temp at your location */}
+      {tempOn && myLoc && (
+        <DraggableWidget id="temp" defaultPos={{ x: 12, y: 300 }}>
+          <TempWidget lat={myLoc.lat} lng={myLoc.lng} />
+        </DraggableWidget>
+      )}
+
       {/* Lake / town / city search */}
       <MapSearch
         onSelect={(lat, lng, label) => {
@@ -909,6 +918,8 @@ export default function MapsHub() {
             onWindChange={setWindOn}
             speedOn={speedOn}
             onSpeedChange={setSpeedOn}
+            tempOn={tempOn}
+            onTempChange={setTempOn}
             followDot={followDot}
             onFollowDotChange={setFollowDot}
             trails={trails}
