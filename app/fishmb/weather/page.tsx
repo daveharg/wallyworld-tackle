@@ -306,16 +306,20 @@ function fishingForecast(
   const restAvg = avg(restToday);
   const restInfo = scoreLabel(restAvg);
 
-  // Tomorrow: all hours with tomorrow's date.
+  // Tomorrow: all hours with tomorrow's local date.
   const tomorrowStr = (() => {
-    const d = new Date(hourlyTime[nowIdx] ?? "");
+    const t = hourlyTime[nowIdx] ?? "";
+    // hourly times are local ISO (YYYY-MM-DDTHH:MM) — add a day in local time.
+    const d = new Date(t.slice(0, 10) + "T12:00:00");
     d.setDate(d.getDate() + 1);
-    return d.toISOString().slice(0, 10);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
   })();
-  // Match by local date — hourly times are local ISO.
   const tomorrowScores = scores.filter((s) => {
     const t = hourlyTime[s.idx] ?? "";
-    return t.slice(0, 10) !== todayStr;
+    return t.slice(0, 10) === tomorrowStr;
   });
   const tomAvg = avg(tomorrowScores);
   const tomInfo = scoreLabel(tomAvg);
@@ -410,7 +414,7 @@ export default function WeatherPage() {
           `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat.toFixed(3)}&longitude=${coords.lon.toFixed(3)}` +
           `&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m` +
           `&hourly=temperature_2m,precipitation_probability,pressure_msl,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max` +
-          `&timezone=auto&forecast_days=2&past_days=7`;
+          `&timezone=auto&forecast_days=7&past_days=7`;
         const r = await fetch(url);
         if (!r.ok) throw new Error("weather request failed");
         const d = (await r.json()) as WxData;
