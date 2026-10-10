@@ -192,71 +192,7 @@ export default function SettingsTab({
         </p>
       </Section>
 
- <Section icon="" title="Saved lakes" sub="Jump the map straight to a saved lake.">
-        <select
-          value={selectedFav}
-          onChange={(e) => {
-            const v = e.target.value;
-            setSelectedFav(v);
-            if (v && v !== "__add__") chooseFav(v);
-          }}
-          aria-label="Choose a saved lake"
-          className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold focus:outline-none focus:border-signal"
-        >
-          <option value="">
-            {favs.length === 0 ? "No saved lakes yet…" : "Choose a saved lake…"}
-          </option>
-          {favs.map((f) => (
-            <option key={f.id} value={f.id}>
-              {f.name}
-            </option>
-          ))}
-          <option value="__add__">Add a new lake…</option>
-        </select>
-        {selectedFav && selectedFav !== "__add__" && (
-          <button
-            type="button"
-            onClick={() => removeFav(selectedFav)}
-            className="mt-2 w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-2.5 text-signal-dark text-xs font-bold uppercase tracking-wider"
-          >
- Remove this lake
-          </button>
-        )}
-        {selectedFav === "__add__" && (
-          <div className="mt-2">
-            <select
-              value={addLakeId}
-              onChange={(e) => setAddLakeId(e.target.value)}
-              aria-label="Choose a lake to save"
-              className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold focus:outline-none focus:border-signal"
-            >
-              <option value="">Pick a lake…</option>
-              {allLakes
-                .filter((l) => !favIds.has(l.id))
-                .map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.name}
-                    {l.region ? ` — ${l.region}` : ""}
-                  </option>
-                ))}
-            </select>
-            <button
-              type="button"
-              onClick={addFavLake}
-              disabled={!addLakeId || addingLake}
-              className="mt-2 w-full bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-5 py-3 rounded-2xl disabled:opacity-40 transition-colors"
-            >
- {addingLake ? "Adding…" : " Add this lake"}
-            </button>
-          </div>
-        )}
-      </Section>
-
- <Section icon="" title="Lake notes" sub="Your private notebook — depths, structure, what's biting.">
-        <LakeNotes />
-      </Section>
-
- <Section icon="" title="My trails" sub="Overlay a recorded boat route to retrace it.">
+      <Section icon="" title="My trails" sub="Overlay a recorded boat route to retrace it.">
         {trails.length > 0 ? (
           <div className="flex gap-2">
             <select
