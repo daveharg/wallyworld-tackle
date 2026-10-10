@@ -96,6 +96,10 @@ export interface Tournament {
   cover_photo_url: string | null;
   venue_name: string | null;
   venue_address: string | null;
+  gps_north: number | null;
+  gps_south: number | null;
+  gps_east: number | null;
+  gps_west: number | null;
   created_at: string;
   participant_count: number;
   entry_count: number;
@@ -150,6 +154,11 @@ export async function ensureTournamentTables(): Promise<void> {
     max_participants int,
     created_at timestamptz NOT NULL DEFAULT now()
   )`);
+  // Custom GPS zone (organizer-defined bounding box). Null = Manitoba default.
+  await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS gps_north double precision`);
+  await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS gps_south double precision`);
+  await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS gps_east double precision`);
+  await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS gps_west double precision`);
   await query(`CREATE TABLE IF NOT EXISTS fm_tournament_participants (
     tournament_id uuid NOT NULL REFERENCES fm_tournaments(id) ON DELETE CASCADE,
     user_id uuid NOT NULL REFERENCES fm_users(id) ON DELETE CASCADE,
@@ -295,9 +304,21 @@ export async function generateInviteCode(): Promise<string> {
   throw new Error("Could not generate an invite code.");
 }
 
-/** Manitoba bounding box sanity check for a GPS fix. */
+/** Manitoba bounding box (default tournament GPS zone). */
+export const MANITOBA_BOUNDS = { north: 60.1, south: 48.9, east: -88.9, west: -102.1 };
+
+/** Check if a GPS fix is inside the given bounds. */
+export function gpsInBounds(
+  lat: number,
+  lng: number,
+  bounds: { north: number; south: number; east: number; west: number }
+): boolean {
+  return lat >= bounds.south && lat <= bounds.north && lng >= bounds.west && lng <= bounds.east;
+}
+
+/** Manitoba bounding box sanity check for a GPS fix (legacy — use gpsInBounds with tournament bounds). */
 export function gpsInManitoba(lat: number, lng: number): boolean {
-  return lat >= 48.9 && lat <= 60.1 && lng >= -102.1 && lng <= -88.9;
+  return gpsInBounds(lat, lng, MANITOBA_BOUNDS);
 }
 
 // Lake-boundary enforcement. Tournaments run on specific water: each entry's

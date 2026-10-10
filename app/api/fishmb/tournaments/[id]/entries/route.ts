@@ -25,7 +25,8 @@ import {
   getEntries,
   getEntriesForViewer,
   isParticipant,
-  gpsInManitoba,
+  gpsInBounds,
+  MANITOBA_BOUNDS,
   nearestTournamentLake,
   LAKE_BOUNDARY_KM,
   computePHash,
@@ -131,8 +132,14 @@ export async function POST(
   const lat = typeof body.latitude === "number" ? body.latitude : null;
   const lng = typeof body.longitude === "number" ? body.longitude : null;
   const acc = typeof body.gps_accuracy === "number" ? body.gps_accuracy : null;
-  if (lat !== null && lng !== null && !gpsInManitoba(lat, lng)) {
-    return badRequest("That location isn't in Manitoba — entries must be caught in Manitoba waters.");
+  if (lat !== null && lng !== null) {
+    const bounds =
+      t.gps_north != null && t.gps_south != null && t.gps_east != null && t.gps_west != null
+        ? { north: t.gps_north, south: t.gps_south, east: t.gps_east, west: t.gps_west }
+        : MANITOBA_BOUNDS;
+    if (!gpsInBounds(lat, lng, bounds)) {
+      return badRequest("That location is outside the tournament's fishing zone.");
+    }
   }
   const notes = typeof body.notes === "string" ? body.notes.trim().slice(0, 500) : "";
 

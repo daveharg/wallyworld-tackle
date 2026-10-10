@@ -42,6 +42,11 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
   const [coverPhotoUrl, setCoverPhotoUrl] = useState<string | null>(null);
   const [venueName, setVenueName] = useState("");
   const [venueAddress, setVenueAddress] = useState("");
+  const [customZone, setCustomZone] = useState(false);
+  const [gpsNorth, setGpsNorth] = useState("60.1");
+  const [gpsSouth, setGpsSouth] = useState("48.9");
+  const [gpsEast, setGpsEast] = useState("-88.9");
+  const [gpsWest, setGpsWest] = useState("-102.1");
   const [uploadingCover, setUploadingCover] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -108,6 +113,14 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
           cover_photo_url: coverPhotoUrl,
           venue_name: venueName.trim() || null,
           venue_address: venueAddress.trim() || null,
+          ...(customZone
+            ? {
+                gps_north: parseFloat(gpsNorth),
+                gps_south: parseFloat(gpsSouth),
+                gps_east: parseFloat(gpsEast),
+                gps_west: parseFloat(gpsWest),
+              }
+            : {}),
         }),
       });
       router.push(`/fishmb/tournaments/${data.tournament.id}/manage`);
@@ -183,6 +196,40 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
               <label className={labelCls}>Venue address (optional)</label>
               <input value={venueAddress} onChange={(e) => setVenueAddress(e.target.value)} maxLength={200} placeholder="e.g. 112 Main St, Selkirk MB" className={inputCls} />
             </div>
+          </div>
+          <div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={customZone}
+                onChange={(e) => setCustomZone(e.target.checked)}
+                className="w-4 h-4 accent-signal"
+              />
+              <span className={labelCls}>Set a custom fishing zone</span>
+            </label>
+            <p className="text-pine/50 text-xs mt-1 mb-3">
+              Catches outside your zone are rejected. Leave off for all of Manitoba.
+            </p>
+            {customZone && (
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className={labelCls}>North (lat)</label>
+                  <input type="number" step="any" value={gpsNorth} onChange={(e) => setGpsNorth(e.target.value)} className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>South (lat)</label>
+                  <input type="number" step="any" value={gpsSouth} onChange={(e) => setGpsSouth(e.target.value)} className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>East (lng)</label>
+                  <input type="number" step="any" value={gpsEast} onChange={(e) => setGpsEast(e.target.value)} className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>West (lng)</label>
+                  <input type="number" step="any" value={gpsWest} onChange={(e) => setGpsWest(e.target.value)} className={inputCls} />
+                </div>
+              </div>
+            )}
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>

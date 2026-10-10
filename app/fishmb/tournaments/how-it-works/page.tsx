@@ -46,8 +46,8 @@ const cheat = [
     body: "When your tournament names specific lakes, every entry's GPS is measured against those waters. Catches logged far from the chosen lakes are flagged for your review — along with how far away they were caught.",
   },
   {
-    title: "Manitoba GPS check",
-    body: "Every entry's location is verified against Manitoba waters. Catches logged outside Manitoba are rejected automatically.",
+    title: "Custom GPS zone",
+    body: "You draw the tournament's fishing zone on a map when you create it — entries caught outside your zone are rejected automatically. No zone set? It defaults to Manitoba waters.",
   },
   {
     title: "Duplicate-photo detection",
