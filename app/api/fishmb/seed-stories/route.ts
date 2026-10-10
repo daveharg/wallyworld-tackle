@@ -1,30 +1,27 @@
 // TEMPORARY: seeds 5 FishMB marketing stories. Remove after use.
 import { NextRequest, NextResponse } from "next/server";
-import { readFile } from "fs/promises";
-import { join } from "path";
-import { put } from "@vercel/blob";
 import { query } from "@/lib/fish/db";
 import { ensureStoryTables } from "@/lib/fish/feed";
 
 const STORIES = [
   {
-    file: "media-generation-fishmb-story-1-0-ad442bfe-7c49-4a9c-9469-0d4c628ece95.webp",
+    file: "fishmb-story-1.webp",
     caption: "Big walleye energy 🎣 Log your catches on FishMB!",
   },
   {
-    file: "media-generation-fishmb-story-2-0-729545ec-1212-478c-b5ba-b2d91c10111f.webp",
+    file: "fishmb-story-2.webp",
     caption: "Manitoba mornings hit different. Find your lake on FishMB 🗺️",
   },
   {
-    file: "media-generation-fishmb-story-3-0-a7e3842a-df58-498b-ad91-2edda733211c.webp",
+    file: "fishmb-story-3.webp",
     caption: "Dial in your tackle. What's your go-to walleye setup?",
   },
   {
-    file: "media-generation-fishmb-story-4-0-45aa14f3-bbe8-4711-86c0-39b8319f1586.webp",
+    file: "fishmb-story-4.webp",
     caption: "Ice season is coming ❄️ Are you ready?",
   },
   {
-    file: "media-generation-fishmb-story-5-0-9e6360b0-5cf6-4c04-a129-c78c5b7b2366.webp",
+    file: "fishmb-story-5.webp",
     caption: "Good friends, big pike. Share your catches on FishMB!",
   },
 ];
@@ -37,6 +34,7 @@ export async function POST(req: NextRequest) {
 
   await ensureStoryTables();
 
+  // Find the FishMB account (Dave's account).
   const users = await query<{ id: string; name: string }>(
     `SELECT id, name FROM fm_users WHERE name ILIKE '%dave%' OR name ILIKE '%DB H%' ORDER BY created_at ASC LIMIT 1`
   );
@@ -45,20 +43,28 @@ export async function POST(req: NextRequest) {
   }
   const userId = users[0].id;
 
+  // Skip stories that already exist (avoid duplicates).
+  const existing = await query<{ media_url: string }>(
+    `SELECT media_url FROM fm_stories WHERE user_id = $1 AND media_url LIKE '%/fishmb/stories/fishmb-story-%'`,
+    [userId]
+  );
+  const existingUrls = new Set(existing.map((r) => r.media_url));
+
   const created: string[] = [];
+  const skipped: string[] = [];
   for (const s of STORIES) {
-    const buf = await readFile(join("/home/hatch/workspace/fishmb-stories", s.file));
-    const blob = await put(`stories/fishmb-${Date.now()}-${s.file}`, buf, {
-      access: "public",
-      contentType: "image/webp",
-    });
+    const url = `https://www.fishmb.ca/fishmb/stories/${s.file}`;
+    if (existingUrls.has(url)) {
+      skipped.push(s.file);
+      continue;
+    }
     const rows = await query<{ id: string }>(
-      `INSERT INTO fm_stories (user_id, media_url, media_type, caption, is_public)
-       VALUES ($1, $2, 'photo', $3, true) RETURNING id`,
-      [userId, blob.url, s.caption]
+      `INSERT INTO fm_stories (user_id, media_url, media_type, caption, is_public, expires_at)
+       VALUES ($1, $2, 'photo', $3, true, NOW() + INTERVAL '10 years') RETURNING id`,
+      [userId, url, s.caption]
     );
     created.push(rows[0].id);
   }
 
-  return NextResponse.json({ ok: true, user: users[0].name, created });
+  return NextResponse.json({ ok: true, user: users[0].name, created, skipped });
 }
