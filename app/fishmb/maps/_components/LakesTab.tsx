@@ -73,6 +73,7 @@ export default function LakesTab({
   const [allLakes, setAllLakes] = useState<{ id: string; name: string; region?: string }[]>([]);
   const [adding, setAdding] = useState(false);
   const [addId, setAddId] = useState("");
+  const [addQuery, setAddQuery] = useState("");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -175,6 +176,7 @@ export default function LakesTab({
       );
       setAdding(false);
       setAddId("");
+      setAddQuery("");
     } catch {
       // Stay open on error.
     } finally {
@@ -243,23 +245,43 @@ export default function LakesTab({
       <div className="mt-3 px-4">
         {adding ? (
           <div className="space-y-2">
-            <select
-              value={addId}
-              onChange={(e) => setAddId(e.target.value)}
-              aria-label="Choose a lake to save"
-              className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold focus:outline-none focus:border-signal"
-            >
-              <option value="">Pick a lake…</option>
-              {allLakes
-                .filter((l) => !cards.some((c) => c.id === l.id))
-                .sort((a, b) => a.name.localeCompare(b.name))
-                .map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.name}
-                    {l.region ? ` — ${l.region}` : ""}
-                  </option>
-                ))}
-            </select>
+            <input
+              value={addQuery}
+              onChange={(e) => {
+                setAddQuery(e.target.value);
+                setAddId("");
+              }}
+              placeholder="Search lakes…"
+              aria-label="Search for a lake to save"
+              className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold placeholder:text-pine/35 placeholder:font-normal focus:outline-none focus:border-signal"
+            />
+            {addQuery.trim().length > 0 && (
+              <div className="max-h-48 overflow-y-auto bg-white border border-pine/15 rounded-2xl divide-y divide-pine/5">
+                {allLakes
+                  .filter((l) => !cards.some((c) => c.id === l.id))
+                  .filter((l) =>
+                    l.name.toLowerCase().includes(addQuery.trim().toLowerCase())
+                  )
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .slice(0, 20)
+                  .map((l) => (
+                    <button
+                      key={l.id}
+                      type="button"
+                      onClick={() => {
+                        setAddId(l.id);
+                        setAddQuery(l.name);
+                      }}
+                      className={`w-full text-left px-4 py-2.5 text-sm font-bold text-pine hover:bg-pine/5 ${
+                        addId === l.id ? "bg-signal/10" : ""
+                      }`}
+                    >
+                      {l.name}
+                      {l.region ? <span className="text-pine/45 font-normal"> — {l.region}</span> : null}
+                    </button>
+                  ))}
+              </div>
+            )}
             <div className="flex gap-2">
               <button
                 type="button"
@@ -274,6 +296,7 @@ export default function LakesTab({
                 onClick={() => {
                   setAdding(false);
                   setAddId("");
+                  setAddQuery("");
                 }}
                 className="text-pine/60 text-xs font-bold uppercase tracking-wider px-4 py-2.5"
               >
