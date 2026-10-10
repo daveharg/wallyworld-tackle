@@ -1074,7 +1074,14 @@ export default function MapsHub() {
                           : "border-pine/15 bg-white hover:border-pine/30"
                       }`}
                     >
-                      {c.emoji}
+                      {c.id === "boat" ? (
+                        <svg width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden>
+                          <path d="M14 1 C18 6, 21 12, 21 18 C21 23, 18 26, 14 26 C10 26, 7 23, 7 18 C7 12, 10 6, 14 1 Z" fill="#1d4d2b" stroke="white" strokeWidth="1.5"/>
+                          <rect x="11" y="12" width="6" height="8" rx="1.5" fill="white" opacity="0.9"/>
+                        </svg>
+                      ) : (
+                        c.emoji
+                      )}
                     </button>
                   ))}
                 </div>
@@ -1236,7 +1243,14 @@ export default function MapsHub() {
                         : "border-pine/15 bg-white hover:border-pine/30"
                     }`}
                   >
-                    {c.emoji}
+                    {c.id === "boat" ? (
+                      <svg width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden>
+                        <path d="M14 1 C18 6, 21 12, 21 18 C21 23, 18 26, 14 26 C10 26, 7 23, 7 18 C7 12, 10 6, 14 1 Z" fill="#1d4d2b" stroke="white" strokeWidth="1.5"/>
+                        <rect x="11" y="12" width="6" height="8" rx="1.5" fill="white" opacity="0.9"/>
+                      </svg>
+                    ) : (
+                      c.emoji
+                    )}
                   </button>
                 ))}
               </div>
