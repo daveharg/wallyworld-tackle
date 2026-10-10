@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
 
@@ -17,6 +17,8 @@ interface FriendsBundle {
   pending_incoming: Person[];
   pending_outgoing: Person[];
 }
+
+type Tab = "friends" | "requests" | "add";
 
 function Avatar({ p, size = 44 }: { p: Person; size?: number }) {
   if (p.avatar_url) {
@@ -36,12 +38,19 @@ function Avatar({ p, size = 44 }: { p: Person; size?: number }) {
 export default function FriendsPage() {
   const { user, openLogin } = useFishAuth();
   const router = useRouter();
+  const params = useSearchParams();
   const [bundle, setBundle] = useState<FriendsBundle | null>(null);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Person[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
   const [actionFriend, setActionFriend] = useState<Person | null>(null);
+
+  const tabParam = params.get("tab");
+  const tab: Tab = tabParam === "requests" ? "requests" : tabParam === "add" ? "add" : "friends";
+  const setTab = (t: Tab) => {
+    router.replace(`/fishmb/friends?tab=${t}`, { scroll: false });
+  };
 
   const messageFriend = async (p: Person) => {
     setBusy(p.id);
@@ -109,7 +118,7 @@ export default function FriendsPage() {
     body: JSON.stringify(b),
   });
   const request = (id: string) =>
- act(id, () => fishFetch("/api/fish/friends/request", json({ user_id: id })), "Friend request sent ");
+    act(id, () => fishFetch("/api/fish/friends/request", json({ user_id: id })), "Friend request sent");
   const accept = (id: string) =>
     act(id, () => fishFetch("/api/fish/friends/respond", json({ requester_id: id, accept: true })), "You're friends now!");
   const decline = (id: string) =>
@@ -135,98 +144,168 @@ export default function FriendsPage() {
     ...(bundle?.pending_incoming.map((f) => f.id) ?? []),
   ]);
 
+  const tabs: { id: Tab; label: string; count?: number }[] = [
+    { id: "friends", label: "Friends", count: bundle?.friends.length },
+    { id: "requests", label: "Requests", count: bundle?.pending_incoming.length },
+    { id: "add", label: "Add friends" },
+  ];
+
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10 md:py-14">
-      <Link href="/fishmb/feed" className="text-sm font-bold text-signal uppercase tracking-wider">← Community feed</Link>
-      <h1 className="font-display font-bold uppercase text-pine text-4xl md:text-5xl tracking-wide mt-4 mb-2">Friends</h1>
-      <p className="text-pine/60 mb-8">Add fishing friends, then share catches and posts with just friends.</p>
-
-      {note && <p className="text-sm text-pine bg-gold/20 border border-gold/50 rounded-2xl px-4 py-3 mb-6">{note}</p>}
-
-      <div id="find-anglers" className="bg-white border border-pine/10 rounded-3xl p-6 mb-8 scroll-mt-24">
-        <h2 className="font-bold text-pine uppercase tracking-wider text-sm mb-3">Find anglers</h2>
-        <input
-          id="find-anglers-input"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by name…"
-          className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine placeholder:text-pine/35 focus:outline-none focus:border-signal"
-        />
-        {results.length > 0 && (
-          <ul className="mt-3 divide-y divide-pine/10">
-            {results.map((p) => (
-              <li key={p.id} className="flex items-center gap-3 py-2.5">
-                <Link href={`/fishmb/anglers/${p.id}`} className="flex items-center gap-3 flex-1 min-w-0">
-                  <Avatar p={p} size={40} />
-                  <span className="flex-1 font-bold text-pine truncate">{p.name}</span>
-                </Link>
-                {requestedIds.has(p.id) ? (
-                  <span className="text-xs font-bold uppercase tracking-wider text-pine/40">Requested</span>
-                ) : (
-                  <button
-                    onClick={() => request(p.id)}
-                    disabled={busy === p.id}
-                    className="text-sm font-bold text-signal uppercase tracking-wider disabled:opacity-50"
-                  >
-                    {busy === p.id ? "…" : "Add friend"}
-                  </button>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
+    <div className="min-h-screen">
+      {/* Centered header */}
+      <div className="pt-8 pb-2 px-4">
+        <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide text-center">Friends</h1>
       </div>
 
-      {(bundle?.pending_incoming.length ?? 0) > 0 && (
-        <div className="bg-white border border-signal/30 rounded-3xl p-6 mb-8">
-          <h2 className="font-bold text-pine uppercase tracking-wider text-sm mb-3">Friend requests</h2>
-          <ul className="divide-y divide-pine/10">
-            {bundle!.pending_incoming.map((p) => (
-              <li key={p.id} className="flex items-center gap-3 py-2.5">
-                <Link href={`/fishmb/anglers/${p.id}`} className="flex items-center gap-3 flex-1 min-w-0">
-                  <Avatar p={p} size={40} />
-                  <span className="flex-1 font-bold text-pine truncate">{p.name}</span>
-                </Link>
-                <button onClick={() => accept(p.id)} disabled={busy === p.id} className="text-sm font-bold text-pine uppercase tracking-wider bg-pine/10 hover:bg-pine/20 px-4 py-2 rounded-full disabled:opacity-50">Accept</button>
-                <button onClick={() => decline(p.id)} disabled={busy === p.id} className="text-sm font-bold text-pine/50 uppercase tracking-wider px-3 py-2 disabled:opacity-50">Decline</button>
-              </li>
+      {/* Tab bar */}
+      <div className="sticky top-0 z-10 bg-paper/95 backdrop-blur border-b border-pine/10">
+        <div className="max-w-3xl mx-auto px-4">
+          <div className="flex gap-2 justify-center py-3">
+            {tabs.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                className={`flex-1 max-w-44 px-4 py-2.5 rounded-full text-sm font-bold uppercase tracking-wider transition-colors ${
+                  tab === t.id
+                    ? "bg-pine text-white"
+                    : "bg-pine/10 text-pine/60 hover:bg-pine/15"
+                }`}
+              >
+                {t.label}
+                {t.count !== undefined && t.count > 0 && (
+                  <span className={`ml-1.5 ${tab === t.id ? "text-gold" : "text-signal"}`}>{t.count}</span>
+                )}
+              </button>
             ))}
-          </ul>
+          </div>
         </div>
-      )}
+      </div>
 
-      <div className="bg-white border border-pine/10 rounded-3xl p-6">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-bold text-pine uppercase tracking-wider text-sm">
-            Your friends ({bundle?.friends.length ?? 0})
-          </h2>
-          <button
-            onClick={() => {
-              document.getElementById("find-anglers")?.scrollIntoView({ behavior: "smooth", block: "start" });
-              document.getElementById("find-anglers-input")?.focus({ preventScroll: true });
-            }}
-            className="bg-signal hover:bg-signal-dark text-white text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full transition-colors"
-          >
-            ＋ Add friends
-          </button>
-        </div>
-        {(bundle?.friends.length ?? 0) === 0 ? (
-          <p className="text-pine/55 text-sm">No friends yet — search above to find friends.</p>
-        ) : (
-          <ul className="divide-y divide-pine/10">
-            {bundle!.friends.map((p) => (
-              <li key={p.id} className="flex items-center gap-3 py-2.5">
+      <div className="max-w-3xl mx-auto px-4 py-6 pb-24">
+        {note && <p className="text-sm text-pine bg-gold/20 border border-gold/50 rounded-2xl px-4 py-3 mb-6">{note}</p>}
+
+        {/* Friends list */}
+        {tab === "friends" && (
+          <div>
+            {(bundle?.friends.length ?? 0) === 0 ? (
+              <div className="text-center py-16">
+                <p className="text-pine/55 mb-4">No friends yet.</p>
                 <button
-                  onClick={() => setActionFriend(p)}
-                  className="flex items-center gap-3 flex-1 min-w-0 text-left"
+                  onClick={() => setTab("add")}
+                  className="bg-signal hover:bg-signal-dark text-white text-sm font-bold uppercase tracking-wider px-6 py-3 rounded-full transition-colors"
                 >
-                  <Avatar p={p} size={40} />
-                  <span className="flex-1 font-bold text-pine truncate">{p.name}</span>
+                  Find friends
                 </button>
-                <button onClick={() => remove(p.id)} disabled={busy === p.id} className="text-xs font-bold text-pine/45 uppercase tracking-wider disabled:opacity-50">Remove</button>
-              </li>
-            ))}
-          </ul>
+              </div>
+            ) : (
+              <ul className="divide-y divide-pine/10">
+                {bundle!.friends.map((p) => (
+                  <li key={p.id} className="flex items-center gap-4 py-3">
+                    <Link href={`/fishmb/anglers/${p.id}`}>
+                      <Avatar p={p} size={64} />
+                    </Link>
+                    <button
+                      onClick={() => setActionFriend(p)}
+                      className="flex-1 min-w-0 text-left"
+                    >
+                      <span className="block font-bold text-pine text-lg truncate">{p.name}</span>
+                    </button>
+                    <button
+                      onClick={() => remove(p.id)}
+                      disabled={busy === p.id}
+                      className="text-xs font-bold text-pine/45 uppercase tracking-wider px-3 py-2 disabled:opacity-50"
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+
+        {/* Friend requests */}
+        {tab === "requests" && (
+          <div>
+            {(bundle?.pending_incoming.length ?? 0) === 0 ? (
+              <p className="text-pine/55 text-center py-16">No friend requests right now.</p>
+            ) : (
+              <ul className="divide-y divide-pine/10">
+                {bundle!.pending_incoming.map((p) => (
+                  <li key={p.id} className="py-4">
+                    <div className="flex items-center gap-4">
+                      <Link href={`/fishmb/anglers/${p.id}`}>
+                        <Avatar p={p} size={80} />
+                      </Link>
+                      <Link href={`/fishmb/anglers/${p.id}`} className="flex-1 min-w-0">
+                        <span className="block font-bold text-pine text-xl truncate">{p.name}</span>
+                      </Link>
+                    </div>
+                    <div className="flex gap-3 mt-3 pl-24">
+                      <button
+                        onClick={() => accept(p.id)}
+                        disabled={busy === p.id}
+                        className="flex-1 bg-signal hover:bg-signal-dark text-white font-bold text-lg py-3 rounded-2xl disabled:opacity-50 transition-colors"
+                      >
+                        Confirm
+                      </button>
+                      <button
+                        onClick={() => decline(p.id)}
+                        disabled={busy === p.id}
+                        className="flex-1 bg-pine/10 hover:bg-pine/15 text-pine font-bold text-lg py-3 rounded-2xl disabled:opacity-50 transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+
+        {/* Add friends */}
+        {tab === "add" && (
+          <div>
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search anglers by name…"
+              className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3.5 text-pine placeholder:text-pine/35 focus:outline-none focus:border-signal mb-4"
+            />
+            {query.trim().length >= 2 && results.length === 0 && (
+              <p className="text-pine/55 text-center py-8">No anglers found.</p>
+            )}
+            <ul className="divide-y divide-pine/10">
+              {results.map((p) => (
+                <li key={p.id} className="py-4">
+                  <div className="flex items-center gap-4">
+                    <Link href={`/fishmb/anglers/${p.id}`}>
+                      <Avatar p={p} size={80} />
+                    </Link>
+                    <Link href={`/fishmb/anglers/${p.id}`} className="flex-1 min-w-0">
+                      <span className="block font-bold text-pine text-xl truncate">{p.name}</span>
+                    </Link>
+                  </div>
+                  <div className="mt-3 pl-24">
+                    {requestedIds.has(p.id) ? (
+                      <span className="block text-center text-sm font-bold uppercase tracking-wider text-pine/40 bg-pine/10 py-3 rounded-2xl">
+                        Requested
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => request(p.id)}
+                        disabled={busy === p.id}
+                        className="w-full bg-signal hover:bg-signal-dark text-white font-bold text-lg py-3 rounded-2xl disabled:opacity-50 transition-colors"
+                      >
+                        {busy === p.id ? "…" : "Add friend"}
+                      </button>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
 
@@ -250,13 +329,13 @@ export default function FriendsPage() {
               disabled={busy === actionFriend.id}
               className="w-full bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3.5 rounded-full mb-3 disabled:opacity-50 transition-colors"
             >
- {busy === actionFriend.id ? "Opening…" : " Message"}
+              {busy === actionFriend.id ? "Opening…" : "Message"}
             </button>
             <Link
               href={`/fishmb/anglers/${actionFriend.id}`}
               className="block w-full bg-pine/10 hover:bg-pine/15 text-pine font-bold uppercase tracking-wider text-sm px-6 py-3.5 rounded-full mb-3 transition-colors"
             >
- View profile
+              View profile
             </Link>
             <button
               onClick={() => setActionFriend(null)}

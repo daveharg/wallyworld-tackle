@@ -125,7 +125,7 @@ export default function DashboardStats() {
             Friends' stats
           </h2>
           <Link
-            href="/fishmb/friends"
+            href="/fishmb/friends?tab=add"
             className="text-signal-dark font-bold text-sm uppercase tracking-wider hover:underline"
           >
             + Add friends
@@ -138,7 +138,7 @@ export default function DashboardStats() {
               Add fishing friends to compare stats.
             </p>
             <Link
-              href="/fishmb/friends"
+              href="/fishmb/friends?tab=add"
               className="inline-block bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
             >
               Find friends
