@@ -7,6 +7,7 @@ import { lakePhotoUrl, hasRealLakePhoto, lakePhotoCredit } from "@/lib/fishmb-co
 import { LakeMap } from "../_components/LakeMap";
 import { LakeSpotsSection } from "../_components/LakeSpotsSection";
 import { TrophyCatchesList } from "./TrophyCatchesList";
+import { SharedCatchesList } from "./SharedCatchesList";
 import coordsJson from "@/public/fishmb/lake-coords.json";
 
 const COORDS = coordsJson as Record<string, { lat: number; lng: number }>;
@@ -252,6 +253,9 @@ export default function LakeDetailPage({ params }: { params: { id: string } }) {
 
           {/* Trophy catches from the Master Angler record book */}
           <TrophyCatches lakeId={lake.id} />
+
+          {/* Shared catches from FishMB users */}
+          <SharedCatchesList lakeId={lake.id} lakeName={lake.name} />
 
           {/* Location map */}
           {coords && (

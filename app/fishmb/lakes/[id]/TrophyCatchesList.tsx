@@ -3,9 +3,10 @@
 import { useState } from "react";
 import type { TrophyCatch } from "@/lib/fishmb";
 
-/** Trophy catches, always newest first — client component for search. */
+/** Trophy catches — shows the most recent by default, with a button to view all. */
 export function TrophyCatchesList({ catches }: { catches: TrophyCatch[] }) {
   const [search, setSearch] = useState("");
+  const [showAll, setShowAll] = useState(false);
   if (catches.length === 0) return null;
 
   const q = search.trim().toLowerCase();
@@ -22,6 +23,8 @@ export function TrophyCatchesList({ catches }: { catches: TrophyCatch[] }) {
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 
+  const visible = showAll ? sorted : sorted.slice(0, 1);
+
   return (
     <section>
       <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
@@ -33,14 +36,16 @@ export function TrophyCatchesList({ catches }: { catches: TrophyCatch[] }) {
         Every documented trophy catch here, from the Manitoba Master
         Angler record book.
       </p>
-      <input
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        placeholder="Search by species, angler, or year…"
-        className="w-full bg-white border border-pine/15 rounded-full px-5 py-2.5 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal mb-3"
-      />
+      {showAll && (
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by species, angler, or year…"
+          className="w-full bg-white border border-pine/15 rounded-full px-5 py-2.5 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal mb-3"
+        />
+      )}
       <div className="rounded-2xl border border-pine/10 bg-white divide-y divide-pine/8 overflow-hidden max-h-[560px] overflow-y-auto">
-        {sorted.map((c, i) => (
+        {visible.map((c, i) => (
           <div key={i} className="px-4 py-3 flex items-center justify-between gap-3">
             <div className="min-w-0">
               <p className="text-sm font-bold text-pine">
@@ -62,6 +67,14 @@ export function TrophyCatchesList({ catches }: { catches: TrophyCatch[] }) {
           </p>
         )}
       </div>
+      {sorted.length > 1 && (
+        <button
+          onClick={() => setShowAll((s) => !s)}
+          className="mt-3 w-full py-3 rounded-full bg-pine/5 hover:bg-pine/10 text-pine font-bold text-sm uppercase tracking-wider transition-colors"
+        >
+          {showAll ? "Show less" : `View all ${sorted.length} trophy catches`}
+        </button>
+      )}
       <p className="text-xs text-pine/40 mt-3">
         Source: Manitoba Master Angler record book (anglers.travelmanitoba.com)
       </p>
