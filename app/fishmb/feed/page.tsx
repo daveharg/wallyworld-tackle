@@ -967,7 +967,7 @@ function FeedPageInner() {
   const [visibility, setVisibility] = useState<"public" | "friends" | "followers" | "private">("public");
   const [shareLocation, setShareLocation] = useState(true);
   const [saveLocation, setSaveLocation] = useState(true);
-  const [personalRecord, setPersonalRecord] = useState(false);
+  const [postToFeed, setPostToFeed] = useState(true);
   const [catchSpecies, setCatchSpecies] = useState("");
   const [catchLength, setCatchLength] = useState("");
   const [catchLat, setCatchLat] = useState<number | null>(null);
@@ -1502,9 +1502,9 @@ function FeedPageInner() {
           photo_measure_url: photoUrl,
           photo_hold_url: photoUrl,
           photos: urls,
-          visibility: personalRecord ? "private" : visibility,
+          visibility: postToFeed ? visibility : "private",
           share_location: shareLocation,
-          personal_record: personalRecord,
+          personal_record: !postToFeed,
           tournament_id: tournamentId || null,
           weather,
           note: draft.trim() || null,
@@ -1540,7 +1540,7 @@ function FeedPageInner() {
       setCatchLng(null);
       setShareLocation(true);
       setSaveLocation(true);
-      setPersonalRecord(false);
+      setPostToFeed(true);
       closeComposer();
       load();
     } catch (e) {
@@ -2254,27 +2254,27 @@ function FeedPageInner() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setPersonalRecord(!personalRecord)}
+                  onClick={() => setPostToFeed(!postToFeed)}
                   className="w-full flex items-center justify-between mt-2 bg-pine/5 border border-pine/10 rounded-2xl px-4 py-3 text-left"
                 >
                   <span>
                     <span className="block text-sm font-bold text-pine">
-                      {personalRecord ? "Personal log" : "Post to feed"}
+                      {postToFeed ? "Post to feed" : "Personal log"}
                     </span>
                     <span className="block text-xs text-pine/55 mt-0.5">
-                      {personalRecord
-                        ? "Only you can see this catch. No verification required. You can share it later from HQ → Stats."
-                        : "This catch will appear in the feed."}
+                      {postToFeed
+                        ? "This catch will appear in the feed."
+                        : "Only you can see this catch. No verification required. You can share it later from HQ → Stats."}
                     </span>
                   </span>
                   <span
                     className={`shrink-0 w-12 h-7 rounded-full p-1 transition-colors ${
-                      personalRecord ? "bg-signal" : "bg-pine/15"
+                      postToFeed ? "bg-signal" : "bg-pine/15"
                     }`}
                   >
                     <span
                       className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
-                        personalRecord ? "translate-x-5" : ""
+                        postToFeed ? "translate-x-5" : ""
                       }`}
                     />
                   </span>

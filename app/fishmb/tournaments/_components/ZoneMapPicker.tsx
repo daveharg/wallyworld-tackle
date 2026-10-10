@@ -18,8 +18,9 @@ export interface ZonePoint {
 
 /**
  * Small map for drawing a tournament fishing zone.
- * Two modes: "box" (draggable/resizable rectangle) and "draw" (tap to place
- * polygon vertices). Reports back a bounding box and/or polygon points.
+ * Tap to place polygon vertices around the zone; drag points to adjust.
+ * Can expand to a fullscreen map with a back button.
+ * Reports back a bounding box and polygon points.
  */
 export default function ZoneMapPicker({
   initialBox,
@@ -34,71 +35,18 @@ export default function ZoneMapPicker({
 }) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapObj = useRef<L.Map | null>(null);
-  const boxRect = useRef<L.Rectangle | null>(null);
-  const cornerMarkers = useRef<L.Marker[]>([]);
   const polyObj = useRef<L.Polygon | null>(null);
   const polyMarkers = useRef<L.Marker[]>([]);
   const changeRef = useRef(onChange);
   changeRef.current = onChange;
 
-  const [mode, setMode] = useState<"box" | "draw">(
-    initialPolygon && initialPolygon.length >= 3 ? "draw" : "box"
-  );
-  const [box, setBox] = useState<ZoneBox>(initialBox);
+  const [expanded, setExpanded] = useState(false);
   const [polygon, setPolygon] = useState<ZonePoint[]>(initialPolygon ?? []);
-  const modeRef = useRef(mode);
-  modeRef.current = mode;
-  const boxRef = useRef(box);
-  boxRef.current = box;
+  const boxRef = useRef(initialBox);
   const polyRef = useRef(polygon);
   polyRef.current = polygon;
 
-  const emit = (b: ZoneBox, p: ZonePoint[] | null) => changeRef.current(b, p);
-
-  // Rebuild the box overlay (rectangle + 4 draggable corners).
-  const renderBox = (map: L.Map, b: ZoneBox) => {
-    boxRect.current?.remove();
-    cornerMarkers.current.forEach((m) => m.remove());
-    cornerMarkers.current = [];
-    const bounds = L.latLngBounds([b.south, b.west], [b.north, b.east]);
-    boxRect.current = L.rectangle(bounds, {
-      color: "#e4572e",
-      weight: 2,
-      fillColor: "#e4572e",
-      fillOpacity: 0.12,
-    }).addTo(map);
-    const corners: [number, number][] = [
-      [b.north, b.west],
-      [b.north, b.east],
-      [b.south, b.east],
-      [b.south, b.west],
-    ];
-    corners.forEach(([la, ln], i) => {
-      const m = L.marker([la, ln], {
-        draggable: true,
-        icon: L.divIcon({
-          className: "",
-          html: `<div style="width:22px;height:22px;border-radius:50%;background:#e4572e;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4);"></div>`,
-          iconSize: [22, 22],
-          iconAnchor: [11, 11],
-        }),
-      }).addTo(map);
-      m.on("dragend", () => {
-        const p = m.getLatLng();
-        const nb = { ...boxRef.current };
-        if (i === 0) { nb.north = p.lat; nb.west = p.lng; }
-        if (i === 1) { nb.north = p.lat; nb.east = p.lng; }
-        if (i === 2) { nb.south = p.lat; nb.east = p.lng; }
-        if (i === 3) { nb.south = p.lat; nb.west = p.lng; }
-        // Keep the box valid.
-        if (nb.north <= nb.south || nb.east <= nb.west) return;
-        setBox(nb);
-        emit(nb, null);
-        renderBox(map, nb);
-      });
-      cornerMarkers.current.push(m);
-    });
-  };
+  const emit = (p: ZonePoint[] | null) => changeRef.current(boxRef.current, p);
 
   // Rebuild the polygon overlay.
   const renderPolygon = (map: L.Map, pts: ZonePoint[]) => {
@@ -128,8 +76,9 @@ export default function ZoneMapPicker({
         const next = [...polyRef.current];
         next[i] = { lat: np.lat, lng: np.lng };
         setPolygon(next);
-        emit(boxRef.current, next.length >= 3 ? next : null);
-        renderPolygon(map, next);
+        emit(next.length >= 3 ? next : null);
+        const mm = mapObj.current;
+        if (mm) renderPolygon(mm, next);
       });
       polyMarkers.current.push(m);
     });
@@ -147,15 +96,14 @@ export default function ZoneMapPicker({
     }).addTo(map);
 
     map.on("click", (e: L.LeafletMouseEvent) => {
-      if (modeRef.current !== "draw") return;
       const next = [...polyRef.current, { lat: e.latlng.lat, lng: e.latlng.lng }];
       setPolygon(next);
-      emit(boxRef.current, next.length >= 3 ? next : null);
-      renderPolygon(map, next);
+      emit(next.length >= 3 ? next : null);
+      const mm = mapObj.current;
+      if (mm) renderPolygon(mm, next);
     });
 
-    if (modeRef.current === "box") renderBox(map, boxRef.current);
-    else renderPolygon(map, polyRef.current);
+    renderPolygon(map, polyRef.current);
 
     mapObj.current = map;
     setTimeout(() => map.invalidateSize(), 300);
@@ -166,6 +114,17 @@ export default function ZoneMapPicker({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Rebuild the map when expanding/collapsing (container size changes).
+  useEffect(() => {
+    const map = mapObj.current;
+    if (!map) return;
+    setTimeout(() => {
+      map.invalidateSize();
+      renderPolygon(map, polyRef.current);
+    }, 100);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expanded]);
+
   // Fly to a picked lake when it changes.
   const lastFocusKey = useRef<string | null>(null);
   useEffect(() => {
@@ -175,32 +134,12 @@ export default function ZoneMapPicker({
     mapObj.current.flyTo([focusLake.lat, focusLake.lng], 10, { duration: 1 });
   }, [focusLake]);
 
-  // Switch modes: clear the other overlay.
-  const switchMode = (m: "box" | "draw") => {
-    setMode(m);
-    const map = mapObj.current;
-    if (!map) return;
-    if (m === "box") {
-      polyObj.current?.remove();
-      polyMarkers.current.forEach((mk) => mk.remove());
-      polyMarkers.current = [];
-      setPolygon([]);
-      renderBox(map, boxRef.current);
-      emit(boxRef.current, null);
-    } else {
-      boxRect.current?.remove();
-      cornerMarkers.current.forEach((mk) => mk.remove());
-      cornerMarkers.current = [];
-      renderPolygon(map, polyRef.current);
-    }
-  };
-
   const undoPoint = () => {
     const map = mapObj.current;
     if (!map) return;
     const next = polyRef.current.slice(0, -1);
     setPolygon(next);
-    emit(boxRef.current, next.length >= 3 ? next : null);
+    emit(next.length >= 3 ? next : null);
     renderPolygon(map, next);
   };
 
@@ -208,54 +147,92 @@ export default function ZoneMapPicker({
     const map = mapObj.current;
     if (!map) return;
     setPolygon([]);
-    emit(boxRef.current, null);
+    emit(null);
     renderPolygon(map, []);
   };
 
+  const mapUi = (
+    <>
+      <div
+        ref={mapRef}
+        className={expanded ? "w-full h-full" : "w-full h-64 rounded-2xl border border-pine/15"}
+        style={expanded ? undefined : { zIndex: 0 }}
+      />
+      {expanded ? (
+        <button
+          type="button"
+          onClick={() => setExpanded(false)}
+          className="absolute top-4 left-4 z-[1000] bg-pine text-white text-sm font-bold px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2"
+        >
+          ← Back
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          className="absolute top-2 right-2 z-[1000] bg-white/95 text-pine text-xs font-bold px-3 py-2 rounded-full shadow border border-pine/15"
+        >
+          ⤢ Expand
+        </button>
+      )}
+    </>
+  );
+
   return (
     <div>
-      <div className="flex gap-2 mb-2">
-        <button
-          type="button"
-          onClick={() => switchMode("box")}
-          className={`flex-1 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors ${
-            mode === "box" ? "bg-signal text-white" : "bg-white border border-pine/20 text-pine/70"
-          }`}
-        >
-          ⬛ Box zone
-        </button>
-        <button
-          type="button"
-          onClick={() => switchMode("draw")}
-          className={`flex-1 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-colors ${
-            mode === "draw" ? "bg-signal text-white" : "bg-white border border-pine/20 text-pine/70"
-          }`}
-        >
-          ✏️ Draw zone
-        </button>
-      </div>
-      <div ref={mapRef} className="w-full h-64 rounded-2xl border border-pine/15 z-0" />
-      <p className="text-[11px] text-pine/50 mt-1.5">
-        {mode === "box"
-          ? "Drag the orange dots to resize the zone."
-          : "Tap the map to place points around your zone. Drag points to adjust."}
-      </p>
-      {mode === "draw" && polygon.length > 0 && (
-        <div className="flex gap-2 mt-2">
-          <button
-            type="button"
-            onClick={undoPoint}
-            className="flex-1 py-2 rounded-full text-xs font-bold bg-white border border-pine/20 text-pine/70"
-          >
-            ↩ Undo point
-          </button>
-          <button
-            type="button"
-            onClick={clearPolygon}
-            className="flex-1 py-2 rounded-full text-xs font-bold bg-white border border-pine/20 text-pine/70"
-          >
-            🗑 Clear
-          </button>
+      {expanded ? (
+        <div className="fixed inset-0 z-[2000] bg-pine-deep/60 flex flex-col">
+          <div className="relative flex-1 m-3 rounded-3xl overflow-hidden">
+            {mapUi}
+          </div>
+          <div className="px-4 pb-6 pt-1">
+            <p className="text-white/80 text-xs text-center mb-2">
+              Tap the map to place points around your zone. Drag points to adjust.
+            </p>
+            {polygon.length > 0 && (
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={undoPoint}
+                  className="flex-1 py-2.5 rounded-full text-xs font-bold bg-white text-pine"
+                >
+                  ↩ Undo point
+                </button>
+                <button
+                  type="button"
+                  onClick={clearPolygon}
+                  className="flex-1 py-2.5 rounded-full text-xs font-bold bg-white text-pine"
+                >
+                  🗑 Clear
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="relative">
+          {mapUi}
+          <p className="text-[11px] text-pine/50 mt-1.5">
+            Tap the map to place points around your zone. Drag points to adjust.
+          </p>
+          {polygon.length > 0 && (
+            <div className="flex gap-2 mt-2">
+              <button
+                type="button"
+                onClick={undoPoint}
+                className="flex-1 py-2 rounded-full text-xs font-bold bg-white border border-pine/20 text-pine/70"
+              >
+                ↩ Undo point
+              </button>
+              <button
+                type="button"
+                onClick={clearPolygon}
+                className="flex-1 py-2 rounded-full text-xs font-bold bg-white border border-pine/20 text-pine/70"
+              >
+                🗑 Clear
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
