@@ -27,6 +27,7 @@ export interface ConversationMember {
 export interface ConversationPreview {
   id: string;
   name: string | null;
+  avatar_url: string | null;
   is_group: boolean;
   members: ConversationMember[];
   last_at: string | null;
@@ -67,6 +68,7 @@ export async function ensureMsgTables(): Promise<void> {
     created_at timestamptz NOT NULL DEFAULT now()
   )`);
   await query(`ALTER TABLE fm_conversations ADD COLUMN IF NOT EXISTS name text`);
+  await query(`ALTER TABLE fm_conversations ADD COLUMN IF NOT EXISTS avatar_url text`);
   await query(`CREATE TABLE IF NOT EXISTS fm_conversation_members (
     conversation_id uuid NOT NULL REFERENCES fm_conversations(id) ON DELETE CASCADE,
     user_id uuid NOT NULL REFERENCES fm_users(id) ON DELETE CASCADE,
@@ -140,6 +142,7 @@ export async function listConversations(userId: string): Promise<ConversationPre
   const rows = await query<{
     id: string;
     name: string | null;
+    avatar_url: string | null;
     member_count: number;
     last_at: string | null;
     last_sender_id: string | null;
@@ -152,7 +155,7 @@ export async function listConversations(userId: string): Promise<ConversationPre
        SELECT conversation_id, last_read_at, pinned_at
          FROM fm_conversation_members WHERE user_id = $1
      )
-     SELECT c.id, c.name,
+     SELECT c.id, c.name, c.avatar_url,
             (SELECT COUNT(*)::int FROM fm_conversation_members mm WHERE mm.conversation_id = c.id) AS member_count,
             m.created_at AS last_at, m.sender_id AS last_sender_id,
             m.nonce AS last_nonce, m.ciphertext AS last_ciphertext,
@@ -180,6 +183,7 @@ export async function listConversations(userId: string): Promise<ConversationPre
     previews.push({
       id: r.id,
       name: r.name,
+      avatar_url: r.avatar_url,
       is_group: r.member_count > 2,
       members,
       last_at: r.last_at,

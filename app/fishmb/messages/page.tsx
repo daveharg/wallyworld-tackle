@@ -27,6 +27,7 @@ interface ConvoMember {
 interface Convo {
   id: string;
   name: string | null;
+  avatar_url: string | null;
   is_group: boolean;
   members: ConvoMember[];
   last_at: string | null;
@@ -171,6 +172,7 @@ function MessagesPageInner() {
     setSelected({
       id: c.id,
       name: c.name,
+      avatar_url: c.avatar_url,
       is_group: c.is_group,
       members: c.members,
     });
@@ -200,7 +202,7 @@ function MessagesPageInner() {
       if (target) {
         const hit = list.find((c) => c.id === target);
         if (hit) {
-          setSelected({ id: hit.id, name: hit.name, is_group: hit.is_group, members: hit.members });
+          setSelected({ id: hit.id, name: hit.name, avatar_url: hit.avatar_url, is_group: hit.is_group, members: hit.members });
         }
       }
     } catch {
@@ -267,6 +269,7 @@ function MessagesPageInner() {
         setSelected({
           id: convo.id,
           name: convo.name,
+          avatar_url: convo.avatar_url,
           is_group: convo.is_group,
           members: convo.members,
         });
@@ -296,6 +299,7 @@ function MessagesPageInner() {
         setSelected({
           id: convo.id,
           name: convo.name,
+          avatar_url: convo.avatar_url,
           is_group: convo.is_group,
           members: convo.members,
         });

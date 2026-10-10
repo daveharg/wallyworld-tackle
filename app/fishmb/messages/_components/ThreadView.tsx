@@ -30,6 +30,7 @@ interface Decrypted {
 export interface ThreadPeer {
   id: string;
   name: string | null;
+  avatar_url: string | null;
   is_group: boolean;
   members: { user_id: string; name: string; avatar_url: string | null }[];
 }
@@ -66,6 +67,10 @@ export default function ThreadView({
   const [sending, setSending] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [showMembers, setShowMembers] = useState(false);
+  const [editingGroup, setEditingGroup] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editAvatar, setEditAvatar] = useState<string | null>(null);
+  const [savingGroup, setSavingGroup] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const lastAtRef = useRef<string | null>(null);
   const secretsRef = useRef<{ user_id: string; shared: Uint8Array }[] | null>(null);
@@ -238,6 +243,7 @@ export default function ThreadView({
   };
 
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const groupAvatarInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
   const sendPhoto = async (file: File) => {
@@ -269,6 +275,59 @@ export default function ThreadView({
     }
   };
 
+  const openGroupEditor = () => {
+    setEditName(peer.name ?? "");
+    setEditAvatar(peer.avatar_url ?? null);
+    setEditingGroup(true);
+  };
+
+  const uploadGroupAvatar = async (file: File) => {
+    setSavingGroup(true);
+    try {
+      const { compressImage } = await import("../../_components/compressImage");
+      const { FISHMB_TOKEN_KEY } = await import("@/lib/fishmb-constants");
+      const token = localStorage.getItem(FISHMB_TOKEN_KEY);
+      const form = new FormData();
+      form.append("file", await compressImage(file));
+      const upRes = await fetch("/api/fish/photos/upload", {
+        method: "POST",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: form,
+      });
+      const up = await upRes.json();
+      if (!upRes.ok) throw new Error(up.error || "Photo upload failed.");
+      setEditAvatar(up.url as string);
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Could not upload photo.");
+    } finally {
+      setSavingGroup(false);
+    }
+  };
+
+  const saveGroup = async () => {
+    const name = editName.trim();
+    if (!name) {
+      setNote("Give the group a name.");
+      return;
+    }
+    setSavingGroup(true);
+    try {
+      await fishFetch(`/api/fishmb/msg/conversations/${peer.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, avatar_url: editAvatar ?? "" }),
+      });
+      peer.name = name;
+      peer.avatar_url = editAvatar;
+      setEditingGroup(false);
+      setNote(null);
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Could not save group.");
+    } finally {
+      setSavingGroup(false);
+    }
+  };
+
   const title = peer.is_group
     ? (peer.name ?? "Group chat")
     : (peer.members.find((m) => m.user_id !== myId)?.name ?? "Chat");
@@ -284,9 +343,14 @@ export default function ThreadView({
 
   const peerAvatar = (size: string, textSize: string) =>
     peer.is_group ? (
-      <span className={`${size} rounded-full bg-pine/15 text-pine flex items-center justify-center font-bold shrink-0`}>
+      peer.avatar_url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={peer.avatar_url} alt="" className={`${size} rounded-full object-cover shrink-0`} />
+      ) : (
+        <span className={`${size} rounded-full bg-pine/15 text-pine flex items-center justify-center font-bold shrink-0`}>
  
-      </span>
+        </span>
+      )
     ) : others[0]?.avatar_url ? (
       // eslint-disable-next-line @next/next/no-img-element
       <img src={others[0].avatar_url} alt="" className={`${size} rounded-full object-cover shrink-0`} />
@@ -346,14 +410,14 @@ export default function ThreadView({
         <div className="flex-1 min-w-0 flex flex-col items-center">
           <button
             type="button"
-            onClick={() => peer.is_group && setShowMembers((s) => !s)}
+            onClick={() => peer.is_group ? openGroupEditor() : undefined}
             className="flex flex-col items-center gap-1 min-w-0"
-            aria-label={peer.is_group ? "Show members" : title}
+            aria-label={peer.is_group ? "Edit group" : title}
           >
             {peerAvatar("w-11 h-11", "text-lg")}
             <span className="font-bold text-pine text-[17px] leading-tight truncate max-w-full">
               {title}
-              <span className="text-pine/30 text-sm"> ›</span>
+              {peer.is_group && <span className="text-pine/30 text-sm"> ›</span>}
             </span>
           </button>
           <p className="text-[11px] text-pine/45 mt-0.5">
@@ -362,6 +426,86 @@ export default function ThreadView({
         </div>
         <span className="w-8 md:hidden shrink-0" />
       </div>
+
+      {editingGroup && peer.is_group && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-4" onClick={() => setEditingGroup(false)}>
+          <div className="bg-paper rounded-3xl w-full max-w-sm p-6" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
+              Edit group
+            </h3>
+            <div className="flex flex-col items-center mb-4">
+              <button
+                type="button"
+                onClick={() => groupAvatarInputRef.current?.click()}
+                className="relative w-20 h-20 rounded-full overflow-hidden bg-pine/10 flex items-center justify-center"
+                aria-label="Change group photo"
+              >
+                {editAvatar ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={editAvatar} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-3xl"></span>
+                )}
+                <span className="absolute inset-0 bg-black/30 flex items-center justify-center text-white text-xs font-bold opacity-0 hover:opacity-100 transition-opacity">
+                  Change
+                </span>
+              </button>
+              <input
+                ref={groupAvatarInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) void uploadGroupAvatar(f);
+                  e.target.value = "";
+                }}
+              />
+              <p className="text-xs text-pine/50 mt-2">Tap photo to change</p>
+            </div>
+            <input
+              value={editName}
+              onChange={(e) => setEditName(e.target.value)}
+              placeholder="Group name"
+              maxLength={60}
+              className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3 text-pine font-bold mb-4 focus:outline-none focus:border-signal"
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setEditingGroup(false)}
+                className="flex-1 py-3 rounded-full border border-pine/20 text-pine font-bold text-sm uppercase tracking-wider"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={saveGroup}
+                disabled={savingGroup}
+                className="flex-1 py-3 rounded-full bg-signal text-white font-bold text-sm uppercase tracking-wider disabled:opacity-50"
+              >
+                {savingGroup ? "Saving…" : "Save"}
+              </button>
+            </div>
+            <div className="mt-5 pt-4 border-t border-pine/10">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-pine/45 mb-2">
+                {peer.members.length} members
+              </p>
+              <div className="space-y-1 max-h-40 overflow-y-auto">
+                {peer.members.map((m) => (
+                  <div key={m.user_id} className="flex items-center gap-2 text-sm text-pine">
+                    <span className="w-6 h-6 rounded-full bg-pine/10 flex items-center justify-center text-xs font-bold">
+                      {m.name.charAt(0).toUpperCase()}
+                    </span>
+                    {m.name}
+                    {m.user_id === myId && <span className="text-xs text-pine/45">(you)</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showMembers && peer.is_group && (
         <div className="bg-white border border-pine/10 rounded-2xl p-3 mt-3 space-y-1">
