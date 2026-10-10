@@ -25,12 +25,12 @@ export function FishChrome({ children }: { children: React.ReactNode }) {
   const hideFooter =
     bare ||
     NO_FOOTER_PREFIXES.some((p) => (pathname ?? "").startsWith(p));
-  // Top bar only on feed for phones; everywhere on desktop.
-  const showHeader = (pathname ?? "").startsWith("/fishmb/feed");
+  // The old top bar is hidden on mobile everywhere — the feed has its own
+  // mobile header now. Desktop keeps it.
   if (bare) return <>{children}</>;
   return (
     <div className="min-h-screen bg-paper font-body text-pine">
-      <div className={showHeader ? "" : "hidden md:block"}>
+      <div className="hidden md:block">
         <FishHeader />
       </div>
       <main className="min-h-[70vh] pb-28 md:pb-32">{children}</main>

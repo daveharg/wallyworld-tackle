@@ -886,6 +886,7 @@ function FeedPageInner() {
   const [sectionMenuOpen, setSectionMenuOpen] = useState(false);
   const [composerOpen, setComposerOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [q, setQ] = useState("");
   const [activeQ, setActiveQ] = useState("");
   const [mode, setMode] = useState<"post" | "catch">("post");
@@ -1493,16 +1494,27 @@ function FeedPageInner() {
           <span className="font-display font-black text-2xl tracking-tight">
             <span className="text-pine">Fish</span><span className="text-signal-dark">MB</span>
           </span>
-          <button
-            onClick={() => setSearchOpen(true)}
-            aria-label="Search the feed"
-            className="w-10 h-10 flex items-center justify-center rounded-full text-pine/70 hover:text-pine"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <circle cx="11" cy="11" r="7" />
-              <path d="m20 20-3.5-3.5" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setSearchOpen(true)}
+              aria-label="Search the feed"
+              className="w-10 h-10 flex items-center justify-center rounded-full text-pine/70 hover:text-pine"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-3.5-3.5" />
+              </svg>
+            </button>
+            <button
+              onClick={() => setMenuOpen(true)}
+              aria-label="Open menu"
+              className="w-10 h-10 flex items-center justify-center rounded-full text-pine/70 hover:text-pine"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <path d="M4 7h16M4 12h16M4 17h16" />
+              </svg>
+            </button>
+          </div>
         </div>
         <div className="flex justify-around border-b border-pine/10 mb-4">
           {(
@@ -1528,6 +1540,39 @@ function FeedPageInner() {
           })}
         </div>
       </div>
+      {/* Mobile menu drawer */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-[1200] md:hidden">
+          <div className="absolute inset-0 bg-pine-deep/60" onClick={() => setMenuOpen(false)} />
+          <div className="absolute right-0 top-0 bottom-0 w-72 bg-white shadow-2xl p-6 overflow-y-auto">
+            <div className="flex justify-end mb-4">
+              <button onClick={() => setMenuOpen(false)} aria-label="Close menu" className="text-pine/60 text-2xl leading-none">×</button>
+            </div>
+            <nav className="flex flex-col gap-1">
+              {[
+                ["/fishmb", "Home"],
+                ["/fishmb/lakes", "Lakes"],
+                ["/fishmb/lodges", "Lodges & Guides"],
+                ["/fishmb/regulations", "Regulations"],
+                ["/fishmb/hot-lakes", "Hot Lakes"],
+                ["/fishmb/tournaments", "Tournaments"],
+                ["/fishmb/tips", "Tips"],
+                ["/fishmb/feed", "The Feed"],
+                ["/fishmb/classifieds", "Classifieds"],
+              ].map(([href, label]) => (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={() => setMenuOpen(false)}
+                  className="py-3 px-2 text-pine font-bold border-b border-pine/10"
+                >
+                  {label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        </div>
+      )}
       {/* Desktop feed section header — tap the title to switch sections */}
       <div className="hidden md:flex items-center justify-between mb-4">        <div className="relative">
           <button
