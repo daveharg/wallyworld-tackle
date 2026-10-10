@@ -19,6 +19,8 @@ interface SettingsTabProps {
   onBasemapChange: (b: BasemapId) => void;
   windOn: boolean;
   onWindChange: (v: boolean) => void;
+  speedOn: boolean;
+  onSpeedChange: (v: boolean) => void;
   trails: Trail[];
   overlayTrailId: string;
   onOverlayTrail: (id: string) => void;
@@ -55,6 +57,8 @@ export default function SettingsTab({
   onBasemapChange,
   windOn,
   onWindChange,
+  speedOn,
+  onSpeedChange,
   trails,
   overlayTrailId,
   onOverlayTrail,
@@ -188,7 +192,28 @@ export default function SettingsTab({
           </span>
         </button>
         <p className="text-[11px] text-pine/45 mt-2">
-          Shows live wind speed and direction at the centre of your map.
+          Floating wind readout — drag it anywhere on the map.
+        </p>
+        <button
+          type="button"
+          onClick={() => onSpeedChange(!speedOn)}
+          className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3 mt-3"
+        >
+          <span className="text-sm font-bold text-pine">Speed widget</span>
+          <span
+            className={`w-12 h-7 rounded-full p-1 transition-colors ${
+              speedOn ? "bg-signal" : "bg-pine/15"
+            }`}
+          >
+            <span
+              className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                speedOn ? "translate-x-5" : ""
+              }`}
+            />
+          </span>
+        </button>
+        <p className="text-[11px] text-pine/45 mt-2">
+          Floating speedometer — drag it anywhere on the map.
         </p>
       </Section>
 

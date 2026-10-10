@@ -25,6 +25,7 @@ import LakeSheetDetail from "./LakeSheetDetail";
 import LakeSheetHeader from "./LakeSheetHeader";
 import SettingsTab from "./SettingsTab";
 import MapSearch from "./MapSearch";
+import DraggableWidget from "./DraggableWidget";
 import WindWidget from "./WindWidget";
 import type { MapCatch, SavedLake } from "./types";
 
@@ -99,6 +100,7 @@ export default function MapsHub() {
     }
   };
   const [windOn, setWindOn] = useState(false);
+  const [speedOn, setSpeedOn] = useState(false);
   const initPlaced = useRef(false);
   const urlPlaced = useRef(false);
 
@@ -665,8 +667,27 @@ export default function MapsHub() {
         )}
       </div>
 
-      {/* Wind overlay */}
-      {windOn && <WindWidget lat={mapCenter.lat} lng={mapCenter.lng} />}
+      {/* Wind overlay — draggable widget */}
+      {windOn && (
+        <DraggableWidget id="wind" defaultPos={{ x: 12, y: 180 }}>
+          <WindWidget lat={mapCenter.lat} lng={mapCenter.lng} />
+        </DraggableWidget>
+      )}
+
+      {/* Speed widget — draggable, shows GPS speed */}
+      {speedOn && (
+        <DraggableWidget id="speed" defaultPos={{ x: 12, y: 240 }}>
+          <div className="flex items-center gap-2 bg-white/95 backdrop-blur border border-pine/15 rounded-full px-4 py-2 shadow-lg">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1d4d2b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 14l4-4" />
+              <path d="M3.34 19a10 10 0 1 1 17.32 0" />
+            </svg>
+            <span className="text-xs font-black text-pine tabular-nums whitespace-nowrap">
+              {myLoc?.speed != null ? `${Math.round(myLoc.speed * 3.6)} km/h` : "— km/h"}
+            </span>
+          </div>
+        </DraggableWidget>
+      )}
 
       {/* Lake / town / city search */}
       <MapSearch
@@ -725,30 +746,32 @@ export default function MapsHub() {
         </button>
       )}
 
-      {/* Go-to navigation bar */}
+      {/* Go-to navigation bar — draggable */}
       {goTo && (
-        <div className="absolute top-28 left-3 z-20 flex items-center gap-2 bg-pine/90 backdrop-blur text-white rounded-full pl-4 pr-2 py-2 shadow-xl max-w-[55vw]">
-          <div className="flex-1 min-w-0">
-            <p className="font-bold text-xs truncate leading-tight">{goTo.name || "Fishing spot"}</p>
-            <p className="text-[11px] text-white/70 tabular-nums leading-tight">
-              {myLoc
-                ? `${formatDist(
-                    haversineM(myLoc.lat, myLoc.lng, Number(goTo.lat), Number(goTo.lng))
-                  )} · ${compassLabel(
-                    bearingDeg(myLoc.lat, myLoc.lng, Number(goTo.lat), Number(goTo.lng))
-                  )}`
-                : "Waiting for GPS…"}
-            </p>
+        <DraggableWidget id="goto" defaultPos={{ x: 12, y: 112 }}>
+          <div className="flex items-center gap-2 bg-pine/90 backdrop-blur text-white rounded-full pl-4 pr-2 py-2 shadow-xl max-w-[55vw]">
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-xs truncate leading-tight">{goTo.name || "Fishing spot"}</p>
+              <p className="text-[11px] text-white/70 tabular-nums leading-tight">
+                {myLoc
+                  ? `${formatDist(
+                      haversineM(myLoc.lat, myLoc.lng, Number(goTo.lat), Number(goTo.lng))
+                    )} · ${compassLabel(
+                      bearingDeg(myLoc.lat, myLoc.lng, Number(goTo.lat), Number(goTo.lng))
+                    )}`
+                  : "Waiting for GPS…"}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setGoTo(null)}
+              aria-label="Stop navigating"
+              className="shrink-0 w-7 h-7 rounded-full bg-white/15 flex items-center justify-center text-white/80 hover:text-white font-black text-sm"
+            >
+              ×
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => setGoTo(null)}
-            aria-label="Stop navigating"
-            className="shrink-0 w-7 h-7 rounded-full bg-white/15 flex items-center justify-center text-white/80 hover:text-white font-black text-sm"
-          >
-            ×
-          </button>
-        </div>
+        </DraggableWidget>
       )}
 
       {/* Toast */}
@@ -840,6 +863,8 @@ export default function MapsHub() {
             onBasemapChange={handleBasemapChange}
             windOn={windOn}
             onWindChange={setWindOn}
+            speedOn={speedOn}
+            onSpeedChange={setSpeedOn}
             trails={trails}
             overlayTrailId={overlayTrailId}
             onOverlayTrail={setOverlayTrailId}
