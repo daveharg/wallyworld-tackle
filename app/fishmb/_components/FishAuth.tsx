@@ -205,21 +205,19 @@ function LoginModal({ onClose, onDone }: { onClose: () => void; onDone: (u: Fish
         }, 500);
       });
 
-      // Exchange the code for tokens (PKCE — no client secret needed).
-      const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+      // Exchange the code for an ID token via our backend (which holds the client secret).
+      const tokenRes = await fetch("/api/fish/auth/google/code", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          client_id: FISHMB_GOOGLE_CLIENT_ID,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           code,
           code_verifier: verifier,
-          grant_type: "authorization_code",
           redirect_uri: redirectUri,
-        }).toString(),
+        }),
       });
       const tokens = await tokenRes.json();
       if (!tokenRes.ok || !tokens.id_token) {
-        throw new Error(tokens.error_description || "Could not complete Google sign-in.");
+        throw new Error(tokens.error || "Could not complete Google sign-in.");
       }
 
       // Send the ID token to our backend (same as before).

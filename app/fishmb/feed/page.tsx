@@ -2258,12 +2258,12 @@ function FeedPageInner() {
                   </span>
                   <span
                     className={`shrink-0 w-12 h-7 rounded-full p-1 transition-colors ${
-                      personalRecord ? "bg-pine/15" : "bg-signal"
+                      personalRecord ? "bg-signal" : "bg-pine/15"
                     }`}
                   >
                     <span
                       className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
-                        personalRecord ? "" : "translate-x-5"
+                        personalRecord ? "translate-x-5" : ""
                       }`}
                     />
                   </span>
