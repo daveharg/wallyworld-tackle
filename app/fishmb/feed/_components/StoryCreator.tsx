@@ -630,7 +630,21 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
       ) : (
         <>
           {/* Edit step — reel editor */}
-          <div className="flex-1 overflow-y-auto">
+          <div
+            className="flex-1 overflow-y-auto"
+            onClick={(e) => {
+              // Tap anywhere outside text editing controls — save and exit editing.
+              if (editingIdx !== null) {
+                const t = e.target as HTMLElement;
+                const inEditControls = t.closest("[data-edit-controls]");
+                const inTextOverlay = t.closest("[data-text-overlay]");
+                const inSlider = t.closest('input[type="range"]');
+                if (!inEditControls && !inTextOverlay && !inSlider) {
+                  addOverlay();
+                }
+              }
+            }}
+          >
             {/* Preview — active clip */}
             <div
               ref={previewRef}
@@ -641,12 +655,6 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
               onTouchStart={onPreviewTouchStart}
               onTouchMove={onPreviewTouchMove}
               onTouchEnd={onPreviewTouchEnd}
-              onClick={(e) => {
-                // Tap on video/photo background (not on text) — save and deselect.
-                if (editingIdx !== null && (e.target as HTMLElement).closest('[data-text-overlay]') === null) {
-                  addOverlay();
-                }
-              }}
             >
               {activeDraft && (
                 <div
@@ -850,7 +858,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
             )}
 
             {/* Text input */}
-            <div className="p-4 space-y-3">
+            <div className="p-4 space-y-3" data-edit-controls>
               <div className="flex gap-2">
                 <input
                   ref={textInputRef}
