@@ -2136,15 +2136,18 @@ function FeedPageInner() {
                     )}
                   </div>
                   <div className="flex items-center gap-2">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-pine/50 whitespace-nowrap">
+                      Visible to
+                    </span>
                     <select
                       value={visibility === "private" ? "public" : visibility}
                       onChange={(e) => setVisibility(e.target.value as "public" | "friends" | "followers")}
                       className="bg-paper-deep border border-pine/15 rounded-full px-3 py-2 text-xs font-bold text-pine focus:outline-none"
-                      aria-label="Who can see this"
+                      aria-label="Who can see this post"
                     >
-                      <option value="public">Share to everyone</option>
-                      <option value="friends">Share to friends</option>
-                      <option value="followers">Share to followers</option>
+                      <option value="public">Everyone</option>
+                      <option value="friends">Friends only</option>
+                      <option value="followers">Followers only</option>
                     </select>
                     <button
                       onClick={post}
@@ -2232,17 +2235,22 @@ function FeedPageInner() {
                       }}
                     />
                   </label>
-                  <select
-                    value={visibility}
-                    onChange={(e) => setVisibility(e.target.value as "public" | "friends" | "followers" | "private")}
-                    className="bg-paper-deep border border-pine/15 rounded-full px-3 py-2 text-xs font-bold text-pine focus:outline-none"
-                    aria-label="Who can see this"
-                  >
-                    <option value="public">Share to everyone</option>
-                    <option value="friends">Share to friends</option>
-                    <option value="followers">Share to followers</option>
-                    <option value="private">Only me</option>
-                  </select>
+                  <label className="flex items-center gap-2">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-pine/50 whitespace-nowrap">
+                      Visible to
+                    </span>
+                    <select
+                      value={visibility}
+                      onChange={(e) => setVisibility(e.target.value as "public" | "friends" | "followers" | "private")}
+                      className="bg-paper-deep border border-pine/15 rounded-full px-3 py-2 text-xs font-bold text-pine focus:outline-none"
+                      aria-label="Who can see this catch"
+                    >
+                      <option value="public">Everyone</option>
+                      <option value="friends">Friends only</option>
+                      <option value="followers">Followers only</option>
+                      <option value="private">Only me</option>
+                    </select>
+                  </label>
                 </div>
                 <button
                   type="button"
