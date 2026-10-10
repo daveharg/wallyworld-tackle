@@ -1,7 +1,6 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import type { SpotPin } from "../../profile/_components/SpotMap";
+import { SPOT_ICON_CHOICES } from "../../profile/_components/spotIcons";
 
 export interface Spot extends SpotPin {
   user_id: string;
@@ -52,6 +51,7 @@ export default function SpotsTab({
   const [editName, setEditName] = useState("");
   const [editNotes, setEditNotes] = useState("");
   const [editLakeId, setEditLakeId] = useState<string | null>(null);
+  const [editIcon, setEditIcon] = useState("pin");
   const [saving, setSaving] = useState(false);
   const [lakes, setLakes] = useState<LakeCoord[]>([]);
 
@@ -86,6 +86,7 @@ export default function SpotsTab({
     setEditName(s.name);
     setEditNotes(s.notes ?? "");
     setEditLakeId(s.lake_id ?? null);
+    setEditIcon(s.icon ?? "pin");
   };
 
   const saveEdit = async (id: string) => {
@@ -94,7 +95,7 @@ export default function SpotsTab({
       await onEdit(id, {
         name: editName.trim() || "Fishing spot",
         notes: editNotes.trim() || null,
-        icon: "pin",
+        icon: editIcon,
         lake_id: editLakeId,
       });
       setEditingId(null);
@@ -216,6 +217,28 @@ export default function SpotsTab({
                               </option>
                             ))}
                         </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-1.5">
+                          Icon
+                        </label>
+                        <div className="flex gap-2">
+                          {SPOT_ICON_CHOICES.map((c) => (
+                            <button
+                              key={c.id}
+                              type="button"
+                              onClick={() => setEditIcon(c.id)}
+                              title={c.label}
+                              className={`w-11 h-11 rounded-2xl border-2 text-2xl flex items-center justify-center transition-colors ${
+                                editIcon === c.id
+                                  ? "border-signal bg-signal/10"
+                                  : "border-pine/15 bg-white"
+                              }`}
+                            >
+                              {c.emoji}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                       <div className="flex gap-2">
                         <button
