@@ -552,28 +552,21 @@ export function FishLoginButton() {
             </div>
           )}
             <Link
-              href="/fishmb/dashboard"
+              href="/fishmb/profile/edit"
               onClick={() => setMenu(false)}
               className="block px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70 hover:text-signal hover:bg-pine/5"
             >
- Dashboard
+              Edit profile
             </Link>
             <Link
-              href="/fishmb/profile"
+              href="/fishmb/friends?tab=add"
               onClick={() => setMenu(false)}
               className="block px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70 hover:text-signal hover:bg-pine/5"
             >
-              My profile
+              Add friends
             </Link>
             <Link
-              href="/fishmb/friends"
-              onClick={() => setMenu(false)}
-              className="block px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70 hover:text-signal hover:bg-pine/5"
-            >
-              Friends
-            </Link>
-            <Link
-              href="/fishmb/friends"
+              href="/fishmb/friends?tab=requests"
               onClick={() => setMenu(false)}
               className="flex items-center justify-between px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70 hover:text-signal hover:bg-pine/5"
             >
@@ -581,18 +574,6 @@ export function FishLoginButton() {
               {pendingCount > 0 && (
                 <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-signal text-white text-[11px] font-black flex items-center justify-center">
                   {pendingCount > 9 ? "9+" : pendingCount}
-                </span>
-              )}
-            </Link>
-            <Link
-              href={joinTourneyId ? `/fishmb/tournaments/${joinTourneyId}/manage` : "/fishmb/tournaments"}
-              onClick={() => setMenu(false)}
-              className="flex items-center justify-between px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70 hover:text-signal hover:bg-pine/5"
-            >
-              <span>Tournaments</span>
-              {joinCount > 0 && (
-                <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-signal text-white text-[11px] font-black flex items-center justify-center">
-                  {joinCount > 9 ? "9+" : joinCount}
                 </span>
               )}
             </Link>
@@ -604,6 +585,16 @@ export function FishLoginButton() {
               className="w-full text-left px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70 hover:text-signal hover:bg-pine/5"
             >
               Log out
+            </button>
+            <button
+              onClick={() => {
+                logout();
+                setMenu(false);
+                openLogin();
+              }}
+              className="w-full text-left px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70 hover:text-signal hover:bg-pine/5"
+            >
+              Change user
             </button>
         </div>
       )}
