@@ -729,6 +729,24 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                   >
                     {liveText}
                   </span>
+                  {isEditing && (
+                    <button
+                      type="button"
+                      aria-label="Delete text"
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOverlays((list) => list.filter((_, j) => j !== i));
+                        setEditingIdx(null);
+                        setEditingOverlay(null);
+                        setOverlayText("");
+                      }}
+                      className="absolute -top-3 -right-3 w-6 h-6 rounded-full bg-red-500 text-white text-sm font-bold leading-none flex items-center justify-center shadow-lg active:scale-90 transition-transform"
+                      style={{ transform: "translate(50%, -50%)" }}
+                    >
+                      ×
+                    </button>
+                  )}
                 </div>
                 );
                 })}
