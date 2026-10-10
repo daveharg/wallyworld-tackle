@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
 import { compressImage } from "../_components/compressImage";
+import { readGpsFromImage } from "../_components/exifGps";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 import MuxPlayer from "@mux/mux-player-react";
 import YouTubeEmbed, { extractYouTubeId } from "../_components/YouTubeEmbed";
@@ -2205,9 +2206,22 @@ function FeedPageInner() {
                       accept="image/*"
                       multiple
                       className="hidden"
-                      onChange={(e) => {
+                      onChange={async (e) => {
                         const picked = Array.from(e.target.files ?? []).slice(0, 4 - catchPhotos.length);
-                        if (picked.length) setCatchPhotos([...catchPhotos, ...picked].slice(0, 4));
+                        if (picked.length) {
+                          setCatchPhotos([...catchPhotos, ...picked].slice(0, 4));
+                          // Prefer the photo's own GPS (where it was taken) over
+                          // the current device location. Falls back silently.
+                          for (const f of picked) {
+                            const gps = await readGpsFromImage(f);
+                            if (gps) {
+                              setCatchLat(gps.lat);
+                              setCatchLng(gps.lng);
+                              setCatchNote(`Location taken from photo GPS.`);
+                              break;
+                            }
+                          }
+                        }
                         e.target.value = "";
                       }}
                     />
