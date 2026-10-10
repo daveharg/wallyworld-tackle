@@ -162,8 +162,8 @@ export default function SpotMap({
       await import("leaflet/dist/leaflet.css");
       if (cancelled || !containerRef.current) return;
       const m = L.map(containerRef.current, { scrollWheelZoom: false }).setView(
-        [53.5, -96.5],
-        5
+        [58, -106],
+        4
       );
       const streets = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:

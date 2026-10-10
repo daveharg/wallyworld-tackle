@@ -131,23 +131,8 @@ export default function MapsHub() {
         const d = await fishFetch("/api/fishmb/spots");
         const list = (d.spots ?? []) as Spot[];
         setSpots(list);
-        // Initial placement: latest saved spot wins. If no spots, GPS takes over.
-        if (!urlPlaced.current && !initPlaced.current && list.length > 0) {
-          const sorted = [...list].sort(
-            (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-          );
-          // Use the latest spot with real coordinates (skip Null Island spots).
-          const latest = sorted.find((s) =>
-            isRealCoord(Number(s.lat), Number(s.lng))
-          );
-          if (latest) {
-            const lat = Number(latest.lat);
-            const lng = Number(latest.lng);
-            initPlaced.current = true;
-            setFocus({ lat, lng, key: `spot:init:${latest.id}`, zoom: 14 });
-            setMapCenter({ lat, lng });
-          }
-        }
+        // Map always starts zoomed out on Canada — no auto-placement.
+        // (URL deep-links still work via the effect below.)
       } catch {
         // Map shows the friendly empty state.
       } finally {
@@ -168,9 +153,9 @@ export default function MapsHub() {
     }
   };
 
-  // Live GPS — centres the map on your current location, but only after
-  // spots have loaded (a saved spot wins over GPS) and only if nothing
-  // else placed the map (URL deep-link or latest spot).
+  // Live GPS — tracks your location for the blue dot, but never moves the
+  // map on its own. The map always starts on Canada; URL deep-links still
+  // work, and the "find me" button flies to you on demand.
   useEffect(() => {
     if (!("geolocation" in navigator) || !spotsReady) return;
     const id = navigator.geolocation.watchPosition(
@@ -180,12 +165,8 @@ export default function MapsHub() {
           lng: pos.coords.longitude,
           speed: pos.coords.speed,
         };
-        setMyLoc(loc);
-        if (!initPlaced.current && !urlPlaced.current && isRealCoord(loc.lat, loc.lng)) {
-          initPlaced.current = true;
-          setFocus({ lat: loc.lat, lng: loc.lng, key: `gps:init`, zoom: 11 });
-          setMapCenter({ lat: loc.lat, lng: loc.lng });
-        }
+        // Reject Null Island fixes for the blue dot too.
+        if (isRealCoord(loc.lat, loc.lng)) setMyLoc(loc);
       },
       () => {
         // Permission denied — map stays where it is.
