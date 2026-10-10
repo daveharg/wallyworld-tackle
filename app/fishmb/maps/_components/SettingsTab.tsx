@@ -133,11 +133,9 @@ export default function SettingsTab({
 
   return (
     <div className="pt-1 space-y-4">
- <Section icon="" title="Map options" sub="Tune the map to how you fish.">
-        <p className="text-[11px] font-black uppercase tracking-[0.14em] text-pine/45 mb-2">
-          Map overlay
-        </p>
-        <div className="flex bg-pine/5 rounded-full p-1 mb-2">
+      {/* Map overlay — very first thing, no header */}
+      <div>
+        <div className="flex bg-pine/5 rounded-full p-1">
           {(
             [
               { id: "satellite", label: "Satellite" },
@@ -164,11 +162,13 @@ export default function SettingsTab({
           ))}
         </div>
         {showContoursSoon && (
-          <p className="text-[11px] text-pine/55 mb-2 bg-pine/5 rounded-2xl px-4 py-3">
+          <p className="text-[11px] text-pine/55 mt-2 bg-pine/5 rounded-2xl px-4 py-3">
             Depth contours are coming with the FishMB mobile app (Garmin
             Navionics). Your spots will work on both views.
           </p>
         )}
+      </div>
+ <Section icon="" title="Map options" sub="Tune the map to how you fish.">
         <button
           type="button"
           onClick={() => onWindChange(!windOn)}

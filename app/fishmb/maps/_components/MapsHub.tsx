@@ -59,6 +59,7 @@ export default function MapsHub() {
   // Map state
   const [spots, setSpots] = useState<Spot[]>([]);
   const [loading, setLoading] = useState(true);
+  const [spotsReady, setSpotsReady] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [myLoc, setMyLoc] = useState<{ lat: number; lng: number; speed: number | null } | null>(null);
   const [mapCenter, setMapCenter] = useState({ lat: 53.5, lng: -96.5 });
@@ -88,7 +89,7 @@ export default function MapsHub() {
     }
   };
   const [windOn, setWindOn] = useState(false);
-  const centeredOnGps = useRef(false);
+  const initPlaced = useRef(false);
   const urlPlaced = useRef(false);
 
   // Spots: picking + quick add
@@ -120,11 +121,26 @@ export default function MapsHub() {
     (async () => {
       try {
         const d = await fishFetch("/api/fishmb/spots");
-        setSpots((d.spots ?? []) as Spot[]);
+        const list = (d.spots ?? []) as Spot[];
+        setSpots(list);
+        // Initial placement: latest saved spot wins. If no spots, GPS takes over.
+        if (!urlPlaced.current && !initPlaced.current && list.length > 0) {
+          const latest = [...list].sort(
+            (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          )[0];
+          const lat = Number(latest.lat);
+          const lng = Number(latest.lng);
+          if (Number.isFinite(lat) && Number.isFinite(lng)) {
+            initPlaced.current = true;
+            setFocus({ lat, lng, key: `spot:init:${latest.id}`, zoom: 14 });
+            setMapCenter({ lat, lng });
+          }
+        }
       } catch {
         // Map shows the friendly empty state.
       } finally {
         setLoading(false);
+        setSpotsReady(true);
       }
     })();
     loadTrails();
@@ -140,10 +156,11 @@ export default function MapsHub() {
     }
   };
 
-  // Live GPS — the map opens on your current location (unless a URL
-  // deep-link already placed it).
+  // Live GPS — centres the map on your current location, but only after
+  // spots have loaded (a saved spot wins over GPS) and only if nothing
+  // else placed the map (URL deep-link or latest spot).
   useEffect(() => {
-    if (!("geolocation" in navigator)) return;
+    if (!("geolocation" in navigator) || !spotsReady) return;
     const id = navigator.geolocation.watchPosition(
       (pos) => {
         const loc = {
@@ -152,8 +169,8 @@ export default function MapsHub() {
           speed: pos.coords.speed,
         };
         setMyLoc(loc);
-        if (!centeredOnGps.current && !urlPlaced.current) {
-          centeredOnGps.current = true;
+        if (!initPlaced.current && !urlPlaced.current) {
+          initPlaced.current = true;
           setFocus({ lat: loc.lat, lng: loc.lng, key: `gps:init`, zoom: 11 });
           setMapCenter({ lat: loc.lat, lng: loc.lng });
         }
@@ -164,7 +181,7 @@ export default function MapsHub() {
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 30000 }
     );
     return () => navigator.geolocation.clearWatch(id);
-  }, []);
+  }, [spotsReady]);
 
   // Manual "find me" — single-shot GPS fix that flies the map to you.
   // (Covers denied-then-granted permission and slow first fixes.)
@@ -223,22 +240,8 @@ export default function MapsHub() {
       setMapCenter({ lat: qLat, lng: qLng });
       return;
     }
-    // No URL location — restore the last map position if the user picked one.
-    // Otherwise the GPS effect below centres on the current location.
-    try {
-      const raw = localStorage.getItem("fishmb-map-center");
-      if (raw) {
-        const saved = JSON.parse(raw) as { lat: number; lng: number; zoom?: number };
-        if (Number.isFinite(saved.lat) && Number.isFinite(saved.lng)) {
-          urlPlaced.current = true;
-          const z = Math.min(Math.max(saved.zoom ?? 11, 3), 18);
-          setFocus({ lat: saved.lat, lng: saved.lng, key: `saved:${Date.now()}`, zoom: z });
-          setMapCenter({ lat: saved.lat, lng: saved.lng });
-        }
-      }
-    } catch {
-      // No saved position — GPS takes over.
-    }
+    // No URL location — the spots effect centres on the latest saved spot,
+    // otherwise the GPS effect centres on the current location.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -296,19 +299,10 @@ export default function MapsHub() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [myLoc]);
 
-  // Refresh nearby catches as the map moves (debounced). Also remembers
-  // the last map position so reopening the map returns you where you were.
+  // Refresh nearby catches as the map moves (debounced).
   const nearbyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onMoveEnd = (center: { lat: number; lng: number }, zoom: number) => {
     setMapCenter(center);
-    try {
-      localStorage.setItem(
-        "fishmb-map-center",
-        JSON.stringify({ lat: center.lat, lng: center.lng, zoom })
-      );
-    } catch {
-      // Storage unavailable — non-fatal.
-    }
     if (nearbyTimer.current) clearTimeout(nearbyTimer.current);
     nearbyTimer.current = setTimeout(() => loadNearbyCatches(center.lat, center.lng), 800);
   };
