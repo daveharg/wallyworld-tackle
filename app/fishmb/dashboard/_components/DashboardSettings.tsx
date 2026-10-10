@@ -33,8 +33,14 @@ export default function DashboardSettings({ afterSaveHref }: { afterSaveHref?: s
     setNote(null);
     try {
       const token = localStorage.getItem(FISHMB_TOKEN_KEY);
+      const compressed = await compressImage(file);
+      if (compressed.size > 4_000_000) {
+        throw new Error(
+          "That photo is too large to upload. Try a smaller photo or take a screenshot of it first."
+        );
+      }
       const form = new FormData();
-      form.append("file", await compressImage(file));
+      form.append("file", compressed);
       const upRes = await fetch("/api/fish/photos/upload", {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : {},

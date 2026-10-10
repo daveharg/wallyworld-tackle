@@ -10,20 +10,32 @@ type Drawable = ImageBitmap | HTMLImageElement;
 
 /**
  * Compress an image file: long edge ≤ 1920px, JPEG quality 0.82.
- * Returns the original file untouched on any failure or if it isn't an image.
+ * Always converts non-JPEG formats (HEIC, PNG, WebP) to JPEG so the result
+ * is web-displayable. Returns the original file untouched only if it is
+ * already a small JPEG or if decoding fails entirely.
  * Never upscales.
  */
 export async function compressImage(file: File): Promise<File> {
   if (!file.type.startsWith("image/")) return file;
+  // Skip only if it's already a small web-ready JPEG.
+  if (file.type === "image/jpeg" && file.size <= 4_000_000) {
+    try {
+      const probe = await loadDrawable(file);
+      const longEdge = Math.max(probe.width as number, probe.height as number);
+      if (typeof (probe as ImageBitmap).close === "function") {
+        (probe as ImageBitmap).close();
+      }
+      if (longEdge <= 1920) return file; // already small enough
+    } catch {
+      // Fall through to re-encode.
+    }
+  }
   try {
     const src = await loadDrawable(file);
     const width = src.width as number;
     const height = src.height as number;
     const longEdge = Math.max(width, height);
     const scale = longEdge > 1920 ? 1920 / longEdge : 1;
-    if (scale >= 1 && file.type === "image/jpeg" && file.size <= 4_000_000) {
-      return file; // already small enough
-    }
     const canvas = document.createElement("canvas");
     canvas.width = Math.max(1, Math.round(width * scale));
     canvas.height = Math.max(1, Math.round(height * scale));
@@ -45,10 +57,15 @@ export async function compressImage(file: File): Promise<File> {
 }
 
 async function loadDrawable(file: File): Promise<Drawable> {
+  // Try createImageBitmap first (fast path).
   if (typeof createImageBitmap === "function") {
-    return createImageBitmap(file);
+    try {
+      return await createImageBitmap(file);
+    } catch {
+      // Fall through to <img> fallback (handles HEIC on iOS Safari).
+    }
   }
-  // Fallback for very old browsers: decode via an <img> element.
+  // Fallback: decode via an <img> element.
   const url = URL.createObjectURL(file);
   try {
     const img = new Image();
