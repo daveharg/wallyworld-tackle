@@ -47,14 +47,11 @@ export default function DashboardTournaments() {
       .then(async (d) => {
         const list = (d.tournaments ?? []) as MyTournament[];
         setTournaments(list);
-        // Fetch current standings for live tournaments.
-        const now = Date.now();
-        const liveIds = list
-          .filter((t) => new Date(t.ends_at).getTime() >= now)
-          .map((t) => t.id);
+        // Fetch current standings for all tournaments (live and past).
+        const ids = list.map((t) => t.id);
         const results: Standing[] = [];
         await Promise.all(
-          liveIds.map(async (id) => {
+          ids.map(async (id) => {
             try {
               const b = await fishFetch(`/api/fishmb/tournaments/${id}/leaderboard`);
               const board = (b.leaderboard ?? []) as {
@@ -97,17 +94,25 @@ export default function DashboardTournaments() {
         href={`/fishmb/tournaments/${t.id}`}
         className="flex items-center gap-3 bg-white border border-pine/10 rounded-2xl px-4 py-3.5 hover:border-signal/40 transition-colors"
       >
-        {standing && !isPast && (
-          <span className="w-10 h-10 rounded-full bg-gold/20 border border-gold/40 flex items-center justify-center font-black text-pine text-sm shrink-0">
-            #{standing.rank}
-          </span>
-        )}
+        <span
+          className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm shrink-0 ${
+            standing
+              ? "bg-gold/20 border border-gold/40 text-pine"
+              : "bg-pine/5 border border-pine/10 text-pine/30"
+          }`}
+        >
+          {standing ? `#${standing.rank}` : "NR"}
+        </span>
         <span className="min-w-0 flex-1">
           <span className="block font-bold text-pine truncate">{t.name}</span>
           <span className="block text-xs text-pine/50 mt-0.5">
             {fmtRange(t.starts_at, t.ends_at)}
-            {standing && !isPast && (
-              <span className="font-bold text-signal-dark"> · {standing.total} anglers</span>
+            {standing ? (
+              <span className="font-bold text-signal-dark">
+                {" "}· Rank {standing.rank} of {standing.total}
+              </span>
+            ) : (
+              <span className="text-pine/40"> · Not ranked yet</span>
             )}
           </span>
         </span>
@@ -115,6 +120,12 @@ export default function DashboardTournaments() {
       </Link>
     );
   };
+
+  // Summary leaderboard across all tournaments with a known standing.
+  const rankedStandings = standings
+    .map((s) => ({ ...s, t: tournaments.find((t) => t.id === s.tournamentId) }))
+    .filter((s) => s.t && !isNaN(new Date(s.t.ends_at).getTime()))
+    .sort((a, b) => a.rank - b.rank);
 
   return (
     <div className="space-y-6">
@@ -164,6 +175,33 @@ export default function DashboardTournaments() {
         </div>
       ) : (
         <>
+          {rankedStandings.length > 0 && (
+            <div className="bg-pine rounded-3xl p-5 text-white shadow-lg">
+              <h3 className="text-xs font-black uppercase tracking-wider text-white/60 mb-3">
+                🏆 Your standings
+              </h3>
+              <div className="space-y-2">
+                {rankedStandings.map((s) => (
+                  <Link
+                    key={s.tournamentId}
+                    href={`/fishmb/tournaments/${s.tournamentId}`}
+                    className="flex items-center gap-3 bg-white/10 hover:bg-white/15 rounded-2xl px-3 py-2.5 transition-colors"
+                  >
+                    <span className="w-9 h-9 rounded-full bg-gold/25 border border-gold/50 flex items-center justify-center font-black text-gold text-sm shrink-0">
+                      {s.rank}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block font-bold text-sm truncate">{s.t!.name}</span>
+                      <span className="block text-xs text-white/50">
+                        Rank {s.rank} of {s.total}
+                      </span>
+                    </span>
+                    <span className="text-white/30 text-lg leading-none shrink-0">›</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
           {live.length > 0 && (
             <div>
               <h3 className="text-xs font-black uppercase tracking-wider text-pine/45 mb-2">
