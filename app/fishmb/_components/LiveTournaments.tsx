@@ -47,7 +47,7 @@ export function LiveTournaments() {
     return (
       <p className="text-pine/55 text-sm bg-white border border-pine/10 rounded-2xl p-6">
         No tournaments posted yet —{" "}
-        <Link href="/fishmb/tournaments/create" className="text-signal-dark font-bold">
+        <Link href="/fishmb/dashboard?tab=tournaments" className="text-signal-dark font-bold">
           be the first to run one
         </Link>
         .

@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useFishAuth } from "../../_components/FishAuth";
 import { fishFetch } from "../../_components/fishFetch";
 import { JoinByCode } from "../../tournaments/_components/JoinByCode";
+import TournamentCreateSection from "./TournamentCreateSection";
 
 interface MyTournament {
   id: string;
@@ -42,6 +43,7 @@ export default function DashboardTournaments() {
   const [tournaments, setTournaments] = useState<MyTournament[]>([]);
   const [standings, setStandings] = useState<Standing[]>([]);
   const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     fishFetch("/api/fishmb/tournaments?mine=1")
@@ -184,13 +186,23 @@ export default function DashboardTournaments() {
             ?
           </Link>
         </div>
-        <Link
-          href="/fishmb/tournaments/create"
+        <button
+          type="button"
+          onClick={() => setCreating((v) => !v)}
           className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-5 py-2.5 rounded-full transition-colors"
         >
-          ＋ Start one
-        </Link>
+          {creating ? "✕ Cancel" : "＋ Start one"}
+        </button>
       </div>
+
+      {creating && (
+        <div className="bg-white border border-pine/10 rounded-3xl p-5">
+          <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
+            Create a tournament
+          </h3>
+          <TournamentCreateSection />
+        </div>
+      )}
 
       {/* Join with a code */}
       <div className="bg-white border border-pine/10 rounded-3xl p-5">
@@ -209,12 +221,13 @@ export default function DashboardTournaments() {
             Run your own or join one with an invite link.
           </p>
           <div className="flex gap-2 justify-center">
-            <Link
-              href="/fishmb/tournaments/create"
+            <button
+              type="button"
+              onClick={() => setCreating(true)}
               className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
             >
               Start a tournament
-            </Link>
+            </button>
             <Link
               href="/fishmb/tournaments"
               className="bg-pine/10 hover:bg-pine/20 text-pine font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"

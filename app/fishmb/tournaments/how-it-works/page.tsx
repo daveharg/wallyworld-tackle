@@ -220,7 +220,7 @@ export default function HowTournamentsWorkPage() {
 
       <div className="flex flex-wrap gap-3">
         <Link
-          href="/fishmb/tournaments/create"
+          href="/fishmb/dashboard?tab=tournaments"
           className="bg-signal hover:bg-signal-dark text-white font-black uppercase tracking-widest text-sm px-8 py-4 rounded-lg shadow-[0_4px_0_rgba(0,0,0,0.15)] hover:shadow-[0_2px_0_rgba(0,0,0,0.15)] hover:translate-y-[2px] transition-all"
         >
           Create a tournament

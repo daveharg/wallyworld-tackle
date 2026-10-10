@@ -37,7 +37,7 @@ export default async function TournamentsPage() {
       <div className="flex flex-col gap-3 mb-10">
         <div className="flex gap-3">
           <Link
-            href="/fishmb/tournaments/create"
+            href="/fishmb/dashboard?tab=tournaments"
             className="flex-1 flex items-center justify-center bg-signal hover:bg-signal-dark text-white font-black uppercase tracking-widest text-sm px-4 py-4 rounded-lg shadow-[0_4px_0_rgba(0,0,0,0.15)] hover:shadow-[0_2px_0_rgba(0,0,0,0.15)] hover:translate-y-[2px] transition-all"
           >
             Create a tournament
