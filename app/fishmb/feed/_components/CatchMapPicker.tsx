@@ -8,11 +8,15 @@ import "leaflet/dist/leaflet.css";
 export default function CatchMapPicker({
   lat,
   lng,
+  avatarUrl,
+  userName,
   onPick,
   onClose,
 }: {
   lat: number | null;
   lng: number | null;
+  avatarUrl?: string | null;
+  userName?: string | null;
   onPick: (lat: number, lng: number) => void;
   onClose: () => void;
 }) {
@@ -33,9 +37,20 @@ export default function CatchMapPicker({
     }).addTo(map);
 
     const setPin = (la: number, ln: number) => {
-      if (markerObj.current) markerObj.current.setLatLng([la, ln]);
-      else {
-        markerObj.current = L.marker([la, ln], { draggable: true }).addTo(map);
+      // Profile-pic pin — no default Leaflet images (they 404 as "?" boxes).
+      const initial = (userName ?? "?").trim().charAt(0).toUpperCase() || "?";
+      const icon = L.divIcon({
+        className: "",
+        html: avatarUrl
+          ? `<div style="width:36px;height:36px;border-radius:50%;overflow:hidden;border:3px solid #e4572e;box-shadow:0 2px 8px rgba(0,0,0,0.4);background:#12322b;"><img src="${avatarUrl}" alt="" style="width:100%;height:100%;object-fit:cover;" /></div>`
+          : `<div style="width:36px;height:36px;border-radius:50%;background:#e4572e;border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:17px;">${initial}</div>`,
+        iconSize: [36, 36],
+        iconAnchor: [18, 18],
+      });
+      if (markerObj.current) {
+        markerObj.current.setLatLng([la, ln]);
+      } else {
+        markerObj.current = L.marker([la, ln], { draggable: true, icon }).addTo(map);
         markerObj.current.on("dragend", () => {
           const p = markerObj.current!.getLatLng();
           pickRef.current(p.lat, p.lng);

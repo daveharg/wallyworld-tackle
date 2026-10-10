@@ -10,6 +10,7 @@ export interface MapCatch {
   lng: number;
   caught_at: string;
   user_name: string;
+  avatar_url: string | null;
   mine: boolean;
 }
 

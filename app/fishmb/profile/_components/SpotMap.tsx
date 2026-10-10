@@ -29,6 +29,8 @@ export interface CatchPin {
   species: string;
   length_in: number | null;
   mine: boolean;
+  avatar_url: string | null;
+  user_name: string;
 }
 
 export type BasemapId = "streets" | "satellite";
@@ -395,11 +397,14 @@ export default function SpotMap({
       const layer = L.layerGroup();
       for (const c of pins) {
         const color = c.mine ? "#e4572e" : "#12322b";
+        const initial = (c.user_name ?? "?").trim().charAt(0).toUpperCase() || "?";
         const icon = L.divIcon({
           className: "",
-          html: `<div style="width:30px;height:30px;border-radius:50%;background:${color};border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:15px;"></div>`,
-          iconSize: [30, 30],
-          iconAnchor: [15, 15],
+          html: c.avatar_url
+            ? `<div style="width:32px;height:32px;border-radius:50%;overflow:hidden;border:2.5px solid ${color};box-shadow:0 2px 8px rgba(0,0,0,0.4);background:#12322b;"><img src="${c.avatar_url}" alt="" style="width:100%;height:100%;object-fit:cover;" /></div>`
+            : `<div style="width:30px;height:30px;border-radius:50%;background:${color};border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:15px;">${initial}</div>`,
+          iconSize: [32, 32],
+          iconAnchor: [16, 16],
         });
         L.marker([c.lat, c.lng], { icon })
           .bindPopup(

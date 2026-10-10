@@ -570,6 +570,8 @@ export default function MapsHub() {
     species: c.species,
     length_in: c.length_in,
     mine: c.mine,
+    avatar_url: c.avatar_url ?? null,
+    user_name: c.user_name,
   }));
 
   const flyTo = (lat: number, lng: number, key: string, zoom = 13) => {

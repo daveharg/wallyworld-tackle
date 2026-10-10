@@ -2406,6 +2406,8 @@ function FeedPageInner() {
                   <CatchMapPicker
                     lat={catchLat}
                     lng={catchLng}
+                    avatarUrl={user?.avatar_url ?? null}
+                    userName={user?.name ?? null}
                     onPick={(la, ln) => {
                       setCatchLat(la);
                       setCatchLng(ln);

@@ -77,7 +77,8 @@ export async function GET(req: NextRequest) {
   }>(
     `SELECT c.id, c.user_id, c.species, c.length_in, c.weight_lb,
             COALESCE(c.photo_hold_url, c.photo_measure_url) AS photo_url,
-            c.lat, c.lng, c.caught_at, u.name AS user_name
+            c.lat, c.lng, c.caught_at, u.name AS user_name,
+            u.avatar_url AS avatar_url
        FROM fm_catches c
        JOIN fm_users u ON u.id = c.user_id
       WHERE ${visibilityWhere}
