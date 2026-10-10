@@ -85,7 +85,7 @@ export default function DashboardStats() {
   const [topAnglers, setTopAnglers] = useState<LeaderRow[]>([]);
   const [topFriends, setTopFriends] = useState<LeaderRow[]>([]);
   const [catches, setCatches] = useState<Catch[]>([]);
-  const [catchFilter, setCatchFilter] = useState<"all" | "shared" | "not-shared" | "tournament">("all");
+  const [catchFilter, setCatchFilter] = useState<"all" | "shared" | "not-shared" | "personal" | "tournament">("all");
   const [sharingId, setSharingId] = useState<string | null>(null);
 
   const shareCatch = async (c: Catch) => {
@@ -249,6 +249,7 @@ export default function DashboardStats() {
               { id: "all", label: "All" },
               { id: "shared", label: "Shared" },
               { id: "not-shared", label: "Not shared" },
+              { id: "personal", label: "Personal" },
               { id: "tournament", label: "Tournament" },
             ] as const
           ).map((f) => (
@@ -274,7 +275,9 @@ export default function DashboardStats() {
                 ? c.tournament_id != null
                 : catchFilter === "shared"
                   ? isShared(c)
-                  : !isShared(c) && c.tournament_id == null
+                  : catchFilter === "personal"
+                    ? c.personal_record === true
+                    : !isShared(c) && c.tournament_id == null
           );
           if (filtered.length === 0) {
             return (
@@ -315,6 +318,11 @@ export default function DashboardStats() {
                     {c.tournament_name && (
                       <p className="text-[10px] font-bold text-signal-dark uppercase tracking-wide truncate mt-0.5">
                         🏆 {c.tournament_name}
+                      </p>
+                    )}
+                    {c.personal_record === true && (
+                      <p className="text-[10px] font-bold text-pine/60 uppercase tracking-wide truncate mt-0.5">
+                        🔒 Personal log
                       </p>
                     )}
                     {c.tournament_id == null && !isShared(c) && (
