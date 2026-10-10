@@ -71,6 +71,7 @@ export function FishAuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const res = await fetch("/api/fish/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
       });
       if (!res.ok) throw new Error("bad session");
       const data = await res.json();

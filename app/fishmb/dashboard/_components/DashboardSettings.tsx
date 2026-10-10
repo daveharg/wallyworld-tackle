@@ -49,7 +49,7 @@ export default function DashboardSettings({ afterSaveHref }: { afterSaveHref?: s
       } catch {
         throw new Error("Upload didn't stick — please try again.");
       }
-      await fishFetch("/api/fish/auth/me", {
+      const updated = await fishFetch("/api/fish/auth/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ avatar_url: blob.url }),
