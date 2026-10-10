@@ -496,6 +496,7 @@ export async function getStories(viewerId: string | null): Promise<StoryItem[]> 
         AND ($1::uuid IS NULL
              OR s.is_public
              OR s.user_id = $1::uuid
+             OR u.name ILIKE 'fishmb'
              OR EXISTS (SELECT 1 FROM fm_friendships f
                         WHERE f.status = 'accepted'
                           AND ((f.requester_id = $1::uuid AND f.addressee_id = s.user_id)
