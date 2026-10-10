@@ -452,9 +452,12 @@ export async function ensureStoryTables(): Promise<void> {
     user_id uuid NOT NULL REFERENCES fm_users(id) ON DELETE CASCADE,
     media_url text NOT NULL,
     media_type text NOT NULL DEFAULT 'photo',
+    duration numeric,
     created_at timestamptz NOT NULL DEFAULT NOW()
   )`);
   await query(`CREATE INDEX IF NOT EXISTS fm_story_drafts_user_idx ON fm_story_drafts(user_id)`);
+  // Add duration column to existing tables.
+  await query(`ALTER TABLE fm_story_drafts ADD COLUMN IF NOT EXISTS duration numeric`);
 }
 
 export interface StoryOverlay {

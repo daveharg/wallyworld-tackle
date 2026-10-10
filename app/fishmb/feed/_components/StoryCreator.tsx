@@ -13,6 +13,7 @@ interface Draft {
   id: string;
   media_url: string;
   media_type: string;
+  duration?: number | null;
   created_at: string;
 }
 
@@ -186,6 +187,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
     try {
       const isVideo = file.type.startsWith("video/");
       let mediaUrl: string;
+      let videoDuration: number | null = null;
       if (isVideo) {
         // Videos go through Mux direct upload (the photo endpoint rejects them).
         const { upload_id, upload_url } = (await fishFetch("/api/fish/video/upload-url", {
@@ -230,9 +232,10 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
           await new Promise((r) => setTimeout(r, 5000));
           const s = (await fishFetch(
             `/api/fish/video/status?upload_id=${encodeURIComponent(upload_id)}`
-          )) as { status: string; playback_id?: string; error?: string };
+          )) as { status: string; playback_id?: string; duration?: number | null; error?: string };
           if (s.status === "ready" && s.playback_id) {
             playbackId = s.playback_id;
+            videoDuration = s.duration ?? null;
             break;
           }
           if (s.status === "errored")
@@ -260,7 +263,11 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
       await fishFetch("/api/fishmb/story-drafts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ media_url: mediaUrl, media_type: isVideo ? "video" : "photo" }),
+        body: JSON.stringify({
+          media_url: mediaUrl,
+          media_type: isVideo ? "video" : "photo",
+          duration: isVideo ? videoDuration : null,
+        }),
       });
       await loadDrafts();
     } catch (e) {
@@ -432,17 +439,44 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                 </button>
               ))}
               {/* Saved drafts */}
-              {drafts.map((d) => (
+              {drafts.map((d) => {
+                // Videos store a Mux HLS URL; use the Mux thumbnail image for the grid.
+                const videoThumb =
+                  d.media_type === "video"
+                    ? d.media_url.replace("stream.mux.com/", "image.mux.com/").replace(/\.m3u8.*$/, "/thumbnail.jpg")
+                    : null;
+                return (
                 <div key={d.id} className="relative aspect-square">
                   <button
                     onClick={() => toggleSelect(d.id)}
                     className="absolute inset-0 rounded-xl overflow-hidden"
                   >
                     {d.media_type === "video" ? (
-                      <video src={d.media_url} className="w-full h-full object-cover" muted playsInline />
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={videoThumb ?? ""} alt="" className="w-full h-full object-cover" />
                     ) : (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={d.media_url} alt="" className="w-full h-full object-cover" />
+                    )}
+                    {/* Type icon top-right: camera for photos, film for videos */}
+                    <span className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/50 flex items-center justify-center">
+                      {d.media_type === "video" ? (
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                          <rect x="2" y="4" width="20" height="16" rx="2" />
+                          <path d="M7 4v16M17 4v16M2 9h5M2 15h5M17 9h5M17 15h5" />
+                        </svg>
+                      ) : (
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                          <circle cx="12" cy="13" r="4" />
+                        </svg>
+                      )}
+                    </span>
+                    {/* Video duration bottom-left */}
+                    {d.media_type === "video" && d.duration != null && (
+                      <span className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px] font-bold">
+                        {Math.floor(d.duration / 60)}:{String(Math.floor(d.duration % 60)).padStart(2, "0")}
+                      </span>
                     )}
                     {selected.has(d.id) && (
                       <span className="absolute inset-0 bg-signal/30 flex items-center justify-center">
@@ -458,7 +492,8 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                     ×
                   </button>
                 </div>
-              ))}
+                );
+              })}
             </div>
             {drafts.length === 0 && !uploading && (
               <p className="text-center text-pine/40 text-sm mt-6">
@@ -475,7 +510,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
               className="w-full py-4 rounded-full bg-signal text-white font-bold uppercase tracking-wider disabled:opacity-40"
             >
               {selected.size === 0
-                ? "Select photos"
+                ? "Select photos and videos"
                 : selected.size === 1
                   ? "Continue"
                   : `Continue with ${selected.size} (reel)`}

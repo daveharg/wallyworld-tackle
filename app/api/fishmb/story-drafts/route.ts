@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
   if (!me) return unauthorized();
   await ensureStoryTables();
   const rows = await query(
-    `SELECT id, media_url, media_type, created_at
+    `SELECT id, media_url, media_type, duration, created_at
        FROM fm_story_drafts
       WHERE user_id = $1
       ORDER BY created_at DESC`,
@@ -37,11 +37,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "A photo or video URL is required." }, { status: 400 });
   }
   const mediaType = body.media_type === "video" ? "video" : "photo";
+  const duration = typeof body.duration === "number" ? body.duration : null;
 
   const rows = await query<{ id: string }>(
-    `INSERT INTO fm_story_drafts (user_id, media_url, media_type)
-     VALUES ($1, $2, $3) RETURNING id, media_url, media_type, created_at`,
-    [me.id, mediaUrl, mediaType]
+    `INSERT INTO fm_story_drafts (user_id, media_url, media_type, duration)
+     VALUES ($1, $2, $3, $4) RETURNING id, media_url, media_type, duration, created_at`,
+    [me.id, mediaUrl, mediaType, duration]
   );
   return NextResponse.json({ ok: true, draft: rows[0] });
 }
