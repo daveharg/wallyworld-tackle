@@ -28,6 +28,7 @@ import MapSearch from "./MapSearch";
 import DraggableWidget from "./DraggableWidget";
 import WindWidget from "./WindWidget";
 import TempWidget from "./TempWidget";
+import BiteWidget from "./BiteWidget";
 import type { MapCatch, SavedLake } from "./types";
 
 const SpotMap = dynamic(
@@ -103,6 +104,7 @@ export default function MapsHub() {
   const [windOn, setWindOn] = useState(false);
   const [speedOn, setSpeedOn] = useState(false);
   const [tempOn, setTempOn] = useState(false);
+  const [biteOn, setBiteOn] = useState(false);
   const [followDot, setFollowDot] = useState<string>(() => {
     try {
       return localStorage.getItem("fishmb-follow-dot") || "dot-blue";
@@ -738,6 +740,13 @@ export default function MapsHub() {
         </DraggableWidget>
       )}
 
+      {/* Bite prediction widget — draggable */}
+      {biteOn && myLoc && (
+        <DraggableWidget id="bite" defaultPos={{ x: 12, y: 360 }}>
+          <BiteWidget lat={myLoc.lat} lng={myLoc.lng} />
+        </DraggableWidget>
+      )}
+
       {/* Lake / town / city search */}
       <MapSearch
         onSelect={(lat, lng, label) => {
@@ -920,6 +929,8 @@ export default function MapsHub() {
             onSpeedChange={setSpeedOn}
             tempOn={tempOn}
             onTempChange={setTempOn}
+            biteOn={biteOn}
+            onBiteChange={setBiteOn}
             followDot={followDot}
             onFollowDotChange={setFollowDot}
             trails={trails}

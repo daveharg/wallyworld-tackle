@@ -24,6 +24,8 @@ interface SettingsTabProps {
   onSpeedChange: (v: boolean) => void;
   tempOn: boolean;
   onTempChange: (v: boolean) => void;
+  biteOn: boolean;
+  onBiteChange: (v: boolean) => void;
   followDot: string;
   onFollowDotChange: (id: string) => void;
   trails: Trail[];
@@ -66,6 +68,8 @@ export default function SettingsTab({
   onSpeedChange,
   tempOn,
   onTempChange,
+  biteOn,
+  onBiteChange,
   followDot,
   onFollowDotChange,
   trails,
@@ -244,6 +248,27 @@ export default function SettingsTab({
         </button>
         <p className="text-[11px] text-pine/45 mt-2">
           Current temperature at your location — drag it anywhere on the map.
+        </p>
+        <button
+          type="button"
+          onClick={() => onBiteChange(!biteOn)}
+          className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3 mt-3"
+        >
+          <span className="text-sm font-bold text-pine">Bite prediction widget</span>
+          <span
+            className={`w-12 h-7 rounded-full p-1 transition-colors ${
+              biteOn ? "bg-signal" : "bg-pine/15"
+            }`}
+          >
+            <span
+              className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                biteOn ? "translate-x-5" : ""
+              }`}
+            />
+          </span>
+        </button>
+        <p className="text-[11px] text-pine/45 mt-2">
+          Live bite rating from barometric pressure — drag it anywhere on the map.
         </p>
         <p className="text-sm font-bold text-pine mt-4 mb-2">Follow-me dot</p>
         <div className="flex flex-wrap gap-2">
