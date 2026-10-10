@@ -13,6 +13,7 @@ import YouTubeEmbed, { extractYouTubeId } from "../_components/YouTubeEmbed";
 import { TournamentBuilder } from "../tournaments/_components/TournamentBuilder";
 import { JoinByCode } from "../tournaments/_components/JoinByCode";
 import StoriesRow from "./_components/StoriesRow";
+import CatchMapPicker from "./_components/CatchMapPicker";
 
 /** Tournament tab inside the + composer: build one here or join with a code. */
 /** Bottom sheet for the + composer: swipe down to dismiss, no X button. */
@@ -971,6 +972,8 @@ function FeedPageInner() {
   const [catchLat, setCatchLat] = useState<number | null>(null);
   const [catchLng, setCatchLng] = useState<number | null>(null);
   const [locating, setLocating] = useState(false);
+  const [locationSource, setLocationSource] = useState<"photo" | "device" | "map" | null>(null);
+  const [mapPickerOpen, setMapPickerOpen] = useState(false);
   const [myTournaments, setMyTournaments] = useState<{ id: string; name: string }[]>([]);
   const [tournamentId, setTournamentId] = useState("");
   const [tournamentHelpOpen, setTournamentHelpOpen] = useState(false);
@@ -1411,6 +1414,7 @@ function FeedPageInner() {
       (pos) => {
         setCatchLat(pos.coords.latitude);
         setCatchLng(pos.coords.longitude);
+        setLocationSource("device");
         setLocating(false);
       },
       () => {
@@ -2217,6 +2221,7 @@ function FeedPageInner() {
                             if (gps) {
                               setCatchLat(gps.lat);
                               setCatchLng(gps.lng);
+                              setLocationSource("photo");
                               setCatchNote(`Location taken from photo GPS.`);
                               break;
                             }
@@ -2226,23 +2231,6 @@ function FeedPageInner() {
                       }}
                     />
                   </label>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const next = !saveLocation;
-                      setSaveLocation(next);
-                      if (!next) {
-                        setCatchLat(null);
-                        setCatchLng(null);
-                      } else if (catchLat === null) {
-                        saveCatchLocation();
-                      }
-                    }}
-                    disabled={locating}
-                    className="text-sm font-bold text-signal-dark disabled:opacity-50"
-                  >
- {locating ? " Getting location…" : saveLocation ? " Location on" : " Location off"}
-                  </button>
                   <select
                     value={visibility}
                     onChange={(e) => setVisibility(e.target.value as "public" | "friends" | "followers" | "private")}
@@ -2282,54 +2270,141 @@ function FeedPageInner() {
                     />
                   </span>
                 </button>
-                {catchLat !== null && catchLng !== null && (
-                  <div className="flex items-center justify-between mt-2 bg-pine/5 border border-pine/10 rounded-2xl px-4 py-2.5">
-                    <p className="text-sm text-pine font-bold">
- Location saved
-                      <span className="font-normal text-pine/50 text-xs ml-2">
-                        {catchLat.toFixed(5)}, {catchLng.toFixed(5)}
-                      </span>
-                    </p>
+                {/* Location settings */}
+                <div className="mt-3">
+                  <p className="text-xs font-bold uppercase tracking-wider text-pine/55 mb-2 px-1">
+                    Location
+                  </p>
+                  <div className="bg-pine/5 border border-pine/10 rounded-2xl divide-y divide-pine/10 overflow-hidden">
+                    {/* Save location toggle */}
                     <button
                       type="button"
                       onClick={() => {
-                        setCatchLat(null);
-                        setCatchLng(null);
+                        const next = !saveLocation;
+                        setSaveLocation(next);
+                        if (!next) {
+                          setCatchLat(null);
+                          setCatchLng(null);
+                          setLocationSource(null);
+                        } else if (catchLat === null) {
+                          saveCatchLocation();
+                        }
                       }}
-                      className="text-xs font-bold text-pine/50 hover:text-signal-dark"
+                      disabled={locating}
+                      className="w-full flex items-center justify-between px-4 py-3 text-left disabled:opacity-50"
                     >
-                      remove
+                      <span>
+                        <span className="block text-sm font-bold text-pine">Save location</span>
+                        <span className="block text-xs text-pine/55 mt-0.5">
+                          {locating
+                            ? "Getting location…"
+                            : saveLocation
+                              ? "Location will be saved with this catch."
+                              : "No location will be saved."}
+                        </span>
+                      </span>
+                      <span className={`shrink-0 w-12 h-7 rounded-full p-1 transition-colors ${saveLocation ? "bg-signal" : "bg-pine/15"}`}>
+                        <span className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${saveLocation ? "translate-x-5" : ""}`} />
+                      </span>
                     </button>
+                    {saveLocation && (
+                      <>
+                        {/* Current location + source */}
+                        <div className="flex items-center justify-between px-4 py-3">
+                          <span>
+                            <span className="block text-sm font-bold text-pine">
+                              {catchLat !== null && catchLng !== null ? (
+                                <>{catchLat.toFixed(5)}, {catchLng.toFixed(5)}</>
+                              ) : (
+                                "No location yet"
+                              )}
+                            </span>
+                            <span className="block text-xs text-pine/55 mt-0.5">
+                              {locationSource === "photo"
+                                ? "From your photo's GPS — where it was taken."
+                                : locationSource === "map"
+                                  ? "Picked by you on the map."
+                                  : locationSource === "device"
+                                    ? "From your current location."
+                                    : "Waiting for location…"}
+                            </span>
+                          </span>
+                          <div className="flex items-center gap-2 shrink-0">
+                            {catchLat !== null && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setCatchLat(null);
+                                  setCatchLng(null);
+                                  setLocationSource(null);
+                                }}
+                                className="text-xs font-bold text-pine/50 hover:text-signal-dark px-2 py-1"
+                              >
+                                Clear
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={saveCatchLocation}
+                              disabled={locating}
+                              className="text-xs font-bold text-signal-dark disabled:opacity-50 px-2 py-1"
+                            >
+                              {locating ? "…" : "Refresh"}
+                            </button>
+                          </div>
+                        </div>
+                        {/* Pick on map */}
+                        <button
+                          type="button"
+                          onClick={() => setMapPickerOpen(true)}
+                          className="w-full flex items-center justify-between px-4 py-3 text-left"
+                        >
+                          <span>
+                            <span className="block text-sm font-bold text-pine">Pick on map</span>
+                            <span className="block text-xs text-pine/55 mt-0.5">
+                              Drop a pin exactly where you caught it.
+                            </span>
+                          </span>
+                          <span className="text-signal-dark text-lg shrink-0">→</span>
+                        </button>
+                        {/* Share location toggle */}
+                        {catchLat !== null && catchLng !== null && (
+                          <button
+                            type="button"
+                            onClick={() => setShareLocation(!shareLocation)}
+                            className="w-full flex items-center justify-between px-4 py-3 text-left"
+                          >
+                            <span>
+                              <span className="block text-sm font-bold text-pine">
+                                {shareLocation ? "Location shared" : "Location private"}
+                              </span>
+                              <span className="block text-xs text-pine/55 mt-0.5">
+                                {shareLocation
+                                  ? "Other anglers can see this catch on the map."
+                                  : "Only you will see where this was caught."}
+                              </span>
+                            </span>
+                            <span className={`shrink-0 w-12 h-7 rounded-full p-1 transition-colors ${shareLocation ? "bg-signal" : "bg-pine/15"}`}>
+                              <span className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${shareLocation ? "translate-x-5" : ""}`} />
+                            </span>
+                          </button>
+                        )}
+                      </>
+                    )}
                   </div>
-                )}
-                {catchLat !== null && catchLng !== null && (
-                  <button
-                    type="button"
-                    onClick={() => setShareLocation(!shareLocation)}
-                    className="w-full flex items-center justify-between mt-2 bg-pine/5 border border-pine/10 rounded-2xl px-4 py-3 text-left"
-                  >
-                    <span>
-                      <span className="block text-sm font-bold text-pine">
-                        {shareLocation ? "Location shared" : "Location private"}
-                      </span>
-                      <span className="block text-xs text-pine/55 mt-0.5">
-                        {shareLocation
-                          ? "Other anglers can see this catch on the map."
-                          : "Only you will see where this was caught."}
-                      </span>
-                    </span>
-                    <span
-                      className={`shrink-0 w-12 h-7 rounded-full p-1 transition-colors ${
-                        shareLocation ? "bg-signal" : "bg-pine/15"
-                      }`}
-                    >
-                      <span
-                        className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
-                          shareLocation ? "translate-x-5" : ""
-                        }`}
-                      />
-                    </span>
-                  </button>
+                </div>
+                {mapPickerOpen && (
+                  <CatchMapPicker
+                    lat={catchLat}
+                    lng={catchLng}
+                    onPick={(la, ln) => {
+                      setCatchLat(la);
+                      setCatchLng(ln);
+                      setLocationSource("map");
+                      setSaveLocation(true);
+                    }}
+                    onClose={() => setMapPickerOpen(false)}
+                  />
                 )}
                 {myTournaments.length > 0 && (
                   <div className="mt-3">
