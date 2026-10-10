@@ -187,6 +187,11 @@ export default function ProfileView({
             <h1 className="font-display font-bold text-pine text-2xl md:text-3xl tracking-wide truncate">
               {user.name}
             </h1>
+            {data.is_self && me?.email && (
+              <p className="w-full text-xs text-pine/50 -mt-2 mb-1">
+                Signed in as {me.email} <span className="text-pine/30">(only you can see this)</span>
+              </p>
+            )}
             {data.is_self ? (
               <>
                 <Link
