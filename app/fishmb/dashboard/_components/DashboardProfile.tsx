@@ -22,7 +22,7 @@ export default function DashboardProfile() {
       <ProfileView userId={user.id} />
       <ProfileFriends />
       {isBusiness && (
-        <div className="max-w-3xl mx-auto px-4 pb-10">
+        <div className="max-w-3xl mx-auto px-4 pb-10 mt-8">
           <button
             type="button"
             onClick={() => setBusinessOpen((v) => !v)}
