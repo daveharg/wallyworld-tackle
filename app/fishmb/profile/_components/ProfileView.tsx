@@ -274,12 +274,12 @@ export default function ProfileView({
       {data.is_self && <MyListings />}
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-pine/10 mb-6 overflow-x-auto">
+      <div className="flex border-b border-pine/10 mb-6">
         {(["posts", "photos", "reels", "friends"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`pb-3 px-4 text-sm font-bold uppercase tracking-wider transition-colors whitespace-nowrap ${
+            className={`flex-1 pb-3 px-1 text-sm font-bold uppercase tracking-wider transition-colors text-center ${
               tab === t
                 ? "text-signal-dark border-b-2 border-signal -mb-px"
                 : "text-pine/45 hover:text-pine"
