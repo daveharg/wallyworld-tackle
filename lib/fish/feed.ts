@@ -502,9 +502,7 @@ export async function getStories(viewerId: string | null): Promise<StoryItem[]> 
       WHERE NOT s.is_reel
         AND (s.expires_at IS NULL OR s.expires_at > NOW())
         AND ($1::uuid IS NULL
-             OR s.is_public
              OR s.user_id = $1::uuid
-             OR u.name ILIKE 'fishmb'
              OR EXISTS (SELECT 1 FROM fm_friendships f
                         WHERE f.status = 'accepted'
                           AND ((f.requester_id = $1::uuid AND f.addressee_id = s.user_id)
