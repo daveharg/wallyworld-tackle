@@ -19,6 +19,17 @@ interface LeaderRow {
   value: number;
 }
 
+interface Catch {
+  id: string;
+  species: string;
+  length_in: string | null;
+  photo_hold_url: string | null;
+  photo_measure_url: string | null;
+  caught_at: string;
+  tournament_id: string | null;
+  tournament_name: string | null;
+}
+
 function LeaderboardList({ rows, unit }: { rows: LeaderRow[]; unit: string }) {
   if (rows.length === 0) {
     return <p className="text-pine/50 text-sm">No rankings yet — log a catch to get on the board.</p>;
@@ -71,6 +82,8 @@ export default function DashboardStats() {
   const [selected, setSelected] = useState<Friend | null>(null);
   const [topAnglers, setTopAnglers] = useState<LeaderRow[]>([]);
   const [topFriends, setTopFriends] = useState<LeaderRow[]>([]);
+  const [catches, setCatches] = useState<Catch[]>([]);
+  const [catchFilter, setCatchFilter] = useState<"all" | "tournament" | "regular">("all");
 
   useEffect(() => {
     fishFetch("/api/fish/friends")
@@ -79,6 +92,10 @@ export default function DashboardStats() {
     // Top Manitoba anglers by fish logged.
     fishFetch("/api/fishmb/leaderboards?category=most")
       .then((d) => setTopAnglers(((d.rows ?? []) as LeaderRow[]).slice(0, 5)))
+      .catch(() => {});
+    // My catches (regular + tournament).
+    fishFetch("/api/fishmb/my-catches")
+      .then((d) => setCatches((d.catches ?? []) as Catch[]))
       .catch(() => {});
   }, []);
 
@@ -188,6 +205,89 @@ export default function DashboardStats() {
           <LeaderboardList rows={topFriends} unit="fish" />
         </div>
       )}
+
+      <div>
+        <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
+          My catches
+        </h2>
+        <div className="flex gap-2 mb-4">
+          {(
+            [
+              { id: "all", label: "All" },
+              { id: "regular", label: "Regular" },
+              { id: "tournament", label: "Tournament" },
+            ] as const
+          ).map((f) => (
+            <button
+              key={f.id}
+              type="button"
+              onClick={() => setCatchFilter(f.id)}
+              className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors ${
+                catchFilter === f.id
+                  ? "bg-pine text-white"
+                  : "bg-white border border-pine/15 text-pine/70"
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+        {(() => {
+          const filtered = catches.filter((c) =>
+            catchFilter === "all"
+              ? true
+              : catchFilter === "tournament"
+                ? c.tournament_id != null
+                : c.tournament_id == null
+          );
+          if (filtered.length === 0) {
+            return (
+              <p className="text-pine/50 text-sm">
+                No catches yet — log one from the feed or join a tournament.
+              </p>
+            );
+          }
+          return (
+            <div className="grid grid-cols-3 gap-2">
+              {filtered.map((c) => (
+                <div
+                  key={`${c.tournament_id ?? "r"}:${c.id}`}
+                  className="relative bg-white border border-pine/10 rounded-2xl overflow-hidden"
+                >
+                  {c.photo_hold_url || c.photo_measure_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={c.photo_hold_url ?? c.photo_measure_url ?? ""}
+                      alt={c.species}
+                      className="w-full aspect-square object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="w-full aspect-square bg-pine/5 flex items-center justify-center text-3xl">
+                      🐟
+                    </div>
+                  )}
+                  <div className="p-2">
+                    <p className="text-xs font-bold text-pine truncate">{c.species}</p>
+                    <p className="text-[11px] text-pine/50">
+                      {c.length_in ? `${c.length_in}" · ` : ""}
+                      {new Date(c.caught_at).toLocaleDateString("en-CA", {
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </p>
+                    {c.tournament_name && (
+                      <p className="text-[10px] font-bold text-signal-dark uppercase tracking-wide truncate mt-0.5">
+                        🏆 {c.tournament_name}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
+      </div>
     </div>
   );
 }
