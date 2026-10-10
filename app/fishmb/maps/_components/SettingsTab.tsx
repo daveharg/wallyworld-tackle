@@ -6,6 +6,7 @@ import { GpxImport } from "../../profile/_components/GpxImport";
 import LakeNotes from "../../dashboard/_components/LakeNotes";
 import { formatDist } from "../../profile/_components/geo";
 import type { BasemapId } from "../../profile/_components/SpotMap";
+import { SPOT_ICON_CHOICES } from "../../profile/_components/spotIcons";
 import type { SavedLake } from "./types";
 
 interface Trail {
@@ -21,6 +22,8 @@ interface SettingsTabProps {
   onWindChange: (v: boolean) => void;
   speedOn: boolean;
   onSpeedChange: (v: boolean) => void;
+  followDot: string;
+  onFollowDotChange: (id: string) => void;
   trails: Trail[];
   overlayTrailId: string;
   onOverlayTrail: (id: string) => void;
@@ -59,6 +62,8 @@ export default function SettingsTab({
   onWindChange,
   speedOn,
   onSpeedChange,
+  followDot,
+  onFollowDotChange,
   trails,
   overlayTrailId,
   onOverlayTrail,
@@ -172,13 +177,13 @@ export default function SettingsTab({
           </p>
         )}
       </div>
- <Section icon="" title="Map options" sub="Tune the map to how you fish.">
+      <Section icon="" title="Widgets" sub="Floating boxes you can drag anywhere on the map.">
         <button
           type="button"
           onClick={() => onWindChange(!windOn)}
           className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3 mt-3"
         >
-          <span className="text-sm font-bold text-pine">Wind overlay</span>
+          <span className="text-sm font-bold text-pine">Wind widget</span>
           <span
             className={`w-12 h-7 rounded-full p-1 transition-colors ${
               windOn ? "bg-signal" : "bg-pine/15"
@@ -192,7 +197,7 @@ export default function SettingsTab({
           </span>
         </button>
         <p className="text-[11px] text-pine/45 mt-2">
-          Floating wind readout — drag it anywhere on the map.
+          Live wind speed and direction — drag it anywhere on the map.
         </p>
         <button
           type="button"
@@ -214,6 +219,26 @@ export default function SettingsTab({
         </button>
         <p className="text-[11px] text-pine/45 mt-2">
           Floating speedometer — drag it anywhere on the map.
+        </p>
+        <p className="text-sm font-bold text-pine mt-4 mb-2">Follow-me dot</p>
+        <div className="flex flex-wrap gap-2">
+          {SPOT_ICON_CHOICES.map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => onFollowDotChange(c.id)}
+              aria-label={`Follow-me dot: ${c.label}`}
+              title={c.label}
+              className={`w-11 h-11 rounded-2xl flex items-center justify-center text-xl border-2 transition-colors ${
+                followDot === c.id ? "border-signal bg-signal/10" : "border-transparent bg-pine/5"
+              }`}
+            >
+              {c.emoji}
+            </button>
+          ))}
+        </div>
+        <p className="text-[11px] text-pine/45 mt-2">
+          The marker that shows your location on the map.
         </p>
       </Section>
 

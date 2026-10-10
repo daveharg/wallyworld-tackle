@@ -54,6 +54,10 @@ interface SpotMapProps {
   onTrailSaved?: () => void;
   /** Fired when a spot marker is tapped — parent shows a custom popup. */
   onSpotClick?: (spot: SpotPin) => void;
+  /** Smooth pan (no zoom change) — used by follow-me mode. */
+  panTo?: { lat: number; lng: number; key: string } | null;
+  /** Icon id for the "my location" marker. */
+  followDot?: string;
   /** GPS catch pins rendered on the map. */
   catchPins?: CatchPin[];
   /** Base map style. */
@@ -113,6 +117,8 @@ export default function SpotMap({
   goTo,
   onTrailSaved,
   onSpotClick,
+  panTo,
+  followDot = "dot-blue",
   catchPins,
   basemap = "streets",
   onMoveEnd,
@@ -414,20 +420,22 @@ export default function SpotMap({
     if (!map) return;
     (async () => {
       const L = (await import("leaflet")).default;
+      const { spotIconHtml, spotIconSize } = await import("./spotIcons");
       personLayerRef.current?.remove();
       if (!myLoc) return;
       const layer = L.layerGroup();
+      const { size, anchor } = spotIconSize(followDot);
       const person = L.divIcon({
         className: "",
-        html: `<div style="font-size:26px;line-height:1;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.55));"></div>`,
-        iconSize: [26, 26],
-        iconAnchor: [13, 22],
+        html: spotIconHtml(followDot),
+        iconSize: size,
+        iconAnchor: anchor,
       });
       L.marker([myLoc.lat, myLoc.lng], { icon: person, interactive: false, zIndexOffset: 500 }).addTo(layer);
       layer.addTo(map);
       personLayerRef.current = layer;
     })();
-  }, [map, myLoc]);
+  }, [map, myLoc, followDot]);
 
   // Trail polylines: live recording (orange) + saved overlay (blue).
   const trailLayerRef = useRef<any>(null);
@@ -628,6 +636,14 @@ export default function SpotMap({
       map.flyTo([focus.lat, focus.lng], zoom, { animate: true, duration: 1.2 });
     }
   }, [map, focus]);
+
+  // Smooth pan for follow-me — no zoom change, no fly animation fighting GPS.
+  const lastPanKey = useRef<string | null>(null);
+  useEffect(() => {
+    if (!map || !panTo || panTo.key === lastPanKey.current) return;
+    lastPanKey.current = panTo.key;
+    map.panTo([panTo.lat, panTo.lng], { animate: true, duration: 0.8 });
+  }, [map, panTo]);
 
   // A quick tap on the map (not a drag, not a long-press) opens it fullscreen.
   // Skipped while dropping a pin or measuring, and taps on markers/popups/

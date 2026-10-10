@@ -101,6 +101,21 @@ export default function MapsHub() {
   };
   const [windOn, setWindOn] = useState(false);
   const [speedOn, setSpeedOn] = useState(false);
+  const [followDot, setFollowDot] = useState<string>(() => {
+    try {
+      return localStorage.getItem("fishmb-follow-dot") || "dot-blue";
+    } catch {
+      return "dot-blue";
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("fishmb-follow-dot", followDot);
+    } catch {
+      // Best effort.
+    }
+  }, [followDot]);
   const initPlaced = useRef(false);
   const urlPlaced = useRef(false);
 
@@ -260,7 +275,22 @@ export default function MapsHub() {
   // Manual "find me" — single-shot GPS fix that flies the map to you.
   // (Covers denied-then-granted permission and slow first fixes.)
   const [locating, setLocating] = useState(false);
-  const locateMe = () => {
+  const [followMe, setFollowMe] = useState(false);
+  const programmaticMove = useRef(false);
+
+  // Follow-me: keep the map centered on the GPS dot as it moves.
+  const [followPan, setFollowPan] = useState<{ lat: number; lng: number; key: string } | null>(null);
+  useEffect(() => {
+    if (!followMe || !myLoc) return;
+    programmaticMove.current = true;
+    setFollowPan({ lat: myLoc.lat, lng: myLoc.lng, key: `follow:${Date.now()}` });
+  }, [followMe, myLoc]);
+
+  const toggleFollowMe = () => {
+    if (followMe) {
+      setFollowMe(false);
+      return;
+    }
     if (!("geolocation" in navigator)) {
       setNote("Your device doesn't support location.");
       return;
@@ -277,7 +307,9 @@ export default function MapsHub() {
         }
         setMyLoc((prev) => ({ ...loc, speed: prev?.speed ?? null }));
         setMapCenter(loc);
-        setFocus({ lat: loc.lat, lng: loc.lng, key: `gps:manual:${Date.now()}`, zoom: 12 });
+        programmaticMove.current = true;
+        setFocus({ lat: loc.lat, lng: loc.lng, key: `gps:follow:${Date.now()}`, zoom: 12 });
+        setFollowMe(true);
         setLocating(false);
       },
       () => {
@@ -440,6 +472,12 @@ export default function MapsHub() {
   const nearbyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onMoveEnd = (center: { lat: number; lng: number }, zoom: number) => {
     setMapCenter(center);
+    // A real user pan/zoom breaks follow-me; programmatic moves don't.
+    if (programmaticMove.current) {
+      programmaticMove.current = false;
+    } else if (followMe) {
+      setFollowMe(false);
+    }
     if (nearbyTimer.current) clearTimeout(nearbyTimer.current);
     nearbyTimer.current = setTimeout(() => loadNearbyCatches(center.lat, center.lng), 800);
   };
@@ -642,6 +680,8 @@ export default function MapsHub() {
             catchPins={catchPins}
             basemap={basemap}
             onMoveEnd={onMoveEnd}
+            panTo={followPan}
+            followDot={followDot}
             onSpotClick={(s) => {
               setSpotPopup(s);
               setSpotEditing(false);
@@ -699,13 +739,17 @@ export default function MapsHub() {
         }}
       />
 
-      {/* Manual locate button */}
+      {/* Follow-me button — tap to follow your GPS, tap again to stop */}
       <button
         type="button"
-        onClick={locateMe}
-        aria-label="Center on my location"
-        title="Center on my location"
-        className="absolute top-14 right-3 z-20 w-11 h-11 rounded-full bg-white/95 backdrop-blur border border-pine/15 shadow-lg text-pine flex items-center justify-center active:scale-95 transition-transform"
+        onClick={toggleFollowMe}
+        aria-label={followMe ? "Stop following me" : "Follow me"}
+        title={followMe ? "Stop following me" : "Follow me"}
+        className={`absolute top-14 right-3 z-20 w-11 h-11 rounded-full backdrop-blur border shadow-lg flex items-center justify-center active:scale-95 transition-transform ${
+          followMe
+            ? "bg-signal text-white border-signal"
+            : "bg-white/95 border-pine/15 text-pine"
+        }`}
       >
         {locating ? (
           <span className="w-5 h-5 border-2 border-pine/30 border-t-pine rounded-full animate-spin" />
@@ -865,6 +909,8 @@ export default function MapsHub() {
             onWindChange={setWindOn}
             speedOn={speedOn}
             onSpeedChange={setSpeedOn}
+            followDot={followDot}
+            onFollowDotChange={setFollowDot}
             trails={trails}
             overlayTrailId={overlayTrailId}
             onOverlayTrail={setOverlayTrailId}
