@@ -1480,7 +1480,7 @@ function FeedPageInner() {
       )}
       {/* Mobile top section — FishMB logo, profile circle, 3 feed tabs */}
       <div className="md:hidden">
-        <div className="flex items-center justify-between mb-3">
+        <div className="relative flex items-center justify-between mb-3">
           <Link href="/fishmb/dashboard?tab=profile" aria-label="Your profile">
             {user?.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -1491,7 +1491,7 @@ function FeedPageInner() {
               </span>
             )}
           </Link>
-          <span className="font-display font-black text-2xl tracking-tight">
+          <span className="absolute left-1/2 -translate-x-1/2 font-display font-black text-2xl tracking-tight">
             <span className="text-pine">Fish</span><span className="text-signal-dark">MB</span>
           </span>
           <div className="flex items-center gap-1">
