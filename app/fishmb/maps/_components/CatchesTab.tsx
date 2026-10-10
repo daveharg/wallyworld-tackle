@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { haversineM, formatDist } from "../../profile/_components/geo";
 import type { MapCatch } from "./types";
 
@@ -71,7 +72,21 @@ function CatchRow({
   );
 }
 
-/** Catches tab — your GPS catches, plus public catches near the map. */
+/** Approx km between two lat/lng points. */
+function kmBetween(aLat: number, aLng: number, bLat: number, bLng: number): number {
+  const dLat = (aLat - bLat) * 111;
+  const dLng = (aLng - bLng) * 111 * Math.cos((bLat * Math.PI) / 180);
+  return Math.hypot(dLat, dLng);
+}
+
+interface LakeCoord {
+  id: string;
+  name: string;
+  lat: number;
+  lng: number;
+}
+
+/** Catches tab — your GPS catches grouped by lake, plus public catches near the map. */
 export default function CatchesTab({
   mine,
   nearby,
@@ -81,7 +96,103 @@ export default function CatchesTab({
   onSelect,
   myLoc,
 }: CatchesTabProps) {
+  const [lakes, setLakes] = useState<LakeCoord[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const [coordsRes, metaRes] = await Promise.all([
+          fetch("/fishmb/lake-coords.json"),
+          fetch("/fish-manitoba/data.json"),
+        ]);
+        const coords = (await coordsRes.json()) as Record<string, { lat: number; lng: number }>;
+        const meta = (await metaRes.json()) as { lakes?: { id: string; name: string }[] };
+        const nameById = new Map((meta.lakes ?? []).map((l) => [l.id, l.name]));
+        setLakes(
+          Object.entries(coords)
+            .filter(([, c]) => Number.isFinite(c.lat) && Number.isFinite(c.lng))
+            .map(([id, c]) => ({
+              id,
+              name: nameById.get(id) ?? id,
+              lat: c.lat,
+              lng: c.lng,
+            }))
+        );
+      } catch {
+        // Lake grouping stays off.
+      }
+    })();
+  }, []);
+
+  // Group "my catches" by nearest lake within 15 km.
+  const nearestLake = (c: MapCatch): LakeCoord | null => {
+    if (!Number.isFinite(c.lat) || !Number.isFinite(c.lng) || lakes.length === 0) return null;
+    let best: LakeCoord | null = null;
+    let bestD = 15;
+    for (const l of lakes) {
+      const d = kmBetween(c.lat, c.lng, l.lat, l.lng);
+      if (d < bestD) {
+        bestD = d;
+        best = l;
+      }
+    }
+    return best;
+  };
+
   const list = scope === "mine" ? mine : nearby;
+
+  // Build lake groups for "my catches".
+  const groups: { lake: LakeCoord | null; catches: MapCatch[] }[] = [];
+  if (scope === "mine" && lakes.length > 0) {
+    const groupById = new Map<string, { lake: LakeCoord | null; catches: MapCatch[] }>();
+    const sorted = [...mine].sort(
+      (a, b) => new Date(b.caught_at).getTime() - new Date(a.caught_at).getTime()
+    );
+    for (const c of sorted) {
+      const lake = nearestLake(c);
+      const key = lake ? lake.id : "__other";
+      let g = groupById.get(key);
+      if (!g) {
+        g = { lake, catches: [] };
+        groupById.set(key, g);
+        groups.push(g);
+      }
+      g.catches.push(c);
+    }
+    groups.sort((a, b) => {
+      if (!a.lake) return 1;
+      if (!b.lake) return -1;
+      return a.lake.name.localeCompare(b.lake.name);
+    });
+  }
+
+  const renderList = () => {
+    if (scope === "nearby" || groups.length === 0) {
+      return (
+        <div className="space-y-2">
+          {list.map((c) => (
+            <CatchRow key={c.id} c={c} myLoc={myLoc} onSelect={() => onSelect(c)} />
+          ))}
+        </div>
+      );
+    }
+    return (
+      <div className="space-y-5">
+        {groups.map((g) => (
+          <div key={g.lake ? g.lake.id : "__other"}>
+            <h3 className="text-xs font-black uppercase tracking-wider text-pine/45 mb-2 px-1">
+              {g.lake ? g.lake.name : "Other waters"}
+            </h3>
+            <div className="space-y-2">
+              {g.catches.map((c) => (
+                <CatchRow key={c.id} c={c} myLoc={myLoc} onSelect={() => onSelect(c)} />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
   return (
     <div className="pt-1">
       <div className="flex bg-pine/5 rounded-full p-1 mb-3">
@@ -121,11 +232,7 @@ export default function CatchesTab({
           </p>
         </div>
       ) : (
-        <div className="space-y-2">
-          {list.map((c) => (
-            <CatchRow key={c.id} c={c} myLoc={myLoc} onSelect={() => onSelect(c)} />
-          ))}
-        </div>
+        renderList()
       )}
       {scope === "nearby" && list.length > 0 && (
         <p className="text-center text-pine/40 text-[11px] mt-3">
