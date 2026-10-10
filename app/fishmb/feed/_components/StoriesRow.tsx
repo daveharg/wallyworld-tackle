@@ -4,6 +4,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { fishFetch } from "../../_components/fishFetch";
 import { useFishAuth } from "../../_components/FishAuth";
 import StoryCreator from "./StoryCreator";
@@ -267,14 +268,21 @@ export default function StoriesRow() {
               ))}
             </div>
             <div className="flex items-center gap-3 p-4 text-white">
-              {viewing.avatar_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={viewing.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover border-2 border-white/50" />
-              ) : (
-                <span className="w-10 h-10 rounded-full bg-white/20 border-2 border-white/50 flex items-center justify-center font-bold">
-                  {viewing.user_name.charAt(0).toUpperCase()}
-                </span>
-              )}
+              <Link
+                href={`/fishmb/anglers/${viewing.user_id}`}
+                onClick={(e) => e.stopPropagation()}
+                className="shrink-0"
+                aria-label={`View ${viewing.user_name}'s profile`}
+              >
+                {viewing.avatar_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={viewing.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover border-2 border-white/50 hover:border-white" />
+                ) : (
+                  <span className="w-10 h-10 rounded-full bg-white/20 border-2 border-white/50 flex items-center justify-center font-bold hover:bg-white/30">
+                    {viewing.user_name.charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </Link>
               <div className="flex-1 min-w-0">
                 <p className="font-bold text-sm truncate drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">{viewing.user_name}</p>
                 <p className="text-xs text-white/80 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
