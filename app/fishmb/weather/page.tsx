@@ -62,13 +62,14 @@ type Current = {
 
 type WxData = {
   current: Current;
-  hourly: { time: string[]; temperature_2m: number[]; precipitation_probability: number[]; pressure_msl: number[]; weather_code: number[] };
+  hourly: { time: string[]; temperature_2m: number[]; precipitation_probability: number[]; pressure_msl: number[]; weather_code: number[]; wind_speed_10m: number[]; wind_gusts_10m: number[] };
   daily: {
     time: string[];
     weather_code: number[];
     temperature_2m_max: number[];
     temperature_2m_min: number[];
     wind_speed_10m_max: number[];
+    wind_gusts_10m_max: number[];
   };
 };
 
@@ -518,7 +519,7 @@ export default function WeatherPage() {
         const url =
           `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat.toFixed(3)}&longitude=${coords.lon.toFixed(3)}` +
           `&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m` +
-          `&hourly=temperature_2m,precipitation_probability,pressure_msl,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max` +
+          `&hourly=temperature_2m,precipitation_probability,pressure_msl,weather_code,wind_speed_10m,wind_gusts_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max,wind_gusts_10m_max` +
           `&timezone=auto&forecast_days=7&past_days=7`;
         const r = await fetch(url);
         if (!r.ok) throw new Error("weather request failed");
@@ -864,6 +865,8 @@ export default function WeatherPage() {
                     <span className="text-lg">{wmo(data.hourly.weather_code[gi] ?? 0).icon}</span>
                     <span className="text-xs font-black">{Math.round(data.hourly.temperature_2m[gi])}°</span>
                     <span className="text-[10px] text-sky-600">{Math.round(data.hourly.precipitation_probability[gi] ?? 0)}%</span>
+                    <span className="text-[10px] text-pine/55">💨{Math.round(data.hourly.wind_speed_10m[gi] ?? 0)}</span>
+                    <span className="text-[10px] text-pine/35">g{Math.round(data.hourly.wind_gusts_10m[gi] ?? 0)}</span>
                   </div>
                 );
               })}
@@ -883,7 +886,7 @@ export default function WeatherPage() {
                   <span className="w-16 text-xs font-bold text-pine/60">{day}</span>
                   <span className="text-lg">{w.icon}</span>
                   <span className="flex-1 text-[11px] text-pine/50">{w.label}</span>
-                  <span className="text-[11px] text-pine/45 w-14 text-right">💨 {Math.round(data.daily.wind_speed_10m_max[gi] ?? 0)}</span>
+                  <span className="text-[11px] text-pine/45 w-20 text-right">💨 {Math.round(data.daily.wind_speed_10m_max[gi] ?? 0)} <span className="text-pine/35">g{Math.round(data.daily.wind_gusts_10m_max[gi] ?? 0)}</span></span>
                   <span className="text-xs text-pine/50">{Math.round(data.daily.temperature_2m_min[gi])}°</span>
                   <span className="text-xs font-black w-10 text-right">{Math.round(data.daily.temperature_2m_max[gi])}°</span>
                 </div>
