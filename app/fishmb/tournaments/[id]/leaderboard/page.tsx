@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface Row {
   user_id: string;
@@ -28,6 +29,7 @@ interface Board {
  * or phone at the event. Big type, auto-refreshes every 30 seconds.
  */
 export default function LeaderboardDisplayPage({ params }: { params: { id: string } }) {
+  const router = useRouter();
   const [board, setBoard] = useState<Board | null>(null);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
 
@@ -66,12 +68,13 @@ export default function LeaderboardDisplayPage({ params }: { params: { id: strin
       <header className="px-6 md:px-12 pt-6 md:pt-8 pb-4">
         <div className="flex items-center justify-between mb-4">
           {board ? (
-            <Link
-              href={`/fishmb/tournaments/${board.tournament.id}`}
+            <button
+              type="button"
+              onClick={() => router.back()}
               className="inline-flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-bold transition-colors"
             >
               ← Back
-            </Link>
+            </button>
           ) : (
             <span />
           )}

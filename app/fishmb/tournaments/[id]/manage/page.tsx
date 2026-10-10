@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useFishAuth } from "../../../_components/FishAuth";
 import { fishFetch, formatDateTime } from "../../../_components/fishFetch";
 import { compressImage } from "../../../_components/compressImage";
@@ -725,6 +726,7 @@ function AnglersDashboard({ tournamentId, inviteCode, entryFeeCents }: { tournam
 
 
 export default function ManageTournamentPage({ params }: { params: { id: string } }) {  const { user, openLogin } = useFishAuth();
+  const router = useRouter();
   const [detail, setDetail] = useState<Detail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -776,7 +778,7 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         <p className="text-signal-dark">{error}</p>
-        <Link href="/fishmb/tournaments" className="text-signal font-bold text-sm uppercase tracking-wider">← Back to tournaments</Link>
+        <button type="button" onClick={() => router.back()} className="text-signal font-bold text-sm uppercase tracking-wider">← Back</button>
       </div>
     );
   }

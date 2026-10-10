@@ -17,6 +17,7 @@ const NO_FOOTER_PREFIXES = [
   "/fishmb/messages",
   "/fishmb/friends",
   "/fishmb/leaderboards",
+  "/fishmb/tournaments",
 ];
 export function FishChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

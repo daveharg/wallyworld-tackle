@@ -5,6 +5,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
 import { UserActivityMap } from "./UserActivityMap";
@@ -384,6 +385,7 @@ function GrowthChart({ data }: { data: GrowthData | null }) {
 }
 
 export default function AdminPage() {
+  const router = useRouter();
   const { user } = useFishAuth();
   const [stats, setStats] = useState<Stats | null>(null);
   const [claims, setClaims] = useState<Claim[]>([]);
@@ -513,12 +515,13 @@ export default function AdminPage() {
             FishMB dashboard
           </h1>
         </div>
-        <Link
-          href="/fishmb"
+        <button
+          type="button"
+          onClick={() => router.back()}
           className="text-xs font-bold uppercase tracking-wider text-pine/60 hover:text-pine"
         >
-          ← Back to site
-        </Link>
+          ← Back
+        </button>
       </div>
       <p className="text-pine/60 text-sm mb-8">
         Review business claims and ad submissions. Approving an ad starts its 7-day run immediately.

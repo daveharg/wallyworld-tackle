@@ -6,6 +6,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { fishFetch } from "../../../../_components/fishFetch";
 
 const TITLES: Record<string, string> = {
@@ -41,6 +42,7 @@ export default function StatDetailPage({
 }: {
   params: { id: string; stat: string };
 }) {
+  const router = useRouter();
   const { id, stat } = params;
   const title = TITLES[stat];
   const [items, setItems] = useState<Record<string, unknown>[] | null>(null);
@@ -79,9 +81,9 @@ export default function StatDetailPage({
     return (
       <div className="max-w-3xl mx-auto px-4 py-16 text-center">
         <p className="text-pine/60 mb-4">Unknown stat.</p>
-        <Link href={`/fishmb/anglers/${id}`} className="text-signal font-bold">
-          ← Back to profile
-        </Link>
+        <button type="button" onClick={() => router.back()} className="text-signal font-bold">
+          ← Back
+        </button>
       </div>
     );
   }

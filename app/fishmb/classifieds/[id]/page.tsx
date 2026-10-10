@@ -150,9 +150,9 @@ export default function ClassifiedDetailPage() {
     return (
       <div className="max-w-2xl mx-auto px-4 pt-16 pb-32 text-center">
         <p className="font-bold text-pine mb-4">That listing is gone.</p>
-        <Link href="/fishmb/classifieds" className="font-bold text-signal-dark hover:underline">
-          ← Back to classifieds
-        </Link>
+        <button type="button" onClick={() => router.back()} className="font-bold text-signal-dark hover:underline">
+          ← Back
+        </button>
       </div>
     );
   }
