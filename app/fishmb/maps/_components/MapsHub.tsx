@@ -109,6 +109,12 @@ export default function MapsHub() {
   const [quickIcon, setQuickIcon] = useState("pin");
   const [quickSaving, setQuickSaving] = useState(false);
   const [quickReady, setQuickReady] = useState(false);
+  // Route recording.
+  const [recording, setRecording] = useState(false);
+  const [recordName, setRecordName] = useState("");
+  const [recordPrompt, setRecordPrompt] = useState(false);
+  const [track, setTrack] = useState<{ lat: number; lng: number; at: string }[]>([]);
+  const watchId = useRef<number | null>(null);
 
   // After a long-press opens the sheet, wait for the finger to lift before
   // the buttons become tappable — otherwise the touch-up fires a phantom tap.
@@ -219,6 +225,59 @@ export default function MapsHub() {
       },
       { enableHighAccuracy: true, timeout: 15000 }
     );
+  };
+
+  const startRecording = () => {
+    if (!("geolocation" in navigator)) {
+      setNote("Your device doesn't support location.");
+      return;
+    }
+    const name = recordName.trim() || `Route ${new Date().toLocaleDateString("en-CA")}`;
+    setTrack([]);
+    setRecording(true);
+    setRecordPrompt(false);
+    setRecordName("");
+    setNote(`Recording "${name}"…`);
+    watchId.current = navigator.geolocation.watchPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        if (!isRealCoord(lat, lng)) return;
+        setTrack((prev) => [...prev, { lat, lng, at: new Date().toISOString() }]);
+      },
+      () => {
+        setNote("Lost GPS signal — recording paused.");
+      },
+      { enableHighAccuracy: true, maximumAge: 5000 }
+    );
+    // Store the name for when we save.
+    (window as unknown as { __recordName: string }).__recordName = name;
+  };
+
+  const stopRecording = async () => {
+    if (watchId.current != null) {
+      navigator.geolocation.clearWatch(watchId.current);
+      watchId.current = null;
+    }
+    setRecording(false);
+    const name = (window as unknown as { __recordName?: string }).__recordName || "Route";
+    if (track.length < 2) {
+      setNote("Route too short — not saved.");
+      setTrack([]);
+      return;
+    }
+    try {
+      await fishFetch("/api/fishmb/routes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, points: track }),
+      });
+      setNote(`Saved "${name}" (${track.length} points).`);
+    } catch {
+      setNote("Couldn't save the route.");
+    }
+    setTrack([]);
+    setTimeout(() => setNote(null), 4000);
   };
 
   // Deep link from a shared spot in the feed: ?spot=lat,lng&name=…
@@ -552,13 +611,34 @@ export default function MapsHub() {
         onClick={locateMe}
         aria-label="Center on my location"
         title="Center on my location"
-        className="absolute top-14 right-3 z-20 w-11 h-11 rounded-full bg-white/95 backdrop-blur border border-pine/15 shadow-lg text-pine text-xl flex items-center justify-center active:scale-95 transition-transform"
+        className="absolute top-14 right-3 z-20 w-11 h-11 rounded-full bg-white/95 backdrop-blur border border-pine/15 shadow-lg text-pine flex items-center justify-center active:scale-95 transition-transform"
       >
         {locating ? (
           <span className="w-5 h-5 border-2 border-pine/30 border-t-pine rounded-full animate-spin" />
         ) : (
-          "◎"
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+            <circle cx="12" cy="12" r="8" strokeWidth="1.5" />
+          </svg>
         )}
+      </button>
+
+      {/* Record route button */}
+      <button
+        type="button"
+        onClick={() => (recording ? stopRecording() : setRecordPrompt(true))}
+        aria-label={recording ? "Stop recording route" : "Record a route"}
+        title={recording ? "Stop recording route" : "Record a route"}
+        className={`absolute top-[11rem] right-3 z-20 w-11 h-11 rounded-full backdrop-blur border shadow-lg flex items-center justify-center active:scale-95 transition-transform ${
+          recording
+            ? "bg-signal text-white border-signal animate-pulse"
+            : "bg-white/95 border-pine/15 text-pine"
+        }`}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="12" r="6" />
+        </svg>
       </button>
 
       {/* Map settings — opens the sheet's Settings tab */}
@@ -716,6 +796,44 @@ export default function MapsHub() {
           </>
         )}
       </MapSheet>
+
+      {/* Record route naming popup */}
+      {recordPrompt && (
+        <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4 bg-pine-deep/60 backdrop-blur-sm">
+          <div className="bg-paper rounded-3xl p-6 w-full max-w-sm shadow-2xl">
+            <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
+              Record a route
+            </h3>
+            <input
+              value={recordName}
+              onChange={(e) => setRecordName(e.target.value)}
+              maxLength={80}
+              placeholder="Route name (e.g. Morning troll)"
+              autoFocus
+              className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3 text-pine mb-4 focus:outline-none focus:border-signal"
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={startRecording}
+                className="flex-1 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3.5 rounded-2xl transition-colors"
+              >
+                Go
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setRecordPrompt(false);
+                  setRecordName("");
+                }}
+                className="px-6 py-3.5 text-pine/60 font-bold uppercase tracking-wider text-sm"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Quick-add modal after a map long-press / tap-to-drop */}
       {quickAdd && (
