@@ -34,23 +34,17 @@ export default async function TournamentsPage() {
           ?
         </Link>
       </div>
-      <p className="text-pine/65 max-w-2xl mb-6">
-        Run your own catch-photo tournament with real anti-cheat — phone-timestamped
-        catches, GPS stamps, tournament-waters checks, duplicate-photo detection and
-        organizer review — or join one below. No entry caps, no platform cut.
-      </p>
-
       <div className="flex flex-wrap gap-3 mb-10">
         <Link
           href="/fishmb/tournaments/create"
-          className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors"
+          className="bg-signal hover:bg-signal-dark text-white font-black uppercase tracking-widest text-sm px-8 py-4 rounded-lg shadow-[0_4px_0_rgba(0,0,0,0.15)] hover:shadow-[0_2px_0_rgba(0,0,0,0.15)] hover:translate-y-[2px] transition-all"
         >
           Create a tournament
         </Link>
         <OrganizerButton />
         <Link
           href="/fishmb/tournaments/how-it-works"
-          className="border-2 border-pine/20 hover:border-pine/40 text-pine font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors"
+          className="bg-white border-2 border-pine/15 hover:border-pine/40 text-pine font-black uppercase tracking-widest text-sm px-8 py-4 rounded-lg shadow-[0_4px_0_rgba(0,0,0,0.08)] hover:shadow-[0_2px_0_rgba(0,0,0,0.08)] hover:translate-y-[2px] transition-all"
         >
           Learn more
         </Link>
