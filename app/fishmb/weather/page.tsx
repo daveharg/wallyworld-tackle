@@ -344,12 +344,12 @@ function fishingForecast(
       ...restInfo,
       note:
         restToday.length === 0
-          ? "Day's about done — check tomorrow."
+          ? "Day's about done."
           : restAvg >= 70
             ? "Conditions hold — get out there."
             : restAvg >= 50
               ? "Decent window left today."
-              : "Bite likely fading — tomorrow may be better.",
+              : "Bite likely fading.",
     },
     tomorrow: {
       ...tomInfo,
