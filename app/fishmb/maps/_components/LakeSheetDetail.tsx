@@ -196,6 +196,9 @@ export default function LakeSheetDetail({ lake, spots, onBack, onSelectSpot }: P
   const shownLimits = matchedLimits.length > 0 ? matchedLimits : (zone?.limits ?? []);
   const latestStock = stocking[0] ?? null;
   const lodges = meta?.lodging ?? [];
+  const sortedTrophies = [...trophies].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
 
   return (
     <div className="pb-6">
@@ -348,12 +351,12 @@ export default function LakeSheetDetail({ lake, spots, onBack, onSelectSpot }: P
         </div>
       )}
 
-      {/* Trophy catches */}
-      {trophies.length > 0 && (
+      {/* Trophy catches — newest first */}
+      {sortedTrophies.length > 0 && (
         <div className="mb-5">
           <SectionTitle>Trophy catches</SectionTitle>
           <div className="rounded-2xl border border-pine/10 bg-white divide-y divide-pine/8 overflow-hidden">
-            {trophies.map((t, i) => (
+            {sortedTrophies.map((t, i) => (
               <div key={i} className="px-4 py-3">
                 <p className="text-sm font-bold text-pine">
                   {t.species} · {t.inch}&Prime; ({t.cm} cm)

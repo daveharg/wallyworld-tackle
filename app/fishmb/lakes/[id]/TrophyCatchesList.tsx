@@ -3,9 +3,8 @@
 import { useState } from "react";
 import type { TrophyCatch } from "@/lib/fishmb";
 
-/** Trophy catches with search + sort — client component for interactivity. */
+/** Trophy catches, always newest first — client component for search. */
 export function TrophyCatchesList({ catches }: { catches: TrophyCatch[] }) {
-  const [sort, setSort] = useState<"date" | "species" | "size">("size");
   const [search, setSearch] = useState("");
   if (catches.length === 0) return null;
 
@@ -19,11 +18,9 @@ export function TrophyCatchesList({ catches }: { catches: TrophyCatch[] }) {
       )
     : catches;
 
-  const sorted = [...filtered].sort((a, b) => {
-    if (sort === "date") return new Date(b.date).getTime() - new Date(a.date).getTime();
-    if (sort === "species") return a.species.localeCompare(b.species) || b.inch - a.inch;
-    return b.inch - a.inch;
-  });
+  const sorted = [...filtered].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
 
   return (
     <section>
@@ -31,19 +28,6 @@ export function TrophyCatchesList({ catches }: { catches: TrophyCatch[] }) {
         <h2 className="font-display font-bold uppercase text-2xl text-pine tracking-wide">
  Trophy catches <span className="text-pine/40 text-lg">({sorted.length})</span>
         </h2>
-        <div className="flex gap-1.5">
-          {(["size", "date", "species"] as const).map((s) => (
-            <button
-              key={s}
-              onClick={() => setSort(s)}
-              className={`text-[11px] font-bold uppercase tracking-wider rounded-full px-3 py-1.5 transition-colors ${
-                sort === s ? "bg-pine text-white" : "bg-pine/10 text-pine/60 hover:text-pine"
-              }`}
-            >
-              {s === "size" ? "Biggest" : s === "date" ? "Newest" : "Species"}
-            </button>
-          ))}
-        </div>
       </div>
       <p className="text-sm text-pine/55 mb-3">
         Every documented trophy catch here, from the Manitoba Master
