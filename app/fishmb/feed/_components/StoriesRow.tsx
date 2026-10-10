@@ -28,10 +28,29 @@ export default function StoriesRow() {
   const [viewing, setViewing] = useState<Story | null>(null);
   const [creating, setCreating] = useState(false);
 
+  const sortStories = (list: Story[]) => {
+    // Unviewed first, then viewed (watched stories drop to the end of the queue).
+    // Within each group, group by user, newest user first.
+    const byUser = new Map<string, Story[]>();
+    for (const s of list) {
+      const l = byUser.get(s.user_id) ?? [];
+      l.push(s);
+      byUser.set(s.user_id, l);
+    }
+    const groups = Array.from(byUser.values());
+    groups.sort((a, b) => {
+      const aViewed = a.every((s) => s.viewed);
+      const bViewed = b.every((s) => s.viewed);
+      if (aViewed !== bViewed) return aViewed ? 1 : -1;
+      return new Date(b[0].created_at).getTime() - new Date(a[0].created_at).getTime();
+    });
+    return groups.flat();
+  };
+
   const load = async () => {
     try {
       const d = await fishFetch("/api/fishmb/stories");
-      setStories(((d as { stories?: Story[] }).stories ?? []) as Story[]);
+      setStories(sortStories(((d as { stories?: Story[] }).stories ?? []) as Story[]));
     } catch {
       // Stories stay empty.
     }
@@ -45,7 +64,9 @@ export default function StoriesRow() {
     setViewing(s);
     try {
       await fishFetch(`/api/fishmb/stories/${s.id}/view`, { method: "POST" });
-      setStories((list) => list.map((x) => (x.id === s.id ? { ...x, viewed: true } : x)));
+      setStories((list) =>
+        sortStories(list.map((x) => (x.id === s.id ? { ...x, viewed: true } : x)))
+      );
     } catch {
       // View tracking is best-effort.
     }
@@ -72,16 +93,6 @@ export default function StoriesRow() {
       }
     }
     setViewing(null);
-  };
-
-  const deleteStory = async (id: string) => {
-    try {
-      await fishFetch(`/api/fishmb/stories/${id}`, { method: "DELETE" });
-      setStories((list) => list.filter((x) => x.id !== id));
-      setViewing(null);
-    } catch {
-      // Best effort.
-    }
   };
 
   // Group stories by user — one card per person, newest story as the cover.
@@ -207,15 +218,6 @@ export default function StoriesRow() {
                 {new Date(viewing.created_at).toLocaleString()}
               </p>
             </div>
-            {viewing.user_id === user.id && (
-              <button
-                type="button"
-                onClick={() => deleteStory(viewing.id)}
-                className="text-white/70 hover:text-white text-sm font-bold"
-              >
-                Delete
-              </button>
-            )}
             <button
               type="button"
               onClick={() => setViewing(null)}
