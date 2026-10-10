@@ -9,7 +9,6 @@ import Link from "next/link";
 import { useFishAuth } from "../../_components/FishAuth";
 import { fishFetch } from "../../_components/fishFetch";
 import ProfileView from "../../profile/_components/ProfileView";
-import DashboardSettings from "./DashboardSettings";
 
 interface Friend {
   id: string;
@@ -20,7 +19,6 @@ interface Friend {
 export default function DashboardProfile() {
   const { user } = useFishAuth();
   const [tab, setTab] = useState<"profile" | "friends">("profile");
-  const [editing, setEditing] = useState(false);
   const [friends, setFriends] = useState<Friend[]>([]);
   const [search, setSearch] = useState("");
   const [loadingFriends, setLoadingFriends] = useState(false);
@@ -63,33 +61,7 @@ export default function DashboardProfile() {
       </div>
 
       {tab === "profile" ? (
-        <div>
-          {!editing ? (
-            <>
-              <div className="flex justify-end mb-2">
-                <button
-                  onClick={() => setEditing(true)}
-                  className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-2.5 rounded-full transition-colors"
-                >
-                  Edit profile
-                </button>
-              </div>
-              <ProfileView userId={user.id} />
-            </>
-          ) : (
-            <div>
-              <div className="flex justify-end mb-2">
-                <button
-                  onClick={() => setEditing(false)}
-                  className="text-sm font-bold uppercase tracking-wider text-pine/60 hover:text-pine px-4 py-2"
-                >
-                  ← Back to profile
-                </button>
-              </div>
-              <DashboardSettings />
-            </div>
-          )}
-        </div>
+        <ProfileView userId={user.id} />
       ) : (
         <div>
           <input
