@@ -235,13 +235,6 @@ function Bar() {
       className={`fixed bottom-0 inset-x-0 flex justify-center pointer-events-none ${
         menuOpen ? "z-[1100]" : "z-40"
       }`}
-      style={{
-        // Force hardware acceleration and viewport-relative positioning on iOS.
-        // Without this, fixed can break when ancestors have transforms/filters.
-        transform: "translateZ(0)",
-        WebkitTransform: "translateZ(0)",
-        willChange: "transform",
-      }}
     >
       <style>{`@keyframes fmb-rise { from { opacity: 0; transform: translateY(14px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }`}</style>
       {/* + menu: shade out the background, circular action buttons stacked
@@ -278,7 +271,15 @@ function Bar() {
       {/* Floating pill bar, raised off the bottom of the phone */}
       <div
         className="pointer-events-auto w-full mx-4 mb-5 md:mx-0 md:mb-6 md:w-[38rem] md:max-w-[calc(100vw-2rem)] relative bg-white rounded-full px-3 shadow-[0_10px_36px_rgba(0,0,0,0.16)] border border-pine/10"
-        style={{ paddingTop: "0.55rem", paddingBottom: "calc(0.55rem + env(safe-area-inset-bottom))" }}
+        style={{
+          paddingTop: "0.55rem",
+          paddingBottom: "calc(0.55rem + env(safe-area-inset-bottom))",
+          // Hardware acceleration for iOS — applied here (not on nav) so the
+          // menu backdrop's fixed positioning stays viewport-relative.
+          transform: "translateZ(0)",
+          WebkitTransform: "translateZ(0)",
+          willChange: "transform",
+        }}
       >
         <div className="flex items-center">
           {LEFT.map((item) => (
