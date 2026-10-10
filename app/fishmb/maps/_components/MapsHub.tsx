@@ -308,7 +308,7 @@ export default function MapsHub() {
         setMyLoc((prev) => ({ ...loc, speed: prev?.speed ?? null }));
         setMapCenter(loc);
         programmaticMove.current = true;
-        setFocus({ lat: loc.lat, lng: loc.lng, key: `gps:follow:${Date.now()}`, zoom: 12 });
+        setFocus({ lat: loc.lat, lng: loc.lng, key: `gps:follow:${Date.now()}`, zoom: 15 });
         setFollowMe(true);
         setLocating(false);
       },
