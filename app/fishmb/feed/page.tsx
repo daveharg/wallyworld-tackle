@@ -11,6 +11,7 @@ import MuxPlayer from "@mux/mux-player-react";
 import YouTubeEmbed, { extractYouTubeId } from "../_components/YouTubeEmbed";
 import { TournamentBuilder } from "../tournaments/_components/TournamentBuilder";
 import { JoinByCode } from "../tournaments/_components/JoinByCode";
+import StoriesRow from "./_components/StoriesRow";
 
 /** Tournament tab inside the + composer: build one here or join with a code. */
 /** Bottom sheet for the + composer: swipe down to dismiss, no X button. */
@@ -1539,6 +1540,10 @@ function FeedPageInner() {
             );
           })}
         </div>
+      </div>
+      {/* Facebook-style stories — right under the mobile header */}
+      <div className="md:hidden">
+        <StoriesRow />
       </div>
       {/* Mobile menu drawer */}
       {menuOpen && (

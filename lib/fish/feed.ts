@@ -414,3 +414,63 @@ export async function ensureFollowTables(): Promise<void> {
   )`);
   await query(`CREATE INDEX IF NOT EXISTS fm_follows_followee_idx ON fm_follows(followee_id)`);
 }
+
+/** Ensure the stories tables exist. Stories expire after 24 hours. */
+export async function ensureStoryTables(): Promise<void> {
+  await query(`CREATE TABLE IF NOT EXISTS fm_stories (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id uuid NOT NULL REFERENCES fm_users(id) ON DELETE CASCADE,
+    media_url text NOT NULL,
+    media_type text NOT NULL DEFAULT 'photo',
+    caption text,
+    created_at timestamptz NOT NULL DEFAULT NOW(),
+    expires_at timestamptz NOT NULL DEFAULT NOW() + INTERVAL '24 hours'
+  )`);
+  await query(`CREATE INDEX IF NOT EXISTS fm_stories_user_idx ON fm_stories(user_id)`);
+  await query(`CREATE INDEX IF NOT EXISTS fm_stories_expires_idx ON fm_stories(expires_at)`);
+  await query(`CREATE TABLE IF NOT EXISTS fm_story_views (
+    story_id uuid NOT NULL REFERENCES fm_stories(id) ON DELETE CASCADE,
+    viewer_id uuid NOT NULL REFERENCES fm_users(id) ON DELETE CASCADE,
+    viewed_at timestamptz NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (story_id, viewer_id)
+  )`);
+}
+
+export interface StoryItem {
+  id: string;
+  user_id: string;
+  user_name: string;
+  avatar_url: string | null;
+  media_url: string;
+  media_type: string;
+  caption: string | null;
+  created_at: string;
+  viewed: boolean;
+}
+
+/** Stories from friends + followed users (+ own), newest first, unexpired. */
+export async function getStories(viewerId: string | null): Promise<StoryItem[]> {
+  await ensureStoryTables();
+  await ensureFollowTables();
+  const rows = await query<StoryItem & { created_at: string }>(
+    `SELECT s.id, s.user_id, u.name AS user_name, u.avatar_url,
+            s.media_url, s.media_type, s.caption, s.created_at,
+            EXISTS(SELECT 1 FROM fm_story_views v
+                    WHERE v.story_id = s.id AND v.viewer_id = $1::uuid) AS viewed
+       FROM fm_stories s
+       JOIN fm_users u ON u.id = s.user_id
+      WHERE s.expires_at > NOW()
+        AND ($1::uuid IS NULL
+             OR s.user_id = $1::uuid
+             OR EXISTS (SELECT 1 FROM fm_friendships f
+                        WHERE f.status = 'accepted'
+                          AND ((f.requester_id = $1::uuid AND f.addressee_id = s.user_id)
+                            OR (f.requester_id = s.user_id AND f.addressee_id = $1::uuid)))
+             OR EXISTS (SELECT 1 FROM fm_follows fo
+                        WHERE fo.follower_id = $1::uuid AND fo.followee_id = s.user_id))
+      ORDER BY s.created_at DESC
+      LIMIT 100`,
+    [viewerId]
+  );
+  return rows.map((r) => ({ ...r, viewed: Boolean(r.viewed) }));
+}
