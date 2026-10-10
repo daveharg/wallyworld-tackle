@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       }))
     : [];
 
-  const zoom = Math.max(1, Math.min(3, Number(body.zoom) || 1));
+  const zoom = Math.max(0.5, Math.min(3, Number(body.zoom) || 1));
 
   const rows = await query<{ id: string }>(
     `INSERT INTO fm_stories (user_id, media_url, media_type, caption, overlays, zoom)

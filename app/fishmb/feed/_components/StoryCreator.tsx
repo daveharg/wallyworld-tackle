@@ -113,7 +113,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
       const dy = e.touches[0].clientY - e.touches[1].clientY;
       const dist = Math.hypot(dx, dy);
       if (dist > 0) {
-        const next = Math.min(3, Math.max(1, pinchRef.current.zoom * (dist / pinchRef.current.dist)));
+        const next = Math.min(3, Math.max(0.5, pinchRef.current.zoom * (dist / pinchRef.current.dist)));
         setActiveZoom(next);
       }
     }
@@ -565,7 +565,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
               <span className="text-pine/60 text-lg leading-none">−</span>
               <input
                 type="range"
-                min={1}
+                min={0.5}
                 max={3}
                 step={0.05}
                 value={activeZoom}
@@ -574,7 +574,13 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                 aria-label="Photo zoom"
               />
               <span className="text-pine/60 text-lg leading-none">＋</span>
-              {activeZoom > 1 && (
+              <button
+                onClick={() => setActiveZoom(0.5)}
+                className="text-xs font-bold uppercase tracking-wider text-pine/50"
+              >
+                Fit
+              </button>
+              {activeZoom !== 1 && (
                 <button
                   onClick={() => setActiveZoom(1)}
                   className="text-xs font-bold uppercase tracking-wider text-pine/50"
