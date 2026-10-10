@@ -81,11 +81,8 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 md:py-14">
-      <p className="text-signal font-bold uppercase tracking-[0.28em] text-sm mb-3">
-        Angler HQ
-      </p>
       <h1 className="font-display font-bold uppercase text-pine text-4xl md:text-5xl tracking-wide mb-6">
-        Dashboard
+        Angler HQ
       </h1>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
