@@ -22,6 +22,8 @@ interface Props {
   onSnapChange: (s: SheetSnap) => void;
   /** When true the sheet shows detail content (e.g. a lake) instead of tabs. */
   detailMode?: boolean;
+  /** Fixed header shown above the scrollable content in detail mode. */
+  detailHeader?: React.ReactNode;
   children: React.ReactNode;
 }
 
@@ -47,6 +49,7 @@ export default function MapSheet({
   snap,
   onSnapChange,
   detailMode,
+  detailHeader,
   children,
 }: Props) {
   const [dragDy, setDragDy] = useState(0);
@@ -176,6 +179,13 @@ export default function MapSheet({
         </div>
       )}
       </div>
+
+      {/* Fixed detail header — doesn't scroll; dragging here moves the sheet */}
+      {detailMode && detailHeader && (
+        <div data-sheet-drag style={{ touchAction: "pan-x" }} className="shrink-0 px-4 pb-1">
+          {detailHeader}
+        </div>
+      )}
 
       {/* Scrollable page content */}
       <div

@@ -201,65 +201,7 @@ export default function LakeSheetDetail({ lake, spots, onBack, onSelectSpot }: P
   );
 
   return (
-    <div className="pb-6">
-      {/* Header — drag handle: pulling here expands the sheet, never scrolls */}
-      <div data-sheet-drag style={{ touchAction: "pan-x" }} className="flex items-center gap-3 mb-4">
-        <button
-          type="button"
-          onClick={onBack}
-          aria-label="Back to lakes"
-          className="shrink-0 w-10 h-10 rounded-full bg-paper-deep border border-pine/15 flex items-center justify-center"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-pine">
-            <path d="M19 12H5" />
-            <path d="m12 19-7-7 7-7" />
-          </svg>
-        </button>
-        <div className="min-w-0">
-          <h2 className="font-display font-bold text-2xl text-pine leading-tight truncate">
-            {lake.name}
-          </h2>
-          {lake.region && (
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-pine/50">
-              {lake.region} Manitoba
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Weather + catches strip */}
-      <div className="flex gap-2.5 mb-5">
-        <div className="flex-1 bg-paper-deep border border-pine/10 rounded-2xl px-4 py-3">
-          <p className="text-[11px] font-black uppercase tracking-[0.14em] text-pine/45 mb-1">
-            Now
-          </p>
-          <p className="text-lg font-extrabold text-pine">
-            {tempC !== null ? `${tempC}°C` : "—"}
-            {weatherCode !== null && (
-              <span className="block text-xs font-semibold text-pine/55">
-                {weatherLabel(weatherCode)}
-              </span>
-            )}
-          </p>
-        </div>
-        <div className="flex-1 bg-paper-deep border border-pine/10 rounded-2xl px-4 py-3">
-          <p className="text-[11px] font-black uppercase tracking-[0.14em] text-pine/45 mb-1">
-            Your catches
-          </p>
-          <p className="text-lg font-extrabold text-pine">
-            {catchCount !== null ? catchCount : "—"}
-          </p>
-        </div>
-        {meta?.size_text && (
-          <div className="flex-1 bg-paper-deep border border-pine/10 rounded-2xl px-4 py-3">
-            <p className="text-[11px] font-black uppercase tracking-[0.14em] text-pine/45 mb-1">
-              Size
-            </p>
-            <p className="text-sm font-extrabold text-pine leading-snug">{meta.size_text}</p>
-          </div>
-        )}
-      </div>
-
+    <div className="pb-6 pt-1">
       {/* Species */}
       {species.length > 0 && (
         <div className="mb-5">

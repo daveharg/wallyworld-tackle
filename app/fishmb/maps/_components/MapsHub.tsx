@@ -22,6 +22,7 @@ import CatchesTab from "./CatchesTab";
 import SpotsTab, { type Spot } from "./SpotsTab";
 import LakesTab from "./LakesTab";
 import LakeSheetDetail from "./LakeSheetDetail";
+import LakeSheetHeader from "./LakeSheetHeader";
 import SettingsTab from "./SettingsTab";
 import MapSearch from "./MapSearch";
 import WindWidget from "./WindWidget";
@@ -641,6 +642,17 @@ export default function MapsHub() {
         snap={snap}
         onSnapChange={handleSnapChange}
         detailMode={selectedLake !== null}
+        detailHeader={
+          selectedLake ? (
+            <LakeSheetHeader
+              lake={selectedLake}
+              onBack={() => {
+                setSelectedLake(null);
+                setSnap("collapsed");
+              }}
+            />
+          ) : undefined
+        }
       >
         {selectedLake ? (
           <LakeSheetDetail
