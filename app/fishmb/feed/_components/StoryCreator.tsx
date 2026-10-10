@@ -57,6 +57,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
   const [step, setStep] = useState<"pick" | "edit">("pick");
   const [overlays, setOverlays] = useState<TextOverlay[]>([]);
   const [editingOverlay, setEditingOverlay] = useState<TextOverlay | null>(null);
+  const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const [overlayText, setOverlayText] = useState("");
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   // Reel state — ordered clips, active clip for preview, per-clip zoom/volume.
@@ -86,10 +87,27 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
   };
 
   // Drag a text overlay around the preview with pointer events.
+  // A tap (no drag) opens the overlay for editing.
+  const tapRef = useRef<{ x: number; y: number; idx: number } | null>(null);
   const onOverlayPointerDown = (e: React.PointerEvent, i: number) => {
     e.preventDefault();
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
     setDragIdx(i);
+    tapRef.current = { x: e.clientX, y: e.clientY, idx: i };
+  };
+
+  const onOverlayPointerUp = (e: React.PointerEvent) => {
+    const tap = tapRef.current;
+    tapRef.current = null;
+    if (tap && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) < 8) {
+      // It was a tap, not a drag — load this overlay into the editor.
+      const o = overlays[tap.idx];
+      if (o) {
+        setOverlayText(o.text);
+        setEditingOverlay(o);
+        setEditingIdx(tap.idx);
+      }
+    }
   };
 
   const onPreviewPointerMove = (e: React.PointerEvent) => {
@@ -323,19 +341,46 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
 
   const addOverlay = () => {
     if (!overlayText.trim() || !activeDraft) return;
-    setOverlays((list) => [
-      ...list,
-      {
-        text: overlayText.trim(),
-        x: 50,
-        y: 30 + list.length * 12,
-        font: editingOverlay?.font ?? "bold",
-        color: editingOverlay?.color ?? "#ffffff",
-        bg: editingOverlay?.bg ?? "transparent",
-        size: editingOverlay?.size ?? 28,
-        clipIds: [activeDraft.id],
-      },
-    ]);
+    if (editingIdx !== null) {
+      // Update the existing overlay being edited.
+      const idx = editingIdx;
+      setOverlays((list) =>
+        list.map((o, i) =>
+          i === idx
+            ? {
+                ...o,
+                text: overlayText.trim(),
+                font: editingOverlay?.font ?? o.font,
+                color: editingOverlay?.color ?? o.color,
+                bg: editingOverlay?.bg ?? o.bg,
+                size: editingOverlay?.size ?? o.size,
+              }
+            : o
+        )
+      );
+      setEditingIdx(null);
+    } else {
+      setOverlays((list) => [
+        ...list,
+        {
+          text: overlayText.trim(),
+          x: 50,
+          y: 30 + list.length * 12,
+          font: editingOverlay?.font ?? "bold",
+          color: editingOverlay?.color ?? "#ffffff",
+          bg: editingOverlay?.bg ?? "transparent",
+          size: editingOverlay?.size ?? 28,
+          clipIds: [activeDraft.id],
+        },
+      ]);
+    }
+    setOverlayText("");
+    setEditingOverlay(null);
+  };
+
+  const cancelOverlayEdit = () => {
+    setEditingIdx(null);
+    setEditingOverlay(null);
     setOverlayText("");
   };
 
@@ -580,6 +625,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                   className="absolute cursor-grab active:cursor-grabbing"
                   style={{ left: `${o.x}%`, top: `${o.y}%`, transform: "translate(-50%, -50%)", touchAction: "none" }}
                   onPointerDown={(e) => onOverlayPointerDown(e, i)}
+                  onPointerUp={onOverlayPointerUp}
                 >
                   <span
                     style={{
@@ -716,8 +762,16 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                   disabled={!overlayText.trim()}
                   className="px-5 rounded-full bg-pine text-white font-bold text-sm disabled:opacity-40"
                 >
-                  Add
+                  {editingIdx !== null ? "Save" : "Add"}
                 </button>
+                {editingIdx !== null && (
+                  <button
+                    onClick={cancelOverlayEdit}
+                    className="px-4 rounded-full bg-pine/10 text-pine font-bold text-sm"
+                  >
+                    Cancel
+                  </button>
+                )}
               </div>
 
               {/* Font styles */}
