@@ -83,7 +83,13 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
   const setActiveVolume = (v: number) => {
     if (!activeDraft) return;
     setClipVolumes((m) => ({ ...m, [activeDraft.id]: v }));
-    if (videoRef.current) videoRef.current.volume = v;
+    const vid = videoRef.current;
+    if (vid) {
+      vid.muted = false;
+      vid.volume = v;
+      // Ensure it's playing so the user hears the change.
+      vid.play().catch(() => {});
+    }
   };
 
   // Drag a text overlay around the preview with pointer events.
@@ -599,7 +605,9 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                       playsInline
                       loop
                       autoPlay
+                      muted
                       onLoadedMetadata={(e) => {
+                        // Start muted for autoplay; unmuted when user touches volume.
                         e.currentTarget.volume = activeVolume;
                       }}
                     />
