@@ -727,6 +727,7 @@ function AnglersDashboard({ tournamentId, inviteCode, entryFeeCents }: { tournam
 
 export default function ManageTournamentPage({ params }: { params: { id: string } }) {  const { user, openLogin } = useFishAuth();
   const router = useRouter();
+  const [editOpen, setEditOpen] = useState(false);
   const [detail, setDetail] = useState<Detail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -876,9 +877,6 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
 
       {/* Anglers dashboard — who joined, keys used, paid, checked in */}
       <AnglersDashboard tournamentId={t.id} inviteCode={t.invite_code} entryFeeCents={t.entry_fee_cents} />
-
-      {/* Full tournament editor */}
-      <EditTournament tournament={t} onSaved={load} />
 
       {/* Single-use entry keys */}
       <EntryKeys tournamentId={t.id} />
@@ -1044,6 +1042,25 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
           </div>
         </>
       )}
+
+      {/* Edit tournament — collapsed behind a button at the end */}
+      <div className="mt-10">
+        <button
+          type="button"
+          onClick={() => setEditOpen((v) => !v)}
+          className="w-full bg-white border border-pine/10 rounded-3xl px-6 py-4 flex items-center justify-between hover:border-signal/40 transition-colors"
+        >
+          <span className="font-display font-bold uppercase text-pine text-lg tracking-wide">
+            ✏️ Edit tournament
+          </span>
+          <span className="text-pine/40 text-xl leading-none">{editOpen ? "▾" : "▸"}</span>
+        </button>
+        {editOpen && (
+          <div className="mt-4">
+            <EditTournament tournament={t} onSaved={load} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
