@@ -42,10 +42,12 @@ export async function POST(req: NextRequest) {
       }))
     : [];
 
+  const zoom = Math.max(1, Math.min(3, Number(body.zoom) || 1));
+
   const rows = await query<{ id: string }>(
-    `INSERT INTO fm_stories (user_id, media_url, media_type, caption, overlays)
-     VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-    [me.id, mediaUrl, mediaType, caption, JSON.stringify(overlays)]
+    `INSERT INTO fm_stories (user_id, media_url, media_type, caption, overlays, zoom)
+     VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+    [me.id, mediaUrl, mediaType, caption, JSON.stringify(overlays), zoom]
   );
   return NextResponse.json({ ok: true, id: rows[0].id });
 }

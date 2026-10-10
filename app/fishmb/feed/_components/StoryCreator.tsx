@@ -80,6 +80,34 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
 
   const endDrag = () => setDragIdx(null);
 
+  // Photo zoom — scale the media to fill the story box.
+  const [zoom, setZoom] = useState(1);
+  const pinchRef = useRef<{ dist: number; zoom: number } | null>(null);
+
+  const onPreviewTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      pinchRef.current = { dist: Math.hypot(dx, dy), zoom };
+    }
+  };
+
+  const onPreviewTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2 && pinchRef.current) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.hypot(dx, dy);
+      if (dist > 0) {
+        const next = Math.min(3, Math.max(1, pinchRef.current.zoom * (dist / pinchRef.current.dist)));
+        setZoom(next);
+      }
+    }
+  };
+
+  const onPreviewTouchEnd = () => {
+    pinchRef.current = null;
+  };
+
   const loadDrafts = async () => {
     try {
       const d = await fishFetch("/api/fishmb/story-drafts");
@@ -186,6 +214,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
             media_url: d.media_url,
             media_type: d.media_type,
             overlays,
+            zoom,
           }),
         });
       }
@@ -351,18 +380,26 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
             {/* Preview */}
             <div
               ref={previewRef}
-              className="relative bg-black aspect-[9/16] max-h-[50vh] mx-auto touch-none select-none"
+              className="relative bg-black aspect-[9/16] max-h-[50vh] mx-auto touch-none select-none overflow-hidden"
               onPointerMove={onPreviewPointerMove}
               onPointerUp={endDrag}
               onPointerCancel={endDrag}
+              onTouchStart={onPreviewTouchStart}
+              onTouchMove={onPreviewTouchMove}
+              onTouchEnd={onPreviewTouchEnd}
             >
               {selectedDrafts[0] && (
-                selectedDrafts[0].media_type === "video" ? (
-                  <video src={selectedDrafts[0].media_url} className="w-full h-full object-contain" muted playsInline />
-                ) : (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={selectedDrafts[0].media_url} alt="" className="w-full h-full object-contain" />
-                )
+                <div
+                  className="absolute inset-0"
+                  style={{ transform: `scale(${zoom})`, transformOrigin: "center" }}
+                >
+                  {selectedDrafts[0].media_type === "video" ? (
+                    <video src={selectedDrafts[0].media_url} className="w-full h-full object-cover" muted playsInline />
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={selectedDrafts[0].media_url} alt="" className="w-full h-full object-cover" />
+                  )}
+                </div>
               )}
               {overlays.map((o, i) => (
                 <div
@@ -387,6 +424,30 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                   </span>
                 </div>
               ))}
+            </div>
+
+            {/* Zoom control */}
+            <div className="px-4 pb-2 flex items-center gap-3">
+              <span className="text-pine/60 text-lg leading-none">−</span>
+              <input
+                type="range"
+                min={1}
+                max={3}
+                step={0.05}
+                value={zoom}
+                onChange={(e) => setZoom(parseFloat(e.target.value))}
+                className="flex-1 accent-[#e8622c]"
+                aria-label="Photo zoom"
+              />
+              <span className="text-pine/60 text-lg leading-none">＋</span>
+              {zoom > 1 && (
+                <button
+                  onClick={() => setZoom(1)}
+                  className="text-xs font-bold uppercase tracking-wider text-pine/50"
+                >
+                  Reset
+                </button>
+              )}
             </div>
 
             {/* Text input */}

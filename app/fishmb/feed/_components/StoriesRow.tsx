@@ -19,6 +19,7 @@ interface Story {
   created_at: string;
   viewed: boolean;
   overlays?: { text: string; x: number; y: number; font: string; color: string; bg: string; size: number }[];
+  zoom?: number;
 }
 
 export default function StoriesRow() {
@@ -188,13 +189,18 @@ export default function StoriesRow() {
               ×
             </button>
           </div>
-          <div className="flex-1 flex items-center justify-center min-h-0 relative" onClick={(e) => e.stopPropagation()}>
-            {viewing.media_type === "video" ? (
-              <video src={viewing.media_url} controls autoPlay playsInline className="max-h-full max-w-full" />
-            ) : (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={viewing.media_url} alt="" className="max-h-full max-w-full object-contain" />
-            )}
+          <div className="flex-1 flex items-center justify-center min-h-0 relative overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="absolute inset-0 flex items-center justify-center"
+              style={{ transform: `scale(${viewing.zoom ?? 1})`, transformOrigin: "center" }}
+            >
+              {viewing.media_type === "video" ? (
+                <video src={viewing.media_url} controls autoPlay playsInline className="max-h-full max-w-full" />
+              ) : (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={viewing.media_url} alt="" className="max-h-full max-w-full object-contain" />
+              )}
+            </div>
             {(viewing.overlays ?? []).map((o, i) => (
               <span
                 key={i}
