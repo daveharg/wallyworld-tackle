@@ -6,21 +6,44 @@ import FishLoader from "../_components/FishLoader";
 import WeatherLoader from "../_components/WeatherLoader";
 
 /* ------------------------------------------------------------------ */
-/* WMO weather-code → label + emoji                                     */
+/* WMO weather-code → label + SVG icon                                   */
 /* ------------------------------------------------------------------ */
+function weatherIcon(code: number): string {
+  // Returns an SVG string for the weather condition.
+  const sun = `<circle cx="12" cy="12" r="5" fill="#FDB813"/><g stroke="#FDB813" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="23"/><line x1="4.2" y1="4.2" x2="6.3" y2="6.3"/><line x1="17.7" y1="17.7" x2="19.8" y2="19.8"/><line x1="1" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="23" y2="12"/><line x1="4.2" y1="19.8" x2="6.3" y2="17.7"/><line x1="17.7" y1="6.3" x2="19.8" y2="4.2"/></g>`;
+  const cloud = `<path d="M17.5 19a4.5 4.5 0 0 0 .42-8.98 6 6 0 0 0-11.7 1.62A4 4 0 0 0 7 19h10.5z" fill="#CBD5E1" stroke="#94A3B8" stroke-width="1.5"/>`;
+  const rain = cloud + `<g stroke="#3B82F6" stroke-width="2" stroke-linecap="round"><line x1="8" y1="21" x2="7" y2="24"/><line x1="12" y1="21" x2="11" y2="24"/><line x1="16" y1="21" x2="15" y2="24"/></g>`;
+  const snow = cloud + `<g fill="#3B82F6"><circle cx="8" cy="22" r="1.2"/><circle cx="12" cy="22" r="1.2"/><circle cx="16" cy="22" r="1.2"/></g>`;
+  const storm = cloud + `<path d="M12 15l-3 5h4l-1 4 5-7h-4l3-5h-4z" fill="#F59E0B"/>`;
+  const fog = `<g stroke="#94A3B8" stroke-width="2" stroke-linecap="round"><line x1="4" y1="10" x2="20" y2="10"/><line x1="6" y1="14" x2="18" y2="14"/><line x1="4" y1="18" x2="20" y2="18"/></g>`;
+
+  if (code === 0) return `<svg viewBox="0 0 24 24" width="72" height="72">${sun}</svg>`;
+  if (code === 1) return `<svg viewBox="0 0 24 24" width="72" height="72">${sun}<g transform="translate(6,8) scale(0.7)">${cloud}</g></svg>`;
+  if (code === 2) return `<svg viewBox="0 0 24 24" width="72" height="72">${cloud}</svg>`;
+  if (code === 3) return `<svg viewBox="0 0 24 24" width="72" height="72"><g opacity="0.9">${cloud}</g><g transform="translate(0,-3)">${cloud}</g></svg>`;
+  if (code === 45 || code === 48) return `<svg viewBox="0 0 24 24" width="72" height="72">${fog}</svg>`;
+  if (code >= 51 && code <= 57) return `<svg viewBox="0 0 24 24" width="72" height="72">${rain}</svg>`;
+  if (code >= 61 && code <= 67) return `<svg viewBox="0 0 24 24" width="72" height="72">${rain}</svg>`;
+  if (code >= 71 && code <= 77) return `<svg viewBox="0 0 24 24" width="72" height="72">${snow}</svg>`;
+  if (code >= 80 && code <= 82) return `<svg viewBox="0 0 24 24" width="72" height="72">${rain}</svg>`;
+  if (code === 85 || code === 86) return `<svg viewBox="0 0 24 24" width="72" height="72">${snow}</svg>`;
+  if (code >= 95) return `<svg viewBox="0 0 24 24" width="72" height="72">${storm}</svg>`;
+  return `<svg viewBox="0 0 24 24" width="72" height="72">${cloud}</svg>`;
+}
+
 function wmo(code: number): { label: string; icon: string } {
- if (code === 0) return { label: "Clear sky", icon: "" };
- if (code === 1) return { label: "Mostly clear", icon: "" };
- if (code === 2) return { label: "Partly cloudy", icon: "" };
- if (code === 3) return { label: "Overcast", icon: "" };
- if (code === 45 || code === 48) return { label: "Fog", icon: "" };
- if (code >= 51 && code <= 57) return { label: "Drizzle", icon: "" };
- if (code >= 61 && code <= 67) return { label: "Rain", icon: "" };
- if (code >= 71 && code <= 77) return { label: "Snow", icon: "" };
- if (code >= 80 && code <= 82) return { label: "Showers", icon: "" };
- if (code === 85 || code === 86) return { label: "Snow showers", icon: "" };
- if (code >= 95) return { label: "Thunderstorm", icon: "" };
- return { label: "—", icon: "" };
+ if (code === 0) return { label: "Clear sky", icon: weatherIcon(code) };
+ if (code === 1) return { label: "Mostly clear", icon: weatherIcon(code) };
+ if (code === 2) return { label: "Partly cloudy", icon: weatherIcon(code) };
+ if (code === 3) return { label: "Overcast", icon: weatherIcon(code) };
+ if (code === 45 || code === 48) return { label: "Fog", icon: weatherIcon(code) };
+ if (code >= 51 && code <= 57) return { label: "Drizzle", icon: weatherIcon(code) };
+ if (code >= 61 && code <= 67) return { label: "Rain", icon: weatherIcon(code) };
+ if (code >= 71 && code <= 77) return { label: "Snow", icon: weatherIcon(code) };
+ if (code >= 80 && code <= 82) return { label: "Showers", icon: weatherIcon(code) };
+ if (code === 85 || code === 86) return { label: "Snow showers", icon: weatherIcon(code) };
+ if (code >= 95) return { label: "Thunderstorm", icon: weatherIcon(code) };
+ return { label: "—", icon: weatherIcon(2) };
 }
 
 function compass(deg: number): string {
@@ -651,9 +674,14 @@ export default function WeatherPage() {
                   <div>
                     <div className="text-7xl font-black tracking-tight">{Math.round(derived.c.temperature_2m)}°</div>
                     <p className="mt-1 text-pine/60 text-sm">
-                      {derived.wmo.icon} {derived.wmo.label} · Feels {Math.round(derived.c.apparent_temperature)}°
+                      {derived.wmo.label} · Feels {Math.round(derived.c.apparent_temperature)}°
                     </p>
                   </div>
+                  <div
+                    className="shrink-0 -mb-2"
+                    dangerouslySetInnerHTML={{ __html: derived.wmo.icon }}
+                    aria-hidden="true"
+                  />
                 </div>
                 <div className="grid grid-cols-3 gap-2.5 mt-4">
                   <div className="rounded-2xl bg-white/70 border border-pine/10 px-3 py-3 text-center">
