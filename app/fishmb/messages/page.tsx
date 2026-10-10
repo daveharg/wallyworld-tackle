@@ -409,20 +409,50 @@ function MessagesPageInner() {
   const peer: ThreadPeer | null = selected;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10 md:py-14">
+    <div className="max-w-5xl mx-auto px-4 py-6 md:py-10">
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide">
-            Messages
-          </h1>
+        {/* User avatar */}
+        <div className="w-12 h-12 rounded-full bg-pine/10 flex items-center justify-center shrink-0">
+          {user?.avatar_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={user.avatar_url} alt="" className="w-12 h-12 rounded-full object-cover" />
+          ) : (
+            <span className="font-bold text-pine/60 text-lg">
+              {(user?.name ?? "F").split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()}
+            </span>
+          )}
         </div>
-        <button
-          type="button"
-          onClick={() => setNewOpen(true)}
-          className="bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-xs px-5 py-3 rounded-full transition-colors"
-        >
- New
-        </button>
+        {/* Title */}
+        <h1 className="font-bold text-pine text-xl tracking-tight">
+          Chats
+        </h1>
+        {/* Camera + compose pill */}
+        <div className="flex items-center gap-1 bg-white border border-pine/10 rounded-full p-1.5 shadow-sm shrink-0">
+          <button
+            type="button"
+            onClick={() => setNewOpen(true)}
+            aria-label="Send a photo"
+            title="Send a photo"
+            className="w-10 h-10 rounded-full hover:bg-pine/5 flex items-center justify-center text-pine transition-colors"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            onClick={() => setNewOpen(true)}
+            aria-label="New message"
+            title="New message"
+            className="w-10 h-10 rounded-full hover:bg-pine/5 flex items-center justify-center text-pine transition-colors"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {note && (
