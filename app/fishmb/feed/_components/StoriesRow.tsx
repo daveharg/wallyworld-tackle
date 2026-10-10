@@ -28,6 +28,24 @@ export default function StoriesRow() {
   const [stories, setStories] = useState<Story[]>([]);
   const [viewing, setViewing] = useState<Story | null>(null);
   const [creating, setCreating] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const deleteViewingStory = async () => {
+    if (!viewing) return;
+    setDeleting(true);
+    try {
+      await fishFetch(`/api/fishmb/stories/${viewing.id}`, { method: "DELETE" });
+      const deletedId = viewing.id;
+      setStories((list) => list.filter((s) => s.id !== deletedId));
+      setViewing(null);
+      setConfirmDelete(false);
+    } catch {
+      // keep viewer open on failure
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const sortStories = (list: Story[]) => {
     // Unviewed first, then viewed (watched stories drop to the end of the queue).
@@ -263,6 +281,21 @@ export default function StoriesRow() {
                   {new Date(viewing.created_at).toLocaleString()}
                 </p>
               </div>
+              {user && viewing.user_id === user.id && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setConfirmDelete(true);
+                  }}
+                  aria-label="Delete story"
+                  className="w-9 h-9 rounded-full bg-black/40 flex items-center justify-center text-white/90 hover:text-white hover:bg-black/60 transition-colors"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                  </svg>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => setViewing(null)}
@@ -273,6 +306,41 @@ export default function StoriesRow() {
               </button>
             </div>
           </div>
+          {/* Delete confirmation */}
+          {confirmDelete && (
+            <div
+              className="absolute inset-0 z-20 flex items-center justify-center bg-black/60 p-6"
+              onClick={(e) => {
+                e.stopPropagation();
+                setConfirmDelete(false);
+              }}
+            >
+              <div
+                className="bg-white rounded-3xl p-6 w-full max-w-xs text-center"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <p className="font-bold text-pine text-lg mb-2">Delete this story?</p>
+                <p className="text-pine/60 text-sm mb-5">It will be removed for everyone.</p>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setConfirmDelete(false)}
+                    className="flex-1 py-3 rounded-full border border-pine/20 text-pine font-bold text-sm uppercase"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={deleteViewingStory}
+                    disabled={deleting}
+                    className="flex-1 py-3 rounded-full bg-red-500 text-white font-bold text-sm uppercase disabled:opacity-50"
+                  >
+                    {deleting ? "Deleting…" : "Delete"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           {viewing.caption && (
             <p className="absolute bottom-0 inset-x-0 z-10 p-4 text-white text-center text-sm drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]" onClick={(e) => e.stopPropagation()}>
               {viewing.caption}

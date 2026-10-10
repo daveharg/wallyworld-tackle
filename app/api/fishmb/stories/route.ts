@@ -45,11 +45,16 @@ export async function POST(req: NextRequest) {
   const zoom = Math.max(0.5, Math.min(3, Number(body.zoom) || 1));
   const volumeRaw = Number(body.volume);
   const volume = Number.isFinite(volumeRaw) ? Math.max(0, Math.min(1, volumeRaw)) : null;
+  // How long the story stays visible (hours). Default 24, min 1, max 168 (7 days).
+  const expiresHoursRaw = Number(body.expires_hours);
+  const expiresHours = Number.isFinite(expiresHoursRaw)
+    ? Math.max(1, Math.min(168, Math.round(expiresHoursRaw)))
+    : 24;
 
   const rows = await query<{ id: string }>(
-    `INSERT INTO fm_stories (user_id, media_url, media_type, caption, overlays, zoom, volume)
-     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-    [me.id, mediaUrl, mediaType, caption, JSON.stringify(overlays), zoom, volume]
+    `INSERT INTO fm_stories (user_id, media_url, media_type, caption, overlays, zoom, volume, expires_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, NOW() + ($8 || ' hours')::interval) RETURNING id`,
+    [me.id, mediaUrl, mediaType, caption, JSON.stringify(overlays), zoom, volume, String(expiresHours)]
   );
   return NextResponse.json({ ok: true, id: rows[0].id });
 }

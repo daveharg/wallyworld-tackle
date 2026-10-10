@@ -65,6 +65,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
   const [activeClip, setActiveClip] = useState(0);
   const [clipZooms, setClipZooms] = useState<Record<string, number>>({});
   const [clipVolumes, setClipVolumes] = useState<Record<string, number>>({});
+  const [expiresHours, setExpiresHours] = useState(24);
   const previewRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -457,6 +458,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
             overlays: clipOverlays,
             zoom: clipZooms[d.id] ?? 1,
             volume: d.media_type === "video" ? (clipVolumes[d.id] ?? 0.5) : null,
+            expires_hours: expiresHours,
           }),
         });
       }
@@ -1020,20 +1022,43 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
           </div>
 
           {/* Bottom bar */}
-          <div className="p-4 border-t border-pine/10 flex gap-2">
-            <button
-              onClick={() => setStep("pick")}
-              className="px-6 py-4 rounded-full border border-pine/20 text-pine font-bold text-sm uppercase"
-            >
-              Back
-            </button>
-            <button
-              onClick={postStories}
-              disabled={posting}
-              className="flex-1 py-4 rounded-full bg-signal text-white font-bold uppercase tracking-wider disabled:opacity-50"
-            >
-              {posting ? "Posting…" : clips.length > 1 ? `Post ${clips.length}-clip reel` : "Post story"}
-            </button>
+          <div className="px-4 pt-3 border-t border-pine/10">
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-pine/50 shrink-0">
+                Visible for
+              </span>
+              <div className="flex gap-1.5 flex-wrap">
+                {[6, 12, 24, 48, 72].map((h) => (
+                  <button
+                    key={h}
+                    type="button"
+                    onClick={() => setExpiresHours(h)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-bold transition-colors ${
+                      expiresHours === h
+                        ? "bg-pine text-white"
+                        : "bg-pine/10 text-pine/60 hover:bg-pine/15"
+                    }`}
+                  >
+                    {h}h
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-2 pb-4">
+              <button
+                onClick={() => setStep("pick")}
+                className="px-6 py-4 rounded-full border border-pine/20 text-pine font-bold text-sm uppercase"
+              >
+                Back
+              </button>
+              <button
+                onClick={postStories}
+                disabled={posting}
+                className="flex-1 py-4 rounded-full bg-signal text-white font-bold uppercase tracking-wider disabled:opacity-50"
+              >
+                {posting ? "Posting…" : clips.length > 1 ? `Post ${clips.length}-clip reel` : "Post story"}
+              </button>
+            </div>
           </div>
           {note && <p className="px-4 pb-2 text-sm text-red-600 text-center">{note}</p>}
         </>
