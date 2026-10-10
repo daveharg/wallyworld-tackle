@@ -274,11 +274,6 @@ function Bar() {
         style={{
           paddingTop: "0.55rem",
           paddingBottom: "calc(0.55rem + env(safe-area-inset-bottom))",
-          // Hardware acceleration for iOS — applied here (not on nav) so the
-          // menu backdrop's fixed positioning stays viewport-relative.
-          transform: "translateZ(0)",
-          WebkitTransform: "translateZ(0)",
-          willChange: "transform",
         }}
       >
         <div className="flex items-center">
