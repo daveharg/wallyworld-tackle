@@ -415,15 +415,21 @@ export default function SpotMap({
   }, [catchPins, map]);
 
   // Live GPS person marker — follows you whenever we have a fix.
-  const personLayerRef = useRef<any>(null);
+  // Single persistent marker (no duplicates): we reuse one Leaflet marker and
+  // just move it / swap its icon, so there's never two location dots.
+  const personMarkerRef = useRef<any>(null);
   useEffect(() => {
     if (!map) return;
+    let cancelled = false;
     (async () => {
       const L = (await import("leaflet")).default;
       const { spotIconHtml, spotIconSize } = await import("./spotIcons");
-      personLayerRef.current?.remove();
-      if (!myLoc) return;
-      const layer = L.layerGroup();
+      if (cancelled) return;
+      if (!myLoc) {
+        personMarkerRef.current?.remove();
+        personMarkerRef.current = null;
+        return;
+      }
       const { size, anchor } = spotIconSize(followDot);
       const person = L.divIcon({
         className: "",
@@ -431,10 +437,20 @@ export default function SpotMap({
         iconSize: size,
         iconAnchor: anchor,
       });
-      L.marker([myLoc.lat, myLoc.lng], { icon: person, interactive: false, zIndexOffset: 500 }).addTo(layer);
-      layer.addTo(map);
-      personLayerRef.current = layer;
+      if (personMarkerRef.current) {
+        personMarkerRef.current.setLatLng([myLoc.lat, myLoc.lng]);
+        personMarkerRef.current.setIcon(person);
+      } else {
+        personMarkerRef.current = L.marker([myLoc.lat, myLoc.lng], {
+          icon: person,
+          interactive: false,
+          zIndexOffset: 500,
+        }).addTo(map);
+      }
     })();
+    return () => {
+      cancelled = true;
+    };
   }, [map, myLoc, followDot]);
 
   // Trail polylines: live recording (orange) + saved overlay (blue).
