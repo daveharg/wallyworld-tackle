@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useFishAuth } from "../../_components/FishAuth";
 import { fishFetch } from "../../_components/fishFetch";
 import { JoinByCode } from "../../tournaments/_components/JoinByCode";
+import { LicenceNotice } from "../../tournaments/_components/PrizePot";
 import TournamentCreateSection from "./TournamentCreateSection";
 
 interface MyTournament {
@@ -197,6 +198,9 @@ export default function DashboardTournaments() {
 
       {creating && (
         <div className="bg-white border border-pine/10 rounded-3xl p-5">
+          <div className="mb-4">
+            <LicenceNotice participantCount={0} maxParticipants={null} />
+          </div>
           <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
             Create a tournament
           </h3>
