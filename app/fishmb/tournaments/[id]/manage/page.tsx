@@ -746,6 +746,16 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
     if (user) load();
   }, [user, load]);
 
+  // The organizer has seen this tournament — clear its "new joins" badge.
+  useEffect(() => {
+    fishFetch("/api/fishmb/tournaments/notifications", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tournament_id: params.id }),
+    }).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const review = async (entryId: string, status: "approved" | "rejected") => {
     const note = status === "rejected" ? window.prompt("Reason for rejection (shown to the angler):") ?? "" : "";
     setReviewing(entryId);

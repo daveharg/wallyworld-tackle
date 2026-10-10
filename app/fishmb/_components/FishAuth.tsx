@@ -406,23 +406,39 @@ export function FishLoginButton() {
   // New tournament joins (organizer alerts) — same badge system.
   const [joinCount, setJoinCount] = useState(0);
   const [joinTourneyId, setJoinTourneyId] = useState<string | null>(null);
+  const [joinDetails, setJoinDetails] = useState<
+    { tournament_id: string; tournament_name: string; user_name: string; joined_at: string; key_code: string | null; key_label: string | null }[]
+  >([]);
+  const [showAlerts, setShowAlerts] = useState(false);
   useEffect(() => {
     if (!user) {
       setJoinCount(0);
       setJoinTourneyId(null);
+      setJoinDetails([]);
       return;
     }
     let cancelled = false;
-    fishFetch("/api/fishmb/tournaments/notifications")
-      .then((d) => {
-        if (cancelled) return;
-        const data = d as { new_joins?: number; tournaments?: { id: string }[] };
-        setJoinCount(Number(data.new_joins ?? 0));
-        setJoinTourneyId(data.tournaments?.[0]?.id ?? null);
-      })
-      .catch(() => {});
+    const load = () => {
+      fishFetch("/api/fishmb/tournaments/notifications")
+        .then((d) => {
+          if (cancelled) return;
+          const data = d as {
+            new_joins?: number;
+            tournaments?: { id: string }[];
+            details?: typeof joinDetails;
+          };
+          setJoinCount(Number(data.new_joins ?? 0));
+          setJoinTourneyId(data.tournaments?.[0]?.id ?? null);
+          setJoinDetails(data.details ?? []);
+        })
+        .catch(() => {});
+    };
+    load();
+    // Refresh every 60s so the badge clears promptly after viewing.
+    const t = setInterval(load, 60000);
     return () => {
       cancelled = true;
+      clearInterval(t);
     };
   }, [user]);
 
@@ -502,9 +518,39 @@ export function FishLoginButton() {
       {menu && (
         <div
           data-menu-panel
-          className="absolute right-0 mt-2 z-20 bg-paper border border-pine/10 rounded-2xl shadow-xl py-2 w-44"
+          className="absolute right-0 mt-2 z-20 bg-paper border border-pine/10 rounded-2xl shadow-xl py-2 w-64"
           onClick={() => setMenu(false)}
         >
+          {joinDetails.length > 0 && (
+            <div className="px-4 py-2 border-b border-pine/10 mb-1">
+              <p className="text-[11px] font-black uppercase tracking-[0.14em] text-pine/45 mb-2">
+                Tournament alerts
+              </p>
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {joinDetails.map((d, i) => (
+                  <Link
+                    key={i}
+                    href={`/fishmb/tournaments/${d.tournament_id}/manage`}
+                    onClick={() => setMenu(false)}
+                    className="block bg-pine/5 rounded-xl px-3 py-2 hover:bg-pine/10"
+                  >
+                    <p className="text-xs font-bold text-pine leading-tight">
+                      {d.user_name} joined {d.tournament_name}
+                    </p>
+                    {d.key_code && (
+                      <p className="text-[11px] text-pine/55 mt-0.5">
+                        Used key {d.key_code}
+                        {d.key_label ? ` (${d.key_label})` : ""}
+                      </p>
+                    )}
+                    <p className="text-[10px] text-pine/40 mt-0.5">
+                      {new Date(d.joined_at).toLocaleString()}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
             <Link
               href="/fishmb/dashboard"
               onClick={() => setMenu(false)}
