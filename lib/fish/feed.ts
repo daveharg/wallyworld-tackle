@@ -433,6 +433,10 @@ export async function ensureFollowTables(): Promise<void> {
      WHERE u.id <> f.id
      ON CONFLICT DO NOTHING`
   );
+  // The FishMB brand account allows followers (so the Follow button shows on its profile).
+  await query(
+    `UPDATE fm_users SET allow_follow = true WHERE name ILIKE '%fishmb%'`
+  );
 }
 
 /** Ensure the stories tables exist. Stories expire after 24 hours. */
