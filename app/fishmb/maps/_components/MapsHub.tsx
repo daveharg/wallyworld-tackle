@@ -67,6 +67,9 @@ export default function MapsHub() {
   const [spotEditNotes, setSpotEditNotes] = useState("");
   const [spotEditIcon, setSpotEditIcon] = useState("pin");
   const [spotSaving, setSpotSaving] = useState(false);
+  const [spotEditLakeId, setSpotEditLakeId] = useState<string | null>(null);
+  const [spotLakeQuery, setSpotLakeQuery] = useState("");
+  const [allLakes, setAllLakes] = useState<{ id: string; name: string; region?: string }[]>([]);
   const [note, setNote] = useState<string | null>(null);
   const [myLoc, setMyLoc] = useState<{ lat: number; lng: number; speed: number | null } | null>(null);
   const [mapCenter, setMapCenter] = useState({ lat: 48, lng: -100 });
@@ -159,6 +162,21 @@ export default function MapsHub() {
     }
   };
 
+  // Load the full lake list once for the spot-edit lake search.
+  useEffect(() => {
+    fetch("/fish-manitoba/data.json")
+      .then((r) => r.json())
+      .then((d) => {
+        const lakes = ((d.lakes ?? []) as { id: string; name: string; region?: string }[]).map((l) => ({
+          id: l.id,
+          name: l.name,
+          region: l.region,
+        }));
+        setAllLakes(lakes);
+      })
+      .catch(() => {});
+  }, []);
+
   const saveSpotEdit = async () => {
     if (!spotPopup || spotSaving) return;
     setSpotSaving(true);
@@ -170,6 +188,7 @@ export default function MapsHub() {
           name: spotEditName.trim(),
           notes: spotEditNotes.trim() || null,
           icon: spotEditIcon,
+          lake_id: spotEditLakeId,
         }),
       });
       await reloadSpots();
@@ -627,6 +646,12 @@ export default function MapsHub() {
               setSpotEditName(s.name || "");
               setSpotEditNotes(s.notes || "");
               setSpotEditIcon(s.icon || "pin");
+              const full = spots.find((sp) => sp.id === s.id);
+              setSpotEditLakeId(full?.lake_id ?? null);
+              const lakeName = full?.lake_id
+                ? allLakes.find((l) => l.id === full.lake_id)?.name ?? ""
+                : "";
+              setSpotLakeQuery(lakeName);
             }}
           />
         </Suspense>
@@ -906,6 +931,40 @@ export default function MapsHub() {
                   className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm mb-3 focus:outline-none focus:border-signal"
                 />
                 <p className="text-xs font-bold uppercase tracking-wider text-pine/55 mb-2">
+                  Lake
+                </p>
+                <input
+                  value={spotLakeQuery}
+                  onChange={(e) => {
+                    setSpotLakeQuery(e.target.value);
+                    setSpotEditLakeId(null);
+                  }}
+                  placeholder="Search lakes…"
+                  className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold placeholder:text-pine/35 placeholder:font-normal focus:outline-none focus:border-signal"
+                />
+                {spotLakeQuery.trim().length > 0 && !spotEditLakeId && (
+                  <div className="max-h-40 overflow-y-auto bg-white border border-pine/15 rounded-2xl divide-y divide-pine/5 mt-1">
+                    {allLakes
+                      .filter((l) => l.name.toLowerCase().includes(spotLakeQuery.trim().toLowerCase()))
+                      .sort((a, b) => a.name.localeCompare(b.name))
+                      .slice(0, 15)
+                      .map((l) => (
+                        <button
+                          key={l.id}
+                          type="button"
+                          onClick={() => {
+                            setSpotEditLakeId(l.id);
+                            setSpotLakeQuery(l.name);
+                          }}
+                          className="w-full text-left px-4 py-2.5 text-sm font-bold text-pine hover:bg-pine/5"
+                        >
+                          {l.name}
+                          {l.region ? <span className="text-pine/45 font-normal"> — {l.region}</span> : null}
+                        </button>
+                      ))}
+                  </div>
+                )}
+                <p className="text-xs font-bold uppercase tracking-wider text-pine/55 mb-2 mt-3">
                   Spot icon
                 </p>
                 <div className="flex gap-2 mb-4">
