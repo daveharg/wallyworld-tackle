@@ -160,6 +160,13 @@ function Bar() {
   const [unread, setUnread] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [postGateOpen, setPostGateOpen] = useState(false);
+  // Which tab was just tapped — highlights instantly while the page loads.
+  const [pendingHref, setPendingHref] = useState<string | null>(null);
+
+  // Once navigation lands, the pathname drives the highlight again.
+  useEffect(() => {
+    setPendingHref(null);
+  }, [pathname]);
 
   useEffect(() => {
     let stop = false;
@@ -198,12 +205,14 @@ function Bar() {
   // Swipe down / tap-away handled by the overlay click; the X button also closes.
 
   const renderItem = (item: Item) => {
-    const active = item.match(pathname);
+    // Highlight instantly on tap — don't wait for the new page to finish loading.
+    const active = pendingHref ? item.href === pendingHref : item.match(pathname);
     const showBadge = item.label === "Inbox" && unread > 0;
     return (
       <Link
         key={item.href}
         href={item.href}
+        onClick={() => setPendingHref(item.href)}
         aria-label={showBadge ? `Inbox, ${unread} unread` : item.label}
         className={`relative flex flex-col items-center justify-center gap-1 w-16 py-2 rounded-full transition-colors ${
           active ? "text-pine bg-pine/[0.07]" : "text-pine/45 hover:text-pine"
