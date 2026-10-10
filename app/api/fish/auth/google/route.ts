@@ -176,6 +176,13 @@ export async function POST(req: NextRequest) {
        VALUES ($1, NULL, 1000, 'signup_bonus')`,
       [created!.id]
     );
+    // New users automatically follow the FishMB brand account (can unfollow later).
+    await client.query(
+      `INSERT INTO fm_follows (follower_id, followee_id)
+       SELECT $1::uuid, id FROM fm_users WHERE name ILIKE '%fishmb%' ORDER BY created_at ASC LIMIT 1
+       ON CONFLICT DO NOTHING`,
+      [created!.id]
+    );
     return { user: created!, isNew: true };
     }));
   } catch (err) {

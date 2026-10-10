@@ -424,6 +424,15 @@ export async function ensureFollowTables(): Promise<void> {
     CONSTRAINT fm_follows_no_self CHECK (follower_id <> followee_id)
   )`);
   await query(`CREATE INDEX IF NOT EXISTS fm_follows_followee_idx ON fm_follows(followee_id)`);
+  // All users follow the FishMB brand account by default (they can unfollow).
+  // Idempotent: ON CONFLICT DO NOTHING skips users already following.
+  await query(
+    `INSERT INTO fm_follows (follower_id, followee_id)
+     SELECT u.id, f.id FROM fm_users u
+     CROSS JOIN (SELECT id FROM fm_users WHERE name ILIKE '%fishmb%' ORDER BY created_at ASC LIMIT 1) f
+     WHERE u.id <> f.id
+     ON CONFLICT DO NOTHING`
+  );
 }
 
 /** Ensure the stories tables exist. Stories expire after 24 hours. */
