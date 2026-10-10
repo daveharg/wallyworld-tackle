@@ -51,6 +51,29 @@ export default function StoriesRow() {
     }
   };
 
+  // Tap-to-advance: next story from same person, then next person's stories.
+  const advanceStory = () => {
+    if (!viewing) return;
+    const userStories = stories.filter((s) => s.user_id === viewing.user_id);
+    const idx = userStories.findIndex((s) => s.id === viewing.id);
+    if (idx >= 0 && idx < userStories.length - 1) {
+      openViewer(userStories[idx + 1]);
+      return;
+    }
+    // Move to next person's first story.
+    const userIds = Array.from(new Set(stories.map((s) => s.user_id)));
+    const userIdx = userIds.indexOf(viewing.user_id);
+    const nextUserId = userIds[userIdx + 1];
+    if (nextUserId) {
+      const nextStory = stories.find((s) => s.user_id === nextUserId);
+      if (nextStory) {
+        openViewer(nextStory);
+        return;
+      }
+    }
+    setViewing(null);
+  };
+
   const deleteStory = async (id: string) => {
     try {
       await fishFetch(`/api/fishmb/stories/${id}`, { method: "DELETE" });
@@ -154,8 +177,21 @@ export default function StoriesRow() {
       )}
 
       {/* Story viewer */}
-      {viewing && (
-        <div className="fixed inset-0 z-[1300] bg-black flex flex-col" onClick={() => setViewing(null)}>
+      {viewing && (() => {
+        const userStories = stories.filter((s) => s.user_id === viewing.user_id);
+        const storyIdx = userStories.findIndex((s) => s.id === viewing.id);
+        return (
+        <div className="fixed inset-0 z-[1300] bg-black flex flex-col" onClick={advanceStory}>
+          {/* Progress bars */}
+          <div className="flex gap-1 px-3 pt-3" onClick={(e) => e.stopPropagation()}>
+            {userStories.map((s) => (
+              <div key={s.id} className="flex-1 h-1 rounded-full bg-white/30 overflow-hidden">
+                <div
+                  className={`h-full rounded-full ${userStories.indexOf(s) <= storyIdx ? "bg-white" : "bg-transparent"}`}
+                />
+              </div>
+            ))}
+          </div>
           <div className="flex items-center gap-3 p-4 text-white" onClick={(e) => e.stopPropagation()}>
             {viewing.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -189,7 +225,7 @@ export default function StoriesRow() {
               ×
             </button>
           </div>
-          <div className="flex-1 flex items-center justify-center min-h-0 relative overflow-hidden" onClick={(e) => e.stopPropagation()}>
+          <div className="flex-1 flex items-center justify-center min-h-0 relative overflow-hidden">
             <div
               className="absolute inset-0 flex items-center justify-center"
               style={{ transform: `scale(${viewing.zoom ?? 1})`, transformOrigin: "center" }}
@@ -227,7 +263,8 @@ export default function StoriesRow() {
             </p>
           )}
         </div>
-      )}
+        );
+      })()}
     </>
   );
 }
