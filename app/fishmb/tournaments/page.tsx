@@ -3,6 +3,7 @@ import { listTournaments } from "@/lib/fish/tournaments";
 import { getLakes, getTournaments as getTraditionalTournaments } from "@/lib/fishmb";
 import { JoinByCode } from "./_components/JoinByCode";
 import { SuggestTournament } from "./_components/SuggestTournament";
+import BackButton from "./_components/BackButton";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 60;
@@ -14,6 +15,7 @@ export default async function TournamentsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 md:py-14">
+      <BackButton />
       <p className="text-signal font-bold uppercase tracking-[0.28em] text-sm mb-3">
         Compete
       </p>

@@ -1,11 +1,13 @@
 import { getLakes } from "@/lib/fishmb";
 import { TournamentBuilder } from "../_components/TournamentBuilder";
 import { LicenceNotice } from "../_components/PrizePot";
+import BackButton from "../_components/BackButton";
 
 export default function CreateTournamentPage() {
   const lakes = getLakes().map((l) => ({ id: l.id, name: l.name, region: l.region }));
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 md:py-14">
+      <BackButton />
       <p className="text-signal font-bold uppercase tracking-[0.28em] text-sm mb-3">
         Organizers
       </p>

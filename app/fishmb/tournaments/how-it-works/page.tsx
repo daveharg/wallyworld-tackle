@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import BackButton from "../_components/BackButton";
 
 export const metadata: Metadata = {
   title: "How tournaments work | FishMB",
@@ -88,6 +89,7 @@ const dashboard = [
 export default function HowTournamentsWorkPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 md:py-14">
+      <BackButton />
       <p className="text-signal font-bold uppercase tracking-[0.28em] text-sm mb-3">
         Organizers
       </p>
