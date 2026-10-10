@@ -19,14 +19,6 @@ interface SpotsTabProps {
   onAddSpot: () => void;
 }
 
-function fmtDate(iso: string): string {
-  try {
-    return new Date(iso).toLocaleDateString("en-CA", { month: "short", day: "numeric" });
-  } catch {
-    return iso.slice(0, 10);
-  }
-}
-
 const inputCls =
   "w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal";
 
@@ -129,54 +121,53 @@ export default function SpotsTab({
                   ) : (
                     <div
                       key={s.id}
-                      className="bg-white border border-pine/10 rounded-2xl p-3.5"
+                      className="bg-white border border-pine/10 rounded-2xl px-3 py-2 flex items-center gap-1.5"
                     >
                       <button
                         type="button"
                         onClick={() => onSelect(s)}
-                        className="w-full text-left"
+                        className="flex-1 min-w-0 text-left py-1"
                       >
-                        <p className="font-bold text-pine truncate">
+                        <span className="font-bold text-pine text-sm truncate block">
                           {s.name || "Fishing spot"}
-                        </p>
-                        <p className="text-xs text-pine/50 mt-0.5">
-                          {fmtDate(s.created_at)}
-                        </p>
-                        {s.notes && (
-                          <p className="text-sm text-pine/70 mt-1 line-clamp-2">{s.notes}</p>
+                        </span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onNavigate(s)}
+                        className="shrink-0 bg-pine text-white text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full"
+                      >
+                        Go
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => startEdit(s)}
+                        aria-label="Edit spot"
+                        className="shrink-0 w-8 h-8 rounded-full bg-pine/5 text-pine flex items-center justify-center"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onShare(s.id)}
+                        disabled={sharingId === s.id}
+                        aria-label="Share spot"
+                        className="shrink-0 w-8 h-8 rounded-full bg-pine/5 text-pine flex items-center justify-center disabled:opacity-40"
+                      >
+                        {sharingId === s.id ? (
+                          <span className="text-xs">…</span>
+                        ) : (
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="m16 6-4-4-4 4"/><path d="M12 2v13"/></svg>
                         )}
                       </button>
-                      <div className="flex gap-2 mt-2.5">
-                        <button
-                          type="button"
-                          onClick={() => onNavigate(s)}
-                          className="flex-1 bg-pine text-white text-[11px] font-bold uppercase tracking-wider px-2 py-2 rounded-xl"
-                        >
- Go
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => startEdit(s)}
-                          className="flex-1 bg-pine/5 text-pine text-[11px] font-bold uppercase tracking-wider px-2 py-2 rounded-xl"
-                        >
- Edit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => onShare(s.id)}
-                          disabled={sharingId === s.id}
-                          className="flex-1 bg-pine/5 text-pine text-[11px] font-bold uppercase tracking-wider px-2 py-2 rounded-xl disabled:opacity-40"
-                        >
- {sharingId === s.id ? "…" : " Share"}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => onDelete(s.id)}
-                          className="flex-1 bg-pine/5 text-signal-dark text-[11px] font-bold uppercase tracking-wider px-2 py-2 rounded-xl"
-                        >
- 
-                        </button>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => onDelete(s.id)}
+                        aria-label="Delete spot"
+                        className="shrink-0 w-8 h-8 rounded-full bg-pine/5 text-signal-dark flex items-center justify-center"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                      </button>
                     </div>
                   )
                 )}
