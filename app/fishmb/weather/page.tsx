@@ -670,7 +670,7 @@ export default function WeatherPage() {
           {derived ? (
             <>
               <div className="mt-4">
-                <div className="flex items-end justify-between">
+                <div className="flex items-center justify-between">
                   <div>
                     <div className="text-7xl font-black tracking-tight">{Math.round(derived.c.temperature_2m)}°</div>
                     <p className="mt-1 text-pine/60 text-sm">
@@ -678,7 +678,7 @@ export default function WeatherPage() {
                     </p>
                   </div>
                   <div
-                    className="shrink-0 -mb-2"
+                    className="shrink-0 flex items-center justify-center pr-2"
                     dangerouslySetInnerHTML={{ __html: derived.wmo.icon }}
                     aria-hidden="true"
                   />
