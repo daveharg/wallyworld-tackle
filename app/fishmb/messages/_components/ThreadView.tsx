@@ -357,7 +357,7 @@ export default function ThreadView({
             </span>
           </button>
           <p className="text-[11px] text-pine/45 mt-0.5">
- End-to-end encrypted{peer.is_group ? ` · ${peer.members.length} members` : ""}
+            {peer.is_group ? `${peer.members.length} members` : "Direct message"}
           </p>
         </div>
         <span className="w-8 md:hidden shrink-0" />

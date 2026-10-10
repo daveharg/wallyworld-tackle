@@ -356,9 +356,6 @@ function MessagesPageInner() {
     <div className="max-w-5xl mx-auto px-4 py-10 md:py-14">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <p className="text-signal font-bold uppercase tracking-[0.28em] text-sm mb-2">
- Encrypted
-          </p>
           <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide">
             Messages
           </h1>
