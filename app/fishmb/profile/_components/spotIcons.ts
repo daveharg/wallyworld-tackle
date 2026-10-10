@@ -9,6 +9,7 @@ export const SPOT_ICON_CHOICES = [
   { id: "fish", emoji: "🐟", label: "Fish" },
   { id: "rock", emoji: "🪨", label: "Rock" },
   { id: "weed", emoji: "🌿", label: "Weeds" },
+  { id: "boat", emoji: "🚤", label: "Boat" },
 ] as const;
 
 export type SpotIconId = (typeof SPOT_ICON_CHOICES)[number]["id"];
