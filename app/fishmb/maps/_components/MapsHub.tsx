@@ -67,6 +67,8 @@ export default function MapsHub() {
   const [spotEditNotes, setSpotEditNotes] = useState("");
   const [spotEditIcon, setSpotEditIcon] = useState("pin");
   const [spotSaving, setSpotSaving] = useState(false);
+  const [mapZoom, setMapZoom] = useState(3);
+  const [zoomRequest, setZoomRequest] = useState<{ zoom: number; key: string } | null>(null);
   const [note, setNote] = useState<string | null>(null);
   const [myLoc, setMyLoc] = useState<{ lat: number; lng: number; speed: number | null } | null>(null);
   const [mapCenter, setMapCenter] = useState({ lat: 48, lng: -100 });
@@ -621,6 +623,8 @@ export default function MapsHub() {
             catchPins={catchPins}
             basemap={basemap}
             onMoveEnd={onMoveEnd}
+            onZoom={setMapZoom}
+            zoomRequest={zoomRequest}
             onSpotClick={(s) => {
               setSpotPopup(s);
               setSpotEditing(false);
@@ -688,6 +692,46 @@ export default function MapsHub() {
           <circle cx="12" cy="12" r="6" />
         </svg>
       </button>
+
+      {/* Zoom slider — vertical, far right under the buttons */}
+      <div className="absolute right-3 top-[11.5rem] z-20 flex flex-col items-center gap-1 bg-white/95 backdrop-blur border border-pine/15 rounded-full px-2 py-3 shadow-lg">
+        <button
+          type="button"
+          aria-label="Zoom in"
+          onClick={() => {
+            const z = Math.min(19, Math.round(mapZoom) + 1);
+            setZoomRequest({ zoom: z, key: `zin:${Date.now()}` });
+          }}
+          className="w-7 h-7 rounded-full text-pine font-black text-lg leading-none hover:bg-pine/10"
+        >
+          +
+        </button>
+        <input
+          type="range"
+          min={3}
+          max={19}
+          step={1}
+          value={Math.round(mapZoom)}
+          onChange={(e) => {
+            const z = Number(e.target.value);
+            setZoomRequest({ zoom: z, key: `zsl:${Date.now()}` });
+          }}
+          aria-label="Map zoom"
+          className="w-24 rotate-[-90deg] my-8 accent-pine cursor-pointer"
+          style={{ writingMode: "vertical-lr" } as React.CSSProperties}
+        />
+        <button
+          type="button"
+          aria-label="Zoom out"
+          onClick={() => {
+            const z = Math.max(3, Math.round(mapZoom) - 1);
+            setZoomRequest({ zoom: z, key: `zout:${Date.now()}` });
+          }}
+          className="w-7 h-7 rounded-full text-pine font-black text-lg leading-none hover:bg-pine/10"
+        >
+          −
+        </button>
+      </div>
 
       {/* Picking banner */}
       {picking && (

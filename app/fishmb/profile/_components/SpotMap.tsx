@@ -54,6 +54,10 @@ interface SpotMapProps {
   onTrailSaved?: () => void;
   /** Fired when a spot marker is tapped — parent shows a custom popup. */
   onSpotClick?: (spot: SpotPin) => void;
+  /** Fired whenever the map zoom changes. */
+  onZoom?: (zoom: number) => void;
+  /** Request a zoom level: when the key changes, the map sets this zoom. */
+  zoomRequest?: { zoom: number; key: string } | null;
   /** GPS catch pins rendered on the map. */
   catchPins?: CatchPin[];
   /** Base map style. */
@@ -113,6 +117,8 @@ export default function SpotMap({
   goTo,
   onTrailSaved,
   onSpotClick,
+  onZoom,
+  zoomRequest,
   catchPins,
   basemap = "streets",
   onMoveEnd,
@@ -121,6 +127,8 @@ export default function SpotMap({
   const containerRef = useRef<HTMLDivElement>(null);
   const onSpotClickRef = useRef(onSpotClick);
   onSpotClickRef.current = onSpotClick;
+  const onZoomRef = useRef(onZoom);
+  onZoomRef.current = onZoom;
   const [map, setMap] = useState<any>(null);
   const [expanded, setExpanded] = useState(false);
   // Circular fill indicator shown at the press point during a long-press.
@@ -166,7 +174,7 @@ export default function SpotMap({
       const L = (await import("leaflet")).default;
       await import("leaflet/dist/leaflet.css");
       if (cancelled || !containerRef.current) return;
-      const m = L.map(containerRef.current, { scrollWheelZoom: false }).setView(
+      const m = L.map(containerRef.current, { scrollWheelZoom: false, zoomControl: false }).setView(
         [48, -100],
         3
       );
@@ -188,6 +196,9 @@ export default function SpotMap({
       m.on("moveend", () => {
         const c = m.getCenter();
         onMoveEndRef.current?.({ lat: c.lat, lng: c.lng }, m.getZoom());
+      });
+      m.on("zoomend", () => {
+        onZoomRef.current?.(m.getZoom());
       });
       m.on("focus", () => m.scrollWheelZoom.enable());
       m.on("blur", () => m.scrollWheelZoom.disable());
@@ -628,6 +639,14 @@ export default function SpotMap({
       map.flyTo([focus.lat, focus.lng], zoom, { animate: true, duration: 1.2 });
     }
   }, [map, focus]);
+
+  // External zoom requests from the parent's zoom slider.
+  const lastZoomKey = useRef<string | null>(null);
+  useEffect(() => {
+    if (!map || !zoomRequest || zoomRequest.key === lastZoomKey.current) return;
+    lastZoomKey.current = zoomRequest.key;
+    map.setZoom(zoomRequest.zoom);
+  }, [map, zoomRequest]);
 
   // A quick tap on the map (not a drag, not a long-press) opens it fullscreen.
   // Skipped while dropping a pin or measuring, and taps on markers/popups/
