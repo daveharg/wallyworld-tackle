@@ -26,8 +26,9 @@ export interface FeedItem {
   comment_count: number;
   like_count: number;
   dislike_count: number;
+  laugh_count: number;
   /** The viewer's own reaction, if any. */
-  viewer_reaction: 1 | -1 | null;
+  viewer_reaction: 1 | -1 | 2 | null;
   created_at: string;
 }
 
@@ -189,6 +190,8 @@ export async function getFeed(opts: GetFeedOptions = {}): Promise<FeedPage> {
               WHERE r.post_id = feed.id AND r.value = 1)::int AS like_count,
             (SELECT COUNT(*) FROM fm_post_reactions r
               WHERE r.post_id = feed.id AND r.value = -1)::int AS dislike_count,
+            (SELECT COUNT(*) FROM fm_post_reactions r
+              WHERE r.post_id = feed.id AND r.value = 2)::int AS laugh_count,
             (SELECT r.value FROM fm_post_reactions r
               WHERE r.post_id = feed.id AND r.user_id = $1::uuid)::smallint AS viewer_reaction
      FROM (
@@ -259,8 +262,8 @@ export async function createPost(
 export async function toggleReaction(
   postId: string,
   userId: string,
-  value: 1 | -1 | null
-): Promise<{ like_count: number; dislike_count: number; viewer_reaction: 1 | -1 | null }> {
+  value: 1 | -1 | 2 | null
+): Promise<{ like_count: number; dislike_count: number; laugh_count: number; viewer_reaction: 1 | -1 | 2 | null }> {
   await ensureFeedColumns();
   if (value === null) {
     await query(`DELETE FROM fm_post_reactions WHERE post_id = $1 AND user_id = $2`, [
@@ -275,9 +278,10 @@ export async function toggleReaction(
       [postId, userId, value]
     );
   }
-  const row = await queryOne<{ like_count: number; dislike_count: number; viewer_reaction: number | null }>(
+  const row = await queryOne<{ like_count: number; dislike_count: number; laugh_count: number; viewer_reaction: number | null }>(
     `SELECT COUNT(*) FILTER (WHERE value = 1)::int AS like_count,
             COUNT(*) FILTER (WHERE value = -1)::int AS dislike_count,
+            COUNT(*) FILTER (WHERE value = 2)::int AS laugh_count,
             (SELECT value FROM fm_post_reactions WHERE post_id = $1 AND user_id = $2)::int AS viewer_reaction
      FROM fm_post_reactions
      WHERE post_id = $1`,
@@ -287,7 +291,8 @@ export async function toggleReaction(
   return {
     like_count: row?.like_count ?? 0,
     dislike_count: row?.dislike_count ?? 0,
-    viewer_reaction: vr === 1 || vr === -1 ? vr : null,
+    laugh_count: row?.laugh_count ?? 0,
+    viewer_reaction: vr === 1 || vr === -1 || vr === 2 ? vr : null,
   };
 }
 

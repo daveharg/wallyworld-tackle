@@ -1,5 +1,5 @@
-// /api/fishmb/feed/[id]/react — like/dislike a feed item.
-// POST { value: 1 | -1 | null } — 1 = like, -1 = dislike, null = remove reaction.
+// /api/fishmb/feed/[id]/react — like/dislike/laugh on a feed item.
+// POST { value: 1 | -1 | 2 | null } — 1 = like, -1 = dislike, 2 = laugh, null = remove.
 
 import { NextRequest, NextResponse } from "next/server";
 import { fishUserFromRequest, unauthorized, badRequest, notFound } from "@/lib/fish/auth";
@@ -16,8 +16,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     return badRequest("Invalid JSON body.");
   }
   const value = body.value;
-  if (value !== 1 && value !== -1 && value !== null) {
-    return badRequest("value must be 1, -1, or null.");
+  if (value !== 1 && value !== -1 && value !== 2 && value !== null) {
+    return badRequest("value must be 1, -1, 2, or null.");
   }
   await ensureFeedColumns();
   // A feed item is either a discussion or a catch.

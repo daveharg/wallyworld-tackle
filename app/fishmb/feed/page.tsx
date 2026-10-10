@@ -551,12 +551,12 @@ function Reactions({
   onReacted,
 }: {
   item: FeedItem;
-  onReacted: (id: string, r: { like_count: number; dislike_count: number; viewer_reaction: 1 | -1 | null }) => void;
+  onReacted: (id: string, r: { like_count: number; dislike_count: number; laugh_count: number; viewer_reaction: 1 | -1 | 2 | null }) => void;
 }) {
   const { user, openLogin } = useFishAuth();
   const [busy, setBusy] = useState(false);
 
-  const react = async (value: 1 | -1) => {
+  const react = async (value: 1 | -1 | 2) => {
     if (!user) {
       openLogin();
       return;
@@ -579,27 +579,41 @@ function Reactions({
     }
   };
 
-  const btn = (value: 1 | -1, icon: string, count: number, label: string) => {
+  const btn = (value: 1 | -1 | 2, icon: React.ReactNode, count: number, label: string) => {
     const active = item.viewer_reaction === value;
     return (
       <button
         onClick={() => react(value)}
         disabled={busy}
         aria-label={label}
-        className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full transition-colors ${
-          active ? "bg-signal/15 text-signal-dark" : "text-pine/50 hover:bg-pine/5"
+        className={`flex items-center gap-1.5 text-sm font-bold px-2 py-1 rounded-full transition-colors ${
+          active ? "text-signal-dark" : "text-pine/45 hover:text-pine"
         }`}
       >
-        <span className={active ? "" : "grayscale opacity-60"}>{icon}</span>
-        {count}
+        <span className={active ? "" : "opacity-70"}>{icon}</span>
+        <span className="tabular-nums">{count}</span>
       </button>
     );
   };
 
+  const thumbsUp = (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M7 10v12" />
+      <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z" />
+    </svg>
+  );
+
+  const thumbsDown = (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 14V2" />
+      <path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z" />
+    </svg>
+  );
+
   return (
-    <div className="flex items-center gap-1">
- {btn(1, "", item.like_count, "Like")}
- {btn(-1, "", item.dislike_count, "Dislike")}
+    <div className="flex items-center gap-4">
+      {btn(1, thumbsUp, item.like_count, "Like")}
+      {btn(-1, thumbsDown, item.dislike_count, "Dislike")}
     </div>
   );
 }
@@ -1772,15 +1786,24 @@ function FeedPageInner() {
                       }
                       setTimeout(() => setShareNote(null), 3000);
                     }}
-                    className="text-xs font-bold uppercase tracking-wider text-pine/50 hover:text-signal-dark"
+                    aria-label="Share"
+                    className="flex items-center gap-1.5 text-sm font-bold text-pine/45 hover:text-pine"
                   >
-                    Share
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="m22 2-7 20-4-9-9-4Z" />
+                      <path d="M22 2 11 13" />
+                    </svg>
+                    <span className="tabular-nums">{item.share_count ?? 0}</span>
                   </button>
                   <button
                     onClick={() => toggleComments(item.id)}
-                    className="text-xs font-bold uppercase tracking-wider text-pine/50 hover:text-signal-dark"
+                    aria-label="Comments"
+                    className="flex items-center gap-1.5 text-sm font-bold text-pine/45 hover:text-pine"
                   >
- {item.comment_count} {item.comment_count === 1 ? "comment" : "comments"}
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z" />
+                    </svg>
+                    <span className="tabular-nums">{item.comment_count}</span>
                   </button>
                 </div>
               </div>
