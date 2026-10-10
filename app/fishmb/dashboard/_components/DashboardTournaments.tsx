@@ -89,8 +89,7 @@ export default function DashboardTournaments() {
   const live = tournaments.filter((t) => new Date(t.ends_at).getTime() >= now);
   const past = tournaments.filter((t) => new Date(t.ends_at).getTime() < now);
 
-  const row = (t: MyTournament) => {
-    const mine = t.organizer_id === user.id;
+  const row = (t: MyTournament, isPast = false) => {
     const standing = standings.find((s) => s.tournamentId === t.id);
     return (
       <Link
@@ -98,12 +97,17 @@ export default function DashboardTournaments() {
         href={`/fishmb/tournaments/${t.id}`}
         className="flex items-center gap-3 bg-white border border-pine/10 rounded-2xl px-4 py-3.5 hover:border-signal/40 transition-colors"
       >
+        {standing && !isPast && (
+          <span className="w-10 h-10 rounded-full bg-gold/20 border border-gold/40 flex items-center justify-center font-black text-pine text-sm shrink-0">
+            #{standing.rank}
+          </span>
+        )}
         <span className="min-w-0 flex-1">
           <span className="block font-bold text-pine truncate">{t.name}</span>
           <span className="block text-xs text-pine/50 mt-0.5">
             {fmtRange(t.starts_at, t.ends_at)}
-            {standing && (
-              <span className="font-bold text-signal-dark"> · #{standing.rank} of {standing.total}</span>
+            {standing && !isPast && (
+              <span className="font-bold text-signal-dark"> · {standing.total} anglers</span>
             )}
           </span>
         </span>
@@ -160,44 +164,20 @@ export default function DashboardTournaments() {
         </div>
       ) : (
         <>
-          {standings.length > 0 && (
+          {live.length > 0 && (
             <div>
               <h3 className="text-xs font-black uppercase tracking-wider text-pine/45 mb-2">
-                Current standings
+                Current tournaments
               </h3>
-              <div className="space-y-2">
-                {standings.map((s) => {
-                  const t = live.find((x) => x.id === s.tournamentId);
-                  if (!t) return null;
-                  return (
-                    <Link
-                      key={s.tournamentId}
-                      href={`/fishmb/tournaments/${s.tournamentId}`}
-                      className="flex items-center gap-3 bg-gradient-to-r from-gold/15 to-gold/5 border border-gold/30 rounded-2xl p-4 hover:border-gold/50 transition-colors"
-                    >
-                      <span className="w-11 h-11 rounded-full bg-gold/25 border border-gold/50 flex items-center justify-center font-black text-pine shrink-0">
-                        #{s.rank}
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block font-bold text-pine truncate">{t.name}</span>
-                        <span className="block text-xs text-pine/50 mt-0.5">
-                          {s.total} angler{s.total === 1 ? "" : "s"} on the board
-                        </span>
-                      </span>
-                      <span className="text-pine/25 text-xl leading-none shrink-0">›</span>
-                    </Link>
-                  );
-                })}
-              </div>
+              <div className="space-y-2">{live.map((t) => row(t, false))}</div>
             </div>
           )}
-          {live.length > 0 && <div className="space-y-2">{live.map(row)}</div>}
           {past.length > 0 && (
             <div>
               <h3 className="text-xs font-black uppercase tracking-wider text-pine/45 mb-2">
-                Past
+                Past tournaments
               </h3>
-              <div className="space-y-2 opacity-75">{past.map(row)}</div>
+              <div className="space-y-2 opacity-75">{past.map((t) => row(t, true))}</div>
             </div>
           )}
         </>
