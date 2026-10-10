@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useFishAuth } from "../../_components/FishAuth";
@@ -55,6 +55,30 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
     west: -102.1,
   });
   const [zonePolygon, setZonePolygon] = useState<ZonePoint[] | null>(null);
+  const [lakeCoords, setLakeCoords] = useState<Record<string, { lat: number; lng: number }>>({});
+
+  // Load lake coordinates so the zone map can jump to a picked lake.
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/fishmb/lake-coords.json");
+        const data = (await res.json()) as Record<string, { lat: number; lng: number }>;
+        setLakeCoords(data);
+      } catch {
+        // Zone map just won't auto-focus.
+      }
+    })();
+  }, []);
+
+  const zoneFocusLake = useMemo(() => {
+    for (const id of lakeIds) {
+      const c = lakeCoords[id];
+      if (c && Number.isFinite(c.lat) && Number.isFinite(c.lng)) {
+        return { lat: c.lat, lng: c.lng, key: id };
+      }
+    }
+    return null;
+  }, [lakeIds, lakeCoords]);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -207,38 +231,26 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
               <input value={venueAddress} onChange={(e) => setVenueAddress(e.target.value)} maxLength={200} placeholder="e.g. 112 Main St, Selkirk MB" className={inputCls} />
             </div>
           </div>
-          <div>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={customZone}
-                onChange={(e) => setCustomZone(e.target.checked)}
-                className="w-4 h-4 accent-signal"
-              />
-              <span className={labelCls}>Set a custom fishing zone</span>
-            </label>
-            <p className="text-pine/50 text-xs mt-1 mb-3">
-              Catches outside your zone are rejected. Leave off for all of Manitoba.
-            </p>
-            {customZone && (
-              <ZoneMapPicker
-                initialBox={zoneBox}
-                initialPolygon={zonePolygon}
-                onChange={(b, p) => {
-                  setZoneBox(b);
-                  setZonePolygon(p);
-                }}
-              />
-            )}
-          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="min-w-0">
+            <div className="min-w-0 overflow-hidden">
               <label className={labelCls}>Starts *</label>
-              <input type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} className={`${inputCls} max-w-full`} />
+              <input
+                type="datetime-local"
+                value={startsAt}
+                onChange={(e) => setStartsAt(e.target.value)}
+                className={inputCls}
+                style={{ minWidth: 0, maxWidth: "100%", display: "block" }}
+              />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 overflow-hidden">
               <label className={labelCls}>Ends *</label>
-              <input type="datetime-local" value={endsAt} onChange={(e) => setEndsAt(e.target.value)} className={`${inputCls} max-w-full`} />
+              <input
+                type="datetime-local"
+                value={endsAt}
+                onChange={(e) => setEndsAt(e.target.value)}
+                className={inputCls}
+                style={{ minWidth: 0, maxWidth: "100%", display: "block" }}
+              />
             </div>
           </div>
           <div>
@@ -427,6 +439,32 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
               </div>
             )}
             <p className="text-xs text-pine/50 mt-2">Optional — leave empty for any Manitoba water.</p>
+          </div>
+          <div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={customZone}
+                onChange={(e) => setCustomZone(e.target.checked)}
+                className="w-4 h-4 accent-signal"
+              />
+              <span className={labelCls}>Set a custom fishing zone</span>
+            </label>
+            <p className="text-pine/50 text-xs mt-1 mb-3">
+              Catches outside your zone are rejected. Leave off for all of Manitoba.
+              {lakeIds.length > 0 ? " Pick a lake above and the map jumps to it." : ""}
+            </p>
+            {customZone && (
+              <ZoneMapPicker
+                initialBox={zoneBox}
+                initialPolygon={zonePolygon}
+                focusLake={zoneFocusLake}
+                onChange={(b, p) => {
+                  setZoneBox(b);
+                  setZonePolygon(p);
+                }}
+              />
+            )}
           </div>
           <div>
             <label className={labelCls}>Eligible species</label>

@@ -24,10 +24,12 @@ export interface ZonePoint {
 export default function ZoneMapPicker({
   initialBox,
   initialPolygon,
+  focusLake,
   onChange,
 }: {
   initialBox: ZoneBox;
   initialPolygon: ZonePoint[] | null;
+  focusLake: { lat: number; lng: number; key: string } | null;
   onChange: (box: ZoneBox, polygon: ZonePoint[] | null) => void;
 }) {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -163,6 +165,15 @@ export default function ZoneMapPicker({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Fly to a picked lake when it changes.
+  const lastFocusKey = useRef<string | null>(null);
+  useEffect(() => {
+    if (!mapObj.current || !focusLake) return;
+    if (lastFocusKey.current === focusLake.key) return;
+    lastFocusKey.current = focusLake.key;
+    mapObj.current.flyTo([focusLake.lat, focusLake.lng], 10, { duration: 1 });
+  }, [focusLake]);
 
   // Switch modes: clear the other overlay.
   const switchMode = (m: "box" | "draw") => {
