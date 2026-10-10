@@ -70,6 +70,10 @@ export default function LakesTab({
   onSelectLake: (lake: SavedLake) => void;
 }) {
   const [cards, setCards] = useState<LakeCardData[]>([]);
+  const [allLakes, setAllLakes] = useState<{ id: string; name: string; region?: string }[]>([]);
+  const [adding, setAdding] = useState(false);
+  const [addId, setAddId] = useState("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -134,8 +138,49 @@ export default function LakesTab({
         })
       );
       setCards(enriched);
+      // All lakes for the add-lake picker (excluding already-saved).
+      setAllLakes(meta.map((m) => ({ id: m.id, name: m.name, region: m.region })));
     })();
   }, []);
+
+  const addLake = async () => {
+    if (!addId || saving) return;
+    setSaving(true);
+    try {
+      await fishFetch("/api/fishmb/favorite-lakes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lake_id: addId }),
+      });
+      // Refresh the list.
+      const f = await fishFetch("/api/fishmb/favorite-lakes");
+      const favList = (f.lakes ?? []) as SavedLake[];
+      const metaRes = await fetch("/fish-manitoba/data.json").then((r) => r.json()).catch(() => ({ lakes: [] }));
+      const metaById = new Map(((metaRes.lakes ?? []) as { id: string; species?: string[] }[]).map((m) => [m.id, m]));
+      const usage = getUsage();
+      const sorted = [...favList].sort((a, b) => {
+        const ua = usage[a.id] ?? { count: 0, last: 0 };
+        const ub = usage[b.id] ?? { count: 0, last: 0 };
+        if (ub.count !== ua.count) return ub.count - ua.count;
+        return ub.last - ua.last;
+      });
+      setCards(
+        sorted.map((lake) => ({
+          ...lake,
+          species: metaById.get(lake.id)?.species ?? [],
+          tempC: null,
+          weatherCode: null,
+          catchCount: null,
+        }))
+      );
+      setAdding(false);
+      setAddId("");
+    } catch {
+      // Stay open on error.
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleSelect = (lake: SavedLake) => {
     recordUsage(lake.id);
@@ -194,6 +239,58 @@ export default function LakesTab({
           ))}
         </div>
       )}
+      {/* Small add-lake button below the last lake */}
+      <div className="mt-3 px-4">
+        {adding ? (
+          <div className="space-y-2">
+            <select
+              value={addId}
+              onChange={(e) => setAddId(e.target.value)}
+              aria-label="Choose a lake to save"
+              className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold focus:outline-none focus:border-signal"
+            >
+              <option value="">Pick a lake…</option>
+              {allLakes
+                .filter((l) => !cards.some((c) => c.id === l.id))
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map((l) => (
+                  <option key={l.id} value={l.id}>
+                    {l.name}
+                    {l.region ? ` — ${l.region}` : ""}
+                  </option>
+                ))}
+            </select>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={addLake}
+                disabled={!addId || saving}
+                className="flex-1 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-5 py-2.5 rounded-full disabled:opacity-40 transition-colors"
+              >
+                {saving ? "Adding…" : "Add lake"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAdding(false);
+                  setAddId("");
+                }}
+                className="text-pine/60 text-xs font-bold uppercase tracking-wider px-4 py-2.5"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setAdding(true)}
+            className="w-full text-center text-signal-dark text-xs font-bold uppercase tracking-wider py-2.5 hover:text-signal transition-colors"
+          >
+            ＋ Add lake
+          </button>
+        )}
+      </div>
     </div>
   );
 }
