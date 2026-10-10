@@ -678,7 +678,7 @@ export default function MapsHub() {
         onClick={() => (recording ? stopRecording() : setRecordPrompt(true))}
         aria-label={recording ? "Stop recording route" : "Record a route"}
         title={recording ? "Stop recording route" : "Record a route"}
-        className={`absolute top-[11rem] right-3 z-20 w-11 h-11 rounded-full backdrop-blur border shadow-lg flex items-center justify-center active:scale-95 transition-transform ${
+        className={`absolute top-[7.5rem] right-3 z-20 w-11 h-11 rounded-full backdrop-blur border shadow-lg flex items-center justify-center active:scale-95 transition-transform ${
           recording
             ? "bg-signal text-white border-signal animate-pulse"
             : "bg-white/95 border-pine/15 text-pine"
@@ -686,24 +686,6 @@ export default function MapsHub() {
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
           <circle cx="12" cy="12" r="6" />
-        </svg>
-      </button>
-
-      {/* Map settings — opens the sheet's Settings tab */}
-      <button
-        type="button"
-        onClick={() => {
-          setTab("settings");
-          setSelectedLake(null);
-          setSnap("full");
-        }}
-        aria-label="Map settings"
-        title="Map settings"
-        className="absolute top-[7.5rem] right-3 z-20 w-11 h-11 rounded-full bg-white/95 backdrop-blur border border-pine/15 shadow-lg text-pine flex items-center justify-center active:scale-95 transition-transform"
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="3" />
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
         </svg>
       </button>
 
