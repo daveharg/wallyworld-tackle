@@ -28,7 +28,13 @@ function fmt(d: string) {
  * The invite code is already in the link — the visitor reads the details
  * first, then taps Join to create an account (or log in) and enter.
  */
-export default async function JoinTournamentPage({ params }: { params: { code: string } }) {
+export default async function JoinTournamentPage({
+  params,
+  searchParams,
+}: {
+  params: { code: string };
+  searchParams?: { key?: string };
+}) {
   const t = await getTournamentByInvite(params.code);
   if (!t) notFound();
 
@@ -113,7 +119,7 @@ export default async function JoinTournamentPage({ params }: { params: { code: s
           </code>{" "}
           is already applied.
         </p>
-        <JoinButton tournamentId={t.id} tournamentName={t.name} inviteCode={params.code} />
+        <JoinButton tournamentId={t.id} tournamentName={t.name} inviteCode={searchParams?.key ?? params.code} />
       </div>
 
       <p className="text-center">

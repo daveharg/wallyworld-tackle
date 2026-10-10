@@ -10,5 +10,8 @@ export async function GET(
 ) {
   const t = await getTournamentByInvite(params.code);
   if (!t) return notFound("No tournament found for that invite code.");
-  return NextResponse.json({ tournament: { id: t.id, name: t.name } });
+  return NextResponse.json({
+    tournament: { id: t.id, name: t.name },
+    entry_key: t.matched_entry_key ? params.code.toUpperCase() : null,
+  });
 }

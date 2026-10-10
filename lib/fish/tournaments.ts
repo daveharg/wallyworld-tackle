@@ -505,9 +505,19 @@ export async function getTournament(id: string): Promise<Tournament | null> {
   return queryOne<Tournament>(`${TOURNAMENT_SELECT} WHERE t.id = $1`, [id]);
 }
 
-export async function getTournamentByInvite(code: string): Promise<Tournament | null> {
+export async function getTournamentByInvite(code: string): Promise<(Tournament & { matched_entry_key?: boolean }) | null> {
   await ensureTournamentTables();
-  return queryOne<Tournament>(`${TOURNAMENT_SELECT} WHERE t.invite_code = $1`, [code.toUpperCase()]);
+  const upper = code.toUpperCase();
+  // First try the tournament invite code.
+  const byInvite = await queryOne<Tournament>(`${TOURNAMENT_SELECT} WHERE t.invite_code = $1`, [upper]);
+  if (byInvite) return byInvite;
+  // Then try an entry key — entry keys work the same as invite codes.
+  const byKey = await queryOne<Tournament>(
+    `${TOURNAMENT_SELECT} JOIN fm_tournament_keys k ON k.tournament_id = t.id WHERE k.key_code = $1`,
+    [upper]
+  );
+  if (byKey) return { ...byKey, matched_entry_key: true };
+  return null;
 }
 
 export async function listTournaments(): Promise<Tournament[]> {

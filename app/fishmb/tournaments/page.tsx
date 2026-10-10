@@ -2,6 +2,7 @@ import Link from "next/link";
 import { listTournaments } from "@/lib/fish/tournaments";
 import { getLakes, getTournaments as getTraditionalTournaments } from "@/lib/fishmb";
 import { JoinByCode } from "./_components/JoinByCode";
+import { OrganizerButton } from "./_components/OrganizerButton";
 import { SuggestTournament } from "./_components/SuggestTournament";
 import BackButton from "./_components/BackButton";
 
@@ -45,6 +46,7 @@ export default async function TournamentsPage() {
         >
           Create a tournament
         </Link>
+        <OrganizerButton />
         <Link
           href="/fishmb/tournaments/how-it-works"
           className="border-2 border-pine/20 hover:border-pine/40 text-pine font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full transition-colors"

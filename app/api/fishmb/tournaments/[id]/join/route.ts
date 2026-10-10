@@ -39,11 +39,25 @@ export async function POST(
   const code =
     typeof body.invite_code === "string" ? body.invite_code.trim().toUpperCase() : "";
   const isOrganizer = t.organizer_id === me.id;
+  // Entry keys work as invite codes too — redeem the key on join.
+  let keyId: string | null = null;
   if (!isOrganizer && code !== t.invite_code.toUpperCase()) {
-    return NextResponse.json(
-      { error: "You need the tournament's invite code to join." },
-      { status: 403 }
+    const keyRow = await query(
+      `SELECT id, status, max_uses, uses FROM fm_tournament_keys WHERE tournament_id = $1 AND key_code = $2`,
+      [t.id, code]
     );
+    const k = keyRow[0] as { id: string; status: string; max_uses: number | null; uses: number } | undefined;
+    if (!k) {
+      return NextResponse.json(
+        { error: "You need the tournament's invite code to join." },
+        { status: 403 }
+      );
+    }
+    const unlimited = k.max_uses === null;
+    if (!unlimited && k.status === "used") {
+      return NextResponse.json({ error: "That entry key has already been used." }, { status: 403 });
+    }
+    keyId = k.id;
   }
 
   if (t.max_participants !== null && t.participant_count >= t.max_participants) {
@@ -53,5 +67,12 @@ export async function POST(
     `INSERT INTO fm_tournament_participants (tournament_id, user_id) VALUES ($1,$2) ON CONFLICT DO NOTHING`,
     [t.id, me.id]
   );
+  // Consume the entry key if one was used.
+  if (keyId) {
+    await query(
+      `UPDATE fm_tournament_keys SET status = 'used', used_by_user_id = $1, used_at = now(), uses = uses + 1 WHERE id = $2`,
+      [me.id, keyId]
+    );
+  }
   return NextResponse.json({ joined: true });
 }

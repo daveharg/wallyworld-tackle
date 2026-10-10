@@ -16,7 +16,11 @@ export function JoinByCode() {
       const res = await fetch(`/api/fishmb/tournaments/by-code/${encodeURIComponent(c)}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Code not found.");
-      router.push(`/fishmb/tournaments/join/${c}`);
+      // Entry keys join in one step — pass the key so the join page redeems it.
+      const dest = data.entry_key
+        ? `/fishmb/tournaments/join/${c}?key=${encodeURIComponent(data.entry_key)}`
+        : `/fishmb/tournaments/join/${c}`;
+      router.push(dest);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Code not found.");
     }
