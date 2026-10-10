@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { upload } from "@vercel/blob/client";
 import { useFishAuth } from "../../_components/FishAuth";
 import { fishFetch } from "../../_components/fishFetch";
 import { compressImage } from "../../_components/compressImage";
@@ -33,25 +34,18 @@ export default function DashboardSettings({ afterSaveHref }: { afterSaveHref?: s
     setNote(null);
     try {
       const token = localStorage.getItem(FISHMB_TOKEN_KEY);
+      // Compress first (HEIC → JPEG, resize if large).
       const compressed = await compressImage(file);
-      if (compressed.size > 4_000_000) {
-        throw new Error(
-          "That photo is too large to upload. Try a smaller photo or take a screenshot of it first."
-        );
-      }
-      const form = new FormData();
-      form.append("file", compressed);
-      const upRes = await fetch("/api/fish/photos/upload", {
-        method: "POST",
+      // Upload directly to Blob (bypasses serverless body limit).
+      const blob = await upload(`fish-avatars/${Date.now()}-${compressed.name}`, compressed, {
+        access: "public",
+        handleUploadUrl: "/api/fish/photos/upload-url",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
-        body: form,
       });
-      const up = await upRes.json();
-      if (!upRes.ok) throw new Error(up.error || "Upload failed.");
       await fishFetch("/api/fish/auth/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ avatar_url: up.url as string }),
+        body: JSON.stringify({ avatar_url: blob.url }),
       });
       await refresh();
       setNote("Profile picture updated!");
