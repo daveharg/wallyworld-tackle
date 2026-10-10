@@ -70,6 +70,37 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
   const fileRef = useRef<HTMLInputElement>(null);
   const textInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  // Web Audio for real volume control on iOS (iOS Safari ignores video.volume).
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const gainNodeRef = useRef<GainNode | null>(null);
+  const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
+
+  // Set up Web Audio routing for the active video so the volume slider works on iOS.
+  const ensureAudioRouting = () => {
+    const vid = videoRef.current;
+    if (!vid) return;
+    try {
+      if (!audioCtxRef.current) {
+        const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        audioCtxRef.current = new AC();
+      }
+      const ctx = audioCtxRef.current;
+      if (ctx.state === "suspended") void ctx.resume();
+      // Create source node once per video element.
+      if (!sourceNodeRef.current || (sourceNodeRef.current as unknown as { mediaElement?: HTMLVideoElement }).mediaElement !== vid) {
+        try {
+          sourceNodeRef.current?.disconnect();
+        } catch { /* noop */ }
+        sourceNodeRef.current = ctx.createMediaElementSource(vid);
+        gainNodeRef.current = ctx.createGain();
+        sourceNodeRef.current.connect(gainNodeRef.current);
+        gainNodeRef.current.connect(ctx.destination);
+        gainNodeRef.current.gain.value = activeVolume;
+      }
+    } catch {
+      // Web Audio unavailable — fall back to video.volume.
+    }
+  };
 
   const clips = clipOrder
     .map((id) => drafts.find((d) => d.id === id))
@@ -80,6 +111,17 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
     if (!activeDraft) return;
     setClipZooms((m) => ({ ...m, [activeDraft.id]: z }));
   };
+  // Reset audio routing when switching clips (new video element).
+  useEffect(() => {
+    sourceNodeRef.current = null;
+    gainNodeRef.current = null;
+    // Set up routing for the new video once it's in the DOM.
+    const t = window.setTimeout(() => {
+      if (activeDraft?.media_type === "video") ensureAudioRouting();
+    }, 100);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeClip]);
   const activeVolume = activeDraft ? (clipVolumes[activeDraft.id] ?? 0.5) : 0.5;
   const setActiveVolume = (v: number) => {
     if (!activeDraft) return;
@@ -88,6 +130,11 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
     if (vid) {
       vid.muted = false;
       vid.volume = v;
+      // Route through Web Audio so the slider actually changes volume on iOS.
+      ensureAudioRouting();
+      if (gainNodeRef.current && audioCtxRef.current) {
+        gainNodeRef.current.gain.setTargetAtTime(v, audioCtxRef.current.currentTime, 0.01);
+      }
       // Ensure it's playing so the user hears the change.
       vid.play().catch(() => {});
     }
@@ -612,6 +659,10 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                       onLoadedMetadata={(e) => {
                         // Start muted for autoplay; unmuted when user touches volume.
                         e.currentTarget.volume = activeVolume;
+                      }}
+                      onPlay={() => {
+                        // Set up Web Audio routing when playback starts.
+                        ensureAudioRouting();
                       }}
                     />
                   ) : (

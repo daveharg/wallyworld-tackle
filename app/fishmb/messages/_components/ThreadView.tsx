@@ -72,7 +72,10 @@ export default function ThreadView({
   const [editAvatar, setEditAvatar] = useState<string | null>(null);
   const [savingGroup, setSavingGroup] = useState(false);
   const [addSearch, setAddSearch] = useState("");
-  const [friendOptions, setFriendOptions] = useState<{ id: string; name: string }[]>([]);
+  const [addScope, setAddScope] = useState<"friends" | "all">("friends");
+  const [friendOptions, setFriendOptions] = useState<{ id: string; name: string; avatar_url: string | null }[]>([]);
+  const [allUserResults, setAllUserResults] = useState<{ id: string; name: string; avatar_url: string | null }[]>([]);
+  const [allUserSearching, setAllUserSearching] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const lastAtRef = useRef<string | null>(null);
   const secretsRef = useRef<{ user_id: string; shared: Uint8Array }[] | null>(null);
@@ -281,16 +284,43 @@ export default function ThreadView({
     setEditName(peer.name ?? "");
     setEditAvatar(peer.avatar_url ?? null);
     setAddSearch("");
+    setAddScope("friends");
+    setAllUserResults([]);
     setEditingGroup(true);
     // Load friends for the add-member picker.
     fishFetch("/api/fish/friends")
       .then((d) => {
-        const list = ((d as { friends?: { id: string; name: string }[] }).friends ?? [])
+        const list = ((d as { friends?: { id: string; name: string; avatar_url: string | null }[] }).friends ?? [])
           .filter((f) => !peer.members.some((m) => m.user_id === f.id));
         setFriendOptions(list);
       })
       .catch(() => {});
   };
+
+  // Search all users when in "all" scope.
+  useEffect(() => {
+    if (!editingGroup || addScope !== "all") return;
+    const q = addSearch.trim();
+    if (q.length < 2) {
+      setAllUserResults([]);
+      setAllUserSearching(false);
+      return;
+    }
+    setAllUserSearching(true);
+    const t = window.setTimeout(async () => {
+      try {
+        const d = await fishFetch(`/api/fishmb/users/search?q=${encodeURIComponent(q)}`);
+        const users = ((d as { users?: { id: string; name: string; avatar_url: string | null }[] }).users ?? [])
+          .filter((u) => !peer.members.some((m) => m.user_id === u.id));
+        setAllUserResults(users);
+      } catch {
+        setAllUserResults([]);
+      } finally {
+        setAllUserSearching(false);
+      }
+    }, 300);
+    return () => window.clearTimeout(t);
+  }, [editingGroup, addScope, addSearch, peer.members]);
 
   const uploadGroupAvatar = async (file: File) => {
     setSavingGroup(true);
@@ -347,10 +377,13 @@ export default function ThreadView({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: userId }),
       });
-      const f = friendOptions.find((x) => x.id === userId);
+      const f = friendOptions.find((x) => x.id === userId) ?? allUserResults.find((x) => x.id === userId);
       if (f && !peer.members.some((m) => m.user_id === userId)) {
-        peer.members.push({ user_id: userId, name: f.name, avatar_url: null });
+        peer.members.push({ user_id: userId, name: f.name, avatar_url: f.avatar_url ?? null });
       }
+      // Remove from pickers so they don't show again.
+      setFriendOptions((prev) => prev.filter((x) => x.id !== userId));
+      setAllUserResults((prev) => prev.filter((x) => x.id !== userId));
       setAddSearch("");
       setNote(null);
     } catch (e) {
@@ -568,14 +601,37 @@ export default function ThreadView({
                 <input
                   value={addSearch}
                   onChange={(e) => setAddSearch(e.target.value)}
-                  placeholder="Search friends…"
+                  placeholder="Search friends and anglers…"
                   className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-2.5 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal mb-2"
                 />
-                {addSearch.trim() && (
+                <div className="flex gap-2 mb-2">
+                  <button
+                    type="button"
+                    onClick={() => setAddScope("friends")}
+                    className={`flex-1 font-bold uppercase tracking-wider text-[10px] px-3 py-1.5 rounded-full transition-colors ${
+                      addScope === "friends" ? "bg-pine text-white" : "bg-pine/10 text-pine/60"
+                    }`}
+                  >
+                    Friends
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAddScope("all")}
+                    className={`flex-1 font-bold uppercase tracking-wider text-[10px] px-3 py-1.5 rounded-full transition-colors ${
+                      addScope === "all" ? "bg-pine text-white" : "bg-pine/10 text-pine/60"
+                    }`}
+                  >
+                    All users
+                  </button>
+                </div>
+                {addScope === "friends" ? (
                   <div className="space-y-1 max-h-32 overflow-y-auto">
                     {friendOptions
-                      .filter((f) => f.name.toLowerCase().includes(addSearch.toLowerCase()))
-                      .slice(0, 5)
+                      .filter((f) =>
+                        !addSearch.trim() ||
+                        f.name.toLowerCase().includes(addSearch.trim().toLowerCase())
+                      )
+                      .slice(0, 8)
                       .map((f) => (
                         <button
                           key={f.id}
@@ -583,13 +639,53 @@ export default function ThreadView({
                           onClick={() => addMember(f.id)}
                           className="w-full flex items-center gap-2 text-sm text-pine hover:bg-pine/5 rounded-xl px-2 py-1.5"
                         >
-                          <span className="w-6 h-6 rounded-full bg-pine/10 flex items-center justify-center text-xs font-bold">
-                            {f.name.charAt(0).toUpperCase()}
-                          </span>
+                          {f.avatar_url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={f.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover" />
+                          ) : (
+                            <span className="w-6 h-6 rounded-full bg-pine/10 flex items-center justify-center text-xs font-bold">
+                              {f.name.charAt(0).toUpperCase()}
+                            </span>
+                          )}
                           {f.name}
                           <span className="ml-auto text-signal-dark font-bold">+</span>
                         </button>
                       ))}
+                    {friendOptions.length === 0 && (
+                      <p className="text-xs text-pine/45 px-2 py-1">No friends to add.</p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-1 max-h-32 overflow-y-auto">
+                    {allUserSearching ? (
+                      <p className="text-xs text-pine/45 px-2 py-1">Searching…</p>
+                    ) : allUserResults.length === 0 ? (
+                      <p className="text-xs text-pine/45 px-2 py-1">
+                        {addSearch.trim().length < 2
+                          ? "Type at least 2 letters to search all anglers."
+                          : "No anglers found."}
+                      </p>
+                    ) : (
+                      allUserResults.map((u) => (
+                        <button
+                          key={u.id}
+                          type="button"
+                          onClick={() => addMember(u.id)}
+                          className="w-full flex items-center gap-2 text-sm text-pine hover:bg-pine/5 rounded-xl px-2 py-1.5"
+                        >
+                          {u.avatar_url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={u.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover" />
+                          ) : (
+                            <span className="w-6 h-6 rounded-full bg-pine/10 flex items-center justify-center text-xs font-bold">
+                              {u.name.charAt(0).toUpperCase()}
+                            </span>
+                          )}
+                          {u.name}
+                          <span className="ml-auto text-signal-dark font-bold">+</span>
+                        </button>
+                      ))
+                    )}
                   </div>
                 )}
               </div>

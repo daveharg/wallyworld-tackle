@@ -140,8 +140,11 @@ function MessagesPageInner() {
   const [selected, setSelected] = useState<ThreadPeer | null>(null);
   const [friends, setFriends] = useState<Friend[]>([]);
   const [newOpen, setNewOpen] = useState(false);
-  const [newMode, setNewMode] = useState<"dm" | "group">("dm");
-  const [groupPicks, setGroupPicks] = useState<string[]>([]);
+  const [newSearch, setNewSearch] = useState("");
+  const [newSearchScope, setNewSearchScope] = useState<"friends" | "all">("friends");
+  const [newSearchResults, setNewSearchResults] = useState<Friend[]>([]);
+  const [newSearching, setNewSearching] = useState(false);
+  const [newPicks, setNewPicks] = useState<string[]>([]);
   const [groupName, setGroupName] = useState("");
   const [note, setNote] = useState<string | null>(null);
   const [sheetConvo, setSheetConvo] = useState<Convo | null>(null);
@@ -253,15 +256,18 @@ function MessagesPageInner() {
     }
   };
 
-  const startChat = async (friend: Friend) => {
+  const startChat = async (userId: string) => {
     setNote(null);
     try {
       const d = await fishFetch("/api/fishmb/msg/conversations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ other_user_id: friend.id }),
+        body: JSON.stringify({ other_user_id: userId }),
       });
       setNewOpen(false);
+      setNewPicks([]);
+      setNewSearch("");
+      setGroupName("");
       const convo = (await fishFetch("/api/fishmb/msg/conversations").then(
         (x) => (x.conversations as Convo[]).find((c) => c.id === d.id)
       )) as Convo | undefined;
@@ -281,16 +287,17 @@ function MessagesPageInner() {
   };
 
   const startGroup = async () => {
-    if (groupPicks.length === 0) return;
+    if (newPicks.length === 0) return;
     setNote(null);
     try {
       const d = await fishFetch("/api/fishmb/msg/conversations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ member_ids: groupPicks, name: groupName.trim() || undefined }),
+        body: JSON.stringify({ member_ids: newPicks, name: groupName.trim() || undefined }),
       });
       setNewOpen(false);
-      setGroupPicks([]);
+      setNewPicks([]);
+      setNewSearch("");
       setGroupName("");
       const convo = (await fishFetch("/api/fishmb/msg/conversations").then(
         (x) => (x.conversations as Convo[]).find((c) => c.id === d.id)
@@ -308,6 +315,53 @@ function MessagesPageInner() {
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not create group.");
     }
+  };
+
+  // Search for new chat: friends (local filter) or all users (API).
+  useEffect(() => {
+    if (!newOpen) return;
+    const q = newSearch.trim();
+    if (newSearchScope === "friends") {
+      setNewSearching(false);
+      if (!q) {
+        setNewSearchResults(friends);
+      } else {
+        setNewSearchResults(
+          friends.filter((f) => f.name.toLowerCase().includes(q.toLowerCase()))
+        );
+      }
+      return;
+    }
+    // All users via API.
+    if (q.length < 2) {
+      setNewSearchResults([]);
+      setNewSearching(false);
+      return;
+    }
+    setNewSearching(true);
+    const t = window.setTimeout(async () => {
+      try {
+        const d = await fishFetch(`/api/fishmb/users/search?q=${encodeURIComponent(q)}`);
+        setNewSearchResults((d.users ?? []) as Friend[]);
+      } catch {
+        setNewSearchResults([]);
+      } finally {
+        setNewSearching(false);
+      }
+    }, 300);
+    return () => window.clearTimeout(t);
+  }, [newOpen, newSearch, newSearchScope, friends]);
+
+  const toggleNewPick = (id: string) => {
+    setNewPicks((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+
+  const closeNewChat = () => {
+    setNewOpen(false);
+    setNewPicks([]);
+    setNewSearch("");
+    setGroupName("");
+    setNewSearchScope("friends");
   };
 
   const convoTitle = (c: Convo): string => {
@@ -430,33 +484,18 @@ function MessagesPageInner() {
         <h1 className="absolute left-1/2 -translate-x-1/2 font-bold text-pine text-xl tracking-tight">
           Chats
         </h1>
-        {/* Camera + compose pill */}
-        <div className="flex items-center gap-1 bg-white border border-pine/10 rounded-full p-1.5 shadow-sm shrink-0">
-          <button
-            type="button"
-            onClick={() => setNewOpen(true)}
-            aria-label="Send a photo"
-            title="Send a photo"
-            className="w-10 h-10 rounded-full hover:bg-pine/5 flex items-center justify-center text-pine transition-colors"
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-              <circle cx="12" cy="13" r="4" />
-            </svg>
-          </button>
-          <button
-            type="button"
-            onClick={() => setNewOpen(true)}
-            aria-label="New message"
-            title="New message"
-            className="w-10 h-10 rounded-full hover:bg-pine/5 flex items-center justify-center text-pine transition-colors"
-          >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 20h9" />
-              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-            </svg>
-          </button>
-        </div>
+        {/* New chat button */}
+        <button
+          type="button"
+          onClick={() => setNewOpen(true)}
+          aria-label="New chat"
+          title="New chat"
+          className="w-12 h-12 rounded-full bg-white border border-pine/10 shadow-sm flex items-center justify-center text-pine shrink-0 active:scale-95 transition-transform"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </button>
       </div>
 
       {note && (
@@ -626,141 +665,153 @@ function MessagesPageInner() {
         </div>
       </div>
 
-      {/* New conversation modal */}
+      {/* New chat modal */}
       {newOpen && (
         <div
           className="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center p-4 bg-pine-deep/60 backdrop-blur-sm"
-          onClick={() => {
-            setNewOpen(false);
-            setGroupPicks([]);
-            setGroupName("");
-          }}
+          onClick={closeNewChat}
         >
           <div
-            className="bg-paper rounded-3xl p-6 w-full max-w-sm shadow-2xl max-h-[70dvh] overflow-y-auto"
+            className="bg-paper rounded-3xl p-6 w-full max-w-sm shadow-2xl max-h-[75dvh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
-              New message
+              New chat
             </h3>
-            <div className="flex gap-2 mb-4">
+            <input
+              value={newSearch}
+              onChange={(e) => setNewSearch(e.target.value)}
+              placeholder="Search friends and anglers…"
+              className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal mb-3"
+            />
+            <div className="flex gap-2 mb-3">
               <button
                 type="button"
-                onClick={() => setNewMode("dm")}
+                onClick={() => setNewSearchScope("friends")}
                 className={`flex-1 font-bold uppercase tracking-wider text-xs px-4 py-2.5 rounded-full transition-colors ${
-                  newMode === "dm" ? "bg-pine text-white" : "bg-pine/10 text-pine/60"
+                  newSearchScope === "friends" ? "bg-pine text-white" : "bg-pine/10 text-pine/60"
                 }`}
               >
-                1:1 chat
+                Friends
               </button>
               <button
                 type="button"
-                onClick={() => setNewMode("group")}
+                onClick={() => setNewSearchScope("all")}
                 className={`flex-1 font-bold uppercase tracking-wider text-xs px-4 py-2.5 rounded-full transition-colors ${
-                  newMode === "group" ? "bg-pine text-white" : "bg-pine/10 text-pine/60"
+                  newSearchScope === "all" ? "bg-pine text-white" : "bg-pine/10 text-pine/60"
                 }`}
               >
- Group
+                All users
               </button>
             </div>
-            {friends.length === 0 ? (
-              <p className="text-pine/60 text-sm">
-                You need friends to message.{" "}
-                <Link href="/fishmb/friends" className="text-signal font-bold underline">
-                  Find friends first →
-                </Link>
-              </p>
-            ) : newMode === "dm" ? (
-              <div className="space-y-1">
-                {friends.map((f) => (
-                  <button
-                    key={f.id}
-                    type="button"
-                    onClick={() => startChat(f)}
-                    className="w-full flex items-center gap-3 rounded-2xl p-3 hover:bg-pine/5 text-left"
-                  >
-                    {f.avatar_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={f.avatar_url}
-                        alt=""
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                    ) : (
-                      <span className="w-10 h-10 rounded-full bg-pine/10 flex items-center justify-center font-bold text-pine">
-                        {f.name.charAt(0).toUpperCase()}
+            {newPicks.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                {newPicks.map((id) => {
+                  const person =
+                    friends.find((f) => f.id === id) ??
+                    newSearchResults.find((f) => f.id === id);
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => toggleNewPick(id)}
+                      className="flex items-center gap-1.5 bg-signal/15 border border-signal/40 text-pine text-xs font-bold rounded-full pl-3 pr-2 py-1.5"
+                    >
+                      {person?.name ?? "…"}
+                      <span className="w-5 h-5 rounded-full bg-signal text-white flex items-center justify-center text-xs">
+                        ×
                       </span>
-                    )}
-                    <span className="font-bold text-pine text-sm">{f.name}</span>
-                  </button>
-                ))}
+                    </button>
+                  );
+                })}
               </div>
+            )}
+            {newPicks.length > 1 && (
+              <input
+                value={groupName}
+                onChange={(e) => setGroupName(e.target.value)}
+                maxLength={60}
+                placeholder="Group name (optional)"
+                className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal mb-3"
+              />
+            )}
+            {newSearching ? (
+              <p className="text-pine/50 text-sm text-center py-4">Searching…</p>
+            ) : newSearchResults.length === 0 ? (
+              <p className="text-pine/50 text-sm text-center py-4">
+                {newSearchScope === "friends" ? (
+                  friends.length === 0 ? (
+                    <>
+                      You need friends to message.{" "}
+                      <Link href="/fishmb/friends" className="text-signal font-bold underline">
+                        Find friends first →
+                      </Link>
+                    </>
+                  ) : (
+                    "No friends match that search."
+                  )
+                ) : newSearch.trim().length < 2 ? (
+                  "Type at least 2 letters to search all anglers."
+                ) : (
+                  "No anglers found."
+                )}
+              </p>
             ) : (
-              <div>
-                <input
-                  value={groupName}
-                  onChange={(e) => setGroupName(e.target.value)}
-                  maxLength={60}
-                  placeholder="Group name (optional)"
-                  className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal mb-3"
-                />
-                <p className="text-xs text-pine/55 mb-2">
-                  Pick friends ({groupPicks.length} selected):
-                </p>
-                <div className="space-y-1 mb-3">
-                  {friends.map((f) => {
-                    const picked = groupPicks.includes(f.id);
-                    return (
-                      <button
-                        key={f.id}
-                        type="button"
-                        onClick={() =>
-                          setGroupPicks((prev) =>
-                            picked ? prev.filter((x) => x !== f.id) : [...prev, f.id]
-                          )
-                        }
-                        className={`w-full flex items-center gap-3 rounded-2xl p-3 text-left transition-colors ${
-                          picked ? "bg-signal/10 border border-signal/40" : "hover:bg-pine/5 border border-transparent"
+              <div className="space-y-1 mb-3">
+                {newSearchResults.map((f) => {
+                  const picked = newPicks.includes(f.id);
+                  return (
+                    <button
+                      key={f.id}
+                      type="button"
+                      onClick={() => toggleNewPick(f.id)}
+                      className={`w-full flex items-center gap-3 rounded-2xl p-3 text-left transition-colors ${
+                        picked ? "bg-signal/10 border border-signal/40" : "hover:bg-pine/5 border border-transparent"
+                      }`}
+                    >
+                      {f.avatar_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={f.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover" />
+                      ) : (
+                        <span className="w-10 h-10 rounded-full bg-pine/10 flex items-center justify-center font-bold text-pine">
+                          {f.name.charAt(0).toUpperCase()}
+                        </span>
+                      )}
+                      <span className="font-bold text-pine text-sm flex-1">{f.name}</span>
+                      <span
+                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-white text-xs ${
+                          picked ? "bg-signal border-signal" : "border-pine/25"
                         }`}
                       >
-                        {f.avatar_url ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={f.avatar_url}
-                            alt=""
-                            className="w-10 h-10 rounded-full object-cover"
-                          />
-                        ) : (
-                          <span className="w-10 h-10 rounded-full bg-pine/10 flex items-center justify-center font-bold text-pine">
-                            {f.name.charAt(0).toUpperCase()}
-                          </span>
-                        )}
-                        <span className="font-bold text-pine text-sm flex-1">{f.name}</span>
-                        <span className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-white text-xs ${picked ? "bg-signal border-signal" : "border-pine/25"}`}>
- {picked ? "" : ""}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-                <button
-                  type="button"
-                  onClick={startGroup}
-                  disabled={groupPicks.length === 0}
-                  className="w-full bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full disabled:opacity-40 transition-colors"
-                >
-                  Create group chat
-                </button>
+                        {picked ? "✓" : ""}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
+            )}
+            {newPicks.length === 1 ? (
+              <button
+                type="button"
+                onClick={() => startChat(newPicks[0])}
+                className="w-full bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
+              >
+                Start chat
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={startGroup}
+                disabled={newPicks.length < 2}
+                className="w-full bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full disabled:opacity-40 transition-colors"
+              >
+                Create group chat ({newPicks.length} selected)
+              </button>
             )}
             <button
               type="button"
-              onClick={() => {
-                setNewOpen(false);
-                setGroupPicks([]);
-                setGroupName("");
-              }}
-              className="w-full mt-4 bg-pine/10 hover:bg-pine/20 text-pine font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
+              onClick={closeNewChat}
+              className="w-full mt-2 bg-pine/10 hover:bg-pine/20 text-pine font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
             >
               Cancel
             </button>
