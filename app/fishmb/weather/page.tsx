@@ -866,6 +866,7 @@ export default function WeatherPage() {
                   <span className="w-16 text-xs font-bold text-pine/60">{day}</span>
                   <span className="text-lg">{w.icon}</span>
                   <span className="flex-1 text-[11px] text-pine/50">{w.label}</span>
+                  <span className="text-[11px] text-pine/45 w-14 text-right">💨 {Math.round(data.daily.wind_speed_10m_max[gi] ?? 0)}</span>
                   <span className="text-xs text-pine/50">{Math.round(data.daily.temperature_2m_min[gi])}°</span>
                   <span className="text-xs font-black w-10 text-right">{Math.round(data.daily.temperature_2m_max[gi])}°</span>
                 </div>

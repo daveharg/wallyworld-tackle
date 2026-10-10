@@ -12,6 +12,8 @@ import ThreadView, { type ThreadPeer } from "./_components/ThreadView";
 import {
   getOrCreateKeypair,
   publicKeyB64,
+  decryptText,
+  sharedSecret,
   type MsgKeypair,
 } from "./_components/msgCrypto";
 
@@ -19,6 +21,7 @@ interface ConvoMember {
   user_id: string;
   name: string;
   avatar_url: string | null;
+  public_key?: string | null;
 }
 
 interface Convo {
@@ -28,6 +31,8 @@ interface Convo {
   members: ConvoMember[];
   last_at: string | null;
   last_sender_id: string | null;
+  last_nonce: string | null;
+  last_ciphertext: string | null;
   unread: number;
   pinned_at: string | null;
 }
@@ -71,6 +76,57 @@ function avatarBg(name: string): string {
   let h = 0;
   for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
   return colors[h % colors.length];
+}
+
+/** Decrypts and shows the last message preview in the conversation list. */
+function LastMessagePreview({
+  convo,
+  keypair,
+  myId,
+}: {
+  convo: Convo;
+  keypair: MsgKeypair | null;
+  myId: string | undefined;
+}) {
+  const [preview, setPreview] = useState<string>("…");
+  useEffect(() => {
+    if (!convo.last_nonce || !convo.last_ciphertext || !keypair) {
+      setPreview("Encrypted message");
+      return;
+    }
+    // The message was encrypted by its sender for us — decrypt with the
+    // shared secret for THAT sender (their public key x our secret key).
+    const sender = convo.members.find((m) => m.user_id === convo.last_sender_id);
+    const pubKey = sender?.public_key;
+    if (!pubKey) {
+      setPreview("Encrypted message");
+      return;
+    }
+    try {
+      const sec = sharedSecret(pubKey, keypair.secretKey);
+      const text = decryptText(convo.last_nonce, convo.last_ciphertext, sec);
+      if (!text) {
+        setPreview("Encrypted message");
+        return;
+      }
+      // Photo messages are JSON { t: "photo", url }.
+      try {
+        const parsed = JSON.parse(text);
+        if (parsed && parsed.t === "photo") {
+          setPreview(`${convo.last_sender_id === myId ? "You" : sender.name ?? "Someone"} sent a photo`);
+          return;
+        }
+      } catch {
+        // Not JSON — plain text.
+      }
+      const prefix = convo.last_sender_id === myId ? "You: " : "";
+      const short = text.length > 60 ? text.slice(0, 60) + "…" : text;
+      setPreview(prefix + short);
+    } catch {
+      setPreview("Encrypted message");
+    }
+  }, [convo.id, convo.last_at, keypair]);
+  return <>{preview}</>;
 }
 
 function MessagesPageInner() {
@@ -483,7 +539,11 @@ function MessagesPageInner() {
                                 </span>
                                 <span className="flex items-center justify-between gap-2 mt-0.5">
                                   <span className="text-[15px] text-pine/50 truncate">
- {c.last_at ? " Encrypted message" : "Say hey "}
+                                    {c.last_at ? (
+                                      <LastMessagePreview convo={c} keypair={keypair} myId={user?.id} />
+                                    ) : (
+                                      "Say hey "
+                                    )}
                                   </span>
                                   <span className="flex items-center gap-1.5 shrink-0">
                                     {c.unread > 0 && (

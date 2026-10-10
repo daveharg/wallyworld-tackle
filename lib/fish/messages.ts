@@ -31,6 +31,8 @@ export interface ConversationPreview {
   members: ConversationMember[];
   last_at: string | null;
   last_sender_id: string | null;
+  last_nonce: string | null;
+  last_ciphertext: string | null;
   unread: number;
   pinned_at: string | null;
 }
@@ -141,6 +143,8 @@ export async function listConversations(userId: string): Promise<ConversationPre
     member_count: number;
     last_at: string | null;
     last_sender_id: string | null;
+    last_nonce: string | null;
+    last_ciphertext: string | null;
     unread: number;
     pinned_at: string | null;
   }>(
@@ -151,6 +155,7 @@ export async function listConversations(userId: string): Promise<ConversationPre
      SELECT c.id, c.name,
             (SELECT COUNT(*)::int FROM fm_conversation_members mm WHERE mm.conversation_id = c.id) AS member_count,
             m.created_at AS last_at, m.sender_id AS last_sender_id,
+            m.nonce AS last_nonce, m.ciphertext AS last_ciphertext,
             (SELECT COUNT(*)::int FROM fm_messages mm
               WHERE mm.conversation_id = c.id
                 AND mm.recipient_id = $1
@@ -160,7 +165,7 @@ export async function listConversations(userId: string): Promise<ConversationPre
        FROM mine
        JOIN fm_conversations c ON c.id = mine.conversation_id
        LEFT JOIN LATERAL (
-         SELECT created_at, sender_id
+         SELECT created_at, sender_id, nonce, ciphertext
            FROM fm_messages
           WHERE conversation_id = c.id AND recipient_id = $1
           ORDER BY created_at DESC LIMIT 1
@@ -179,6 +184,8 @@ export async function listConversations(userId: string): Promise<ConversationPre
       members,
       last_at: r.last_at,
       last_sender_id: r.last_sender_id,
+      last_nonce: r.last_nonce,
+      last_ciphertext: r.last_ciphertext,
       unread: r.unread,
       pinned_at: r.pinned_at,
     });
