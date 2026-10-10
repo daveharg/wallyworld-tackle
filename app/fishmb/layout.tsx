@@ -15,11 +15,11 @@ export const metadata: Metadata = {
   title: {
     // absolute: the root layout's "%s | Wallyworld Tackle" template would
     // otherwise wrap this default (templates apply to child-segment titles).
-    absolute: "FishMB — Manitoba fishing lakes, lodges & regulations",
+    absolute: "FishMB — Manitoba's fishing app: maps, catches, tournaments & community",
     template: "%s | FishMB",
   },
   description:
-    "Search 272 Manitoba lakes and 175 lodges & guides. Look up 2026 fishing regulations, stocking history, and what's biting right now.",
+    "Your Manitoba fishing companion — interactive lake maps, log your catches, join tournaments, check the fish-activity forecast, and connect with local anglers.",
   keywords: [
     "Manitoba fishing",
     "Manitoba lakes",
@@ -32,9 +32,9 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "FishMB",
-    title: "FishMB — Manitoba fishing lakes, lodges & regulations",
+    title: "FishMB — Manitoba's fishing app: maps, catches, tournaments & community",
     description:
-      "Search 272 Manitoba lakes and 175 lodges & guides. Look up 2026 fishing regulations, stocking history, and what's biting right now.",
+      "Your Manitoba fishing companion — interactive lake maps, log your catches, join tournaments, check the fish-activity forecast, and connect with local anglers.",
     url: "https://www.fishmb.ca/fishmb",
     images: [
       {
@@ -47,9 +47,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "FishMB — Manitoba fishing lakes, lodges & regulations",
+    title: "FishMB — Manitoba's fishing app: maps, catches, tournaments & community",
     description:
-      "Search 272 Manitoba lakes and 175 lodges & guides. Look up 2026 fishing regulations, stocking history, and what's biting right now.",
+      "Your Manitoba fishing companion — interactive lake maps, log your catches, join tournaments, check the fish-activity forecast, and connect with local anglers.",
     images: ["https://www.fishmb.ca/fishmb/icon-512.png"],
   },
   manifest: "/fishmb/manifest.json",

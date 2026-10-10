@@ -5,13 +5,13 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   // absolute bypasses the root layout's "%s | Wallyworld Tackle" title template
-  title: { absolute: "FishMB — Coming Soon" },
+  title: { absolute: "FishMB — Manitoba's fishing app: maps, catches, tournaments & community" },
   description:
-    "FishMB — Manitoba's fishing community. Tournaments, private maps with Garmin Navionics contours, encrypted messaging and an Fish-activity forecast. Coming soon.",
+    "Your Manitoba fishing companion — interactive lake maps, log your catches, join tournaments, check the fish-activity forecast, and connect with local anglers.",
   openGraph: {
-    title: "FishMB — Coming Soon",
+    title: "FishMB — Manitoba's fishing app: maps, catches, tournaments & community",
     description:
-      "Manitoba's fishing community — tournaments, private maps, encrypted messaging and an Fish-activity forecast.",
+      "Your Manitoba fishing companion — interactive lake maps, log your catches, join tournaments, check the fish-activity forecast, and connect with local anglers.",
     url: "https://www.fishmb.ca",
     siteName: "FishMB",
     images: [
@@ -19,15 +19,15 @@ export const metadata: Metadata = {
         url: "https://www.fishmb.ca/fishmb/icon-512.png",
         width: 512,
         height: 512,
-        alt: "FishMB — Manitoba's fishing community",
+        alt: "FishMB — Manitoba's fishing app",
       },
     ],
   },
   twitter: {
     card: "summary",
-    title: "FishMB — Coming Soon",
+    title: "FishMB — Manitoba's fishing app: maps, catches, tournaments & community",
     description:
-      "Manitoba's fishing community — tournaments, private maps, encrypted messaging and an Fish-activity forecast.",
+      "Your Manitoba fishing companion — interactive lake maps, log your catches, join tournaments, check the fish-activity forecast, and connect with local anglers.",
     images: ["https://www.fishmb.ca/fishmb/icon-512.png"],
   },
 };
