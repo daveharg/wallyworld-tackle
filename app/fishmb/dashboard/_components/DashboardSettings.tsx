@@ -42,6 +42,13 @@ export default function DashboardSettings({ afterSaveHref }: { afterSaveHref?: s
         handleUploadUrl: "/api/fish/photos/upload-url",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
+      // Verify the uploaded image is actually reachable before saving.
+      try {
+        const check = await fetch(blob.url, { method: "HEAD" });
+        if (!check.ok) throw new Error(`Upload verification failed (${check.status}).`);
+      } catch {
+        throw new Error("Upload didn't stick — please try again.");
+      }
       await fishFetch("/api/fish/auth/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
