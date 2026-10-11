@@ -28,10 +28,10 @@ export function PayoutEditor({
             max={100}
             value={p.place}
             onChange={(e) => update(i, { place: Math.max(1, parseInt(e.target.value) || 1) })}
-            className="w-14 bg-paper-deep border border-pine/15 rounded-xl px-2 py-2 text-sm font-bold text-pine text-center"
+            className="w-14 shrink-0 bg-paper-deep border border-pine/15 rounded-xl px-2 py-2 text-sm font-bold text-pine text-center"
             aria-label="Place"
           />
-          <div className="flex rounded-xl overflow-hidden border border-pine/15">
+          <div className="flex shrink-0 rounded-xl overflow-hidden border border-pine/15">
             {(["percent", "amount"] as const).map((t) => (
               <button
                 key={t}
@@ -52,7 +52,7 @@ export function PayoutEditor({
             value={p.value || ""}
             onChange={(e) => update(i, { value: Math.max(0, parseFloat(e.target.value) || 0) })}
             placeholder={p.type === "percent" ? "% of pot" : "$ amount"}
-            className="flex-1 bg-paper-deep border border-pine/15 rounded-xl px-3 py-2 text-sm text-pine"
+            className="flex-1 min-w-0 bg-paper-deep border border-pine/15 rounded-xl px-3 py-2 text-sm text-pine"
             aria-label={p.type === "percent" ? "Percent of pot" : "Fixed dollar amount"}
           />
           <button
