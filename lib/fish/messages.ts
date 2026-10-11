@@ -382,6 +382,7 @@ export async function storeMessage(
   await ensureMsgTables();
   const members = await getMembers(conversationId);
   const memberIds = new Set(members.map((m) => m.user_id));
+  const memberNames = new Map(members.map((m) => [m.user_id, m.name]));
   const stored: StoredMessage[] = [];
   for (const p of parts) {
     if (!memberIds.has(p.recipient_id)) {
@@ -400,6 +401,28 @@ export async function storeMessage(
       WHERE conversation_id = $1 AND user_id = $2`,
     [conversationId, senderId]
   );
+  // Push-notify recipients (not the sender). Best-effort, never throws.
+  try {
+    const { sendPushToUser } = await import("./push");
+    const senderName = memberNames.get(senderId) ?? "Someone";
+    const recipientSet = new Set<string>();
+    parts.forEach((p) => {
+      if (p.recipient_id !== senderId) recipientSet.add(p.recipient_id);
+    });
+    const recipients = Array.from(recipientSet);
+    await Promise.allSettled(
+      recipients.map((rid) =>
+        sendPushToUser(rid, {
+          title: senderName,
+          body: "Sent you a message.",
+          url: `/fishmb/messages?c=${conversationId}`,
+          tag: `fishmb-msg-${conversationId}`,
+        })
+      )
+    );
+  } catch {
+    // ignore
+  }
   return stored;
 }
 
