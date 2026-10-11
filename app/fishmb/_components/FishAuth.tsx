@@ -553,7 +553,7 @@ export function FishLoginButton() {
             </div>
           )}
             <Link
-              href="/fishmb/profile/edit"
+              href="/fishmb/dashboard?tab=profile&edit=1"
               onClick={() => setMenu(false)}
               className="block px-4 py-2.5 text-sm font-bold uppercase tracking-wider text-pine/70 hover:text-signal hover:bg-pine/5"
             >

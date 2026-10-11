@@ -3,15 +3,27 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useFishAuth } from "../../_components/FishAuth";
 import ProfileView from "../../profile/_components/ProfileView";
 import ProfileFriends from "./ProfileFriends";
 import FriendRequests from "./FriendRequests";
 import BusinessSettings from "./BusinessSettings";
+import DashboardSettings from "./DashboardSettings";
 
 export default function DashboardProfile() {
   const { user } = useFishAuth();
+  const searchParams = useSearchParams();
   const [businessOpen, setBusinessOpen] = useState(false);
+  const editing = searchParams.get("edit") === "1";
+
+  if (editing) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 pb-10">
+        <DashboardSettings afterSaveHref="/fishmb/dashboard?tab=profile" />
+      </div>
+    );
+  }
 
   if (!user) return null;
 
