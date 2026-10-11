@@ -341,9 +341,10 @@ export default function DashboardStats() {
             <>
               <div className="flex flex-col gap-2">
                 {visible.map((c) => (
-                  <div
+                  <Link
                     key={`${c.tournament_id ?? "r"}:${c.id}`}
-                    className="flex items-center gap-3 bg-white border border-pine/10 rounded-2xl p-2.5"
+                    href={c.tournament_id ? `/fishmb/tournaments/${c.tournament_id}` : `/fishmb/catches/${c.id}`}
+                    className="w-full flex items-center gap-3 bg-white border border-pine/10 rounded-2xl p-3 text-left active:scale-[0.99] transition-transform"
                   >
                     {/* Thumbnail */}
                     {c.photo_hold_url || c.photo_measure_url ? (
@@ -351,21 +352,21 @@ export default function DashboardStats() {
                       <img
                         src={c.photo_hold_url ?? c.photo_measure_url ?? ""}
                         alt={c.species}
-                        className="w-14 h-14 rounded-xl object-cover shrink-0"
+                        className="w-14 h-14 rounded-xl object-cover shrink-0 bg-pine/5"
                         loading="lazy"
                       />
                     ) : (
-                      <div className="w-14 h-14 rounded-xl bg-pine/5 flex items-center justify-center text-2xl shrink-0">
+                      <span className="w-14 h-14 rounded-xl bg-pine/5 flex items-center justify-center text-2xl shrink-0">
                         🐟
-                      </div>
+                      </span>
                     )}
                     {/* Species + size + meta */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-pine truncate">
+                    <span className="flex-1 min-w-0">
+                      <span className="block font-bold text-pine truncate">
                         {c.species}
-                        {c.length_in ? <span className="font-normal text-pine/60"> · {c.length_in}"</span> : null}
-                      </p>
-                      <p className="text-[11px] text-pine/50 truncate">
+                        {c.length_in ? <span className="text-pine/50 font-medium"> · {c.length_in}″</span> : null}
+                      </span>
+                      <span className="block text-xs text-pine/50 mt-0.5 truncate">
                         {new Date(c.caught_at).toLocaleDateString("en-CA", {
                           month: "short",
                           day: "numeric",
@@ -373,28 +374,24 @@ export default function DashboardStats() {
                         })}
                         {c.tournament_name ? ` · 🏆 ${c.tournament_name}` : ""}
                         {c.personal_record === true ? " · 🔒 Personal" : ""}
-                      </p>
+                      </span>
                       {c.tournament_id == null && !isShared(c) && (
                         <button
                           type="button"
-                          onClick={() => shareCatch(c)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            shareCatch(c);
+                          }}
                           disabled={sharingId === c.id}
                           className="mt-1 text-[11px] font-bold text-signal-dark disabled:opacity-40"
                         >
                           {sharingId === c.id ? "Sharing…" : "📤 Share to feed"}
                         </button>
                       )}
-                    </div>
-                    {/* Go to location */}
-                    {c.lat !== null && c.lat !== undefined && c.lng !== null && c.lng !== undefined ? (
-                      <Link
-                        href={`/fishmb/maps?lat=${c.lat}&lng=${c.lng}`}
-                        className="shrink-0 text-[11px] font-bold text-pine/60 hover:text-pine bg-pine/5 hover:bg-pine/10 rounded-full px-3 py-2 whitespace-nowrap"
-                      >
-                        📍 Map
-                      </Link>
-                    ) : null}
-                  </div>
+                    </span>
+                    <span className="text-pine/30 text-lg shrink-0">›</span>
+                  </Link>
                 ))}
               </div>
               {sorted.length > 3 && (

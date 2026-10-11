@@ -1672,19 +1672,50 @@ function FeedPageInner() {
       }
       const photoUrl = urls[0];
       // Snapshot the weather at the catch location (when we have GPS).
-      let weather: { temp_c: number; code: number; wind_kph: number } | null = null;
+      let weather: Record<string, number | string> | null = null;
       if (catchLat !== null && catchLng !== null) {
         try {
           const w = await fetch(
-            `https://api.open-meteo.com/v1/forecast?latitude=${catchLat}&longitude=${catchLng}&current=temperature_2m,weather_code,wind_speed_10m&wind_speed_unit=kmh&timezone=auto`
+            `https://api.open-meteo.com/v1/forecast?latitude=${catchLat}&longitude=${catchLng}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=pressure_msl&wind_speed_unit=kmh&timezone=auto&forecast_days=1`
           ).then((r) => r.json());
           const cur = w?.current;
           if (cur && Number.isFinite(cur.temperature_2m) && Number.isFinite(cur.weather_code)) {
             weather = {
               temp_c: Math.round(cur.temperature_2m),
               code: cur.weather_code,
-              wind_kph: Math.round(cur.wind_speed_10m ?? 0),
             };
+            if (Number.isFinite(cur.apparent_temperature)) weather.feels_like_c = Math.round(cur.apparent_temperature);
+            if (Number.isFinite(cur.relative_humidity_2m)) weather.humidity_pct = Math.round(cur.relative_humidity_2m);
+            if (Number.isFinite(cur.pressure_msl)) weather.pressure_hpa = Math.round(cur.pressure_msl);
+            if (Number.isFinite(cur.wind_speed_10m)) weather.wind_kph = Math.round(cur.wind_speed_10m);
+            if (Number.isFinite(cur.wind_direction_10m)) weather.wind_dir_deg = Math.round(cur.wind_direction_10m);
+            if (Number.isFinite(cur.wind_gusts_10m)) weather.wind_gust_kph = Math.round(cur.wind_gusts_10m);
+            if (Number.isFinite(cur.cloud_cover)) weather.cloud_pct = Math.round(cur.cloud_cover);
+            // Pressure trend from hourly data: compare now vs 3h ago (front info).
+            const hp = w?.hourly?.pressure_msl as number[] | undefined;
+            const ht = w?.hourly?.time as string[] | undefined;
+            if (hp && ht && cur.time) {
+              const idx = ht.indexOf(cur.time);
+              if (idx >= 3 && Number.isFinite(hp[idx]) && Number.isFinite(hp[idx - 3])) {
+                const d = hp[idx] - hp[idx - 3];
+                weather.pressure_trend = d > 0.8 ? "rising" : d < -0.8 ? "falling" : "steady";
+              }
+            }
+            // Moon phase (0 = new, 0.5 = full).
+            const now = new Date(cur.time + "Z").getTime() || Date.now();
+            const synodic = 29.530588853;
+            const known = Date.UTC(2000, 0, 6, 18, 14) / 86400000;
+            const phase = (((now / 86400000 - known) % synodic) + synodic) % synodic / synodic;
+            weather.moon_phase = Math.round(phase * 100) / 100;
+            weather.moon_label =
+              phase < 0.03 || phase > 0.97 ? "New moon"
+              : phase < 0.22 ? "Waxing crescent"
+              : phase < 0.28 ? "First quarter"
+              : phase < 0.47 ? "Waxing gibbous"
+              : phase < 0.53 ? "Full moon"
+              : phase < 0.72 ? "Waning gibbous"
+              : phase < 0.78 ? "Last quarter"
+              : "Waning crescent";
           }
         } catch {
           // Catch logs fine without weather.

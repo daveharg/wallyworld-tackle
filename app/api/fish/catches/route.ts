@@ -202,15 +202,33 @@ export async function POST(req: NextRequest) {
   // Optional tournament link (for feed display of tournament stats).
   const tournamentId = typeof body.tournament_id === "string" && body.tournament_id ? body.tournament_id : null;
 
-  // Optional weather snapshot captured at log time (temp °C, condition code, wind kph).
-  let weather: { temp_c: number; code: number; wind_kph: number } | null = null;
+  // Optional weather snapshot captured at log time.
+  // Fields: temp_c, feels_like_c, humidity_pct, pressure_hpa, pressure_trend
+  // ("rising"|"falling"|"steady"), code (WMO), wind_kph, wind_dir_deg,
+  // wind_gust_kph, moon_phase (0-1), moon_label, cloud_pct, visibility_km.
+  let weather: Record<string, number | string> | null = null;
   if (body.weather && typeof body.weather === "object") {
     const w = body.weather as Record<string, unknown>;
     const t = Number(w.temp_c);
     const c = Number(w.code);
-    const wk = Number(w.wind_kph);
     if (Number.isFinite(t) && Number.isFinite(c)) {
-      weather = { temp_c: t, code: c, wind_kph: Number.isFinite(wk) ? wk : 0 };
+      weather = { temp_c: t, code: c };
+      const num = (k: string) => {
+        const v = Number(w[k]);
+        return Number.isFinite(v) ? v : undefined;
+      };
+      const str = (k: string) => {
+        const v = w[k];
+        return typeof v === "string" && v ? v : undefined;
+      };
+      for (const k of ["feels_like_c", "humidity_pct", "pressure_hpa", "wind_kph", "wind_dir_deg", "wind_gust_kph", "moon_phase", "cloud_pct", "visibility_km"] as const) {
+        const v = num(k);
+        if (v !== undefined) weather[k] = Math.round(v * 10) / 10;
+      }
+      for (const k of ["pressure_trend", "moon_label"] as const) {
+        const v = str(k);
+        if (v !== undefined) weather[k] = v;
+      }
     }
   }
 

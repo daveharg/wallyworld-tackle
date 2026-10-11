@@ -8,6 +8,48 @@ import { fishUserFromRequest, unauthorized, badRequest } from "@/lib/fish/auth";
 
 const VISIBILITIES = ["public", "friends", "private"] as const;
 
+// GET /api/fish/catches/[id] — full catch details (owner, or anyone who can
+// see it by visibility/friendship; tournament entries visible to participants).
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const me = await fishUserFromRequest(req);
+  const { id } = await params;
+  const rows = await query(
+    `SELECT c.*, u.name AS user_name, u.avatar_url AS user_avatar
+     FROM fm_catches c JOIN fm_users u ON u.id = c.user_id
+     WHERE c.id = $1`,
+    [id]
+  );
+  const c = rows[0] as Record<string, unknown> | undefined;
+  if (!c) return NextResponse.json({ error: "Catch not found." }, { status: 404 });
+
+  const ownerId = c.user_id as string;
+  const isOwner = !!me && me.id === ownerId;
+  const vis = c.visibility as string;
+  // Tournament entries: visible to tournament participants + organizer.
+  let canSee = isOwner || vis === "public";
+  if (!canSee && me) {
+    if (vis === "friends") {
+      const fr = await query(
+        `SELECT 1 FROM fm_friends WHERE ((user_id = $1 AND friend_id = $2) OR (user_id = $2 AND friend_id = $1)) AND status = 'accepted' LIMIT 1`,
+        [me.id, ownerId]
+      );
+      canSee = fr.length > 0;
+    }
+    if (!canSee && c.tournament_id) {
+      const tp = await query(
+        `SELECT 1 FROM fm_tournament_participants WHERE tournament_id = $1 AND user_id = $2 LIMIT 1`,
+        [c.tournament_id, me.id]
+      );
+      canSee = tp.length > 0;
+    }
+  }
+  if (!canSee) return NextResponse.json({ error: "Catch not found." }, { status: 404 });
+  return NextResponse.json({ catch: c });
+}
+
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
