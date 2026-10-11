@@ -184,9 +184,13 @@ function Bar() {
     }
     check();
     const t = setInterval(check, 30000);
+    // Refresh immediately when messages are read elsewhere in the app.
+    const onUnreadChanged = () => check();
+    window.addEventListener("fishmb-unread-changed", onUnreadChanged);
     return () => {
       stop = true;
       clearInterval(t);
+      window.removeEventListener("fishmb-unread-changed", onUnreadChanged);
     };
   }, [user]);
 

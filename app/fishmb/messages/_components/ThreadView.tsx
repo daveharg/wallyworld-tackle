@@ -274,7 +274,13 @@ export default function ThreadView({
           fishFetch(`/api/fishmb/msg/conversations/${peer.id}/read`, {
             method: "POST",
           })
-            .then(() => onRead())
+            .then(() => {
+              onRead();
+              // Tell the bottom bar to refresh its unread badge immediately.
+              try {
+                window.dispatchEvent(new Event("fishmb-unread-changed"));
+              } catch {}
+            })
             .catch(() => {});
         }
       } catch {
@@ -334,6 +340,9 @@ export default function ThreadView({
       );
       setDraft("");
       onSent();
+      try {
+        window.dispatchEvent(new Event("fishmb-unread-changed"));
+      } catch {}
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not send.");
     } finally {
