@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { fishFetch } from "./fishFetch";
-import { THEMES, getTheme, setTheme, DEFAULT_THEME, type ThemeId } from "./theme";
+import { THEMES, getTheme, setTheme, type ThemeId } from "./theme";
 
 interface Prefs {
   friend_catch: boolean;
@@ -32,7 +32,7 @@ type PushState = "checking" | "unsupported" | "denied" | "prompt" | "enabled";
 
 /** Settings popup: color themes + push notification alert settings. */
 export default function SettingsModal({ onClose }: { onClose: () => void }) {
-  const [theme, setThemeState] = useState<ThemeId>("forest");
+  const [theme, setThemeState] = useState<ThemeId>("ocean");
   const [prefs, setPrefs] = useState<Prefs | null>(null);
   const [saving, setSaving] = useState<keyof Prefs | null>(null);
   const [pushState, setPushState] = useState<PushState>("checking");
@@ -183,13 +183,6 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
               );
             })}
           </div>
-          <button
-            type="button"
-            onClick={() => pickTheme(DEFAULT_THEME)}
-            className="w-full mb-7 text-xs font-bold uppercase tracking-wider text-pine/55 hover:text-pine border border-pine/15 rounded-full px-5 py-2.5 transition-colors"
-          >
-            Reset to default theme
-          </button>
 
           {/* Push notifications */}
           <h3 className="text-xs font-black uppercase tracking-[0.14em] text-pine/45 mb-3">

@@ -13,18 +13,8 @@
 }
 
 /* FishMB color themes — RGB triplets consumed by tailwind.config.js so the
- * user can switch themes at runtime. `forest` is the default (no data-theme). */
+ * user can switch themes at runtime. `ocean` is the default (no data-theme). */
 :root,
-[data-theme="forest"] {
-  --fish-paper: 253 253 251;
-  --fish-paper-deep: 242 239 231;
-  --fish-pine: 18 50 43;
-  --fish-pine-deep: 11 35 31;
-  --fish-signal: 228 87 46;
-  --fish-signal-dark: 201 72 38;
-  --fish-gold: 185 126 20;
-}
-
 [data-theme="ocean"] {
   --fish-paper: 247 250 252;
   --fish-paper-deep: 224 233 240;
@@ -33,6 +23,16 @@
   --fish-signal: 8 145 178;
   --fish-signal-dark: 6 117 144;
   --fish-gold: 202 138 4;
+}
+
+[data-theme="forest"] {
+  --fish-paper: 253 253 251;
+  --fish-paper-deep: 242 239 231;
+  --fish-pine: 18 50 43;
+  --fish-pine-deep: 11 35 31;
+  --fish-signal: 228 87 46;
+  --fish-signal-dark: 201 72 38;
+  --fish-gold: 185 126 20;
 }
 
 [data-theme="sunset"] {
@@ -63,6 +63,46 @@
   --fish-signal: 46 155 198;
   --fish-signal-dark: 36 128 165;
   --fish-gold: 201 150 46;
+}
+
+[data-theme="aurora"] {
+  --fish-paper: 244 248 250;
+  --fish-paper-deep: 228 238 242;
+  --fish-pine: 30 58 63;
+  --fish-pine-deep: 18 36 40;
+  --fish-signal: 124 58 237;
+  --fish-signal-dark: 109 40 217;
+  --fish-gold: 52 211 153;
+}
+
+[data-theme="ember"] {
+  --fish-paper: 253 248 243;
+  --fish-paper-deep: 240 228 214;
+  --fish-pine: 66 28 20;
+  --fish-pine-deep: 44 18 13;
+  --fish-signal: 230 100 30;
+  --fish-signal-dark: 195 80 22;
+  --fish-gold: 240 180 60;
+}
+
+[data-theme="walleye"] {
+  --fish-paper: 250 249 242;
+  --fish-paper-deep: 233 230 212;
+  --fish-pine: 52 62 38;
+  --fish-pine-deep: 35 42 25;
+  --fish-signal: 176 122 42;
+  --fish-signal-dark: 143 95 31;
+  --fish-gold: 212 175 55;
+}
+
+[data-theme="storm"] {
+  --fish-paper: 245 247 249;
+  --fish-paper-deep: 226 231 236;
+  --fish-pine: 45 55 65;
+  --fish-pine-deep: 30 37 44;
+  --fish-signal: 90 140 170;
+  --fish-signal-dark: 70 115 145;
+  --fish-gold: 200 160 60;
 }
 
 /* Always light theme — no dark mode override. */

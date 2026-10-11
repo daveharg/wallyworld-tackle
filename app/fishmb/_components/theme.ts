@@ -4,16 +4,16 @@
 
 export const THEMES = [
   {
-    id: "forest",
-    name: "Forest",
-    desc: "Classic FishMB greens",
-    swatch: ["#12322b", "#e4572e", "#b97e14"],
-  },
-  {
     id: "ocean",
     name: "Ocean",
     desc: "Deep lake blues",
     swatch: ["#0b3b52", "#0891b2", "#ca8804"],
+  },
+  {
+    id: "forest",
+    name: "Forest",
+    desc: "Classic FishMB greens",
+    swatch: ["#12322b", "#e4572e", "#b97e14"],
   },
   {
     id: "sunset",
@@ -33,13 +33,37 @@ export const THEMES = [
     desc: "Hardwater steel blue",
     swatch: ["#264458", "#2e9bc6", "#c9962e"],
   },
+  {
+    id: "aurora",
+    name: "Aurora",
+    desc: "Northern lights",
+    swatch: ["#1e3a3f", "#7c3aed", "#34d399"],
+  },
+  {
+    id: "ember",
+    name: "Ember",
+    desc: "Campfire glow",
+    swatch: ["#421c14", "#e6641e", "#f0b43c"],
+  },
+  {
+    id: "walleye",
+    name: "Walleye",
+    desc: "Olive and bronze",
+    swatch: ["#343e26", "#b07a2a", "#d4af37"],
+  },
+  {
+    id: "storm",
+    name: "Storm",
+    desc: "Dark rolling clouds",
+    swatch: ["#2d3741", "#5a8caa", "#c8a03c"],
+  },
 ] as const;
 
 export type ThemeId = (typeof THEMES)[number]["id"];
 
 const KEY = "fishmb-theme";
 
-export const DEFAULT_THEME: ThemeId = "forest";
+export const DEFAULT_THEME: ThemeId = "ocean";
 
 const VALID: readonly string[] = THEMES.map((t) => t.id);
 
