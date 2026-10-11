@@ -827,6 +827,7 @@ function MessagesPageInner() {
                 keypair={keypair}
                 onBack={() => setSelected(null)}
                 onSent={loadConvos}
+                onRead={loadConvos}
               />
             </div>
           ) : (

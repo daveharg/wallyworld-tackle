@@ -55,12 +55,14 @@ export default function ThreadView({
   keypair,
   onBack,
   onSent,
+  onRead,
 }: {
   peer: ThreadPeer;
   myId: string;
   keypair: MsgKeypair;
   onBack: () => void;
   onSent: () => void;
+  onRead: () => void;
 }) {
   const [secrets, setSecrets] = useState<{ user_id: string; shared: Uint8Array }[] | null>(null);
   const [missingNames, setMissingNames] = useState<string[]>([]);
@@ -271,7 +273,9 @@ export default function ThreadView({
         if (rows.length > 0) {
           fishFetch(`/api/fishmb/msg/conversations/${peer.id}/read`, {
             method: "POST",
-          }).catch(() => {});
+          })
+            .then(() => onRead())
+            .catch(() => {});
         }
       } catch {
         // keep polling quietly
