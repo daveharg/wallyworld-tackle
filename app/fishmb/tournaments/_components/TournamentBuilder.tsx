@@ -43,7 +43,7 @@ export function DateTimeField({ label, value, onChange }: { label: string; value
   return (
     <div className="min-w-0">
       {label && <label className={labelCls}>{label}</label>}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-1 gap-2">
         <input
           type="date"
           value={d}
