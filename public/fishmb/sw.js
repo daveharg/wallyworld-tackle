@@ -13,37 +13,3 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   event.respondWith(fetch(event.request));
 });
-
-// Push notifications for new messages.
-self.addEventListener("push", (event) => {
-  let data = {};
-  try {
-    data = event.data ? event.data.json() : {};
-  } catch (e) {}
-  const title = data.title || "FishMB";
-  const options = {
-    body: data.body || "You have a new message.",
-    icon: "/fishmb/icon-192.png",
-    badge: "/fishmb/icon-192.png",
-    data: { url: data.url || "/fishmb/messages" },
-    tag: data.tag || "fishmb-message",
-  };
-  event.waitUntil(self.registration.showNotification(title, options));
-});
-
-self.addEventListener("notificationclick", (event) => {
-  event.notification.close();
-  const url = (event.notification.data && event.notification.data.url) || "/fishmb/messages";
-  event.waitUntil(
-    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
-      for (const client of clients) {
-        if (client.url.includes("/fishmb/messages") && "focus" in client) {
-          return client.focus();
-        }
-      }
-      if (self.clients.openWindow) {
-        return self.clients.openWindow(url);
-      }
-    })
-  );
-});

@@ -139,8 +139,6 @@ function MessagesPageInner() {
   const [convos, setConvos] = useState<Convo[]>([]);
   const [selected, setSelected] = useState<ThreadPeer | null>(null);
   const [friends, setFriends] = useState<Friend[]>([]);
-  const [pushState, setPushState] = useState<"unknown" | "enabled" | "prompt" | "denied" | "unsupported">("unknown");
-  const [enablingPush, setEnablingPush] = useState(false);
   const [newOpen, setNewOpen] = useState(false);
   const [newSearch, setNewSearch] = useState("");
   const [newPicks, setNewPicks] = useState<string[]>([]);
@@ -521,82 +519,10 @@ function MessagesPageInner() {
     );
   }
 
-  // Check push notification status.
-  // TEMPORARILY DISABLED — debugging client-side crash.
-  useEffect(() => {
-    setPushState("unsupported");
-    return;
-    // if (!user || setup !== "ready") return;
-    // (async () => {
-    //   try {
-    //     if (!("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)) {
-    //       setPushState("unsupported");
-    //       return;
-    //     }
-    //     if (Notification.permission === "denied") {
-    //       setPushState("denied");
-    //       return;
-    //     }
-    //     const reg = await navigator.serviceWorker.ready;
-    //     const sub = await reg.pushManager.getSubscription();
-    //     setPushState(sub ? "enabled" : "prompt");
-    //   } catch {
-    //     setPushState("unsupported");
-    //   }
-    // })();
-  }, [user, setup]);
-
-  const enablePush = async () => {
-    setEnablingPush(true);
-    try {
-      const perm = await Notification.requestPermission();
-      if (perm !== "granted") {
-        setPushState("denied");
-        return;
-      }
-      const keyRes = await fishFetch("/api/fishmb/push/vapid-key");
-      const publicKey = (keyRes as { publicKey?: string }).publicKey;
-      if (!publicKey) throw new Error("No key");
-      const reg = await navigator.serviceWorker.ready;
-      const sub = await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: Uint8Array.from(atob(publicKey.replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0)),
-      });
-      const json = sub.toJSON();
-      await fishFetch("/api/fishmb/push/subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ endpoint: json.endpoint, keys: json.keys }),
-      });
-      setPushState("enabled");
-    } catch {
-      setPushState("prompt");
-    } finally {
-      setEnablingPush(false);
-    }
-  };
-
   const peer: ThreadPeer | null = selected;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 md:py-10">
-      {pushState === "prompt" && (
-        <button
-          type="button"
-          onClick={enablePush}
-          disabled={enablingPush}
-          className="w-full mb-4 flex items-center gap-3 bg-pine text-white rounded-2xl px-4 py-3 text-left"
-        >
-          <span className="text-2xl">🔔</span>
-          <span className="flex-1">
-            <span className="block font-bold text-sm">Get notified of new messages</span>
-            <span className="block text-white/70 text-xs">Works on Android and iPhone (add FishMB to your home screen first)</span>
-          </span>
-          <span className="font-bold text-sm uppercase tracking-wider">
-            {enablingPush ? "…" : "Turn on"}
-          </span>
-        </button>
-      )}
       <div className="relative flex items-center justify-between mb-6">
         {/* User avatar */}
         <div className="w-12 h-12 rounded-full bg-pine/10 flex items-center justify-center shrink-0">
