@@ -197,11 +197,11 @@ export default function DashboardTournaments() {
       </div>
 
       {creating && (
-        <div className="bg-white border border-pine/10 rounded-3xl p-5">
-          <div className="mb-4">
+        <div>
+          <div className="bg-white border border-pine/10 rounded-3xl p-5 mb-4">
             <LicenceNotice participantCount={0} maxParticipants={null} />
           </div>
-          <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
+          <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4 px-1">
             Create a tournament
           </h3>
           <TournamentCreateSection />
