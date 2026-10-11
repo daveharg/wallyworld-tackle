@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useFishAuth } from "../_components/FishAuth";
@@ -29,6 +29,15 @@ export default function DashboardPage() {
     return t === "tournaments" || t === "licence" || t === "profile" ? t : "stats";
   })();
   const [tab, setTab] = useState<TabId>(initialTab);
+
+  // Keep the tab in sync when navigating with ?tab= (e.g. the bottom-bar
+  // Tournaments shortcut) while already on this page.
+  useEffect(() => {
+    const t = searchParams.get("tab");
+    if (t === "tournaments" || t === "licence" || t === "profile" || t === "stats") {
+      setTab(t);
+    }
+  }, [searchParams]);
 
   if (!user) {
     const perks = [
