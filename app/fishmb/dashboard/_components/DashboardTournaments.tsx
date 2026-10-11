@@ -293,7 +293,7 @@ export default function DashboardTournaments() {
           {live.length > 0 && (
             <div>
               <h3 className="text-xs font-black uppercase tracking-wider text-pine/45 mb-2">
-                Live now
+                Your live tournaments
               </h3>
               <div className="space-y-2">{live.map((t) => row(t, false))}</div>
             </div>
@@ -319,7 +319,7 @@ export default function DashboardTournaments() {
           {/* Upcoming tournaments — the main public listing */}
           <div>
             <h3 className="text-xs font-black uppercase tracking-wider text-pine/45 mb-2">
-              Upcoming tournaments
+              Your upcoming tournaments
             </h3>
             {upcomingAll.length === 0 ? (
               <p className="text-pine/50 text-sm text-center py-4 bg-white border border-pine/10 rounded-2xl">
