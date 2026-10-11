@@ -24,17 +24,20 @@ interface TKey {
 }
 
 /**
- * Organizer's entry key manager. Two modes:
- * - Individual keys: one-time codes, optionally labeled with each angler's
- *   name so the organizer can track who got which key. Hand one to each
- *   angler after they pay (payment stays off-platform).
- * - One shared key: a single code with unlimited uses — every angler joins
- *   with the same key, but each angler still joins only once. The list shows
- *   who has used it.
+ * Organizer's entry key manager. The tournament's key mode (chosen at creation)
+ * decides what's shown:
+ * - open: anyone can join, no keys needed — nothing to manage.
+ * - individual: one-time tickets, optionally labeled per angler.
+ * - shared: one code with unlimited uses for everyone.
  */
-export function EntryKeys({ tournamentId }: { tournamentId: string }) {
+export function EntryKeys({
+  tournamentId,
+  keyMode,
+}: {
+  tournamentId: string;
+  keyMode: "open" | "shared" | "individual";
+}) {
   const [keys, setKeys] = useState<TKey[]>([]);
-  const [mode, setMode] = useState<"individual" | "shared">("individual");
   const [count, setCount] = useState("10");
   const [names, setNames] = useState("");
   const [busy, setBusy] = useState(false);
@@ -187,6 +190,13 @@ export function EntryKeys({ tournamentId }: { tournamentId: string }) {
       <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-2">
         Entry keys
       </h2>
+      {keyMode === "open" ? (
+        <p className="text-pine/55 text-sm">
+          This tournament is <strong className="text-pine">open join</strong> — anyone on
+          FishMB can join with no key. Nothing to manage here.
+        </p>
+      ) : (
+        <>
       <p className="text-pine/55 text-sm mb-5">
         Give each angler their key after they pay — payment stays
         off-platform. Each key joins one angler, once.{" "}
@@ -202,31 +212,6 @@ export function EntryKeys({ tournamentId }: { tournamentId: string }) {
         </p>
       )}
 
-      <div className="flex gap-2 mb-5">
-        {([
-          { id: "individual", label: "Individual keys", hint: "One ticket per angler — can't be shared" },
-          { id: "shared", label: "One shared key", hint: "Anyone can share and join with it" },
-        ] as const).map((m) => {
-          const locked = lockedMode !== null && lockedMode !== m.id;
-          return (
-            <button
-              key={m.id}
-              onClick={() => !locked && setMode(m.id)}
-              disabled={locked}
-              title={locked ? `This tournament already uses ${lockedMode === "individual" ? "individual" : "a shared"} key${lockedMode === "individual" ? "s" : ""} — one key type per tournament.` : m.hint}
-              className={`px-5 py-2.5 rounded-full text-sm font-bold uppercase tracking-wider transition-colors ${
-                mode === m.id
-                  ? "bg-pine text-white"
-                  : locked
-                    ? "bg-paper-deep text-pine/30 cursor-not-allowed"
-                    : "bg-paper-deep text-pine/60 hover:text-pine"
-              }`}
-            >
-              {m.label}
-            </button>
-          );
-        })}
-      </div>
 
       {lockedMode && (
         <p className="text-pine/55 text-sm mb-4 max-w-md">
@@ -236,7 +221,7 @@ export function EntryKeys({ tournamentId }: { tournamentId: string }) {
         </p>
       )}
 
-      {mode === "individual" ? (
+      {keyMode === "individual" ? (
         <div className="mb-6">
           <div className="flex flex-wrap gap-3 items-center mb-3">
             <input
@@ -413,6 +398,8 @@ export function EntryKeys({ tournamentId }: { tournamentId: string }) {
             );
           })}
         </div>
+      )}
+        </>
       )}
     </section>
   );

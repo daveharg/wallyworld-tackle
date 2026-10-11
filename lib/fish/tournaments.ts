@@ -86,6 +86,7 @@ export interface Tournament {
   scoring: string;
   scoring_count: number | null;
   invite_code: string;
+  key_mode: "open" | "shared" | "individual";
   status: string;
   max_participants: number | null;
   entry_fee_cents: number;
@@ -163,6 +164,10 @@ export async function ensureTournamentTables(): Promise<void> {
   await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS gps_south double precision`);
   await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS gps_east double precision`);
   await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS gps_west double precision`);
+  // Entry key mode: how anglers join. 'open' = no key needed, 'shared' = one
+  // key for everyone, 'individual' = one single-use key per angler.
+  await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS key_mode text NOT NULL DEFAULT 'individual'`);
+  await query(`UPDATE fm_tournaments SET key_mode = 'individual' WHERE key_mode NOT IN ('open','shared','individual')`);
   await query(`CREATE TABLE IF NOT EXISTS fm_tournament_participants (
     tournament_id uuid NOT NULL REFERENCES fm_tournaments(id) ON DELETE CASCADE,
     user_id uuid NOT NULL REFERENCES fm_users(id) ON DELETE CASCADE,
@@ -517,20 +522,20 @@ export async function getTournament(id: string): Promise<Tournament | null> {
   return queryOne<Tournament>(`${TOURNAMENT_SELECT} WHERE t.id = $1`, [id]);
 }
 
-export async function getTournamentByInvite(code: string): Promise<(Tournament & { matched_entry_key?: boolean }) | null> {
+export async function getTournamentByKey(code: string): Promise<Tournament | null> {
   await ensureTournamentTables();
   const upper = code.toUpperCase();
-  // First try the tournament invite code.
-  const byInvite = await queryOne<Tournament>(`${TOURNAMENT_SELECT} WHERE t.invite_code = $1`, [upper]);
-  if (byInvite) return byInvite;
-  // Then try an entry key — entry keys work the same as invite codes.
+  // Entry keys are the only way in — no invite codes anymore.
   const byKey = await queryOne<Tournament>(
     `${TOURNAMENT_SELECT} JOIN fm_tournament_keys k ON k.tournament_id = t.id WHERE k.key_code = $1`,
     [upper]
   );
-  if (byKey) return { ...byKey, matched_entry_key: true };
+  if (byKey) return byKey;
   return null;
 }
+
+/** @deprecated Use getTournamentByKey — invite codes no longer exist. */
+export const getTournamentByInvite = getTournamentByKey;
 
 export async function listTournaments(): Promise<Tournament[]> {
   await ensureTournamentTables();

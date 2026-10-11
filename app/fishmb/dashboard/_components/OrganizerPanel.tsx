@@ -43,6 +43,7 @@ interface Detail {
     starts_at: string;
     ends_at: string;
     invite_code: string;
+    key_mode: "open" | "shared" | "individual";
     status: string;
     scoring: string;
     rules: string;
@@ -481,7 +482,7 @@ interface Angler {
 /** Organizer's angler dashboard: who joined, who paid, who checked in,
  *  which invite key each angler used (auto-linked at redemption), plus
  *  private notes and CSV export. */
-function AnglersDashboard({ tournamentId, inviteCode, entryFeeCents }: { tournamentId: string; inviteCode: string; entryFeeCents: number }) {
+function AnglersDashboard({ tournamentId, entryFeeCents }: { tournamentId: string; entryFeeCents: number }) {
   const [anglers, setAnglers] = useState<Angler[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -545,7 +546,7 @@ function AnglersDashboard({ tournamentId, inviteCode, entryFeeCents }: { tournam
       ...anglers.map((a) => [
         a.name,
         new Date(a.joined_at).toLocaleString(),
-        a.key_code ?? inviteCode,
+        a.key_code,
         a.paid ? "yes" : "no",
         a.checked_in ? "yes" : "no",
         (a.organizer_note ?? "").replace(/"/g, '""'),
@@ -642,7 +643,7 @@ function AnglersDashboard({ tournamentId, inviteCode, entryFeeCents }: { tournam
           {/* Angler rows */}
           <div className="space-y-3">
             {visible.map((a) => {
-              const keyDisplay = a.key_code ?? inviteCode;
+              const keyDisplay = a.key_code;
               const noteVal = noteEdits[a.user_id] ?? a.organizer_note ?? "";
               const noteDirty = (noteEdits[a.user_id] ?? a.organizer_note ?? "") !== (a.organizer_note ?? "");
               return (
@@ -811,7 +812,6 @@ export default function OrganizerPanel({ tournamentId, onBack }: { tournamentId:
   const t = detail.tournament;
   const pending = detail.entries.filter((e) => e.status === "pending");
   const decided = detail.entries.filter((e) => e.status !== "pending");
-  const inviteUrl = typeof window !== "undefined" ? `${window.location.origin}/fishmb/tournaments/join/${t.invite_code}` : "";
 
   return (
     <div>
@@ -844,36 +844,50 @@ export default function OrganizerPanel({ tournamentId, onBack }: { tournamentId:
         />
       </section>
 
-      {/* Invite */}
+      {/* Getting anglers in — keys are the only way in now */}
       <section className="bg-pine rounded-3xl p-6 md:p-8 mb-8">
-        <h2 className="font-display font-bold uppercase text-white text-xl tracking-wide mb-2">Invite anglers</h2>
-        <p className="text-white/70 text-sm mb-4">Share this link — anglers see the full tournament details first, then create a free account and join with one tap. The invite code is already in the link.</p>
-        <div className="flex flex-wrap gap-3 items-center">
-          <code className="bg-white/10 text-gold font-bold tracking-[0.2em] px-5 py-3 rounded-full text-lg">{t.invite_code}</code>
+        <h2 className="font-display font-bold uppercase text-white text-xl tracking-wide mb-2">Getting anglers in</h2>
+        {t.key_mode === "open" ? (
+          <p className="text-white/70 text-sm">
+            This tournament is <strong className="text-white">open join</strong> — anyone on
+            FishMB can join straight from the tournament page. Share the tournament link below.
+          </p>
+        ) : (
+          <p className="text-white/70 text-sm">
+            Anglers join with an entry key — generate and share keys in the{" "}
+            <strong className="text-white">Entry keys</strong> section below.{" "}
+            {t.key_mode === "shared"
+              ? "One shared key works for everyone."
+              : "Each angler gets their own single-use key."}
+          </p>
+        )}
+        <div className="flex flex-wrap gap-3 items-center mt-4">
           <button
             onClick={() => {
-              navigator.clipboard.writeText(inviteUrl);
+              const url = typeof window !== "undefined" ? `${window.location.origin}/fishmb/tournaments/${t.id}` : "";
+              navigator.clipboard.writeText(url);
               setCopied(true);
               setTimeout(() => setCopied(false), 2000);
             }}
             className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
           >
-            {copied ? "Copied!" : "Copy invite link"}
+            {copied ? "Copied!" : "Copy tournament link"}
           </button>
           <button
             onClick={async () => {
+              const url = typeof window !== "undefined" ? `${window.location.origin}/fishmb/tournaments/${t.id}` : "";
               if (navigator.share) {
                 try {
                   await navigator.share({
                     title: `Join ${t.name} on FishMB`,
-                    text: `You're invited to ${t.name} on FishMB — create a free account and join with the code ${t.invite_code}.`,
-                    url: inviteUrl,
+                    text: `You're invited to ${t.name} on FishMB!`,
+                    url,
                   });
                 } catch {
                   /* user dismissed the share sheet */
                 }
               } else {
-                navigator.clipboard.writeText(inviteUrl);
+                navigator.clipboard.writeText(url);
                 setCopied(true);
                 setTimeout(() => setCopied(false), 2000);
               }
@@ -886,10 +900,10 @@ export default function OrganizerPanel({ tournamentId, onBack }: { tournamentId:
       </section>
 
       {/* Anglers dashboard — who joined, keys used, paid, checked in */}
-      <AnglersDashboard tournamentId={t.id} inviteCode={t.invite_code} entryFeeCents={t.entry_fee_cents} />
+      <AnglersDashboard tournamentId={t.id} entryFeeCents={t.entry_fee_cents} />
 
       {/* Single-use entry keys */}
-      <EntryKeys tournamentId={t.id} />
+      <EntryKeys tournamentId={t.id} keyMode={t.key_mode ?? "individual"} />
 
       {/* Pending review */}
       <h2 className="font-display font-bold uppercase text-pine text-2xl tracking-wide mb-4">

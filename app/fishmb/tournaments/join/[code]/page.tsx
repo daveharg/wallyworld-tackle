@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTournamentByInvite } from "@/lib/fish/tournaments";
+import { getTournamentByKey } from "@/lib/fish/tournaments";
 import { JoinButton } from "../../_components/JoinButton";
 import { PrizePot, LicenceNotice } from "../../_components/PrizePot";
 import BackArrow from "../../../_components/BackArrow";
@@ -25,8 +25,8 @@ function fmt(d: string) {
 }
 
 /**
- * Shared invite landing page: a full "about the tournament" overview.
- * The invite code is already in the link — the visitor reads the details
+ * Entry key landing page: a full "about the tournament" overview.
+ * The key is already in the link — the visitor reads the details
  * first, then taps Join to create an account (or log in) and enter.
  */
 export default async function JoinTournamentPage({
@@ -36,7 +36,7 @@ export default async function JoinTournamentPage({
   params: { code: string };
   searchParams?: { key?: string };
 }) {
-  const t = await getTournamentByInvite(params.code);
+  const t = await getTournamentByKey(params.code);
   if (!t) notFound();
 
   return (
@@ -115,9 +115,9 @@ export default async function JoinTournamentPage({
           Ready to fish?
         </h2>
         <p className="text-white/70 text-sm mb-5">
-          Create a free FishMB account (or log in) and the invite code{" "}
+          Create a free FishMB account (or log in) and your entry key{" "}
           <code className="bg-white/10 text-gold font-bold tracking-[0.2em] px-3 py-1 rounded-full">
-            {t.invite_code}
+            {params.code.toUpperCase()}
           </code>{" "}
           is already applied.
         </p>

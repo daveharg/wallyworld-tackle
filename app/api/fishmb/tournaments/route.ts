@@ -103,6 +103,10 @@ export async function POST(req: NextRequest) {
     : [];
 
   const inviteCode = await generateInviteCode();
+  const keyMode =
+    body.key_mode === "open" || body.key_mode === "shared" || body.key_mode === "individual"
+      ? body.key_mode
+      : "individual";
   const coverPhotoUrl =
     typeof body.cover_photo_url === "string" && /^https?:\/\//.test(body.cover_photo_url.trim())
       ? body.cover_photo_url.trim()
@@ -145,10 +149,10 @@ export async function POST(req: NextRequest) {
   await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS zone_polygon jsonb`);
   const created = await queryOne<{ id: string }>(
     `INSERT INTO fm_tournaments
-       (name, description, organizer_id, lake_ids, species, starts_at, ends_at, rules, scoring, scoring_count, invite_code, max_participants, entry_fee_cents, payouts, auto_approve_entries, cover_photo_url, venue_name, venue_address, photo_mode, hide_locations, gps_north, gps_south, gps_east, gps_west, require_hold_photo, zone_polygon)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26::jsonb)
+       (name, description, organizer_id, lake_ids, species, starts_at, ends_at, rules, scoring, scoring_count, invite_code, key_mode, max_participants, entry_fee_cents, payouts, auto_approve_entries, cover_photo_url, venue_name, venue_address, photo_mode, hide_locations, gps_north, gps_south, gps_east, gps_west, require_hold_photo, zone_polygon)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27::jsonb)
      RETURNING id`,
-    [name, description, me.id, lakeIds, species, start.toISOString(), end.toISOString(), rules, scoring, scoringCount, inviteCode, maxParticipants, entryFeeCents, JSON.stringify(payouts), body.auto_approve_entries === true, coverPhotoUrl, venueName, venueAddress, photoMode, hideLocations, gpsBounds?.north ?? null, gpsBounds?.south ?? null, gpsBounds?.east ?? null, gpsBounds?.west ?? null, requireHoldPhoto, zonePolygon ? JSON.stringify(zonePolygon) : null]
+    [name, description, me.id, lakeIds, species, start.toISOString(), end.toISOString(), rules, scoring, scoringCount, inviteCode, keyMode, maxParticipants, entryFeeCents, JSON.stringify(payouts), body.auto_approve_entries === true, coverPhotoUrl, venueName, venueAddress, photoMode, hideLocations, gpsBounds?.north ?? null, gpsBounds?.south ?? null, gpsBounds?.east ?? null, gpsBounds?.west ?? null, requireHoldPhoto, zonePolygon ? JSON.stringify(zonePolygon) : null]
   );
   // The organizer is automatically a participant.
   await queryOne(

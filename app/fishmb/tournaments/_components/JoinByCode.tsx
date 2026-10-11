@@ -15,14 +15,10 @@ export function JoinByCode() {
     try {
       const res = await fetch(`/api/fishmb/tournaments/by-code/${encodeURIComponent(c)}`);
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Code not found.");
-      // Entry keys join in one step — pass the key so the join page redeems it.
-      const dest = data.entry_key
-        ? `/fishmb/tournaments/join/${c}?key=${encodeURIComponent(data.entry_key)}`
-        : `/fishmb/tournaments/join/${c}`;
-      router.push(dest);
+      if (!res.ok) throw new Error(data.error || "Key not found.");
+      router.push(`/fishmb/tournaments/join/${c}?key=${encodeURIComponent(data.entry_key)}`);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Code not found.");
+      setError(e instanceof Error ? e.message : "Key not found.");
     }
   };
 
@@ -33,8 +29,8 @@ export function JoinByCode() {
           value={code}
           onChange={(e) => setCode(e.target.value.toUpperCase())}
           onKeyDown={(e) => e.key === "Enter" && go()}
-          placeholder="Invite code"
-          maxLength={8}
+          placeholder="Entry key"
+          maxLength={16}
           className="flex-1 min-w-0 bg-white border border-pine/20 rounded-lg px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-pine placeholder:text-pine/35 focus:outline-none focus:border-signal"
         />
         <button

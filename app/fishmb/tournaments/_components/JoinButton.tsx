@@ -30,7 +30,7 @@ export function JoinButton({
       await fishFetch(`/api/fishmb/tournaments/${tournamentId}/join`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ invite_code: inviteCode ?? "" }),
+        body: JSON.stringify({ key: inviteCode ?? "" }),
       });
       router.push(`/fishmb/tournaments/${tournamentId}`);
     } catch (e) {

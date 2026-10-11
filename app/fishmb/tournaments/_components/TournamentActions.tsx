@@ -9,7 +9,7 @@ import { SubmitEntry } from "./SubmitEntry";
 interface Detail {
   joined: boolean;
   is_organizer: boolean;
-  tournament: { status: string; species: string[]; photo_mode?: string | null; scoring?: string | null; require_hold_photo?: boolean };
+  tournament: { status: string; species: string[]; photo_mode?: string | null; scoring?: string | null; require_hold_photo?: boolean; key_mode?: "open" | "shared" | "individual" };
 }
 
 /** Join / submit-catch / manage buttons on the tournament detail page. */
@@ -36,8 +36,9 @@ export function TournamentActions({ tournamentId }: { tournamentId: string }) {
       openLogin();
       return;
     }
-    if (!code.trim()) {
-      setError("Enter the invite code to join.");
+    const needsKey = detail?.tournament.key_mode !== "open";
+    if (needsKey && !code.trim()) {
+      setError("Enter your entry key to join.");
       return;
     }
     setJoining(true);
@@ -46,7 +47,7 @@ export function TournamentActions({ tournamentId }: { tournamentId: string }) {
       await fishFetch(`/api/fishmb/tournaments/${tournamentId}/join`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ invite_code: code.trim() }),
+        body: JSON.stringify({ key: code.trim() }),
       });
       const d = await fishFetch(`/api/fishmb/tournaments/${tournamentId}`);
       setDetail(d);
@@ -74,14 +75,16 @@ export function TournamentActions({ tournamentId }: { tournamentId: string }) {
         )}
         {!detail.joined ? (
           <div className="flex items-center gap-2">
-            <input
-              value={code}
-              onChange={(e) => setCode(e.target.value.toUpperCase())}
-              placeholder="Invite code"
-              maxLength={12}
-              className="w-32 bg-white border border-pine/20 rounded-full px-4 py-2.5 text-sm font-bold uppercase tracking-widest text-pine placeholder:text-pine/35 placeholder:font-normal placeholder:tracking-normal focus:outline-none focus:border-signal"
-              aria-label="Invite code"
-            />
+            {detail.tournament.key_mode !== "open" && (
+              <input
+                value={code}
+                onChange={(e) => setCode(e.target.value.toUpperCase())}
+                placeholder="Entry key"
+                maxLength={16}
+                className="w-32 bg-white border border-pine/20 rounded-full px-4 py-2.5 text-sm font-bold uppercase tracking-widest text-pine placeholder:text-pine/35 placeholder:font-normal placeholder:tracking-normal focus:outline-none focus:border-signal"
+                aria-label="Entry key"
+              />
+            )}
             <button
               onClick={join}
               disabled={joining}

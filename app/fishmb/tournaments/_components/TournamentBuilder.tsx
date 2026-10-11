@@ -210,6 +210,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
   const [templatesOpen, setTemplatesOpen] = useState(false);
   const [optEntryFee, setOptEntryFee] = useState(false);
   const [entryFee, setEntryFee] = useState("");
+  const [keyMode, setKeyMode] = useState<"open" | "shared" | "individual">("individual");
   const [payouts, setPayouts] = useState<PayoutTier[]>([]);
   const [optPhotoProof, setOptPhotoProof] = useState(false);
   const [photoProof, setPhotoProof] = useState<"bump" | "tape" | "none">("tape");
@@ -332,6 +333,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
           scoring_count: scoringCount,
           max_participants: null,
           entry_fee_cents: entryFeeCents,
+          key_mode: keyMode,
           payouts,
           auto_approve_entries: autoApprove,
           photo_mode: effectivePhotoMode,
@@ -656,6 +658,30 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
               </div>
             )}
 
+            <div>
+              <label className={labelCls}>How anglers join</label>
+              <div className="grid grid-cols-1 gap-2">
+                <Pill selected={keyMode === "individual"} onClick={() => setKeyMode("individual")} className="text-left">
+                  Individual keys
+                  <span className={`block text-xs font-normal mt-1 ${keyMode === "individual" ? "text-white/85" : "text-pine/50"}`}>
+                    One single-use ticket per angler — hand one to each after they pay
+                  </span>
+                </Pill>
+                <Pill selected={keyMode === "shared"} onClick={() => setKeyMode("shared")} className="text-left">
+                  One shared key
+                  <span className={`block text-xs font-normal mt-1 ${keyMode === "shared" ? "text-white/85" : "text-pine/50"}`}>
+                    A single code everyone uses — post it wherever your anglers are
+                  </span>
+                </Pill>
+                <Pill selected={keyMode === "open"} onClick={() => setKeyMode("open")} className="text-left">
+                  No keys — open join
+                  <span className={`block text-xs font-normal mt-1 ${keyMode === "open" ? "text-white/85" : "text-pine/50"}`}>
+                    Anyone on FishMB can join, no key needed
+                  </span>
+                </Pill>
+              </div>
+            </div>
+
             <CheckRow
               checked={optPhotoProof}
               onChange={setOptPhotoProof}
@@ -901,8 +927,15 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
               <p className="text-pine text-sm">{species.join(", ") || "All species"}</p>
             </div>
             <div className="bg-white border border-pine/10 rounded-2xl p-5">
-              <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-2">Invite code</h3>
-              <p className="text-pine/55 text-sm">Your invite code is created when you submit.</p>
+              <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-2">How anglers join</h3>
+              <p className="text-pine text-sm font-bold">
+                {keyMode === "individual" && "Individual keys — one single-use ticket per angler."}
+                {keyMode === "shared" && "One shared key — a single code everyone uses."}
+                {keyMode === "open" && "Open join — no key needed."}
+              </p>
+              {keyMode !== "open" && (
+                <p className="text-pine/55 text-sm mt-1">You&apos;ll generate the keys after creating the tournament.</p>
+              )}
             </div>
           </div>
 

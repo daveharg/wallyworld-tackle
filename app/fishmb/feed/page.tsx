@@ -152,7 +152,7 @@ function TournamentPanel() {
       ) : (
         <div className="py-4">
           <p className="text-sm text-pine/65 mb-4">
-            Got an invite code from an organizer? Enter it to join their
+            Got an entry key from an organizer? Enter it to join their
             tournament.
           </p>
           <JoinByCode />
@@ -289,7 +289,7 @@ const FEATURE_PROMOS = [
     img: "/fishmb/promos/tournaments.jpg",
  badge: " Tournaments",
     title: "Run your own fishing tournament",
-    body: "Challenge your friends to a month-long walleye showdown. Invite codes, live leaderboard, GPS-verified catches — FishMB never touches the money.",
+    body: "Challenge your friends to a month-long walleye showdown. Entry keys, live leaderboard, GPS-verified catches — FishMB never touches the money.",
     cta: "Start a tournament",
     href: "/fishmb/tournaments",
   },

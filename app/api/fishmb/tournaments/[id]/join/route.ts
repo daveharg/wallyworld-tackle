@@ -1,6 +1,9 @@
 // POST /api/fishmb/tournaments/[id]/join — join a tournament (auth required).
-// An invite code is required to join someone else's tournament (Dave's rule —
-// no open joins). The organizer is exempt.
+// Entry keys are the only way in (no invite codes anymore):
+// - key_mode 'open': anyone can join, no key needed.
+// - key_mode 'shared': one key everyone uses.
+// - key_mode 'individual': one single-use key per angler.
+// The organizer is exempt.
 
 import { NextRequest, NextResponse } from "next/server";
 import {
@@ -30,18 +33,27 @@ export async function POST(
     return NextResponse.json({ joined: true });
   }
 
-  let body: Record<string, unknown> = {};
-  try {
-    body = await req.json();
-  } catch {
-    // no body — code check below will reject
-  }
-  const code =
-    typeof body.invite_code === "string" ? body.invite_code.trim().toUpperCase() : "";
   const isOrganizer = t.organizer_id === me.id;
-  // Entry keys work as invite codes too — redeem the key on join.
+  const keyMode = (t as { key_mode?: string }).key_mode ?? "individual";
   let keyId: string | null = null;
-  if (!isOrganizer && code !== t.invite_code.toUpperCase()) {
+
+  if (!isOrganizer && keyMode !== "open") {
+    let body: Record<string, unknown> = {};
+    try {
+      body = await req.json();
+    } catch {
+      // no body — key check below will reject
+    }
+    const code =
+      typeof body.key === "string" ? body.key.trim().toUpperCase()
+      : typeof body.invite_code === "string" ? body.invite_code.trim().toUpperCase()
+      : "";
+    if (!code) {
+      return NextResponse.json(
+        { error: "This tournament needs an entry key to join." },
+        { status: 403 }
+      );
+    }
     const keyRow = await query(
       `SELECT id, status, max_uses, uses FROM fm_tournament_keys WHERE tournament_id = $1 AND key_code = $2`,
       [t.id, code]
@@ -49,7 +61,7 @@ export async function POST(
     const k = keyRow[0] as { id: string; status: string; max_uses: number | null; uses: number } | undefined;
     if (!k) {
       return NextResponse.json(
-        { error: "You need the tournament's invite code to join." },
+        { error: "That entry key isn't valid for this tournament." },
         { status: 403 }
       );
     }

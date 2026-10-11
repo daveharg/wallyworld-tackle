@@ -12,12 +12,12 @@ const steps = [
   {
     n: "1",
     title: "Create your tournament",
-    body: "Name it, pick your dates, waters and species, set the rules, entry fee and prize payouts. You'll get a private invite code and a shareable link — only people with the link can join.",
+    body: "Name it, pick your dates, waters and species, set the rules, entry fee and prize payouts. Choose how anglers join: individual entry keys, one shared key, or open join.",
   },
   {
     n: "2",
     title: "Invite your anglers",
-    body: "Share the link by text, social, or word of mouth. Anglers see the full tournament details first, then create a free FishMB account and join with one tap — the invite code is already in the link.",
+    body: "Share your entry keys by text, social, or word of mouth. Anglers see the full tournament details first, then create a free FishMB account and join with their key.",
   },
   {
     n: "3",
@@ -66,7 +66,7 @@ const dashboard = [
   },
   {
     title: "Invite anglers",
-    body: "Your invite code, a copy-link button and native phone sharing, all in one place.",
+    body: "Your entry keys, a copy-link button and native phone sharing, all in one place.",
   },
   {
     title: "Entry fees",
@@ -152,7 +152,7 @@ export default function HowTournamentsWorkPage() {
           longest walleye. One of you creates the tournament — name it, set the
           dates to June 1–30, pick your lakes (or leave it open to any Manitoba
           water), choose longest-fish scoring, and set a $20 entry fee. Share
-          the invite code in the group chat and everyone joins.
+          the entry keys in the group chat and everyone joins.
         </p>
         <p className="text-pine/70 text-sm leading-relaxed mt-3">
           All June, whenever anyone lands a walleye, they snap its photo in the
