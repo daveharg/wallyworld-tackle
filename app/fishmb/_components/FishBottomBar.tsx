@@ -260,7 +260,7 @@ function Bar() {
                 <span className="w-16 h-16 shrink-0 rounded-full bg-white shadow-2xl flex items-center justify-center">
                   {a.icon}
                 </span>
-                <span className="absolute left-[calc(50%+2.75rem)] top-1/2 -translate-y-1/2 whitespace-nowrap text-white text-2xl font-bold tracking-tight bg-pine-deep/60 backdrop-blur-sm px-4 py-1.5 rounded-full">
+                <span className="absolute left-[calc(50%+2.75rem)] top-1/2 -translate-y-1/2 whitespace-nowrap text-white text-2xl font-bold tracking-tight">
                   {a.label}
                 </span>
               </Link>
