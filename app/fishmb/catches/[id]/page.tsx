@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import BackArrow from "../../_components/BackArrow";
 import { fishFetch } from "../../_components/fishFetch";
+import CatchLocationMap from "../_components/CatchLocationMap";
 
 interface CatchDetail {
   id: string;
@@ -149,17 +150,11 @@ export default function CatchDetailPage({ params }: { params: { id: string } }) 
       )}
 
       {c.lat != null && c.lng != null && (
-        <div className="bg-white border border-pine/10 rounded-3xl p-5 mb-6">
-          <h2 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-2">Location</h2>
-          <p className="text-pine text-sm">
-            {c.lat.toFixed(4)}, {c.lng.toFixed(4)}
-          </p>
-          <Link
-            href={`/fishmb/maps?lat=${c.lat}&lng=${c.lng}`}
-            className="text-signal-dark text-sm font-bold hover:underline mt-1 inline-block"
-          >
-            View on map →
-          </Link>
+        <div className="mb-6">
+          <h2 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-2 px-1">
+            Where it was caught
+          </h2>
+          <CatchLocationMap lat={c.lat} lng={c.lng} />
         </div>
       )}
 

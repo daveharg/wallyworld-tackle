@@ -2206,7 +2206,13 @@ function FeedPageInner() {
                 </div>
               ) : photos.length > 0 ? (
                 <div className="relative">
-                  <PhotoCarousel photos={photos} bare />
+                  {item.kind === "catch" ? (
+                    <Link href={`/fishmb/catches/${item.id}`} aria-label="View catch details">
+                      <PhotoCarousel photos={photos} bare />
+                    </Link>
+                  ) : (
+                    <PhotoCarousel photos={photos} bare />
+                  )}
                   {authorOverlay}
                 </div>
               ) : (

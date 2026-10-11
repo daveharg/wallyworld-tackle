@@ -79,6 +79,12 @@ export default function MapsHub() {
   const [myLoc, setMyLoc] = useState<{ lat: number; lng: number; speed: number | null } | null>(null);
   const [mapCenter, setMapCenter] = useState(() => {
     try {
+      // Deep link (e.g. from a catch page) takes priority.
+      const qLat = Number(searchParams.get("lat"));
+      const qLng = Number(searchParams.get("lng"));
+      if (Number.isFinite(qLat) && Number.isFinite(qLng)) {
+        return { lat: qLat, lng: qLng };
+      }
       const raw = localStorage.getItem("fishmb-map-center");
       if (raw) {
         const p = JSON.parse(raw);
@@ -104,7 +110,25 @@ export default function MapsHub() {
     key: string;
     zoom?: number;
     offsetY?: number;
-  } | null>(null);
+  } | null>(() => {
+    // Deep link from a catch page (?lat=&lng=&zoom=) — focus on load.
+    try {
+      const qLat = Number(searchParams.get("lat"));
+      const qLng = Number(searchParams.get("lng"));
+      const qZoom = Number(searchParams.get("zoom"));
+      if (Number.isFinite(qLat) && Number.isFinite(qLng)) {
+        return {
+          lat: qLat,
+          lng: qLng,
+          key: `deeplink:${qLat},${qLng}`,
+          zoom: Number.isFinite(qZoom) ? qZoom : 13,
+        };
+      }
+    } catch {
+      // No deep link.
+    }
+    return null;
+  });
   const [basemap, setBasemap] = useState<BasemapId>(() => {
     try {
       const saved = localStorage.getItem("fishmb-basemap");
