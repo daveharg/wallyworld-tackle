@@ -114,14 +114,29 @@ export default function ZoneMapPicker({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Rebuild the map when expanding/collapsing (container size changes).
+  // Re-measure the map when expanding/collapsing (container size changes).
+  // iOS Safari can lag the layout pass, so invalidate on the next frames
+  // plus timed safety nets — a blank expanded map means invalidateSize ran
+  // while the container still measured 0.
   useEffect(() => {
     const map = mapObj.current;
     if (!map) return;
-    setTimeout(() => {
+    const raf = requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        map.invalidateSize();
+        renderPolygon(map, polyRef.current);
+      })
+    );
+    const t1 = setTimeout(() => {
       map.invalidateSize();
       renderPolygon(map, polyRef.current);
-    }, 100);
+    }, 250);
+    const t2 = setTimeout(() => map.invalidateSize(), 800);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [expanded]);
 
@@ -164,8 +179,13 @@ export default function ZoneMapPicker({
   return (
     // NOTE: the map div below must NEVER unmount/remount when `expanded`
     // toggles — Leaflet binds to the DOM node, so only classNames change here.
-    <div className={expanded ? "fixed inset-0 z-[2000] bg-pine-deep/60 flex flex-col" : undefined}>
-      <div className={expanded ? "relative flex-1 m-3 rounded-3xl overflow-hidden" : "relative"}>
+    // In expanded mode the map wrapper uses absolute insets (a definite size)
+    // rather than a flex height chain, so Leaflet always measures it correctly.
+    <div className={expanded ? "fixed inset-0 z-[2000] bg-pine-deep/80" : undefined}>
+      <div
+        className={expanded ? "absolute rounded-3xl overflow-hidden" : "relative"}
+        style={expanded ? { left: 12, right: 12, top: 12, bottom: 132 } : undefined}
+      >
         <div
           ref={mapRef}
           className={expanded ? "w-full h-full" : "w-full h-64 rounded-2xl border border-pine/15"}
@@ -190,7 +210,7 @@ export default function ZoneMapPicker({
         )}
       </div>
       {expanded ? (
-        <div className="px-4 pb-6 pt-1">
+        <div className="absolute bottom-0 inset-x-0 px-4 pb-6 pt-2">
           <p className="text-white/80 text-xs text-center mb-2">
             Tap the map to place points around your zone. Drag points to adjust.
           </p>
