@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import MapSearch from "../../maps/_components/MapSearch";
 
 /** Small map for manually picking a catch location. Tap/drag to set the pin. */
 export default function CatchMapPicker({
@@ -25,6 +26,7 @@ export default function CatchMapPicker({
   const markerObj = useRef<L.Marker | null>(null);
   const pickRef = useRef(onPick);
   pickRef.current = onPick;
+  const [searchTarget, setSearchTarget] = useState<{ lat: number; lng: number; key: string } | null>(null);
 
   useEffect(() => {
     if (!mapRef.current || mapObj.current) return;
@@ -75,6 +77,13 @@ export default function CatchMapPicker({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Fly to a lake chosen from the search bar.
+  useEffect(() => {
+    if (searchTarget && mapObj.current) {
+      mapObj.current.flyTo([searchTarget.lat, searchTarget.lng], 11, { duration: 1 });
+    }
+  }, [searchTarget]);
+
   return (
     <div className="fixed inset-0 z-[1200] flex items-end sm:items-center justify-center" role="dialog" aria-modal="true" aria-label="Pick catch location">
       <div className="absolute inset-0 bg-pine-deep/70" onClick={onClose} />
@@ -91,7 +100,16 @@ export default function CatchMapPicker({
           </button>
         </div>
         <p className="px-5 pb-3 text-xs text-pine/60">Tap the map to drop a pin, or drag the pin to fine-tune.</p>
-        <div ref={mapRef} className="w-full h-72 sm:h-80" />
+        <div className="relative">
+          <div className="absolute top-2 left-2 right-2 z-[500]">
+            <MapSearch
+              onSelect={(la, ln, label) =>
+                setSearchTarget({ lat: la, lng: ln, key: `${label}:${Date.now()}` })
+              }
+            />
+          </div>
+          <div ref={mapRef} className="w-full h-72 sm:h-80" />
+        </div>
         <div className="p-4">
           <button
             type="button"
