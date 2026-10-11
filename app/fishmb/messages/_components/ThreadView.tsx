@@ -24,6 +24,7 @@ interface Decrypted {
   mine: boolean;
   sender_id: string;
   text: string | null;
+  noKey: boolean;
   created_at: string;
 }
 
@@ -125,11 +126,13 @@ export default function ThreadView({
     rows.map((m) => {
       const sec =
         secretsRef.current?.find((x) => x.user_id === m.sender_id)?.shared ?? null;
+      const text = sec ? decryptText(m.nonce, m.ciphertext, sec) : null;
       return {
         id: m.id,
         mine: m.sender_id === myId,
         sender_id: m.sender_id,
-        text: sec ? decryptText(m.nonce, m.ciphertext, sec) : null,
+        text,
+        noKey: !sec,
         created_at: m.created_at,
       };
     });
@@ -218,7 +221,7 @@ export default function ThreadView({
           if (prev.some((m) => m.id === mine.id)) return prev;
           return [
             ...prev,
-            { id: mine.id, mine: true, sender_id: myId, text: optimisticText ?? payload, created_at: mine.created_at },
+            { id: mine.id, mine: true, sender_id: myId, text: optimisticText ?? payload, noKey: false, created_at: mine.created_at },
           ];
         });
         lastAtRef.current = mine.created_at;
@@ -801,7 +804,7 @@ export default function ThreadView({
                   <img src={photo} alt="Shared photo" className="rounded-2xl max-h-64 object-cover" loading="lazy" />
                 ) : (
                   <p className="text-[17px] leading-snug whitespace-pre-wrap break-words">
- {m.text ?? " Couldn't decrypt this message."}
+                    {m.text ?? (m.noKey ? "Waiting for encryption key…" : "Couldn't decrypt this message.")}
                   </p>
                 )}
               </div>
