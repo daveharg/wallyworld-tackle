@@ -24,6 +24,43 @@ const inputCls =
   "w-full bg-white border border-pine/20 rounded-2xl px-4 py-3 text-pine focus:outline-none focus:border-signal";
 const labelCls = "block text-xs font-bold uppercase tracking-[0.18em] text-pine/60 mb-1.5";
 
+function splitDateTime(v: string): [string, string] {
+  if (!v) return ["", ""];
+  const [d, t] = v.split("T");
+  return [d || "", (t || "").slice(0, 5)];
+}
+
+// Separate date + time inputs: iOS Safari renders a single datetime-local
+// input as an oversized empty box, so we split them for a clean compact look.
+export function DateTimeField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  const [d, t] = splitDateTime(value);
+  const update = (nd: string, nt: string) => {
+    if (!nd) return onChange("");
+    onChange(`${nd}T${nt || "08:00"}`);
+  };
+  return (
+    <div className="min-w-0">
+      <label className={labelCls}>{label}</label>
+      <div className="grid grid-cols-2 gap-2">
+        <input
+          type="date"
+          value={d}
+          onChange={(e) => update(e.target.value, t)}
+          className={`${inputCls} min-w-0 block`}
+          aria-label={`${label} date`}
+        />
+        <input
+          type="time"
+          value={t}
+          onChange={(e) => update(d, e.target.value)}
+          className={`${inputCls} min-w-0 block`}
+          aria-label={`${label} time`}
+        />
+      </div>
+    </div>
+  );
+}
+
 export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
   const router = useRouter();
   const { user, openLogin } = useFishAuth();
@@ -232,26 +269,8 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="min-w-0">
-              <label className={labelCls}>Starts *</label>
-              <input
-                type="datetime-local"
-                value={startsAt}
-                onChange={(e) => setStartsAt(e.target.value)}
-                className={`${inputCls} overflow-hidden`}
-                style={{ minWidth: 0, maxWidth: "100%", display: "block" }}
-              />
-            </div>
-            <div className="min-w-0">
-              <label className={labelCls}>Ends *</label>
-              <input
-                type="datetime-local"
-                value={endsAt}
-                onChange={(e) => setEndsAt(e.target.value)}
-                className={`${inputCls} overflow-hidden`}
-                style={{ minWidth: 0, maxWidth: "100%", display: "block" }}
-              />
-            </div>
+            <DateTimeField label="Starts *" value={startsAt} onChange={setStartsAt} />
+            <DateTimeField label="Ends *" value={endsAt} onChange={setEndsAt} />
           </div>
           <div>
             <label className={labelCls}>Scoring</label>
