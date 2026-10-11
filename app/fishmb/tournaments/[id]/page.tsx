@@ -1,5 +1,4 @@
 import Link from "next/link";
-import BackButton from "../_components/BackButton";
 import { notFound } from "next/navigation";
 import { getTournament, getLeaderboard } from "@/lib/fish/tournaments";
 import { getLakes } from "@/lib/fishmb";
@@ -13,79 +12,108 @@ import { formatDateTime } from "../../_components/formatDate";
 export const dynamic = "force-dynamic";
 export const revalidate = 30;
 
+function scoringLabel(scoring: string, scoringCount: number | null): string {
+  if (scoring === "heaviest") return "Biggest fish (heaviest)";
+  if (scoring === "longest") return "Biggest fish (longest)";
+  if (scoring === "total")
+    return scoringCount ? `Total length (top ${scoringCount})` : "Total length (all fish)";
+  if (scoring === "count") return "Most fish";
+  return scoring;
+}
+
 export default async function TournamentDetailPage({ params }: { params: { id: string } }) {
   const t = await getTournament(params.id);
   if (!t) notFound();
-  const leaderboard = await getLeaderboard(t.id, t.scoring, (t as any).scoring_count ?? null);
+  const scoringCount = (t as any).scoring_count ?? null;
+  const leaderboard = await getLeaderboard(t.id, t.scoring, scoringCount);
   const lakeNames = new Map(getLakes().map((l) => [l.id, l.name]));
 
-  const scoreLabel = t.scoring === "total" ? "Total in." : t.scoring === "count" ? "Fish" : t.scoring === "heaviest" ? "Best lbs" : "Best in.";
+  const scoreLabel =
+    t.scoring === "total" ? "Total in." : t.scoring === "count" ? "Fish" : t.scoring === "heaviest" ? "Best lbs" : "Best in.";
   const venueQuery = [t.venue_name, t.venue_address].filter(Boolean).join(", ");
   const mapsUrl = venueQuery
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venueQuery)}`
     : null;
+  const watersLabel = t.lake_ids.length
+    ? t.lake_ids.map((id) => lakeNames.get(id) || id).join(", ")
+    : "All of Manitoba";
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10 md:py-14">
-      <BackButton label="Back" />
+    <div className="max-w-3xl mx-auto px-4 py-6 md:py-10 pb-32">
+      <Link
+        href="/fishmb/dashboard?tab=tournaments"
+        className="inline-flex items-center gap-1.5 text-pine/60 hover:text-pine font-bold text-sm mb-4 transition-colors"
+      >
+        <span className="text-lg leading-none">‹</span> Tournaments
+      </Link>
 
-      {/* Cover hero */}
+      {/* Cover hero — matches the builder preview */}
       {t.cover_photo_url ? (
-        <div className="relative mt-4 rounded-3xl overflow-hidden bg-pine-deep">
+        <div className="relative rounded-3xl overflow-hidden bg-pine-deep">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={t.cover_photo_url} alt={t.name} className="w-full h-64 md:h-96 object-cover" />
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-pine-deep/90 via-pine-deep/40 to-transparent pt-24 pb-6 px-6 md:px-10">
-            <p className="text-gold font-bold uppercase tracking-[0.24em] text-xs mb-2">{t.status}</p>
-            <h1 className="font-display font-bold uppercase text-white text-4xl md:text-6xl tracking-wide">
+          <img src={t.cover_photo_url} alt={t.name} className="w-full h-48 md:h-64 object-cover" />
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-pine-deep/90 via-pine-deep/40 to-transparent pt-16 pb-5 px-5">
+            <p className="text-gold font-bold uppercase tracking-[0.24em] text-xs mb-1.5">{t.status}</p>
+            <h1 className="font-display font-bold uppercase text-white text-3xl md:text-4xl tracking-wide">
               {t.name}
             </h1>
           </div>
         </div>
-      ) : null}
-
-      <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
+      ) : (
         <div>
-          {!t.cover_photo_url && (
-            <>
-              <p className="text-signal font-bold uppercase tracking-[0.24em] text-xs mb-2">{t.status}</p>
-              <h1 className="font-display font-bold uppercase text-pine text-4xl md:text-5xl tracking-wide">
-                {t.name}
-              </h1>
-            </>
-          )}
-          <p className="text-pine/60 mt-2">
-            Organized by {t.organizer_name} · {t.participant_count} anglers · {formatDateTime(t.starts_at)} → {formatDateTime(t.ends_at)}
-          </p>
-          {t.photo_mode === "measure_only" && (
-            <p className="mt-3 inline-block text-xs font-bold uppercase tracking-wider text-pine bg-pine/10 rounded-full px-4 py-2">
- Measure-only photos — no posed photo with the fish needed
-            </p>
-          )}
-          {t.photo_mode === "strict" && (
-            <p className="mt-3 inline-block text-xs font-bold uppercase tracking-wider text-pine bg-pine/10 rounded-full px-4 py-2">
- Strict camera-only — entries must be taken with the FishMB app&apos;s in-app camera
-            </p>
-          )}
+          <p className="text-signal font-bold uppercase tracking-[0.24em] text-xs mb-1.5">{t.status}</p>
+          <h1 className="font-display font-bold uppercase text-pine text-3xl md:text-4xl tracking-wide">
+            {t.name}
+          </h1>
         </div>
+      )}
+
+      <p className="text-pine/60 text-sm mt-3">
+        Organized by {t.organizer_name} · {t.participant_count}{" "}
+        {t.participant_count === 1 ? "angler" : "anglers"} · {formatDateTime(t.starts_at)} →{" "}
+        {formatDateTime(t.ends_at)}
+      </p>
+      <div className="flex flex-wrap gap-2 mt-2">
+        {t.photo_mode === "measure_only" && (
+          <span className="text-xs font-bold uppercase tracking-wider text-pine bg-pine/10 rounded-full px-4 py-2">
+            Measure-only photos — no posed photo with the fish needed
+          </span>
+        )}
+        {t.photo_mode === "strict" && (
+          <span className="text-xs font-bold uppercase tracking-wider text-pine bg-pine/10 rounded-full px-4 py-2">
+            Strict camera-only — entries must be taken with the FishMB app&apos;s in-app camera
+          </span>
+        )}
+        {t.photo_mode === "no_measure" && (
+          <span className="text-xs font-bold uppercase tracking-wider text-pine bg-pine/10 rounded-full px-4 py-2">
+            No measuring needed — just a clear fish photo
+          </span>
+        )}
+        <span className="text-xs font-bold uppercase tracking-wider text-pine bg-pine/10 rounded-full px-4 py-2">
+          {scoringLabel(t.scoring, scoringCount)}
+        </span>
+      </div>
+
+      <div className="mt-4">
         <TournamentActions tournamentId={t.id} />
       </div>
 
-      {t.description && <p className="text-pine/75 mt-6 max-w-3xl whitespace-pre-line">{t.description}</p>}
+      {t.description && (
+        <p className="text-pine/75 mt-6 whitespace-pre-line">{t.description}</p>
+      )}
 
-      {/* Where — venue name + address with a map link */}
+      {/* Where */}
       {(t.venue_name || t.venue_address) && (
-        <div className="bg-white border border-pine/10 rounded-2xl p-6 mt-6 flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-1.5">Where</h3>
-            {t.venue_name && <p className="text-pine font-bold text-lg">{t.venue_name}</p>}
-            {t.venue_address && <p className="text-pine/60 text-sm">{t.venue_address}</p>}
-          </div>
+        <div className="bg-white border border-pine/10 rounded-2xl p-5 mt-6">
+          <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-1.5">Where</h3>
+          {t.venue_name && <p className="text-pine font-bold text-lg">{t.venue_name}</p>}
+          {t.venue_address && <p className="text-pine/60 text-sm">{t.venue_address}</p>}
           {mapsUrl && (
             <a
               href={mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-xs px-6 py-3 rounded-full transition-colors"
+              className="inline-block mt-3 text-xs font-bold uppercase tracking-wider text-signal-dark hover:underline"
             >
               Open in Google Maps →
             </a>
@@ -93,10 +121,11 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
         </div>
       )}
 
-      <div className="grid md:grid-cols-3 gap-4 mt-4">
+      {/* Waters / Species / Invite */}
+      <div className="grid grid-cols-1 gap-3 mt-4">
         <div className="bg-white border border-pine/10 rounded-2xl p-5">
           <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-2">Waters</h3>
-          <p className="text-pine text-sm">{t.lake_ids.length ? t.lake_ids.map((id) => lakeNames.get(id) || id).join(", ") : "Any Manitoba water"}</p>
+          <p className="text-pine text-sm">{watersLabel}</p>
         </div>
         <div className="bg-white border border-pine/10 rounded-2xl p-5">
           <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-2">Species</h3>
@@ -105,43 +134,50 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
         <InviteCodeReveal tournamentId={t.id} />
       </div>
 
-      <LicenceNotice participantCount={t.participant_count} maxParticipants={t.max_participants} />
+      <div className="mt-4">
+        <LicenceNotice participantCount={t.participant_count} maxParticipants={t.max_participants} />
+      </div>
 
-      {/* Rules — dedicated section */}
+      {/* Rules */}
       {t.rules && (
-        <section className="mt-10">
-          <h2 className="font-display font-bold uppercase text-pine text-2xl md:text-3xl tracking-wide mb-4">
+        <div className="mt-8">
+          <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-3">
             Tournament rules
           </h2>
-          <div className="bg-paper-deep border border-pine/10 rounded-3xl p-6 md:p-8">
-            <p className="text-pine/80 whitespace-pre-line leading-relaxed">{t.rules}</p>
+          <div className="bg-white border border-pine/10 rounded-3xl p-6">
+            <p className="text-pine/80 whitespace-pre-line leading-relaxed text-sm">{t.rules}</p>
           </div>
-        </section>
+        </div>
       )}
 
-      <div className="grid md:grid-cols-2 gap-4 mt-4">
-        <PrizePot
-          entryFeeCents={t.entry_fee_cents ?? 0}
-          participantCount={t.participant_count}
-          payouts={t.payouts ?? []}
-        />
-      </div>
-      <MyPaymentStatus tournamentId={t.id} entryFeeCents={t.entry_fee_cents ?? 0} />
+      {/* Prize pot */}
+      {(t.entry_fee_cents ?? 0) > 0 || (t.payouts ?? []).length > 0 ? (
+        <div className="mt-6">
+          <PrizePot
+            entryFeeCents={t.entry_fee_cents ?? 0}
+            participantCount={t.participant_count}
+            payouts={t.payouts ?? []}
+          />
+          <MyPaymentStatus tournamentId={t.id} entryFeeCents={t.entry_fee_cents ?? 0} />
+        </div>
+      ) : null}
 
       {/* Leaderboard */}
-      <div className="flex items-center justify-between mt-12 mb-4">
-        <h2 className="font-display font-bold uppercase text-pine text-2xl md:text-3xl tracking-wide">
+      <div className="flex items-center justify-between mt-10 mb-3">
+        <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide">
           Leaderboard
         </h2>
         <Link
           href={`/fishmb/tournaments/${t.id}/leaderboard`}
           className="bg-pine-deep text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full hover:bg-pine transition-colors"
         >
- Full-screen board
+          Full-screen board
         </Link>
       </div>
       {leaderboard.length === 0 ? (
-        <p className="text-pine/55">No approved catches yet — the board lights up once the organizer approves entries.</p>
+        <p className="text-pine/55 text-sm bg-white border border-pine/10 rounded-2xl p-5">
+          No approved catches yet — the board lights up once the organizer approves entries.
+        </p>
       ) : (
         <div className="bg-white border border-pine/10 rounded-3xl overflow-hidden">
           {leaderboard.map((row, i) => (
@@ -168,12 +204,12 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
       )}
 
       {/* Catches */}
-      <h2 className="font-display font-bold uppercase text-pine text-2xl md:text-3xl tracking-wide mt-12 mb-4">
+      <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mt-10 mb-3">
         Catches
       </h2>
       {t.hide_locations && (
         <p className="text-pine/60 text-sm mb-4 bg-pine/5 border border-pine/10 rounded-2xl px-4 py-3">
- Catch spots are private in this tournament — the app confirms each catch is inside
+          Catch spots are private in this tournament — the app confirms each catch is inside
           the tournament waters, but exact locations are never shown to other anglers.
         </p>
       )}
