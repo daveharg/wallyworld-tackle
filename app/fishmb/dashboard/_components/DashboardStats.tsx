@@ -111,6 +111,7 @@ export default function DashboardStats() {
   const [catchSort, setCatchSort] = useState<CatchSort>("size");
   const [catchesExpanded, setCatchesExpanded] = useState(false);
   const [sharingId, setSharingId] = useState<string | null>(null);
+  const [catchesError, setCatchesError] = useState<string | null>(null);
 
   const shareCatch = async (c: Catch) => {
     if (sharingId) return;
@@ -142,10 +143,18 @@ export default function DashboardStats() {
     fishFetch("/api/fishmb/leaderboards?category=most")
       .then((d) => setTopAnglers(((d.rows ?? []) as LeaderRow[]).slice(0, 5)))
       .catch(() => {});
-    // My catches (regular + tournament).
-    fishFetch("/api/fishmb/my-catches")
-      .then((d) => setCatches((d.catches ?? []) as Catch[]))
-      .catch(() => {});
+    // My catches (regular + tournament). Refetch when the tab regains focus
+    // so newly logged catches appear without a full reload.
+    const loadCatches = () => {
+      setCatchesError(null);
+      fishFetch("/api/fishmb/my-catches")
+        .then((d) => setCatches((d.catches ?? []) as Catch[]))
+        .catch((e) => setCatchesError(e instanceof Error ? e.message : "Couldn't load catches."));
+    };
+    loadCatches();
+    const onFocus = () => loadCatches();
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
   }, []);
 
   // Top friends: rank the user's friends by fish logged.
@@ -329,7 +338,11 @@ export default function DashboardStats() {
                     : !isShared(c) && c.tournament_id == null
           );
           if (filtered.length === 0) {
-            return (
+            return catchesError ? (
+              <p className="text-signal-dark text-sm">
+                Couldn&apos;t load your catches: {catchesError}
+              </p>
+            ) : (
               <p className="text-pine/50 text-sm">
                 No catches yet — log one from the feed or join a tournament.
               </p>
