@@ -223,6 +223,11 @@ function MessagesPageInner() {
   // key if missing or mismatched — no manual setup step needed.
   useEffect(() => {
     if (!user) return;
+    // DEV BRANCH ONLY: test bypass skips encryption setup.
+    if (user.id === "test-user-dev-001") {
+      setSetup("ready");
+      return;
+    }
     (async () => {
       try {
         const d = await fishFetch("/api/fishmb/msg/keys");
@@ -414,10 +419,15 @@ function MessagesPageInner() {
         applicationServerKey: Uint8Array.from(atob(publicKey.replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0)),
       });
       const json = sub.toJSON();
+      const isTestBypass = typeof window !== "undefined" && window.location.search.includes("testbypass=1");
       await fishFetch("/api/fishmb/push/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ endpoint: json.endpoint, keys: json.keys }),
+        body: JSON.stringify({
+          endpoint: json.endpoint,
+          keys: json.keys,
+          ...(isTestBypass ? { test_user_id: "test-user-dev-001" } : {}),
+        }),
       });
       setPushState("enabled");
     } catch {

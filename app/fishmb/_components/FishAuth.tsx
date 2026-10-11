@@ -85,6 +85,18 @@ export function FishAuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    // DEV BRANCH ONLY: ?testbypass=1 skips Google login with a mock user.
+    if (typeof window !== "undefined" && window.location.search.includes("testbypass=1")) {
+      setUser({
+        id: "test-user-dev-001",
+        name: "Test Angler",
+        email: "test@fishmb.dev",
+        avatar_url: null,
+        is_anonymous: false,
+      });
+      setLoading(false);
+      return;
+    }
     refresh();
   }, [refresh]);
 

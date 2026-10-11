@@ -6,7 +6,14 @@ import { ensurePushTable } from "@/lib/fish/push";
 import { fishUserFromRequest } from "@/lib/fish/auth";
 
 export async function POST(req: NextRequest) {
-  const me = await fishUserFromRequest(req);
+  let me = await fishUserFromRequest(req);
+  // DEV BRANCH ONLY: allow test user to subscribe for push testing.
+  if (!me) {
+    const body_test = await req.clone().json().catch(() => ({}));
+    if (body_test.test_user_id === "test-user-dev-001") {
+      me = { id: "test-user-dev-001" } as unknown as typeof me;
+    }
+  }
   if (!me) {
     return NextResponse.json({ error: "Not signed in." }, { status: 401 });
   }
