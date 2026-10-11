@@ -102,20 +102,15 @@ export default function DashboardTournaments() {
   const live = tournaments.filter((t) => getStatus(t).label === "Live");
   const upcoming = tournaments.filter((t) => getStatus(t).label === "Upcoming");
   const past = tournaments.filter((t) => getStatus(t).label === "Done");
-  const [showOthers, setShowOthers] = useState(false);
-  const [otherTournaments, setOtherTournaments] = useState<MyTournament[]>([]);
+  const [allTournaments, setAllTournaments] = useState<MyTournament[]>([]);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    if (!showOthers || otherTournaments.length > 0) return;
+    // All public tournaments — powers the Upcoming listing and search.
     fishFetch("/api/fishmb/tournaments")
-      .then((d) => {
-        const all = (d.tournaments ?? []) as MyTournament[];
-        const mine = new Set(tournaments.map((t) => t.id));
-        setOtherTournaments(all.filter((t) => !mine.has(t.id)));
-      })
+      .then((d) => setAllTournaments((d.tournaments ?? []) as MyTournament[]))
       .catch(() => {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showOthers]);
+  }, []);
 
   const row = (t: MyTournament, isPast = false) => {
     const standing = standings.find((s) => s.tournamentId === t.id);
@@ -172,6 +167,38 @@ export default function DashboardTournaments() {
     .filter((s) => s.t && !isNaN(new Date(s.t.ends_at).getTime()))
     .sort((a, b) => a.rank - b.rank);
 
+  // Public listing: upcoming tournaments the user hasn't joined + search.
+  const mineIds = new Set(tournaments.map((t) => t.id));
+  const upcomingAll = allTournaments.filter(
+    (t) => !mineIds.has(t.id) && getStatus(t).label === "Upcoming"
+  );
+  const q = search.trim().toLowerCase();
+  const searchResults = q
+    ? allTournaments.filter((t) => t.name.toLowerCase().includes(q))
+    : [];
+
+  const publicRow = (t: MyTournament) => {
+    const status = getStatus(t);
+    return (
+      <Link
+        key={t.id}
+        href={`/fishmb/tournaments/${t.id}`}
+        className="flex items-center gap-3 bg-white border border-pine/10 rounded-2xl px-4 py-3.5 hover:border-signal/40 transition-colors"
+      >
+        <span className="min-w-0 flex-1">
+          <span className={`inline-block text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full mb-1 ${status.color}`}>
+            {status.label}
+          </span>
+          <span className="block font-bold text-pine truncate">{t.name}</span>
+          <span className="block text-xs text-pine/50 mt-0.5">
+            {t.participant_count} anglers · {fmtRange(t.starts_at, t.ends_at)}
+          </span>
+        </span>
+        <span className="text-pine/25 text-xl leading-none shrink-0">›</span>
+      </Link>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -218,31 +245,25 @@ export default function DashboardTournaments() {
 
       {loading ? (
         <div className="h-32 bg-pine/10 rounded-3xl animate-pulse" />
-      ) : tournaments.length === 0 ? (
-        <div className="bg-white border border-pine/10 rounded-3xl p-8 text-center">
-          <p className="text-pine/70 font-bold">No tournaments yet</p>
-          <p className="text-pine/50 text-sm mt-1 mb-4">
-            Run your own or join one with an invite link.
-          </p>
-          <div className="flex gap-2 justify-center">
-            <button
-              type="button"
-              onClick={() => setCreating(true)}
-              className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
-            >
-              Start a tournament
-            </button>
-            <Link
-              href="/fishmb/tournaments"
-              className="bg-pine/10 hover:bg-pine/20 text-pine font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
-            >
-              Browse
-            </Link>
-          </div>
-        </div>
       ) : (
         <>
-          {rankedStandings.length > 0 && (
+          {tournaments.length === 0 ? (
+            <div className="bg-white border border-pine/10 rounded-3xl p-8 text-center">
+              <p className="text-pine/70 font-bold">No tournaments yet</p>
+              <p className="text-pine/50 text-sm mt-1 mb-4">
+                Run your own or join one with an invite link.
+              </p>
+              <button
+                type="button"
+                onClick={() => setCreating(true)}
+                className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
+              >
+                Start a tournament
+              </button>
+            </div>
+          ) : (
+            <>
+              {rankedStandings.length > 0 && (
             <div className="bg-pine rounded-3xl p-5 text-white shadow-lg">
               <h3 className="text-xs font-black uppercase tracking-wider text-white/60 mb-3">
                 🏆 Your standings
@@ -293,43 +314,40 @@ export default function DashboardTournaments() {
               <div className="space-y-2 opacity-75">{past.map((t) => row(t, true))}</div>
             </div>
           )}
-          {/* Other tournaments you haven't joined */}
+          </>
+          )}
+          {/* Upcoming tournaments — the main public listing */}
           <div>
-            <button
-              onClick={() => setShowOthers((s) => !s)}
-              className="w-full flex items-center justify-between bg-white border border-pine/10 rounded-2xl px-4 py-3.5 hover:border-signal/40 transition-colors"
-            >
-              <span className="text-xs font-black uppercase tracking-wider text-pine/45">
-                Other tournaments
-              </span>
-              <span className="text-pine/40 text-lg leading-none">{showOthers ? "▾" : "▸"}</span>
-            </button>
-            {showOthers && (
-              <div className="space-y-2 mt-2">
-                {otherTournaments.length === 0 ? (
-                  <p className="text-pine/50 text-sm text-center py-4">No other tournaments right now.</p>
+            <h3 className="text-xs font-black uppercase tracking-wider text-pine/45 mb-2">
+              Upcoming tournaments
+            </h3>
+            {upcomingAll.length === 0 ? (
+              <p className="text-pine/50 text-sm text-center py-4 bg-white border border-pine/10 rounded-2xl">
+                No upcoming tournaments right now.
+              </p>
+            ) : (
+              <div className="space-y-2">{upcomingAll.map((t) => publicRow(t))}</div>
+            )}
+          </div>
+          {/* Search tournaments */}
+          <div>
+            <h3 className="text-xs font-black uppercase tracking-wider text-pine/45 mb-2">
+              Search tournaments
+            </h3>
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by tournament name…"
+              className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3 text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal mb-2"
+            />
+            {q !== "" && (
+              <div className="space-y-2">
+                {searchResults.length === 0 ? (
+                  <p className="text-pine/50 text-sm text-center py-4">
+                    No tournaments match “{search.trim()}”.
+                  </p>
                 ) : (
-                  otherTournaments.map((t) => {
-                    const status = getStatus(t);
-                    return (
-                      <Link
-                        key={t.id}
-                        href={`/fishmb/tournaments/${t.id}`}
-                        className="flex items-center gap-3 bg-white border border-pine/10 rounded-2xl px-4 py-3.5 hover:border-signal/40 transition-colors"
-                      >
-                        <span className="min-w-0 flex-1">
-                          <span className={`inline-block text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full mb-1 ${status.color}`}>
-                            {status.label}
-                          </span>
-                          <span className="block font-bold text-pine truncate">{t.name}</span>
-                          <span className="block text-xs text-pine/50 mt-0.5">
-                            {t.participant_count} anglers · {fmtRange(t.starts_at, t.ends_at)}
-                          </span>
-                        </span>
-                        <span className="text-pine/25 text-xl leading-none shrink-0">›</span>
-                      </Link>
-                    );
-                  })
+                  searchResults.map((t) => publicRow(t))
                 )}
               </div>
             )}

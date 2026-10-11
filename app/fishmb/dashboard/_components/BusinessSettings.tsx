@@ -248,7 +248,7 @@ export default function BusinessSettings() {
             empty="No past tournaments yet."
           />
           <Link
-            href="/fishmb/tournaments"
+            href="/fishmb/dashboard?tab=tournaments"
             className="inline-block bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
           >
             + New tournament
