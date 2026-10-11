@@ -16,10 +16,10 @@ export const revalidate = 30;
 export default async function TournamentDetailPage({ params }: { params: { id: string } }) {
   const t = await getTournament(params.id);
   if (!t) notFound();
-  const leaderboard = await getLeaderboard(t.id, t.scoring);
+  const leaderboard = await getLeaderboard(t.id, t.scoring, (t as any).scoring_count ?? null);
   const lakeNames = new Map(getLakes().map((l) => [l.id, l.name]));
 
-  const scoreLabel = t.scoring === "total" ? "Total in." : t.scoring === "count" ? "Fish" : "Best in.";
+  const scoreLabel = t.scoring === "total" ? "Total in." : t.scoring === "count" ? "Fish" : t.scoring === "heaviest" ? "Best lbs" : "Best in.";
   const venueQuery = [t.venue_name, t.venue_address].filter(Boolean).join(", ");
   const mapsUrl = venueQuery
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venueQuery)}`

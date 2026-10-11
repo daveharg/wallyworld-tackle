@@ -114,7 +114,7 @@ export async function GET(
       for (const t of joined) {
         if (t.status !== "ended") continue;
         try {
-          const board = await getLeaderboard(t.id, t.scoring);
+          const board = await getLeaderboard(t.id, t.scoring, (t as any).scoring_count ?? null);
           if (board.length > 0 && board[0].user_id === userId) wins.push(t);
         } catch {
           // Skip tournaments whose leaderboard can't be computed.

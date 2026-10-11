@@ -129,9 +129,17 @@ export async function POST(
     typeof body.length_inches === "number" && body.length_inches > 0 && body.length_inches < 100
       ? body.length_inches
       : null;
+  const weightLbs =
+    typeof body.weight_lbs === "number" && body.weight_lbs > 0 && body.weight_lbs < 500
+      ? body.weight_lbs
+      : null;
   const lat = typeof body.latitude === "number" ? body.latitude : null;
   const lng = typeof body.longitude === "number" ? body.longitude : null;
   const acc = typeof body.gps_accuracy === "number" ? body.gps_accuracy : null;
+  // GPS against the tournament's chosen lake(s); flag (never auto-reject) when
+  // it's outside lake waters so the organizer can review it.
+  let lakeDistanceKm: number | null = null;
+  let locationFlag: string | null = null;
   if (lat !== null && lng !== null) {
     // Point-in-polygon (ray casting) for hand-drawn zones.
     const pointInPolygon = (
@@ -154,9 +162,11 @@ export async function POST(
     const poly = Array.isArray(t.zone_polygon) && t.zone_polygon.length >= 3
       ? t.zone_polygon
       : null;
+    // Flag (never auto-reject) catches outside a custom zone so the organizer
+    // can review them — GPS drift shouldn't nuke a legitimate entry.
     if (poly) {
       if (!pointInPolygon(lat, lng, poly)) {
-        return badRequest("That location is outside the tournament's fishing zone.");
+        locationFlag = "outside-zone";
       }
     } else {
       const bounds =
@@ -242,29 +252,27 @@ export async function POST(
   // Lake-boundary check: tournaments run on specific water. Measure the entry
   // GPS against the tournament's chosen lake(s); flag (never auto-reject) when
   // it's outside lake waters so the organizer can review it.
-  let lakeDistanceKm: number | null = null;
-  let locationFlag: string | null = null;
   const lakeIds = Array.isArray(t.lake_ids) ? t.lake_ids : [];
   if (lakeIds.length > 0) {
     if (lat !== null && lng !== null) {
       const near = nearestTournamentLake(lat, lng, lakeIds);
       if (near) {
         lakeDistanceKm = Math.round(near.km * 10) / 10;
-        if (near.km > LAKE_BOUNDARY_KM) locationFlag = "outside-lake";
-      } else {
+        if (near.km > LAKE_BOUNDARY_KM && !locationFlag) locationFlag = "outside-lake";
+      } else if (!locationFlag) {
         locationFlag = "no-gps";
       }
-    } else {
+    } else if (!locationFlag) {
       locationFlag = "no-gps";
     }
   }
 
   const entry = await queryOne(
     `INSERT INTO fm_tournament_entries
-       (tournament_id, user_id, photo_url, photo_urls, species, length_inches, latitude, longitude, gps_accuracy, notes, photo_hash, photo_phash, similar_photo_of, similar_catch_of, captured_at, time_flag, lake_distance_km, location_flag, status)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
+       (tournament_id, user_id, photo_url, photo_urls, species, length_inches, weight_lbs, latitude, longitude, gps_accuracy, notes, photo_hash, photo_phash, similar_photo_of, similar_catch_of, captured_at, time_flag, lake_distance_km, location_flag, status)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)
      RETURNING *`,
-    [t.id, me.id, photoUrl, JSON.stringify(photoUrls), species, lengthIn, lat, lng, acc, notes, photoHash, photoPHash, similarPhotoOf, similarCatchOf, capturedAt.toISOString(), timeFlag, lakeDistanceKm, locationFlag, t.auto_approve_entries ? "approved" : "pending"]
+    [t.id, me.id, photoUrl, JSON.stringify(photoUrls), species, lengthIn, weightLbs, lat, lng, acc, notes, photoHash, photoPHash, similarPhotoOf, similarCatchOf, capturedAt.toISOString(), timeFlag, lakeDistanceKm, locationFlag, t.auto_approve_entries ? "approved" : "pending"]
   );
   return NextResponse.json({ entry }, { status: 201 });
 }

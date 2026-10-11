@@ -84,6 +84,7 @@ export interface Tournament {
   ends_at: string;
   rules: string;
   scoring: string;
+  scoring_count: number | null;
   invite_code: string;
   status: string;
   max_participants: number | null;
@@ -132,6 +133,7 @@ export interface TournamentEntry {
   time_flag: string | null;
   lake_distance_km: number | null;
   location_flag: string | null;
+  weight_lbs: number | null;
   /** Present when locations are hidden: confirms the catch was GPS-verified in-area. */
   location_verified?: boolean;
 }
@@ -227,6 +229,8 @@ export async function ensureTournamentTables(): Promise<void> {
   // tournament lake center + a review flag when it's outside lake waters.
   await query(`ALTER TABLE fm_tournament_entries ADD COLUMN IF NOT EXISTS lake_distance_km numeric`);
   await query(`ALTER TABLE fm_tournament_entries ADD COLUMN IF NOT EXISTS location_flag text`);
+  // Weight for 'heaviest' scoring tournaments (lbs, optional otherwise).
+  await query(`ALTER TABLE fm_tournament_entries ADD COLUMN IF NOT EXISTS weight_lbs numeric`);
   // Entry-fee tracking: the organizer marks each participant paid (payment
   // itself stays manual/off-platform — FishMB never touches the money).
   await query(`ALTER TABLE fm_tournament_participants ADD COLUMN IF NOT EXISTS paid boolean NOT NULL DEFAULT false`);
@@ -256,6 +260,9 @@ export async function ensureTournamentTables(): Promise<void> {
   // Require the "holding the fish" photo in addition to the bump board photo.
   // Bump board is always required; this controls the second photo.
   await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS require_hold_photo boolean NOT NULL DEFAULT false`);
+  // Scoring options: for 'total' scoring, how many fish count (null = all);
+  // for 'heaviest' scoring, entries carry weight_lbs.
+  await query(`ALTER TABLE fm_tournaments ADD COLUMN IF NOT EXISTS scoring_count int`);
   // Location privacy: when true, exact catch GPS is hidden from other anglers
   // (organizer still sees it for verification); everyone else only sees that
   // the catch was confirmed inside the tournament area.
@@ -762,19 +769,50 @@ export interface LeaderboardRow {
   fish_count: number;
   best_length: number | null;
   total_length: number;
+  best_weight: number | null;
   score: number;
 }
 
-/** Leaderboard from approved entries. Scoring: longest | total | count. */
-export async function getLeaderboard(tournamentId: string, scoring: string): Promise<LeaderboardRow[]> {
+/** Leaderboard from approved entries. Scoring: longest | heaviest | total | count. */
+export async function getLeaderboard(
+  tournamentId: string,
+  scoring: string,
+  scoringCount?: number | null
+): Promise<LeaderboardRow[]> {
   await ensureTournamentTables();
+  // 'total' with a fish limit counts only each angler's N longest fish.
+  if (scoring === "total" && scoringCount && scoringCount > 0) {
+    const rows = await query<LeaderboardRow>(
+      `WITH ranked AS (
+         SELECT e.user_id, e.length_inches,
+                ROW_NUMBER() OVER (PARTITION BY e.user_id ORDER BY e.length_inches DESC NULLS LAST) AS rn
+         FROM fm_tournament_entries e
+         WHERE e.tournament_id = $1 AND e.status = 'approved' AND e.length_inches IS NOT NULL
+       )
+       SELECT r.user_id, u.name AS user_name, u.avatar_url,
+         COUNT(*)::int AS fish_count,
+         MAX(r.length_inches)::float AS best_length,
+         COALESCE(SUM(r.length_inches), 0)::float AS total_length,
+         NULL::float AS best_weight,
+         COALESCE(SUM(r.length_inches), 0)::float AS score
+       FROM ranked r
+       JOIN fm_users u ON u.id = r.user_id
+       WHERE r.rn <= $3
+       GROUP BY r.user_id, u.name, u.avatar_url
+       ORDER BY score DESC, fish_count DESC`,
+      [tournamentId, scoring, scoringCount]
+    );
+    return rows;
+  }
   const rows = await query<LeaderboardRow>(
     `SELECT e.user_id, u.name AS user_name, u.avatar_url,
        COUNT(*)::int AS fish_count,
        MAX(e.length_inches)::float AS best_length,
        COALESCE(SUM(e.length_inches), 0)::float AS total_length,
+       MAX(e.weight_lbs)::float AS best_weight,
        CASE WHEN $2 = 'total' THEN COALESCE(SUM(e.length_inches), 0)::float
             WHEN $2 = 'count' THEN COUNT(*)::float
+            WHEN $2 = 'heaviest' THEN COALESCE(MAX(e.weight_lbs), 0)::float
             ELSE COALESCE(MAX(e.length_inches), 0)::float END AS score
      FROM fm_tournament_entries e
      JOIN fm_users u ON u.id = e.user_id

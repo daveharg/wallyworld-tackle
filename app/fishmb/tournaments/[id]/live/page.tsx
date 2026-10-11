@@ -26,14 +26,14 @@ export default async function LiveTournamentPage({ params }: { params: { id: str
     redirect(`/fishmb/tournaments/${t.id}`);
   }
 
-  const leaderboard = await getLeaderboard(t.id, t.scoring);
+  const leaderboard = await getLeaderboard(t.id, t.scoring, (t as any).scoring_count ?? null);
 
   // Angler stats from the leaderboard rows.
   const totalFish = leaderboard.reduce((s, r) => s + r.fish_count, 0);
   const totalAnglers = t.participant_count;
 
   const scoreLabel =
-    t.scoring === "total" ? "in" : t.scoring === "count" ? "fish" : "in";
+    t.scoring === "total" ? "in" : t.scoring === "count" ? "fish" : t.scoring === "heaviest" ? "lbs" : "in";
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 md:py-14">

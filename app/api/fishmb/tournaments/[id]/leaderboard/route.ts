@@ -12,7 +12,7 @@ export async function GET(
   if (!t) {
     return NextResponse.json({ error: "Tournament not found." }, { status: 404 });
   }
-  const board = await getLeaderboard(t.id, t.scoring);
+  const board = await getLeaderboard(t.id, t.scoring, (t as any).scoring_count ?? null);
   return NextResponse.json({
     tournament: {
       id: t.id,

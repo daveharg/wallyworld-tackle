@@ -47,6 +47,66 @@ export const RULE_TEMPLATES: RuleTemplate[] = [
 6. REVIEW — The organizer reviews every catch before it counts. The organizer's decision is final.`,
   },
   {
+    id: "heaviest-fish",
+    name: "Heaviest fish",
+    description: "One winner — the heaviest fish on the scale wins.",
+    rules: `1. ELIGIBILITY — Valid Manitoba angling licence (or exemption) required; all provincial angling and boating regulations apply.
+
+2. FORMAT — One winner: the single heaviest fish logged during the tournament window wins. Ties are broken by the earliest catch time.
+
+3. CATCH PHOTO — Entries are logged through FishMB with a photo taken in the app at the moment of capture — no camera-roll uploads. Photos are time, date and GPS stamped.
+
+4. WEIGHING — Photograph the fish on a scale with the weight clearly visible, plus a photo holding the fish. Enter the weight when you log the catch. The organizer may ask for a re-weigh photo.
+
+5. CATCH & RELEASE — Release every fish alive after the photo. Keeping an entered fish means disqualification.
+
+6. REVIEW — The organizer reviews every catch before it counts. The organizer's decision is final.`,
+  },
+  {
+    id: "total-length",
+    name: "Total length slam",
+    description: "Your longest fish add up — top 5 (or all) count.",
+    rules: `1. ELIGIBILITY — Valid Manitoba angling licence (or exemption) required; all provincial angling and boating regulations apply.
+
+2. FORMAT — Each angler's longest fish add up. Only your top 5 longest fish count toward your total (organizer sets the number). The highest total wins. Ties broken by single longest fish, then earliest catch time.
+
+3. CATCH PHOTO — Entries are logged through FishMB with a photo taken in the app at the moment of capture — no camera-roll uploads. Photos are time, date and GPS stamped.
+
+4. MEASURING — Fish photographed flat on a bump board or tape, nose at zero, tail pinched. Organizer's reading is final. Upgrade your total all tournament long — a bigger fish bumps a smaller one out.
+
+5. CATCH & RELEASE — Release every fish alive after the photo. Keeping an entered fish means disqualification.
+
+6. REVIEW — The organizer reviews every catch before it counts. The organizer's decision is final.`,
+  },
+  {
+    id: "most-fish",
+    name: "Most fish frenzy",
+    description: "Numbers game — most fish logged wins. No measuring needed.",
+    rules: `1. ELIGIBILITY — Valid Manitoba angling licence (or exemption) required; all provincial angling and boating regulations apply.
+
+2. FORMAT — Most fish logged during the tournament window wins. Every fish counts the same — no measuring needed, just a clear photo of each fish. Ties broken by earliest final catch time.
+
+3. CATCH PHOTO — Entries are logged through FishMB with a photo taken in the app at the moment of capture — no camera-roll uploads. Photos are time, date and GPS stamped. One photo per fish.
+
+4. CATCH & RELEASE — Release every fish alive after the photo. Keeping an entered fish means disqualification.
+
+5. REVIEW — The organizer reviews every catch before it counts. Duplicate photos of the same fish will be rejected. The organizer's decision is final.`,
+  },
+  {
+    id: "friendly",
+    name: "Friendly catch & brag",
+    description: "Just for fun — no money, no pressure, honour system.",
+    rules: `1. THE VIBE — This is a friendly tournament. No entry fee, no money, just bragging rights. Keep it fun and honest.
+
+2. FORMAT — As set by the organizer (biggest fish, total length, or most fish — see tournament details).
+
+3. CATCH PHOTO — Log catches through FishMB with a photo. Be honest: one photo per fish, no reusing old photos.
+
+4. CATCH & RELEASE — Please release fish quickly and handle them with care.
+
+5. DISPUTES — The organizer's call is final. Remember: it's just for fun.`,
+  },
+  {
     id: "team",
     name: "Team tournament",
     description: "Fish as a team — best combined result wins.",

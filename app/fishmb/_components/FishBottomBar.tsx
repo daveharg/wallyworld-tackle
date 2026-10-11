@@ -163,6 +163,10 @@ function Bar() {
   const [postGateOpen, setPostGateOpen] = useState(false);
   // Which tab was just tapped — highlights instantly while the page loads.
   const [pendingHref, setPendingHref] = useState<string | null>(null);
+  // Hide the bar while the iOS/Android keyboard is open: with
+  // interactive-widget=resizes-content the fixed bar would otherwise ride
+  // up above the keyboard and look broken. Native apps hide the tab bar.
+  const [kbOpen, setKbOpen] = useState(false);
 
   // Once navigation lands, the pathname drives the highlight again.
   useEffect(() => {
@@ -198,6 +202,33 @@ function Bar() {
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname, searchParams]);
+
+  // Track the software keyboard: hide the bar while typing.
+  useEffect(() => {
+    const vv = window.visualViewport;
+    let baseH = vv?.height ?? window.innerHeight;
+    const check = () => {
+      const el = document.activeElement as HTMLElement | null;
+      const typing =
+        !!el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable);
+      const h = window.visualViewport?.height ?? window.innerHeight;
+      if (!typing) {
+        // Re-baseline when not typing (rotation, toolbar show/hide).
+        baseH = h;
+        setKbOpen(false);
+        return;
+      }
+      setKbOpen(h < baseH - 120);
+    };
+    vv?.addEventListener("resize", check);
+    document.addEventListener("focusin", check);
+    document.addEventListener("focusout", check);
+    return () => {
+      vv?.removeEventListener("resize", check);
+      document.removeEventListener("focusin", check);
+      document.removeEventListener("focusout", check);
+    };
+  }, []);
 
   // Tournament full-screen leaderboard stays bare.
   if (pathname.startsWith("/fishmb/tournaments/") && pathname.endsWith("/leaderboard")) return null;
@@ -239,9 +270,9 @@ function Bar() {
   return (
     <nav
       aria-label="FishMB sections"
-      className={`fixed bottom-0 inset-x-0 flex justify-center pointer-events-none ${
-        menuOpen ? "z-[1100]" : "z-40"
-      }`}
+      className={`fixed bottom-0 inset-x-0 flex justify-center pointer-events-none transition-transform duration-300 ${
+        kbOpen ? "translate-y-[150%]" : ""
+      } ${menuOpen ? "z-[1100]" : "z-40"}`}
     >
       <style>{`@keyframes fmb-rise { from { opacity: 0; transform: translateY(14px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }`}</style>
       {/* + menu: shade out the background, circular action buttons stacked

@@ -14,11 +14,13 @@ export function SubmitEntry({
   tournamentId,
   species,
   photoMode,
+  scoring,
   requireHoldPhoto = false,
 }: {
   tournamentId: string;
   species: string[];
   photoMode?: string | null;
+  scoring?: string | null;
   requireHoldPhoto?: boolean;
 }) {
   const [bumpFile, setBumpFile] = useState<File | null>(null);
@@ -27,6 +29,7 @@ export function SubmitEntry({
   const [holdPreview, setHoldPreview] = useState<string | null>(null);
   const [fishSpecies, setFishSpecies] = useState(species[0] || "");
   const [length, setLength] = useState("");
+  const [weight, setWeight] = useState("");
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -130,6 +133,7 @@ export function SubmitEntry({
           captured_at: capturedAt,
           species: fishSpecies.trim(),
           length_inches: length ? parseFloat(length) : null,
+          weight_lbs: weight ? parseFloat(weight) : null,
           latitude: lat,
           longitude: lng,
           gps_accuracy: acc,
@@ -232,9 +236,15 @@ export function SubmitEntry({
         </datalist>
       </div>
       <div>
-        <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/60 mb-1.5">Length (inches)</label>
+        <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/60 mb-1.5">Length (inches){photoMode === "no_measure" ? " — optional" : ""}</label>
         <input value={length} onChange={(e) => setLength(e.target.value)} type="number" step="0.5" min="0" placeholder="e.g. 24.5" className={inputCls} />
       </div>
+      {scoring === "heaviest" && (
+        <div>
+          <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/60 mb-1.5">Weight (lbs) *</label>
+          <input value={weight} onChange={(e) => setWeight(e.target.value)} type="number" step="0.1" min="0" placeholder="e.g. 8.5" className={inputCls} />
+        </div>
+      )}
       <div>
         <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/60 mb-1.5">Notes</label>
         <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Anything the organizer should know" className={inputCls} />

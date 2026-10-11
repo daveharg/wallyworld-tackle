@@ -181,7 +181,7 @@ export async function getUserStats(
     [userId]
   );
   for (const t of ended) {
-    const board = await getLeaderboard(t.id, t.scoring);
+    const board = await getLeaderboard(t.id, t.scoring, (t as any).scoring_count ?? null);
     if (board.length > 0 && board[0].user_id === userId) wins++;
   }
 
@@ -315,7 +315,7 @@ export async function getAllUserStats(limit = 500): Promise<AdminUserStats[]> {
        AND EXISTS (SELECT 1 FROM fm_tournament_participants p WHERE p.tournament_id = t.id)`
   );
   for (const t of ended) {
-    const board = await getLeaderboard(t.id, t.scoring);
+    const board = await getLeaderboard(t.id, t.scoring, (t as any).scoring_count ?? null);
     if (board.length > 0) {
       const w = byId.get(board[0].user_id);
       if (w) w.tournament_wins++;

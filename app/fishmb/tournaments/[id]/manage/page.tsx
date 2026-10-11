@@ -297,6 +297,7 @@ function EditTournament({ tournament, onSaved }: { tournament: Detail["tournamen
           <label className={labelCls}>Scoring</label>
           <select value={scoring} onChange={(e) => setScoring(e.target.value)} className={inputCls}>
             <option value="longest">Longest fish</option>
+            <option value="heaviest">Heaviest fish</option>
             <option value="total">Total length</option>
             <option value="count">Most fish</option>
           </select>

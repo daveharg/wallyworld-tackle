@@ -9,7 +9,7 @@ import { SubmitEntry } from "./SubmitEntry";
 interface Detail {
   joined: boolean;
   is_organizer: boolean;
-  tournament: { status: string; species: string[]; photo_mode?: string | null; require_hold_photo?: boolean };
+  tournament: { status: string; species: string[]; photo_mode?: string | null; scoring?: string | null; require_hold_photo?: boolean };
 }
 
 /** Join / submit-catch / manage buttons on the tournament detail page. */
@@ -108,6 +108,7 @@ export function TournamentActions({ tournamentId }: { tournamentId: string }) {
             tournamentId={tournamentId}
             species={detail.tournament.species}
             photoMode={detail.tournament.photo_mode}
+            scoring={detail.tournament.scoring}
             requireHoldPhoto={detail.tournament.require_hold_photo ?? false}
           />
         </div>

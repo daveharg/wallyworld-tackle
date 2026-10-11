@@ -24,7 +24,7 @@ export async function GET(
   const t = await getTournament(params.id);
   if (!t) return notFound("Tournament not found.");
   const me = await fishUserFromRequest(req);
-  const leaderboard = await getLeaderboard(t.id, t.scoring);
+  const leaderboard = await getLeaderboard(t.id, t.scoring, (t as any).scoring_count ?? null);
   const entries = await getEntries(t.id, ["approved"]);
   const mine = me ? await isParticipant(t.id, me.id) : false;
   const participantCount = t.participant_count;
@@ -79,7 +79,7 @@ export async function PATCH(
     );
   if (typeof body.rules === "string") set("rules", body.rules.trim().slice(0, 5000));
   if (typeof body.scoring === "string" && SCORING.includes(body.scoring)) set("scoring", body.scoring);
-  if (typeof body.photo_mode === "string" && ["standard", "measure_only", "strict"].includes(body.photo_mode))
+  if (typeof body.photo_mode === "string" && ["standard", "measure_only", "strict", "no_measure"].includes(body.photo_mode))
     set("photo_mode", body.photo_mode);
   if (typeof body.require_hold_photo === "boolean") set("require_hold_photo", body.require_hold_photo);
   if (typeof body.hide_locations === "boolean") set("hide_locations", body.hide_locations);
