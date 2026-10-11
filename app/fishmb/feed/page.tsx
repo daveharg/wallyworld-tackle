@@ -13,6 +13,7 @@ import YouTubeEmbed, { extractYouTubeId } from "../_components/YouTubeEmbed";
 import { TournamentBuilder } from "../tournaments/_components/TournamentBuilder";
 import { JoinByCode } from "../tournaments/_components/JoinByCode";
 import StoriesRow from "./_components/StoriesRow";
+import SettingsModal from "../_components/SettingsModal";
 import dynamic from "next/dynamic";
 const CatchMapPicker = dynamic(() => import("./_components/CatchMapPicker"), { ssr: false });
 
@@ -1132,6 +1133,7 @@ function FeedPageInner() {
   const [composerOpen, setComposerOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [friendRequestCount, setFriendRequestCount] = useState(0);
   const [q, setQ] = useState("");
@@ -1964,7 +1966,7 @@ function FeedPageInner() {
             <nav className="flex flex-col gap-1">
               {[
                 ["/fishmb", "Home"],
-                ["/fishmb/dashboard", "Angler HQ"],
+                ["__settings__", "Settings"],
                 ["/fishmb/dashboard?tab=stats", "My Stats"],
                 ["/fishmb/dashboard?tab=tournaments", "Tournaments"],
                 ["/fishmb/dashboard?tab=licence", "Licence"],
@@ -1976,16 +1978,30 @@ function FeedPageInner() {
                 ["/fishmb/feed", "The Feed"],
                 ["/fishmb/classifieds", "Classifieds"],
                 ["/fishmb/dashboard?tab=profile", "View profile"],
-              ].map(([href, label]) => (
-                <Link
-                  key={href}
-                  href={href}
-                  onClick={() => setMenuOpen(false)}
-                  className="py-3 px-2 text-pine font-bold border-b border-pine/10"
-                >
-                  {label}
-                </Link>
-              ))}
+              ].map(([href, label]) =>
+                href === "__settings__" ? (
+                  <button
+                    key="settings"
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setSettingsOpen(true);
+                    }}
+                    className="py-3 px-2 text-left text-pine font-bold border-b border-pine/10"
+                  >
+                    Settings
+                  </button>
+                ) : (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={() => setMenuOpen(false)}
+                    className="py-3 px-2 text-pine font-bold border-b border-pine/10"
+                  >
+                    {label}
+                  </Link>
+                )
+              )}
               <button
                 type="button"
                 onClick={() => {
@@ -2004,6 +2020,8 @@ function FeedPageInner() {
           </div>
         </div>
       )}
+      {/* Settings popup */}
+      {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
       {/* Desktop feed section header — tap the title to switch sections */}
       <div className="hidden md:flex items-center justify-between mb-4">        <div className="relative">
           <button

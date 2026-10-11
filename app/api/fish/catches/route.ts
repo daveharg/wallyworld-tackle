@@ -247,5 +247,21 @@ export async function POST(req: NextRequest) {
       // Spot creation is best-effort — the catch itself is already saved.
     }
   }
+  // Alert friends about the new catch (fire-and-forget) — each friend's own
+  // "friend caught a fish" setting decides. Private catches stay private.
+  if (visibility !== "private") {
+    try {
+      const { notifyFriends } = await import("@/lib/fish/push");
+      const len = `${lengthIn}″`;
+      notifyFriends(me.id, "friend_catch", (authorName) => ({
+        title: authorName,
+        body: `Caught a ${len} ${species}!`,
+        url: "/fishmb/feed?kind=catch",
+        tag: `fishmb-catch-${newCatch.id}`,
+      }));
+    } catch {
+      // Best-effort.
+    }
+  }
   return NextResponse.json({ catch: toItem(newCatch) }, { status: 201 });
 }

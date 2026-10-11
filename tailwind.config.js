@@ -7,21 +7,24 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Exact tokens from the original Stillwater Tackle Co. theme.css
+        // Themeable tokens — resolved through CSS variables so the user can
+        // switch color themes at runtime (see globals.css [data-theme]).
+        // Defined as RGB triplets so Tailwind opacity modifiers (bg-pine/10)
+        // keep working.
         paper: {
-          DEFAULT: "#fdfdfb",
-          deep: "#f2efe7",
+          DEFAULT: "rgb(var(--fish-paper) / <alpha-value>)",
+          deep: "rgb(var(--fish-paper-deep) / <alpha-value>)",
         },
         pine: {
-          DEFAULT: "#12322b",
-          deep: "#0b231f",
+          DEFAULT: "rgb(var(--fish-pine) / <alpha-value>)",
+          deep: "rgb(var(--fish-pine-deep) / <alpha-value>)",
         },
         signal: {
-          DEFAULT: "#e4572e",
-          dark: "#c94826",
+          DEFAULT: "rgb(var(--fish-signal) / <alpha-value>)",
+          dark: "rgb(var(--fish-signal-dark) / <alpha-value>)",
         },
         gold: {
-          DEFAULT: "#b97e14",
+          DEFAULT: "rgb(var(--fish-gold) / <alpha-value>)",
         },
       },
       fontFamily: {

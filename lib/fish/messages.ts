@@ -441,8 +441,9 @@ export async function storeMessage(
     [conversationId, senderId]
   );
   // Push-notify recipients (not the sender). Best-effort, never throws.
+  // Respects each recipient's "new message" alert setting.
   try {
-    const { sendPushToUser } = await import("./push");
+    const { sendPushToUser, wantsAlert } = await import("./push");
     const senderName = memberNames.get(senderId) ?? "Someone";
     const recipientSet = new Set<string>();
     parts.forEach((p) => {
@@ -451,6 +452,7 @@ export async function storeMessage(
     const recipients = Array.from(recipientSet);
     await Promise.allSettled(
       recipients.map(async (rid) => {
+        if (!(await wantsAlert(rid, "new_message"))) return;
         // Count total unread for the app icon badge.
         let unread = 0;
         try {

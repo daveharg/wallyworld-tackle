@@ -12,6 +12,39 @@
   --gold: #b97e14;
 }
 
+/* FishMB color themes — RGB triplets consumed by tailwind.config.js so the
+ * user can switch themes at runtime. `forest` is the default (no data-theme). */
+:root,
+[data-theme="forest"] {
+  --fish-paper: 253 253 251;
+  --fish-paper-deep: 242 239 231;
+  --fish-pine: 18 50 43;
+  --fish-pine-deep: 11 35 31;
+  --fish-signal: 228 87 46;
+  --fish-signal-dark: 201 72 38;
+  --fish-gold: 185 126 20;
+}
+
+[data-theme="ocean"] {
+  --fish-paper: 247 250 252;
+  --fish-paper-deep: 224 233 240;
+  --fish-pine: 11 59 82;
+  --fish-pine-deep: 7 40 56;
+  --fish-signal: 8 145 178;
+  --fish-signal-dark: 6 117 144;
+  --fish-gold: 202 138 4;
+}
+
+[data-theme="sunset"] {
+  --fish-paper: 255 251 244;
+  --fish-paper-deep: 244 232 214;
+  --fish-pine: 74 36 22;
+  --fish-pine-deep: 50 24 15;
+  --fish-signal: 217 72 31;
+  --fish-signal-dark: 181 58 24;
+  --fish-gold: 196 125 20;
+}
+
 /* Always light theme — no dark mode override. */
 
 html {

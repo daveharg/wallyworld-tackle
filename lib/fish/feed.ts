@@ -257,7 +257,20 @@ export async function createPost(
        created_at`,
     [userId, body, finalPhotoUrl, JSON.stringify(finalPhotos), video ? JSON.stringify(video) : null, visibility, speciesTag]
   );
-  return normalizeFeedItem(rows[0]);
+  const post = normalizeFeedItem(rows[0]);
+  // Alert friends (fire-and-forget) — each friend's own "friend made a post" setting decides.
+  try {
+    const { notifyFriends } = await import("./push");
+    notifyFriends(userId, "friend_post", (authorName) => ({
+      title: authorName,
+      body: "Made a new post on FishMB.",
+      url: "/fishmb/feed",
+      tag: `fishmb-post-${post.id}`,
+    }));
+  } catch {
+    // Best-effort.
+  }
+  return post;
 }
 
 /** Toggle the viewer's reaction: 1 = like, -1 = dislike, null = remove. */

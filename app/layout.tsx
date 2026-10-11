@@ -79,6 +79,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const isFishMb = h.get("x-fishmb-site") === "1";
   return (
     <html lang="en">
+      <head>
+        {/* Apply the saved FishMB color theme before first paint (no flash). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("fishmb-theme");if(t==="ocean"||t==="sunset"||t==="forest"){document.documentElement.setAttribute("data-theme",t);}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className={`${display.variable} ${body.variable}`}>
         <AuthProviders>
           <CartProvider>
