@@ -555,14 +555,24 @@ export default function ThreadView({
         </button>
         <div className="flex-1 min-w-0 flex flex-col items-center">
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => peer.is_group ? openGroupEditor() : undefined}
-              className="flex flex-col items-center gap-1 min-w-0"
-              aria-label={peer.is_group ? "Edit group" : title}
-            >
-              {peerAvatar("w-11 h-11", "text-lg")}
-            </button>
+            {!peer.is_group && peer.members.length > 0 ? (
+              <Link
+                href={`/fishmb/anglers/${peer.members.find((m) => m.user_id !== myId)?.user_id ?? peer.members[0].user_id}`}
+                className="flex flex-col items-center gap-1 min-w-0"
+                aria-label={`View ${title}'s profile`}
+              >
+                {peerAvatar("w-11 h-11", "text-lg")}
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => peer.is_group ? openGroupEditor() : undefined}
+                className="flex flex-col items-center gap-1 min-w-0"
+                aria-label={peer.is_group ? "Edit group" : title}
+              >
+                {peerAvatar("w-11 h-11", "text-lg")}
+              </button>
+            )}
             {!peer.is_group && (
               <button
                 type="button"
@@ -574,17 +584,29 @@ export default function ThreadView({
               </button>
             )}
           </div>
-          <button
-            type="button"
-            onClick={() => peer.is_group ? openGroupEditor() : undefined}
-            className="flex flex-col items-center gap-1 min-w-0 mt-1"
-            aria-label={peer.is_group ? "Edit group" : title}
-          >
-            <span className="font-bold text-pine text-[17px] leading-tight truncate max-w-full">
-              {title}
-              {peer.is_group && <span className="text-pine/30 text-sm"> ›</span>}
-            </span>
-          </button>
+          {!peer.is_group && peer.members.length > 0 ? (
+            <Link
+              href={`/fishmb/anglers/${peer.members.find((m) => m.user_id !== myId)?.user_id ?? peer.members[0].user_id}`}
+              className="flex flex-col items-center gap-1 min-w-0 mt-1"
+              aria-label={`View ${title}'s profile`}
+            >
+              <span className="font-bold text-pine text-[17px] leading-tight truncate max-w-full">
+                {title}
+              </span>
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={() => peer.is_group ? openGroupEditor() : undefined}
+              className="flex flex-col items-center gap-1 min-w-0 mt-1"
+              aria-label={peer.is_group ? "Edit group" : title}
+            >
+              <span className="font-bold text-pine text-[17px] leading-tight truncate max-w-full">
+                {title}
+                {peer.is_group && <span className="text-pine/30 text-sm"> ›</span>}
+              </span>
+            </button>
+          )}
           <p className="text-[11px] text-pine/45 mt-0.5">
             {peer.is_group ? `${peer.members.length} members` : "Direct message"}
           </p>

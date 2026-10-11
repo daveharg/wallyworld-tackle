@@ -137,6 +137,26 @@ export default function ProfileView({
     }
   };
 
+  const respondRequest = async (accept: boolean) => {
+    setActing(true);
+    setNote(null);
+    try {
+      const d = await fishFetch("/api/fish/friends/respond", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requester_id: userId, accept }),
+      });
+      if ((d as { error?: string }).error) throw new Error((d as { error: string }).error);
+      setNote(accept ? "You're friends now! " : "Request declined.");
+      const refreshed = await fishFetch(`/api/fishmb/users/${userId}`);
+      setData(refreshed);
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Could not respond.");
+    } finally {
+      setActing(false);
+    }
+  };
+
   const toggleFollow = async () => {
     setActing(true);
     setNote(null);
@@ -218,9 +238,28 @@ export default function ProfileView({
  Friends 
                   </span>
                 ) : data.friendship_status === "pending" ? (
-                  <span className="text-xs font-bold uppercase tracking-wider text-pine/50 bg-pine/10 rounded-full px-4 py-2">
-                    {data.friendship_incoming ? "Request pending — check your friends page" : "Request sent"}
-                  </span>
+                  data.friendship_incoming ? (
+                    <>
+                      <button
+                        onClick={() => respondRequest(true)}
+                        disabled={acting}
+                        className="bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-xs px-5 py-2.5 rounded-full disabled:opacity-50 transition-colors"
+                      >
+                        {acting ? "…" : "Accept"}
+                      </button>
+                      <button
+                        onClick={() => respondRequest(false)}
+                        disabled={acting}
+                        className="border border-pine/20 text-pine/60 font-bold uppercase tracking-wider text-xs px-5 py-2.5 rounded-full disabled:opacity-50 transition-colors"
+                      >
+                        Decline
+                      </button>
+                    </>
+                  ) : (
+                    <span className="text-xs font-bold uppercase tracking-wider text-pine/50 bg-pine/10 rounded-full px-4 py-2">
+                      Request sent
+                    </span>
+                  )
                 ) : (
                   <button
                     onClick={sendRequest}
