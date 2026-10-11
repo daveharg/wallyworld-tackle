@@ -152,8 +152,8 @@ export function getStockingHistory(lakeId: string): StockingEvent[] {
 
 export interface TrophyCatch {
   species: string;
-  inch: number;
-  cm: number;
+  inch: number | null; // null for pre-1990 records (length listed as n/a)
+  cm: number | null;
   date: string;
   waterbody: string;
   angler: string;

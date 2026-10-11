@@ -301,7 +301,7 @@ export default function LakeSheetDetail({ lake, spots, onBack, onSelectSpot }: P
             {sortedTrophies.map((t, i) => (
               <div key={i} className="px-4 py-3">
                 <p className="text-sm font-bold text-pine">
-                  {t.species} · {t.inch}&Prime; ({t.cm} cm)
+                  {t.species}{t.inch !== null ? ` · ${t.inch}″ (${t.cm} cm)` : ""}
                 </p>
                 <p className="text-xs text-pine/60 mt-0.5">
                   {t.angler}

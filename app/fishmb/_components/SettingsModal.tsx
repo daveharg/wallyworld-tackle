@@ -38,6 +38,15 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
   const [pushState, setPushState] = useState<PushState>("checking");
   const [enabling, setEnabling] = useState(false);
 
+  // Lock background scroll while the sheet is open.
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
   useEffect(() => {
     setThemeState(getTheme());
     (async () => {

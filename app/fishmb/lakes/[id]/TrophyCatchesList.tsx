@@ -49,7 +49,7 @@ export function TrophyCatchesList({ catches }: { catches: TrophyCatch[] }) {
           <div key={i} className="px-4 py-3 flex items-center justify-between gap-3">
             <div className="min-w-0">
               <p className="text-sm font-bold text-pine">
-                {c.inch.toFixed(2).replace(/\.?0+$/, "")}″ {c.species}
+                {c.inch !== null ? `${c.inch.toFixed(2).replace(/\.?0+$/, "")}″ ` : ""}{c.species}
                 {c.released && <span className="ml-2 text-[10px] font-black uppercase tracking-wider text-green-700 bg-green-700/10 rounded-full px-2 py-0.5">Released</span>}
               </p>
               <p className="text-xs text-pine/60 truncate">
@@ -57,7 +57,7 @@ export function TrophyCatchesList({ catches }: { catches: TrophyCatch[] }) {
               </p>
             </div>
             <p className="text-xs text-pine/40 whitespace-nowrap tabular-nums">
-              {c.cm.toFixed(1)} cm
+              {c.cm !== null ? `${c.cm.toFixed(1)} cm` : ""}
             </p>
           </div>
         ))}
