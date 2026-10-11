@@ -704,8 +704,8 @@ export default function WeatherPage() {
                       {derived.wmo.label} · Feels {Math.round(derived.c.apparent_temperature)}°
                     </p>
                   </div>
-                  <div className="shrink-0 flex items-center justify-center pr-2">
-                    <WeatherIcon code={derived.c.weather_code} size={72} />
+                  <div className="flex-1 flex items-center justify-center">
+                    <WeatherIcon code={derived.c.weather_code} size={128} />
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-2.5 mt-4">
