@@ -76,7 +76,7 @@ function ComposerSheet({
           transform: dragY > 0 ? `translateY(${dragY}px)` : undefined,
           transition: dragging ? "none" : "transform 0.2s ease-out",
         }}
-        className={`relative bg-white w-full rounded-t-3xl sm:rounded-3xl max-h-[92vh] overflow-y-auto overscroll-contain ${
+        className={`relative bg-white w-full rounded-t-3xl sm:rounded-3xl max-h-[92vh] overflow-y-auto overscroll-contain pb-[max(1.5rem,env(safe-area-inset-bottom))] ${
           "sm:max-w-lg"
         }`}
       >
