@@ -23,7 +23,7 @@
             "species": "Lake Trout",
             "limit": "1",
             "size": "None may exceed 65 cm",
-            "season": "Southern Division: closed September 15 to October 31, 2026; open November 1, 2026 to September 14, 2027. New 2026 rule: Area A (eastern Manitoba) — all lake trout over 55 cm must be released. Northwest/North Central: generally open year-round per general limits (check waterbody-specific closures)."
+            "season": "Southern Division: closed September 15 to October 31, 2026; open November 1, 2026 to September 14, 2027. New 2026 rule: Area A (eastern Manitoba) \u2014 all lake trout over 55 cm must be released. Northwest/North Central: generally open year-round per general limits (check waterbody-specific closures)."
           },
           {
             "species": "Channel Catfish",
@@ -78,7 +78,7 @@
             "species": "Lake Trout",
             "limit": "1",
             "size": "None may exceed 65 cm",
-            "season": "Southern Division: closed September 15 to October 31, 2026; open November 1, 2026 to September 14, 2027. New 2026 rule: Area A (eastern Manitoba) — all lake trout over 55 cm must be released. Northwest/North Central: generally open year-round per general limits (check waterbody-specific closures)."
+            "season": "Southern Division: closed September 15 to October 31, 2026; open November 1, 2026 to September 14, 2027. New 2026 rule: Area A (eastern Manitoba) \u2014 all lake trout over 55 cm must be released. Northwest/North Central: generally open year-round per general limits (check waterbody-specific closures)."
           },
           {
             "species": "Channel Catfish",
@@ -133,7 +133,7 @@
             "species": "Lake Trout",
             "limit": "1",
             "size": "None may exceed 65 cm",
-            "season": "Southern Division: closed September 15 to October 31, 2026; open November 1, 2026 to September 14, 2027. New 2026 rule: Area A (eastern Manitoba) — all lake trout over 55 cm must be released. Northwest/North Central: generally open year-round per general limits (check waterbody-specific closures)."
+            "season": "Southern Division: closed September 15 to October 31, 2026; open November 1, 2026 to September 14, 2027. New 2026 rule: Area A (eastern Manitoba) \u2014 all lake trout over 55 cm must be released. Northwest/North Central: generally open year-round per general limits (check waterbody-specific closures)."
           },
           {
             "species": "Channel Catfish",
@@ -188,7 +188,7 @@
             "species": "Lake Trout",
             "limit": "1",
             "size": "None may exceed 65 cm",
-            "season": "Southern Division: closed September 15 to October 31, 2026; open November 1, 2026 to September 14, 2027. New 2026 rule: Area A (eastern Manitoba) — all lake trout over 55 cm must be released. Northwest/North Central: generally open year-round per general limits (check waterbody-specific closures)."
+            "season": "Southern Division: closed September 15 to October 31, 2026; open November 1, 2026 to September 14, 2027. New 2026 rule: Area A (eastern Manitoba) \u2014 all lake trout over 55 cm must be released. Northwest/North Central: generally open year-round per general limits (check waterbody-specific closures)."
           },
           {
             "species": "Channel Catfish",
@@ -268,7 +268,7 @@
         "division": "Northeast Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Northeast Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Northeast Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -304,7 +304,7 @@
       "towns": [
         {
           "name": "Rennie",
-          "description": "Nearest community, on Hwy 44/307 and home to the park district office — the last stop for gas and supplies before the lake.",
+          "description": "Nearest community, on Hwy 44/307 and home to the park district office \u2014 the last stop for gas and supplies before the lake.",
           "distance": "west of the lake on the access route"
         },
         {
@@ -386,7 +386,7 @@
       "towns": [
         {
           "name": "Grand Rapids",
-          "description": "Town at the lake's north end, where Cedar Lake drains into Lake Winnipeg — full services for anglers and boaters.",
+          "description": "Town at the lake's north end, where Cedar Lake drains into Lake Winnipeg \u2014 full services for anglers and boaters.",
           "distance": "at the lake's north end"
         },
         {
@@ -399,7 +399,7 @@
         "division": "North Central Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general North Central Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general North Central Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -428,7 +428,7 @@
       "towns": [
         {
           "name": "Wasagaming",
-          "description": "Park townsite on the lake's shore inside Riding Mountain — marina with boat rentals, bait, launches, restaurants and lodging.",
+          "description": "Park townsite on the lake's shore inside Riding Mountain \u2014 marina with boat rentals, bait, launches, restaurants and lodging.",
           "distance": "on the lake's shore"
         },
         {
@@ -441,7 +441,7 @@
         "division": "Southern Division",
         "division_approximate": false,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -484,7 +484,7 @@
       "towns": [
         {
           "name": "The Pas",
-          "description": "City on the lake's shore — full services, bait, launches, and the provincial park campground close by.",
+          "description": "City on the lake's shore \u2014 full services, bait, launches, and the provincial park campground close by.",
           "distance": "on the lake's shore"
         }
       ],
@@ -580,7 +580,7 @@
       "towns": [
         {
           "name": "Rennie",
-          "description": "Nearest community, on the access route to Big Whiteshell Lake — the last stop for gas and supplies, since Crowduck itself is reached by portage from Big Whiteshell.",
+          "description": "Nearest community, on the access route to Big Whiteshell Lake \u2014 the last stop for gas and supplies, since Crowduck itself is reached by portage from Big Whiteshell.",
           "distance": "west of Big Whiteshell Lake, on the access route"
         },
         {
@@ -627,7 +627,7 @@
       "towns": [
         {
           "name": "Dauphin",
-          "description": "City just west of the lake and the Parkland region's main service centre — groceries, bait, fuel and boat services.",
+          "description": "City just west of the lake and the Parkland region's main service centre \u2014 groceries, bait, fuel and boat services.",
           "distance": "west of the lake"
         }
       ],
@@ -703,7 +703,7 @@
         },
         {
           "name": "West Hawk Lake",
-          "description": "Adjacent resort townsite with restaurants, shops and its own lake — minutes away on the Trans-Canada.",
+          "description": "Adjacent resort townsite with restaurants, shops and its own lake \u2014 minutes away on the Trans-Canada.",
           "distance": "just east of Falcon Lake"
         }
       ],
@@ -711,7 +711,7 @@
         "division": "Southern Division",
         "division_approximate": false,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -761,7 +761,7 @@
         },
         {
           "name": "Thompson",
-          "description": "Nearest full-service city — winter road and scheduled air service to Gods Lake Narrows run from here.",
+          "description": "Nearest full-service city \u2014 winter road and scheduled air service to Gods Lake Narrows run from here.",
           "distance": "about 224 km by air northwest of the lake"
         }
       ],
@@ -808,7 +808,7 @@
         "division": "Northeast Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Northeast Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Northeast Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -848,7 +848,7 @@
       "towns": [
         {
           "name": "Falcon Lake",
-          "description": "Resort townsite at the west end of Falcon Lake — the launch point, since backcountry High Lake is reached by portage from Falcon Lake's east end.",
+          "description": "Resort townsite at the west end of Falcon Lake \u2014 the launch point, since backcountry High Lake is reached by portage from Falcon Lake's east end.",
           "distance": "nearby, at Falcon Lake"
         },
         {
@@ -861,7 +861,7 @@
         "division": "Southern Division",
         "division_approximate": false,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -898,7 +898,7 @@
         },
         {
           "name": "Flin Flon",
-          "description": "Nearest full-service city, about 30 km southwest — the last stop for groceries, fuel and bait.",
+          "description": "Nearest full-service city, about 30 km southwest \u2014 the last stop for groceries, fuel and bait.",
           "distance": "30 km southwest of the lake"
         }
       ],
@@ -952,7 +952,7 @@
       "towns": [
         {
           "name": "Flin Flon",
-          "description": "City right on the lake's northwest shore — full services, bait shops, launches and the region's main supply hub.",
+          "description": "City right on the lake's northwest shore \u2014 full services, bait shops, launches and the region's main supply hub.",
           "distance": "on the lake's northwest shore"
         },
         {
@@ -965,7 +965,7 @@
         "division": "Northwest Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Northwest Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Northwest Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -1015,12 +1015,12 @@
         },
         {
           "name": "St. Laurent",
-          "description": "Métis community on the west shore with public lake access — the main launch point for the west side of the lake.",
+          "description": "M\u00e9tis community on the west shore with public lake access \u2014 the main launch point for the west side of the lake.",
           "distance": "on the west shore"
         },
         {
           "name": "Lundar",
-          "description": "Town south of the lake on Hwy 6 with fuel, groceries and supplies — the last full-service stop for anglers heading up the east side.",
+          "description": "Town south of the lake on Hwy 6 with fuel, groceries and supplies \u2014 the last full-service stop for anglers heading up the east side.",
           "distance": "south of the lake on Hwy 6"
         }
       ],
@@ -1028,7 +1028,7 @@
         "division": "Southern Division",
         "division_approximate": false,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -1077,7 +1077,7 @@
       "towns": [
         {
           "name": "Gypsumville",
-          "description": "Small community of under 300 on the lake's north bank — the closest roadside services to the lake.",
+          "description": "Small community of under 300 on the lake's north bank \u2014 the closest roadside services to the lake.",
           "distance": "on the lake's north bank"
         },
         {
@@ -1090,7 +1090,7 @@
         "division": "Southern Division",
         "division_approximate": false,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -1149,7 +1149,7 @@
         },
         {
           "name": "Pine Falls",
-          "description": "Small community at the mouth of the Winnipeg River, at the lake's east shore — the main launch point for Traverse Bay's late-season walleye run.",
+          "description": "Small community at the mouth of the Winnipeg River, at the lake's east shore \u2014 the main launch point for Traverse Bay's late-season walleye run.",
           "distance": "on the east shore, at Traverse Bay"
         },
         {
@@ -1209,7 +1209,7 @@
       "towns": [
         {
           "name": "Winnipegosis",
-          "description": "Small town right on the lake's southeast shore — the lake's main service stop, with a boat launch, lodging and supplies.",
+          "description": "Small town right on the lake's southeast shore \u2014 the lake's main service stop, with a boat launch, lodging and supplies.",
           "distance": "on the lake's southeast shore"
         },
         {
@@ -1274,7 +1274,7 @@
       "towns": [
         {
           "name": "Roblin",
-          "description": "Town on the lake's north shore with groceries, fuel and lodging — the main base for fishing the lake.",
+          "description": "Town on the lake's north shore with groceries, fuel and lodging \u2014 the main base for fishing the lake.",
           "distance": "on the lake's north shore"
         },
         {
@@ -1317,14 +1317,14 @@
       ],
       "size_text": "~105 km north-south x ~90 km east-west, 14,000+ islands (Ontario's second-largest inland lake)",
       "max_depth_text": "",
-      "description": "One of North America's great multi-species fisheries, Lake of the Woods spans Ontario, Manitoba and Minnesota. The Manitoba share is Buffalo Bay in the lake's southwest corner, in extreme southeast Manitoba on the Canada-U.S. border (about 160 km southeast of Winnipeg) — Hunt Fish Manitoba calls Buffalo Point Resort Manitoba's only access point on the lake, and Buffalo Bay is considered by many the best walleye water on Lake of the Woods. The vast majority of the Canadian side is in Ontario's Kenora District, reached through Kenora, Sioux Narrows and Nestor Falls. Manitoba waters hold walleye, northern pike, yellow perch, sauger, lake sturgeon and burbot; smallmouth and largemouth bass, muskellunge, lake trout, black crappie and lake whitefish are Ontario-side species. No provincial stocking records exist for either portion — the fishery is naturally reproducing.",
+      "description": "One of North America's great multi-species fisheries, Lake of the Woods spans Ontario, Manitoba and Minnesota. The Manitoba share is Buffalo Bay in the lake's southwest corner, in extreme southeast Manitoba on the Canada-U.S. border (about 160 km southeast of Winnipeg) \u2014 Hunt Fish Manitoba calls Buffalo Point Resort Manitoba's only access point on the lake, and Buffalo Bay is considered by many the best walleye water on Lake of the Woods. The vast majority of the Canadian side is in Ontario's Kenora District, reached through Kenora, Sioux Narrows and Nestor Falls. Manitoba waters hold walleye, northern pike, yellow perch, sauger, lake sturgeon and burbot; smallmouth and largemouth bass, muskellunge, lake trout, black crappie and lake whitefish are Ontario-side species. No provincial stocking records exist for either portion \u2014 the fishery is naturally reproducing.",
       "depth_map_url": null,
       "stocked": false,
       "stocked_species": [],
       "towns": [
         {
           "name": "Buffalo Point, MB",
-          "description": "Resort community on the Buffalo Point peninsula in extreme southeast Manitoba — Manitoba's only access point on Lake of the Woods (Buffalo Bay).",
+          "description": "Resort community on the Buffalo Point peninsula in extreme southeast Manitoba \u2014 Manitoba's only access point on Lake of the Woods (Buffalo Bay).",
           "distance": "on the Manitoba portion (Buffalo Bay)"
         },
         {
@@ -1342,7 +1342,7 @@
         "division": "Southern Division",
         "division_approximate": false,
         "special": "",
-        "note": "Manitoba waters (Buffalo Bay): no waterbody-specific rules listed — general Southern Division limits apply: walleye & sauger combined 4/day, none over 55 cm; northern pike 4/day, none over 75 cm. Ontario waters: Fisheries Management Zone 5 with Lake of the Woods exceptions — walleye & sauger combined, 43-70 cm protected slot (residents: sport 4 / conservation 2); northern pike sport 4 / conservation 2, none over 75 cm. An Ontario licence is required the moment you cross into Ontario water — there is no Manitoba/Ontario licence reciprocity on this lake.",
+        "note": "Manitoba waters (Buffalo Bay): no waterbody-specific rules listed \u2014 general Southern Division limits apply: walleye & sauger combined 4/day, none over 55 cm; northern pike 4/day, none over 75 cm. Ontario waters: Fisheries Management Zone 5 with Lake of the Woods exceptions \u2014 walleye & sauger combined, 43-70 cm protected slot (residents: sport 4 / conservation 2); northern pike sport 4 / conservation 2, none over 75 cm. An Ontario licence is required the moment you cross into Ontario water \u2014 there is no Manitoba/Ontario licence reciprocity on this lake.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf); 2026 Ontario Fishing Regulations Summary, FMZ 5 (ontario.ca)"
       },
       "lodging": [
@@ -1581,7 +1581,7 @@
       "towns": [
         {
           "name": "Swan River",
-          "description": "Nearest full-service town, about 96 km away on PR 367 — the gateway and last supply stop for Duck Mountain's trout lakes.",
+          "description": "Nearest full-service town, about 96 km away on PR 367 \u2014 the gateway and last supply stop for Duck Mountain's trout lakes.",
           "distance": "about 96 km from the lake"
         }
       ],
@@ -1704,7 +1704,7 @@
       "towns": [
         {
           "name": "Thompson",
-          "description": "City just north of the lake on Hwy 6 — the closest source of groceries, bait, fuel and lodging.",
+          "description": "City just north of the lake on Hwy 6 \u2014 the closest source of groceries, bait, fuel and lodging.",
           "distance": "north of the lake on Hwy 6"
         }
       ],
@@ -1712,7 +1712,7 @@
         "division": "North Central Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general North Central Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general North Central Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -1748,7 +1748,7 @@
       "towns": [
         {
           "name": "Snow Lake",
-          "description": "Mining town on Hwy 392 about 40 minutes east — the closest place for groceries, fuel, lodging and bait; several lodges along the way serve the lake.",
+          "description": "Mining town on Hwy 392 about 40 minutes east \u2014 the closest place for groceries, fuel, lodging and bait; several lodges along the way serve the lake.",
           "distance": "about 40 min east of the lake"
         }
       ],
@@ -1791,7 +1791,7 @@
       "towns": [
         {
           "name": "Flin Flon",
-          "description": "City right beside the lake — full services, boat launches and bait within minutes of the water.",
+          "description": "City right beside the lake \u2014 full services, boat launches and bait within minutes of the water.",
           "distance": "adjacent to the lake"
         }
       ],
@@ -1799,7 +1799,7 @@
         "division": "Northwest Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Northwest Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Northwest Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -1825,7 +1825,7 @@
       "towns": [
         {
           "name": "Thompson",
-          "description": "City just west of the lake on Hwy 6 — full services, and the last stop for fuel and supplies before heading to the lake.",
+          "description": "City just west of the lake on Hwy 6 \u2014 full services, and the last stop for fuel and supplies before heading to the lake.",
           "distance": "west of the lake on Hwy 6"
         }
       ],
@@ -1933,7 +1933,7 @@
         "division": "Southern Division",
         "division_approximate": false,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -1974,7 +1974,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -2109,7 +2109,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -2149,7 +2149,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -2196,7 +2196,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -2308,7 +2308,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -2364,7 +2364,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -2417,7 +2417,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -2466,7 +2466,7 @@
         "division": "North Central Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general North Central Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general North Central Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -2509,7 +2509,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -2564,7 +2564,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -2645,7 +2645,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -2695,7 +2695,7 @@
         "division": "Northwest Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Northwest Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Northwest Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -2724,7 +2724,7 @@
         "division": "North Central Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general North Central Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general North Central Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -2779,7 +2779,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -2830,7 +2830,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -2959,7 +2959,7 @@
         "division": "Northwest Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Northwest Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Northwest Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -3004,7 +3004,7 @@
         "division": "Northwest Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Northwest Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Northwest Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -3049,7 +3049,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -3099,7 +3099,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -3314,7 +3314,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -3344,7 +3344,7 @@
         "division": "Northeast Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Northeast Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Northeast Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -3396,7 +3396,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -3473,7 +3473,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -3513,7 +3513,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -3702,7 +3702,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -3758,7 +3758,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -3816,7 +3816,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -3932,7 +3932,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -4040,7 +4040,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -4188,7 +4188,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -4243,7 +4243,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -4281,7 +4281,7 @@
         "White Sucker",
         "Largemouth Bass"
       ],
-      "size_text": "1.64 km²",
+      "size_text": "1.64 km\u00b2",
       "max_depth_text": "5.5 m",
       "description": "A small, shallow lake right on the edge of the town of Killarney, Killarney Lake is an easy-access family fishery. Provincial depth charts list northern pike, walleye, black bullhead, yellow perch, white sucker and even largemouth bass as common species. It is stocked with walleye fry and fishes well for pike and panfish close to town amenities.",
       "depth_map_url": "https://www.gov.mb.ca/nrnd/fish-wildlife/pubs/lifa/pdf/killarny_map.pdf",
@@ -4303,7 +4303,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -4356,7 +4356,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -4386,7 +4386,7 @@
         "division": "Northeast Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Northeast Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Northeast Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -4430,7 +4430,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -4472,7 +4472,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -4509,7 +4509,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -4548,7 +4548,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -4559,7 +4559,7 @@
       ],
       "restaurants": [
         {
-          "name": "Velvet Antler Café",
+          "name": "Velvet Antler Caf\u00e9",
           "detail": "Turtle Mountain Resort, Lake Metigoshe"
         }
       ],
@@ -4601,7 +4601,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -4641,7 +4641,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -4707,7 +4707,7 @@
         "Rock Bass",
         "Yellow Perch"
       ],
-      "size_text": "6.3 km²",
+      "size_text": "6.3 km\u00b2",
       "max_depth_text": "17.8 m",
       "description": "Also known as the Rivers Reservoir, Lake Wahtopanah is a reservoir on the Little Saskatchewan River just east of Rivers. Provincial surveys list walleye, northern pike, rock bass and perch as the common species, and index netting found walleye the dominant catch. It has produced Master Angler walleye and pike, hosts an annual summer fishing derby, and offers boat launches plus camping at Rivers Provincial Park.",
       "depth_map_url": "https://www.gov.mb.ca/sd/waterstewardship/fisheries/fish_stocking_gMap_MVC_V2/pdf/wahtopanah_final.pdf",
@@ -4737,7 +4737,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -4853,7 +4853,7 @@
         "division": "Northeast Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Northeast Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Northeast Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -4878,7 +4878,7 @@
         "Yellow Perch",
         "Northern Pike"
       ],
-      "size_text": "approx. 40 km² (4,000 ha); 15 km long",
+      "size_text": "approx. 40 km\u00b2 (4,000 ha); 15 km long",
       "max_depth_text": "",
       "description": "Little Limestone Lake is the world's largest marl lake, famous for water that shifts from crystal clear to brilliant turquoise as calcite precipitates in warm weather. Beneath the Caribbean looks is a genuine fishery for walleye, northern pike, perch and lake whitefish, with very little angling pressure thanks to its remote setting off Highway 6. The whole lake sits in a backcountry provincial park, so visits take planning and permission from the Mosakahiken Cree Nation.",
       "depth_map_url": null,
@@ -4895,7 +4895,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -5014,7 +5014,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -5064,7 +5064,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -5146,7 +5146,7 @@
       "towns": [
         {
           "name": "Manitou",
-          "description": "Small town with heritage sites and cafés; the reservoir is a short drive west.",
+          "description": "Small town with heritage sites and caf\u00e9s; the reservoir is a short drive west.",
           "distance": "~10 min west"
         }
       ],
@@ -5209,7 +5209,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -5260,7 +5260,7 @@
         "division": "Northwest Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Northwest Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Northwest Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -5406,7 +5406,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -5451,7 +5451,7 @@
         "division": "Northwest Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Northwest Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Northwest Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -5498,7 +5498,7 @@
         "division": "North Central Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general North Central Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general North Central Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -5533,7 +5533,7 @@
         "division": "Northeast Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Northeast Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Northeast Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -5567,7 +5567,7 @@
         "division": "Northwest Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Northwest Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Northwest Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -5613,7 +5613,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -5700,7 +5700,7 @@
         "division": "Northeast Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Northeast Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Northeast Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -5744,7 +5744,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -5843,7 +5843,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -5894,7 +5894,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -5952,7 +5952,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -6054,7 +6054,7 @@
         "Northern Pike",
         "Yellow Perch"
       ],
-      "size_text": "27.3 km² (2,734 ha); ~22 km long by 2.5 km wide",
+      "size_text": "27.3 km\u00b2 (2,734 ha); ~22 km long by 2.5 km wide",
       "max_depth_text": "",
       "description": "The largest navigable lake in southwestern Manitoba, Pelican Lake is a long, narrow prairie lake known first and foremost for walleye. The province stocks it heavily with walleye fry each year, and index netting shows walleye dominating the catch ahead of yellow perch and northern pike. It fishes well in both open water and winter, and the town of Ninette on the north shore hosts an annual walleye tournament.",
       "depth_map_url": null,
@@ -6083,7 +6083,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -6310,7 +6310,7 @@
         "Northern Pike",
         "Yellow Perch"
       ],
-      "size_text": "657 km²",
+      "size_text": "657 km\u00b2",
       "max_depth_text": "18 m",
       "description": "Playgreen Lake is a large, island-dotted widening of the Nelson River at the top of Lake Winnipeg, on the historic Norway House fur-trade corridor. It supports a commercial fishery run through the Norway House Fishermen's Co-op, with walleye, sauger and lake whitefish under quota. Anglers reach it by boat from Norway House or Grand Rapids and find classic shield-country structure with strong walleye and pike fishing.",
       "depth_map_url": null,
@@ -6334,7 +6334,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -6372,7 +6372,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -6424,7 +6424,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -6470,7 +6470,7 @@
         "division": "Northeast Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Northeast Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Northeast Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -6576,7 +6576,7 @@
         "division": "Northwest Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Northwest Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Northwest Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -6623,7 +6623,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -6689,7 +6689,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -6737,7 +6737,7 @@
         "division": "Northeast Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Northeast Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Northeast Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -6767,7 +6767,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -6814,7 +6814,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -6868,7 +6868,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -6906,7 +6906,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -6954,7 +6954,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -6987,7 +6987,7 @@
         "division": "Northwest Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Northwest Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Northwest Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -7073,7 +7073,7 @@
         "Freshwater Drum",
         "Lake Sturgeon"
       ],
-      "size_text": "454 km²",
+      "size_text": "454 km\u00b2",
       "max_depth_text": "",
       "description": "Sipiwesk Lake is a broad expansion of the upper Nelson River, flooded in 1961 by the Kelsey Generating Station. Experimental gillnet surveys have documented a rich fish community including walleye, northern pike, sauger, lake whitefish, perch, mooneyes and goldeye, and the area is recognized lake sturgeon habitat. It sits north of Cross Lake in remote, boat-access-only country.",
       "depth_map_url": null,
@@ -7090,7 +7090,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -7219,7 +7219,7 @@
         "division": "North Central Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general North Central Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general North Central Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -7249,7 +7249,7 @@
         "division": "North Central Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general North Central Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general North Central Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -7287,7 +7287,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -7318,7 +7318,7 @@
         "Yellow Perch",
         "Black Crappie"
       ],
-      "size_text": "0.63 km²",
+      "size_text": "0.63 km\u00b2",
       "max_depth_text": "9.2 m",
       "description": "A stocked walleye lake beside the community of St. Malo in southeastern Manitoba, just east of PTH 59, provincially stocked with walleye fry. St. Malo Provincial Park on the lake offers campgrounds, new mini cabins and beaches with seasonal food service.",
       "depth_map_url": "https://gov.mb.ca/nrnd/fish-wildlife/pubs/lifa/pdf/stmalo_map.pdf",
@@ -7404,7 +7404,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -7442,7 +7442,7 @@
         "Yellow Perch",
         "Walleye"
       ],
-      "size_text": "1.3 km²",
+      "size_text": "1.3 km\u00b2",
       "max_depth_text": "",
       "description": "A reservoir on the Boyne River inside Stephenfield Provincial Park, Stephenfield Lake is described by the province as a productive fishery with northern pike, perch and some walleye. It has a special walleye size rule (all walleye under 35 cm released). With a big family campground, sandy beach, boat launch and hiking trails, it is more of a camping-first lake where fishing is a strong bonus.",
       "depth_map_url": null,
@@ -7462,7 +7462,7 @@
         },
         {
           "name": "Manitou",
-          "description": "Small town with heritage sites and cafés, closest community to the park's west side.",
+          "description": "Small town with heritage sites and caf\u00e9s, closest community to the park's west side.",
           "distance": "~20 min west"
         }
       ],
@@ -7516,7 +7516,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -7556,7 +7556,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -7587,7 +7587,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -7617,7 +7617,7 @@
         "division": "Northeast Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Northeast Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Northeast Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -7890,7 +7890,7 @@
         "division": "North Central Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general North Central Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general North Central Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -8053,7 +8053,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -8105,7 +8105,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [
@@ -8153,7 +8153,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -8196,7 +8196,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -8455,7 +8455,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -8494,7 +8494,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -8541,7 +8541,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Southern Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Southern Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -8721,7 +8721,7 @@
         "division": "Northwest Division",
         "division_approximate": true,
         "special": "",
-        "note": "No waterbody-specific rules listed — general Northwest Division limits apply.",
+        "note": "No waterbody-specific rules listed \u2014 general Northwest Division limits apply.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca/nrnd/fish-wildlife/pubs/fish_wildlife/fish/angling-guide.pdf), Waterbody Specific Regulations pp. 18-23"
       },
       "lodging": [],
@@ -8759,7 +8759,7 @@
         "division": "Western Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Western Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -8821,7 +8821,7 @@
         "division": "Northern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -8890,7 +8890,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "Trout limit is two.",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -8995,7 +8995,7 @@
       "towns": [
         {
           "name": "Waterhen",
-          "description": "Small community on the Waterhen River; limited services — stock up in Gypsumville or Ste. Rose du Lac.",
+          "description": "Small community on the Waterhen River; limited services \u2014 stock up in Gypsumville or Ste. Rose du Lac.",
           "distance": "nearest community"
         }
       ],
@@ -9003,7 +9003,7 @@
         "division": "Interlake Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -9065,7 +9065,7 @@
         "division": "Western Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Western Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -9144,7 +9144,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -9230,7 +9230,7 @@
         "division": "Northern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -9322,7 +9322,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -9390,7 +9390,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -9454,7 +9454,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "Walleye limit is 2 and all walleye over 45 cm must be released.",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -9534,7 +9534,7 @@
       "towns": [
         {
           "name": "Hecla Village",
-          "description": "Small village on Hecla Island; limited supplies — larger stores are in Gimli or Riverton.",
+          "description": "Small village on Hecla Island; limited supplies \u2014 larger stores are in Gimli or Riverton.",
           "distance": "0.5 km south of the pond"
         }
       ],
@@ -9542,7 +9542,7 @@
         "division": "Interlake Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -9641,7 +9641,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -9658,7 +9658,7 @@
           "detail": "http://www.timberlandinn.ca/"
         },
         {
-          "name": "Duck Mountain Provincial Park – Blue Lakes Campground"
+          "name": "Duck Mountain Provincial Park \u2013 Blue Lakes Campground"
         }
       ],
       "restaurants": [
@@ -9761,7 +9761,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -9870,7 +9870,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -9935,7 +9935,7 @@
         "division": "Interlake Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [],
@@ -9980,7 +9980,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -10099,7 +10099,7 @@
         "division": "Northern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [],
@@ -10136,7 +10136,7 @@
       "towns": [
         {
           "name": "Waterhen",
-          "description": "Small community on the Waterhen River; limited services — stock up in Gypsumville or Ste. Rose du Lac.",
+          "description": "Small community on the Waterhen River; limited services \u2014 stock up in Gypsumville or Ste. Rose du Lac.",
           "distance": "nearest community"
         }
       ],
@@ -10144,7 +10144,7 @@
         "division": "Interlake Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -10205,7 +10205,7 @@
         "division": "Northern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -10267,7 +10267,7 @@
         "division": "Interlake Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [],
@@ -10315,7 +10315,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "Trout limit is one and all trout over 45 cm must be released; artificial lures and flies only.",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -10392,7 +10392,7 @@
       "towns": [
         {
           "name": "Waterhen",
-          "description": "Small community on the Waterhen River; limited services — stock up in Gypsumville or Ste. Rose du Lac.",
+          "description": "Small community on the Waterhen River; limited services \u2014 stock up in Gypsumville or Ste. Rose du Lac.",
           "distance": "nearest community"
         }
       ],
@@ -10400,7 +10400,7 @@
         "division": "Interlake Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -10454,7 +10454,7 @@
         "division": "Northern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [],
@@ -10506,7 +10506,7 @@
         "division": "Western Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Western Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [],
@@ -10557,7 +10557,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -10627,7 +10627,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -10696,7 +10696,7 @@
         "division": "Northern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -10756,7 +10756,7 @@
         "division": "Western Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Western Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -10853,7 +10853,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -10927,7 +10927,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -11002,7 +11002,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -11071,7 +11071,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -11137,7 +11137,7 @@
         "division": "Northern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -11249,7 +11249,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -11316,7 +11316,7 @@
         "division": "Northern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -11387,7 +11387,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -11460,7 +11460,7 @@
         "division": "Western Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Western Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -11541,7 +11541,7 @@
         "division": "Interlake Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -11650,7 +11650,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -11714,7 +11714,7 @@
         "division": "Northern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -11791,7 +11791,7 @@
         "division": "Western Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Western Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -11865,7 +11865,7 @@
         "division": "Western Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Western Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -11949,7 +11949,7 @@
         "division": "Interlake Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [],
@@ -12000,7 +12000,7 @@
         "division": "Western Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Western Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -12087,7 +12087,7 @@
         "division": "Western Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Western Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -12145,7 +12145,7 @@
         "division": "Western Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Western Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -12236,7 +12236,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [],
@@ -12335,7 +12335,7 @@
         "division": "Northern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -12431,7 +12431,7 @@
         "division": "Interlake Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [],
@@ -12475,7 +12475,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -12560,7 +12560,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -12657,7 +12657,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -12707,7 +12707,7 @@
         "division": "Western Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Western Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -12791,7 +12791,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -12867,7 +12867,7 @@
         "division": "Northern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -12939,7 +12939,7 @@
         "division": "Interlake Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -13028,7 +13028,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -13045,7 +13045,7 @@
           "detail": "http://www.timberlandinn.ca/"
         },
         {
-          "name": "Duck Mountain Provincial Park – Blue Lakes Campground"
+          "name": "Duck Mountain Provincial Park \u2013 Blue Lakes Campground"
         }
       ],
       "restaurants": [
@@ -13106,7 +13106,7 @@
         "division": "Western Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Western Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -13191,7 +13191,7 @@
         "division": "Northern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked trout water — open to fishing all year; general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked trout water \u2014 open to fishing all year; general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -13276,7 +13276,7 @@
         "division": "Western Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Western Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -13321,7 +13321,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Southern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Southern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -13390,7 +13390,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "Trout limit is one; artificial lures and flies only; no motors except electric motors.",
-        "note": "Stocked trout water — open to fishing all year; general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked trout water \u2014 open to fishing all year; general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -13500,7 +13500,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked trout water — open to fishing all year; general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked trout water \u2014 open to fishing all year; general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [],
@@ -13552,7 +13552,7 @@
         "division": "Northern Division",
         "division_approximate": true,
         "special": "No motors except electric motors.",
-        "note": "Stocked trout water — open to fishing all year; general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked trout water \u2014 open to fishing all year; general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -13689,7 +13689,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked trout water — open to fishing all year; general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked trout water \u2014 open to fishing all year; general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -13762,7 +13762,7 @@
         "division": "Western Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked trout water — open to fishing all year; general Western Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked trout water \u2014 open to fishing all year; general Western Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -13861,7 +13861,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "All walleye shorter than 35 cm must be released.",
-        "note": "Stocked water — general Southern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Southern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -13934,7 +13934,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -13951,7 +13951,7 @@
           "detail": "http://www.timberlandinn.ca/"
         },
         {
-          "name": "Duck Mountain Provincial Park – Blue Lakes Campground"
+          "name": "Duck Mountain Provincial Park \u2013 Blue Lakes Campground"
         }
       ],
       "restaurants": [
@@ -14011,7 +14011,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked trout water — open to fishing all year; general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked trout water \u2014 open to fishing all year; general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -14101,7 +14101,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -14161,7 +14161,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -14232,7 +14232,7 @@
         "division": "Western Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Western Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -14318,7 +14318,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked trout water — open to fishing all year; general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked trout water \u2014 open to fishing all year; general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -14391,7 +14391,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked trout water — open to fishing all year; general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked trout water \u2014 open to fishing all year; general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -14470,7 +14470,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "No motors may be used.",
-        "note": "Stocked trout water — open to fishing all year; general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked trout water \u2014 open to fishing all year; general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -14568,7 +14568,7 @@
         "division": "Northern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked trout water — open to fishing all year; general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked trout water \u2014 open to fishing all year; general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -14634,7 +14634,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -14707,7 +14707,7 @@
         "division": "Northern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked trout water — open to fishing all year; general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked trout water \u2014 open to fishing all year; general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -14772,7 +14772,7 @@
         "division": "Western Division",
         "division_approximate": true,
         "special": "Trout limit is one; all trout over 45 cm must be released; artificial lures and flies only.",
-        "note": "Stocked trout water — open to fishing all year; general Western Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked trout water \u2014 open to fishing all year; general Western Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -14853,7 +14853,7 @@
         "division": "Interlake Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked trout water — open to fishing all year; general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked trout water \u2014 open to fishing all year; general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -14942,7 +14942,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -14994,7 +14994,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -15056,7 +15056,7 @@
         "division": "Interlake Division",
         "division_approximate": true,
         "special": "All walleye over 45 cm must be released.",
-        "note": "Stocked water — general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -15124,7 +15124,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked trout water — open to fishing all year; general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked trout water \u2014 open to fishing all year; general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -15225,7 +15225,7 @@
         "division": "Northern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked trout water — open to fishing all year; general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked trout water \u2014 open to fishing all year; general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -15337,7 +15337,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -15403,7 +15403,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked trout water — open to fishing all year; general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked trout water \u2014 open to fishing all year; general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [],
@@ -15441,7 +15441,7 @@
       "towns": [
         {
           "name": "Swan River",
-          "description": "The main service town for the Duck Mountain area — groceries, bait and tackle, and lodging for anglers.",
+          "description": "The main service town for the Duck Mountain area \u2014 groceries, bait and tackle, and lodging for anglers.",
           "distance": "~85 km"
         }
       ],
@@ -15449,7 +15449,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -15466,7 +15466,7 @@
           "detail": "http://www.timberlandinn.ca/"
         },
         {
-          "name": "Duck Mountain Provincial Park – Blue Lakes Campground"
+          "name": "Duck Mountain Provincial Park \u2013 Blue Lakes Campground"
         }
       ],
       "restaurants": [
@@ -15533,7 +15533,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -15609,7 +15609,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -15737,7 +15737,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -15808,7 +15808,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "Trout limit is two; artificial lures and flies only.",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -15869,7 +15869,7 @@
       ],
       "size_text": "",
       "max_depth_text": "",
-      "description": "A stocked trout pond in northern Manitoba, provincially stocked with rainbow trout. A remote, lesser-known water — plan ahead before travelling.",
+      "description": "A stocked trout pond in northern Manitoba, provincially stocked with rainbow trout. A remote, lesser-known water \u2014 plan ahead before travelling.",
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
@@ -15881,7 +15881,7 @@
         "division": "Northern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [],
@@ -15919,7 +15919,7 @@
       "towns": [
         {
           "name": "Manigotagan",
-          "description": "Small community on the east shore of Lake Winnipeg; limited services — stock up in a larger centre.",
+          "description": "Small community on the east shore of Lake Winnipeg; limited services \u2014 stock up in a larger centre.",
           "distance": "~25 km (approximate)"
         }
       ],
@@ -15927,7 +15927,7 @@
         "division": "Interlake Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -15983,7 +15983,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -16074,7 +16074,7 @@
         "division": "Western Division",
         "division_approximate": true,
         "special": "Closed to all fishing from November 1 to April 15 (stocked trout stream).",
-        "note": "Stocked water — general Western Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -16168,7 +16168,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -16267,7 +16267,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -16344,7 +16344,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -16427,7 +16427,7 @@
       ],
       "size_text": "",
       "max_depth_text": "",
-      "description": "A small stocked pond in the Steinbach area of southeastern Manitoba, stocked once with walleye. A quiet, lesser-known water — check current stocking before making the trip.",
+      "description": "A small stocked pond in the Steinbach area of southeastern Manitoba, stocked once with walleye. A quiet, lesser-known water \u2014 check current stocking before making the trip.",
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
@@ -16436,7 +16436,7 @@
       "towns": [
         {
           "name": "Steinbach",
-          "description": "Large service centre in southeastern Manitoba — full groceries, tackle, and lodging.",
+          "description": "Large service centre in southeastern Manitoba \u2014 full groceries, tackle, and lodging.",
           "distance": "~30 km (approximate)"
         }
       ],
@@ -16444,7 +16444,7 @@
         "division": "Southern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Southern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Southern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -16511,7 +16511,7 @@
         "division": "Interlake Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Interlake Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -16574,7 +16574,7 @@
       ],
       "size_text": "",
       "max_depth_text": "",
-      "description": "A small stocked walleye pond in the Falcon Lake area of the Whiteshell, stocked in select years. A minor water — confirm access before visiting.",
+      "description": "A small stocked walleye pond in the Falcon Lake area of the Whiteshell, stocked in select years. A minor water \u2014 confirm access before visiting.",
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
@@ -16592,7 +16592,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -16666,7 +16666,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -16735,7 +16735,7 @@
       ],
       "size_text": "",
       "max_depth_text": "",
-      "description": "A stocked tiger trout lake in northern Manitoba, stocked in recent years. Remote and hard to reach — plan logistics carefully.",
+      "description": "A stocked tiger trout lake in northern Manitoba, stocked in recent years. Remote and hard to reach \u2014 plan logistics carefully.",
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
@@ -16747,7 +16747,7 @@
         "division": "Northern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [],
@@ -16794,7 +16794,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -16862,7 +16862,7 @@
       "towns": [
         {
           "name": "Dauphin",
-          "description": "Regional service centre with full amenities for anglers — bait and tackle shops, groceries, restaurants and motels.",
+          "description": "Regional service centre with full amenities for anglers \u2014 bait and tackle shops, groceries, restaurants and motels.",
           "distance": "~4 km"
         }
       ],
@@ -16870,7 +16870,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -16942,7 +16942,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -16987,7 +16987,7 @@
       ],
       "size_text": "",
       "max_depth_text": "",
-      "description": "A stocked walleye lake in the Swan Valley area, surveyed by Swan Valley Sport Fishing Enhancement. Stocking results have been variable — check current reports.",
+      "description": "A stocked walleye lake in the Swan Valley area, surveyed by Swan Valley Sport Fishing Enhancement. Stocking results have been variable \u2014 check current reports.",
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
@@ -16996,7 +16996,7 @@
       "towns": [
         {
           "name": "Swan River",
-          "description": "The main service town for the Swan Valley — groceries, bait and tackle, and lodging for anglers.",
+          "description": "The main service town for the Swan Valley \u2014 groceries, bait and tackle, and lodging for anglers.",
           "distance": "~40 km (approximate)"
         }
       ],
@@ -17004,7 +17004,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -17077,7 +17077,7 @@
         },
         {
           "name": "Brandon",
-          "description": "Manitoba's second city — full services for anglers, including bait, tackle and lodging.",
+          "description": "Manitoba's second city \u2014 full services for anglers, including bait, tackle and lodging.",
           "distance": "~30 km (approximate)"
         }
       ],
@@ -17085,7 +17085,7 @@
         "division": "Western Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Western Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -17180,7 +17180,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -17250,7 +17250,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "All tiger trout must be released.",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -17325,7 +17325,7 @@
         "division": "Northern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Northern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -17383,7 +17383,7 @@
       ],
       "size_text": "",
       "max_depth_text": "",
-      "description": "A Duck Mountain lake on the west edge of the escarpment, chosen for an experimental muskellunge introduction — stocked with muskie in 2017 and 2019.",
+      "description": "A Duck Mountain lake on the west edge of the escarpment, chosen for an experimental muskellunge introduction \u2014 stocked with muskie in 2017 and 2019.",
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
@@ -17392,7 +17392,7 @@
       "towns": [
         {
           "name": "Swan River",
-          "description": "The main service town for the Duck Mountain area — groceries, bait and tackle, and lodging for anglers.",
+          "description": "The main service town for the Duck Mountain area \u2014 groceries, bait and tackle, and lodging for anglers.",
           "distance": "~50 km (approximate)"
         }
       ],
@@ -17400,7 +17400,7 @@
         "division": "Parkland Division",
         "division_approximate": true,
         "special": "Closed to all fishing from November 15 to June 15; artificial lures and flies only, one hook per lure; no natural bait.",
-        "note": "Stocked water — general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Parkland Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -17417,7 +17417,7 @@
           "detail": "http://www.timberlandinn.ca/"
         },
         {
-          "name": "Duck Mountain Provincial Park – Blue Lakes Campground"
+          "name": "Duck Mountain Provincial Park \u2013 Blue Lakes Campground"
         }
       ],
       "restaurants": [
@@ -17456,7 +17456,7 @@
       ],
       "size_text": "",
       "max_depth_text": "",
-      "description": "A stocked brown trout lake in the Brandon area of southwestern Manitoba, provincially stocked with brown trout. A lesser-known water — confirm access and current stocking before visiting.",
+      "description": "A stocked brown trout lake in the Brandon area of southwestern Manitoba, provincially stocked with brown trout. A lesser-known water \u2014 confirm access and current stocking before visiting.",
       "depth_map_url": null,
       "stocked": true,
       "stocked_species": [
@@ -17465,7 +17465,7 @@
       "towns": [
         {
           "name": "Brandon",
-          "description": "Manitoba's second city — full services for anglers, including bait, tackle and lodging.",
+          "description": "Manitoba's second city \u2014 full services for anglers, including bait, tackle and lodging.",
           "distance": "~15 km (approximate)"
         }
       ],
@@ -17473,7 +17473,7 @@
         "division": "Western Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Western Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Western Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -17545,7 +17545,7 @@
         "division": "Eastern Division",
         "division_approximate": true,
         "special": "",
-        "note": "Stocked water — general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
+        "note": "Stocked water \u2014 general Eastern Division limits apply; check the current Manitoba Anglers' Guide.",
         "source": "2026 Manitoba Anglers' Guide (gov.mb.ca)"
       },
       "lodging": [
@@ -17697,15 +17697,15 @@
       "packages": [
         {
           "name": "Main Lodge",
-          "description": "Award-winning 5-star full-service experience; modern two-person suites or luxurious chalets; fully guided; all-inclusive Platinum Plan available; groups of 2–32."
+          "description": "Award-winning 5-star full-service experience; modern two-person suites or luxurious chalets; fully guided; all-inclusive Platinum Plan available; groups of 2\u201332."
         },
         {
           "name": "Great Gray Owl Mini-Lodge",
-          "description": "Secluded mini-lodge 3 miles across the lake from main camp; fully catered, guided and pampered with American Plan or all-inclusive Platinum packages; groups of 6–12."
+          "description": "Secluded mini-lodge 3 miles across the lake from main camp; fully catered, guided and pampered with American Plan or all-inclusive Platinum packages; groups of 6\u201312."
         },
         {
           "name": "Lost Lake Luxury Outpost",
-          "description": "Completely do-it-yourself luxury outpost on a peninsula between Lost Lake and Aikens Lake; groups of 4–8; exclusive use of Lost Lake plus access to Aikens Lake and the Gammon River."
+          "description": "Completely do-it-yourself luxury outpost on a peninsula between Lost Lake and Aikens Lake; groups of 4\u20138; exclusive use of Lost Lake plus access to Aikens Lake and the Gammon River."
         }
       ],
       "rates_note": "",
@@ -17792,7 +17792,7 @@
         "Laurie River system"
       ],
       "ice_fishing": true,
-      "ice_fishing_details": "Yes — winter ice fishing packages at the main lodge on Lake Athapapuskow, plus the Kamuchawie Lake Fly-In Lodge, billed as the world's first remote fly-in ice fishing lodge; all-inclusive hardwater packages include guides, gear, meals and ice transport.",
+      "ice_fishing_details": "Yes \u2014 winter ice fishing packages at the main lodge on Lake Athapapuskow, plus the Kamuchawie Lake Fly-In Lodge, billed as the world's first remote fly-in ice fishing lodge; all-inclusive hardwater packages include guides, gear, meals and ice transport.",
       "established": null,
       "access": "fly-in & drive-in"
     },
@@ -17958,7 +17958,7 @@
         },
         {
           "name": "Outpost Camp Stays",
-          "description": "DIY stays at the outpost camps (Jordan, LeClair, Wolf Wilderness, Chipewyan lakes) — pricing listed on their rates page."
+          "description": "DIY stays at the outpost camps (Jordan, LeClair, Wolf Wilderness, Chipewyan lakes) \u2014 pricing listed on their rates page."
         },
         {
           "name": "Hunting Trips",
@@ -18100,20 +18100,20 @@
           "description": "8 hours of catfishing on the Red River."
         },
         {
-          "name": "Full Day Walleye – Lake Winnipeg (Hecla)",
-          "description": "Full day 8:00am–3:00pm; guide cleans your fish."
+          "name": "Full Day Walleye \u2013 Lake Winnipeg (Hecla)",
+          "description": "Full day 8:00am\u20133:00pm; guide cleans your fish."
         },
         {
-          "name": "Half Day Walleye – Lake Winnipeg (Hecla)",
+          "name": "Half Day Walleye \u2013 Lake Winnipeg (Hecla)",
           "description": "4-hour walleye trip; guide cleans your fish."
         },
         {
-          "name": "Late Fall Walleye – Red River",
+          "name": "Late Fall Walleye \u2013 Red River",
           "description": "October dates; full-day 8 hours or half-day 4 hours."
         },
         {
-          "name": "Full Day Bass – Back Country Lakes",
-          "description": "Smallmouth bass trip; generally a 2-hour drive each way plus 6–7 hours fishing."
+          "name": "Full Day Bass \u2013 Back Country Lakes",
+          "description": "Smallmouth bass trip; generally a 2-hour drive each way plus 6\u20137 hours fishing."
         },
         {
           "name": "Corporate All-Inclusive Lake Winnipeg Ice Fishing",
@@ -18125,21 +18125,21 @@
         },
         {
           "name": "BWC Snobear Adventure",
-          "description": "Fish with mobility and in comfort in the BWC Snobear; 1–3 guests; Dec 27 through March 31."
+          "description": "Fish with mobility and in comfort in the BWC Snobear; 1\u20133 guests; Dec 27 through March 31."
         },
         {
           "name": "Corporate Fishing Trips",
           "description": "Catfishing or walleye for groups of 12 to 40+ guests; lunch and accommodations available on request."
         }
       ],
-      "rates_note": "Catfish trips $450 (3 hr) to $650 (8 hr) per boat (1–4 guests); Lake Winnipeg walleye full day $700 per boat; late-fall Red River walleye $700 full / $550 half day per boat; ice packages from $730 US/day per guide, per blackwatercats.com rates pages, 2026",
+      "rates_note": "Catfish trips $450 (3 hr) to $650 (8 hr) per boat (1\u20134 guests); Lake Winnipeg walleye full day $700 per boat; late-fall Red River walleye $700 full / $550 half day per boat; ice packages from $730 US/day per guide, per blackwatercats.com rates pages, 2026",
       "fishing_waters": [
         "Red River",
         "Winnipeg River",
         "Lake Winnipeg"
       ],
       "ice_fishing": true,
-      "ice_fishing_details": "Offers Lake Winnipeg ice fishing for trophy greenback walleye with multiple guided package options (track truck, mobile wheelhouse combo, Snobear, and corporate all-inclusive trips) through Dec 27 – March 31.",
+      "ice_fishing_details": "Offers Lake Winnipeg ice fishing for trophy greenback walleye with multiple guided package options (track truck, mobile wheelhouse combo, Snobear, and corporate all-inclusive trips) through Dec 27 \u2013 March 31.",
       "established": null,
       "access": null
     },
@@ -18556,7 +18556,7 @@
         "Walleye",
         "Bass"
       ],
-      "description": "CatDaddy Fishing Guide Service is a fully licensed fishing outfitter based in Selkirk, Manitoba, about 20 minutes northeast of Winnipeg. Owner and head guide Paul Munroe specializes in catching world-class trophy channel catfish on the historic Red River and also guides for walleye on Lake Winnipeg and Traverse Bay, and walleye or bass on Lake of the Woods. CatDaddy does not subcontract — every trip is run by its own trained guides, bookings are exclusive to one group, and all tackle, bait, gas, and guiding are included. Their standout feature is a written guarantee: on an 8-hour catfish trip the party will catch at least forty pounds of catfish, or the next 8-hour trip is free.",
+      "description": "CatDaddy Fishing Guide Service is a fully licensed fishing outfitter based in Selkirk, Manitoba, about 20 minutes northeast of Winnipeg. Owner and head guide Paul Munroe specializes in catching world-class trophy channel catfish on the historic Red River and also guides for walleye on Lake Winnipeg and Traverse Bay, and walleye or bass on Lake of the Woods. CatDaddy does not subcontract \u2014 every trip is run by its own trained guides, bookings are exclusive to one group, and all tackle, bait, gas, and guiding are included. Their standout feature is a written guarantee: on an 8-hour catfish trip the party will catch at least forty pounds of catfish, or the next 8-hour trip is free.",
       "website": "https://catdaddy.ca/",
       "phone": "1 (204) 461-4511",
       "email": "info@catdaddy.ca",
@@ -18571,27 +18571,27 @@
       ],
       "packages": [
         {
-          "name": "8 Hour Trip – Catfish (Red River)",
-          "description": "8 hours, 2–3 guests; fourth person add-on available."
+          "name": "8 Hour Trip \u2013 Catfish (Red River)",
+          "description": "8 hours, 2\u20133 guests; fourth person add-on available."
         },
         {
-          "name": "6 Hour Trip – Catfish (Red River)",
-          "description": "6 hours, 2–3 guests; fourth person add-on available."
+          "name": "6 Hour Trip \u2013 Catfish (Red River)",
+          "description": "6 hours, 2\u20133 guests; fourth person add-on available."
         },
         {
-          "name": "4 Hour Trip – Catfish (Red River)",
-          "description": "4 hours, 2–3 guests; fourth person add-on available."
+          "name": "4 Hour Trip \u2013 Catfish (Red River)",
+          "description": "4 hours, 2\u20133 guests; fourth person add-on available."
         },
         {
-          "name": "10 Hour Trip – Walleye or Bass",
-          "description": "10 hours, 2–3 guests."
+          "name": "10 Hour Trip \u2013 Walleye or Bass",
+          "description": "10 hours, 2\u20133 guests."
         },
         {
-          "name": "8 Hour Trip – Walleye (Lake Winnipeg / Traverse Bay)",
-          "description": "8 hours, 2–3 guests."
+          "name": "8 Hour Trip \u2013 Walleye (Lake Winnipeg / Traverse Bay)",
+          "description": "8 hours, 2\u20133 guests."
         },
         {
-          "name": "Walleye or Bass – Lake of the Woods",
+          "name": "Walleye or Bass \u2013 Lake of the Woods",
           "description": "8 hours minimum; contact for pricing."
         },
         {
@@ -18599,7 +18599,7 @@
           "description": "Family and corporate packages available by request; call for details."
         }
       ],
-      "rates_note": "Catfish 4 hr $500 / 6 hr $600 / 8 hr $675 (2–3 guests, +$75 fourth person); walleye Lake Winnipeg 8 hr $700; 10-hr walleye/bass $900 — all CAD, all tackle/bait/gas/guide included, per catdaddy.ca/reservations/rates/, 2026",
+      "rates_note": "Catfish 4 hr $500 / 6 hr $600 / 8 hr $675 (2\u20133 guests, +$75 fourth person); walleye Lake Winnipeg 8 hr $700; 10-hr walleye/bass $900 \u2014 all CAD, all tackle/bait/gas/guide included, per catdaddy.ca/reservations/rates/, 2026",
       "fishing_waters": [
         "Red River",
         "Lake Winnipeg",
@@ -19030,7 +19030,7 @@
         "Walleye",
         "Smallmouth Bass"
       ],
-      "description": "Evergreen Lodge and Resort is an all-season drive-to resort run by Ken and Faye Kobelka, set on a quiet bay on the southwest corner of Clearwater Lake near The Pas – one of the three 'true blue' lakes in the world, with crystal-clear, pollutant-free water and long sand beaches. The resort offers fully equipped housekeeping cabins and a comfortable main lodge, plus a solar-powered fly-in walleye outpost camp on Fly-In Lake, 20 minutes by float plane. Guests fish for master-angler lake trout, northern pike, walleye and smallmouth bass with licensed guides and boat rentals, and the lodge also runs guided black bear and duck hunts in the surrounding wilderness. Winter brings heated ice-hut packages on Clearwater Lake.",
+      "description": "Evergreen Lodge and Resort is an all-season drive-to resort run by Ken and Faye Kobelka, set on a quiet bay on the southwest corner of Clearwater Lake near The Pas \u2013 one of the three 'true blue' lakes in the world, with crystal-clear, pollutant-free water and long sand beaches. The resort offers fully equipped housekeeping cabins and a comfortable main lodge, plus a solar-powered fly-in walleye outpost camp on Fly-In Lake, 20 minutes by float plane. Guests fish for master-angler lake trout, northern pike, walleye and smallmouth bass with licensed guides and boat rentals, and the lodge also runs guided black bear and duck hunts in the surrounding wilderness. Winter brings heated ice-hut packages on Clearwater Lake.",
       "website": "https://evergreenlodgeandresort.com/",
       "phone": "(204) 624-5750",
       "email": "",
@@ -19776,7 +19776,7 @@
         "Lake Trout",
         "Northern Pike"
       ],
-      "description": "Healey's God's Lake Narrows Lodge is a working wilderness outpost at God's Lake Narrows on 65 miles of crystal-clear water known for world-class lake trout — the Manitoba Department of Fisheries certified its all-time record lake trout here in 1998. Guests fish from a fleet of 18-foot Lund boats with 40 HP Yamaha engines, fish locators and live wells, guided by local experts targeting lake trout and northern pike. The lodge leans into homemade hospitality and hearty northern cooking in a serene, off-the-grid setting. It welcomes anglers, hunters and travelers year-round and has hosted visitors like Alex Debogorski of Ice Road Truckers.",
+      "description": "Healey's God's Lake Narrows Lodge is a working wilderness outpost at God's Lake Narrows on 65 miles of crystal-clear water known for world-class lake trout \u2014 the Manitoba Department of Fisheries certified its all-time record lake trout here in 1998. Guests fish from a fleet of 18-foot Lund boats with 40 HP Yamaha engines, fish locators and live wells, guided by local experts targeting lake trout and northern pike. The lodge leans into homemade hospitality and hearty northern cooking in a serene, off-the-grid setting. It welcomes anglers, hunters and travelers year-round and has hosted visitors like Alex Debogorski of Ice Road Truckers.",
       "website": "https://godslake.com",
       "phone": "(204) 335-2405",
       "email": "RedCross32@hotmail.com",
@@ -20238,7 +20238,7 @@
         "Northern Pike",
         "Lake Trout"
       ],
-      "description": "Kississing Lake Lodge is a fly-in fishing destination on Kississing Lake, reached by floatplane from Flin Flon via the lodge's own air service, Wings Over Kississing. The lodge pitches a 5-star experience: a chalet-style main lodge with a 26-foot fireplace, private cabins with down duvets, and what it calls legendary local guides at a ratio of one guide per two anglers. Its waters produce trophy northern pike, walleye and lake trout — the lodge notes a single angler can catch 100 fish a day — and it operates nine additional outpost camps on nearby lakes. In September it runs dedicated Northern Lights packages pairing late-season fishing with aurora viewing.",
+      "description": "Kississing Lake Lodge is a fly-in fishing destination on Kississing Lake, reached by floatplane from Flin Flon via the lodge's own air service, Wings Over Kississing. The lodge pitches a 5-star experience: a chalet-style main lodge with a 26-foot fireplace, private cabins with down duvets, and what it calls legendary local guides at a ratio of one guide per two anglers. Its waters produce trophy northern pike, walleye and lake trout \u2014 the lodge notes a single angler can catch 100 fish a day \u2014 and it operates nine additional outpost camps on nearby lakes. In September it runs dedicated Northern Lights packages pairing late-season fishing with aurora viewing.",
       "website": "http://kississinglodge.com/",
       "phone": "1-800-230-5519",
       "email": "info@kississinglodge.com",
@@ -20257,11 +20257,11 @@
       "packages": [
         {
           "name": "2026 Guided Fishing Packages (Main Lodge)",
-          "description": "4 days/4 nights $4,675 USD or 6 days/6 nights $5,500 USD per person (May 26 – Sept 1); Northern Lights packages 4-day $4,950 / 6-day $5,950 USD per person (Sept 1 – 27). Per their 2026 rates page."
+          "description": "4 days/4 nights $4,675 USD or 6 days/6 nights $5,500 USD per person (May 26 \u2013 Sept 1); Northern Lights packages 4-day $4,950 / 6-day $5,950 USD per person (Sept 1 \u2013 27). Per their 2026 rates page."
         },
         {
           "name": "2026 Outpost Packages (7-Day)",
-          "description": "7-day DIY outpost stays at nine outpost camps; July–September from $1,995 USD (4+ people) to $2,195 USD per person; Hilton outpost $2,500 per person. Per their 2026 outpost rates page."
+          "description": "7-day DIY outpost stays at nine outpost camps; July\u2013September from $1,995 USD (4+ people) to $2,195 USD per person; Hilton outpost $2,500 per person. Per their 2026 outpost rates page."
         }
       ],
       "rates_note": "Published USD rates on kississinglodge.com (2026): 4-day guided main lodge package $4,675/person; 7-day outpost packages from $1,995/person.",
@@ -20455,7 +20455,7 @@
       ],
       "packages": [
         {
-          "name": "American Plan — Laurie River Lodge",
+          "name": "American Plan \u2014 Laurie River Lodge",
           "description": "Full-service main lodge stay at McGavock Lake: six modern lakeside cabins with private bathrooms, all meals, 16 professional guides, daily maid service; 4-, 6- and 8-day trips running May 30 through August 25."
         },
         {
@@ -20658,11 +20658,11 @@
         "Perch",
         "Cisco (Tullibee)"
       ],
-      "description": "Moak Lodge calls itself 'one of Manitoba's best drive-to fisheries for trophy Northern Pike, Burbot and Walleye,' located on Cross Bay of Cedar Lake – just north of the 53rd parallel, 450 km north of Winnipeg and 15 km NNW of the town of Grand Rapids. The lodge offers cabin rentals, tent and RV campsites, rental boats, bait, tackle and ice. Cedar Lake was created in the early 1960s by the Grand Rapids hydro dam on the Saskatchewan River; its flooded forest of sunken timber, drop-offs and mix of gravel, limestone and mud bottoms hold walleye, northern pike, lake whitefish, cisco, perch and burbot, and the lodge sits close to stocked trout water. Winter accommodations stay open for ice fishing season.",
+      "description": "Moak Lodge calls itself 'one of Manitoba's best drive-to fisheries for trophy Northern Pike, Burbot and Walleye,' located on Cross Bay of Cedar Lake \u2013 just north of the 53rd parallel, 450 km north of Winnipeg and 15 km NNW of the town of Grand Rapids. The lodge offers cabin rentals, tent and RV campsites, rental boats, bait, tackle and ice. Cedar Lake was created in the early 1960s by the Grand Rapids hydro dam on the Saskatchewan River; its flooded forest of sunken timber, drop-offs and mix of gravel, limestone and mud bottoms hold walleye, northern pike, lake whitefish, cisco, perch and burbot, and the lodge sits close to stocked trout water. Winter accommodations stay open for ice fishing season.",
       "website": "http://moaklodge.ca/Site/Welcome.html",
       "phone": "1-204-639-2351",
       "email": "moaklodgemb@gmail.com",
-      "address": "53°16.557'N 99°24.224'W, Grand Rapids, MB R0C 1E0",
+      "address": "53\u00b016.557'N 99\u00b024.224'W, Grand Rapids, MB R0C 1E0",
       "amenities": [
         "drive-to access",
         "cabins",
@@ -21166,7 +21166,7 @@
         "Lake Trout",
         "Arctic Grayling"
       ],
-      "description": "Nueltin Fly-In Lodges operates on Nueltin Lake in the sub-Arctic wilderness on the Manitoba/Nunavut border, describing itself as operating exclusively on over 14,000 square miles of wilderness — one of Canada's largest tourism resource allocations. The operation is built around trophy lake trout, northern pike and arctic grayling on what it calls 'Canada's Original Catch and Release Lake' (catch-and-release since 1978), with two lodges, mini-lodges and nine outpost camps, plus day fly-outs to additional sites. Guests fly directly from Winnipeg to a private airstrip on South Nueltin; the lodge also offered guided caribou, moose and black bear hunting. NOTE: nueltin.com currently resolves to a parked placeholder page, so the operation's current status could not be verified — contact details below are from published company materials and may be stale.",
+      "description": "Nueltin Fly-In Lodges operates on Nueltin Lake in the sub-Arctic wilderness on the Manitoba/Nunavut border, describing itself as operating exclusively on over 14,000 square miles of wilderness \u2014 one of Canada's largest tourism resource allocations. The operation is built around trophy lake trout, northern pike and arctic grayling on what it calls 'Canada's Original Catch and Release Lake' (catch-and-release since 1978), with two lodges, mini-lodges and nine outpost camps, plus day fly-outs to additional sites. Guests fly directly from Winnipeg to a private airstrip on South Nueltin; the lodge also offered guided caribou, moose and black bear hunting. NOTE: nueltin.com currently resolves to a parked placeholder page, so the operation's current status could not be verified \u2014 contact details below are from published company materials and may be stale.",
       "website": "http://www.nueltin.com",
       "phone": "800-361-7177",
       "email": "info@nueltin.com",
@@ -22291,7 +22291,7 @@
         "Walleye (fly-in only, by prior arrangement)",
         "Brook Trout (fly-in only, by prior arrangement)"
       ],
-      "description": "Webber's Lodges, established 1967 and operated by Dymond Lake Outfitters Ltd., is a family-run fly-in fishing outfitter on North Knife Lake and Dymond Lake in northern Manitoba. After a ten-year hiatus, the lodge relaunched with renovated accommodations, new boats and motors, and a renewed program — open June and July, fly-in only. The main lodge offers four deluxe rooms with ensuites plus a duplex, a licensed dining room and 5-star meals, with boats, motors, gas, guides and fish processing included. It markets catch-and-release fly-in fishing for trophy northern pike, lake trout, whitefish and arctic grayling, with North Knife Lake fished by only 48 guests per year.",
+      "description": "Webber's Lodges, established 1967 and operated by Dymond Lake Outfitters Ltd., is a family-run fly-in fishing outfitter on North Knife Lake and Dymond Lake in northern Manitoba. After a ten-year hiatus, the lodge relaunched with renovated accommodations, new boats and motors, and a renewed program \u2014 open June and July, fly-in only. The main lodge offers four deluxe rooms with ensuites plus a duplex, a licensed dining room and 5-star meals, with boats, motors, gas, guides and fish processing included. It markets catch-and-release fly-in fishing for trophy northern pike, lake trout, whitefish and arctic grayling, with North Knife Lake fished by only 48 guests per year.",
       "website": "https://webberslodges.com",
       "phone": "1-888-932-2377",
       "email": "info@webberslodges.com",
@@ -22592,7 +22592,7 @@
         "Lake Sturgeon",
         "Burbot"
       ],
-      "description": "Year-round resort on Buffalo Bay — Manitoba's only access point on Lake of the Woods, on the Buffalo Point peninsula in extreme southeast Manitoba (developed by Buffalo Point First Nation). Cabins, RV campground, 320-slip marina, guided fishing, ice fishing and restaurant. Buffalo Bay is considered by many the best walleye fishing spot on Lake of the Woods.",
+      "description": "Year-round resort on Buffalo Bay \u2014 Manitoba's only access point on Lake of the Woods, on the Buffalo Point peninsula in extreme southeast Manitoba (developed by Buffalo Point First Nation). Cabins, RV campground, 320-slip marina, guided fishing, ice fishing and restaurant. Buffalo Bay is considered by many the best walleye fishing spot on Lake of the Woods.",
       "website": "http://www.buffalopoint.ca/",
       "phone": "+1 204-437-2777",
       "email": null,
@@ -22628,7 +22628,7 @@
         "Yellow Perch",
         "Black Crappie"
       ],
-      "description": "Fishing and hunting lodge on Lake of the Woods in the Kenora District (Ash Bay), in the Shoal Lake area. Ontario waters — Ontario licence required.",
+      "description": "Fishing and hunting lodge on Lake of the Woods in the Kenora District (Ash Bay), in the Shoal Lake area. Ontario waters \u2014 Ontario licence required.",
       "website": "https://ashrapidslodge.ca/",
       "phone": "+1 800-465-1095",
       "email": null,
@@ -22659,7 +22659,7 @@
         "Yellow Perch",
         "Black Crappie"
       ],
-      "description": "Family-run lodge on Lake of the Woods near Sioux Narrows (also fishes nearby Crow Lake). Advertises trophy muskie, pike, walleye, lake trout, smallmouth bass, whitefish, perch and crappies. Ontario waters — Ontario licence required.",
+      "description": "Family-run lodge on Lake of the Woods near Sioux Narrows (also fishes nearby Crow Lake). Advertises trophy muskie, pike, walleye, lake trout, smallmouth bass, whitefish, perch and crappies. Ontario waters \u2014 Ontario licence required.",
       "website": "http://muskiebayresort.com/",
       "phone": "+1 807-271-3015",
       "email": null,
@@ -22687,7 +22687,7 @@
         "Lake Trout",
         "Yellow Perch"
       ],
-      "description": "Historic lodge (est. 1920s) on a private 35-acre island in Sabaskong Bay, about 5 miles from Nestor Falls; American Plan plus housekeeping cabins; boat-in; also guided whitetail and waterfowl hunting. Ontario waters — Ontario licence required.",
+      "description": "Historic lodge (est. 1920s) on a private 35-acre island in Sabaskong Bay, about 5 miles from Nestor Falls; American Plan plus housekeeping cabins; boat-in; also guided whitetail and waterfowl hunting. Ontario waters \u2014 Ontario licence required.",
       "website": "https://www.lakeofthewoodslodge.com/",
       "phone": "1-888-484-2686",
       "email": null,
@@ -22714,7 +22714,7 @@
         "Muskellunge",
         "Smallmouth Bass"
       ],
-      "description": "Secluded drive-in camp on Witch Bay near Kenora; full American Plan plus free on-water fishing help; May-September. Ontario waters — Ontario licence required.",
+      "description": "Secluded drive-in camp on Witch Bay near Kenora; full American Plan plus free on-water fishing help; May-September. Ontario waters \u2014 Ontario licence required.",
       "website": "https://witchbay.com",
       "phone": "807-548-3076",
       "email": null,
@@ -22771,7 +22771,7 @@
         "Smallmouth Bass",
         "Walleye"
       ],
-      "description": "Island lodge on Tetu Lake north of Kenora; trophy pike, muskie, smallmouth and walleye. (Permanently closed — verified via public receivership records.)",
+      "description": "Island lodge on Tetu Lake north of Kenora; trophy pike, muskie, smallmouth and walleye. (Permanently closed \u2014 verified via public receivership records.)",
       "website": null,
       "phone": null,
       "email": null,
@@ -22887,7 +22887,7 @@
         "Northern Pike",
         "Smallmouth Bass"
       ],
-      "description": "Boat-in lodge on a remote private island near Kenora — the only fly-fishing lodge on Lake of the Woods; fully guided American Plan (6 guests per week), June-August.",
+      "description": "Boat-in lodge on a remote private island near Kenora \u2014 the only fly-fishing lodge on Lake of the Woods; fully guided American Plan (6 guests per week), June-August.",
       "website": "https://epicwatersangling.com",
       "phone": "877-846-9153",
       "email": null,
@@ -22917,7 +22917,7 @@
         "Lake Trout",
         "Black Crappie"
       ],
-      "description": "8 modern self-catering cabins on the Pipestone Peninsula; boat, hovercraft and float-plane access with 3 outpost locations. Note: adjacent Moore Bay acreage has been listed for sale — confirm the lodge is operating before booking.",
+      "description": "8 modern self-catering cabins on the Pipestone Peninsula; boat, hovercraft and float-plane access with 3 outpost locations. Note: adjacent Moore Bay acreage has been listed for sale \u2014 confirm the lodge is operating before booking.",
       "website": "https://moorebaylodge.com",
       "phone": "807-464-1051",
       "email": null,
@@ -23031,7 +23031,7 @@
         "Lake Trout",
         "Black Crappie"
       ],
-      "description": "Lakefront cabins on Regina Bay with all-inclusive plans, restaurant/bar and guided fishing. Note: a 2023 report said bookings were cancelled and the property was under renovation/for sale — confirm it is operating before booking.",
+      "description": "Lakefront cabins on Regina Bay with all-inclusive plans, restaurant/bar and guided fishing. Note: a 2023 report said bookings were cancelled and the property was under renovation/for sale \u2014 confirm it is operating before booking.",
       "website": "http://whitebirchlodge.ca/",
       "phone": "1-807-444-2212",
       "email": null,
@@ -23061,7 +23061,7 @@
         "Lake Trout",
         "Black Crappie"
       ],
-      "description": "Established 1944 — one of Sioux Narrows' oldest resorts; family-run housekeeping cabins, guided fishing and restaurant.",
+      "description": "Established 1944 \u2014 one of Sioux Narrows' oldest resorts; family-run housekeeping cabins, guided fishing and restaurant.",
       "website": "http://rodandreelresort.com/",
       "phone": "807-226-5240",
       "email": null,
@@ -23091,7 +23091,7 @@
         "Lake Trout",
         "Black Crappie"
       ],
-      "description": "Drive-to housekeeping cottages on Regina Bay (also listed as Regina Bay Lodge — same business).",
+      "description": "Drive-to housekeeping cottages on Regina Bay (also listed as Regina Bay Lodge \u2014 same business).",
       "website": "https://reginabaylodge.net/",
       "phone": "807-407-0802",
       "email": null,
@@ -23271,7 +23271,7 @@
         "Lake Trout",
         "Black Crappie"
       ],
-      "description": "Drive-to lodge with 10 cabins, full-service marina and bait shop; American Plan or modified meal plans; guided fishing and fly-out day trips. (Website/phone unverified — listed via resortsandlodges.com.)",
+      "description": "Drive-to lodge with 10 cabins, full-service marina and bait shop; American Plan or modified meal plans; guided fishing and fly-out day trips. (Website/phone unverified \u2014 listed via resortsandlodges.com.)",
       "website": null,
       "phone": null,
       "email": null,
@@ -23301,7 +23301,7 @@
         "Lake Trout",
         "Black Crappie"
       ],
-      "description": "Boat-access island cabin rentals on Calvert Island in Whitefish Bay (self-catering, weekly) — cabin rentals rather than a full-service fishing lodge.",
+      "description": "Boat-access island cabin rentals on Calvert Island in Whitefish Bay (self-catering, weekly) \u2014 cabin rentals rather than a full-service fishing lodge.",
       "website": "https://clipperbaycamp.com",
       "phone": null,
       "email": null,
@@ -23331,7 +23331,7 @@
         "Lake Trout",
         "Black Crappie"
       ],
-      "description": "Modern housekeeping cabins plus American Plan; fishing and hunting. (Website/phone unverified — listed via resortsandlodges.com.)",
+      "description": "Modern housekeeping cabins plus American Plan; fishing and hunting. (Website/phone unverified \u2014 listed via resortsandlodges.com.)",
       "website": null,
       "phone": null,
       "email": null,
@@ -23528,7 +23528,7 @@
         "Muskellunge",
         "Northern Pike"
       ],
-      "description": "American Plan lodge with 6 lakefront cabins on Hay Island in Sabaskong Bay; boat-in and fly-in access. Note: sources conflict on the current owners/contact — confirm details before booking.",
+      "description": "American Plan lodge with 6 lakefront cabins on Hay Island in Sabaskong Bay; boat-in and fly-in access. Note: sources conflict on the current owners/contact \u2014 confirm details before booking.",
       "website": "https://duckbaylodge.com",
       "phone": null,
       "email": null,
@@ -23641,7 +23641,7 @@
         "Northern Pike",
         "Smallmouth Bass"
       ],
-      "description": "Rustic housekeeping cabins (8) on a secluded island in Miles Bay; family-run since 1951. Note: no current website found — confirm it is still operating before booking.",
+      "description": "Rustic housekeeping cabins (8) on a secluded island in Miles Bay; family-run since 1951. Note: no current website found \u2014 confirm it is still operating before booking.",
       "website": null,
       "phone": "807-486-0299",
       "email": null,
@@ -23668,7 +23668,7 @@
         "Northern Pike",
         "Smallmouth Bass"
       ],
-      "description": "Family-run muskie/walleye cottages, homesteaded 1964; drive-to. (Not redwinglodge.com — that is a different business on Leech Lake, Minnesota.)",
+      "description": "Family-run muskie/walleye cottages, homesteaded 1964; drive-to. (Not redwinglodge.com \u2014 that is a different business on Leech Lake, Minnesota.)",
       "website": "http://www.redwinglodge.net",
       "phone": "1-807-488-5601",
       "email": null,
@@ -23724,7 +23724,7 @@
         "Lake Trout",
         "Black Crappie"
       ],
-      "description": "Drive-to resort/lodge on Lake of the Woods at Morson. (Similar name to New Moon Lodge but a distinct listing — relationship unconfirmed.)",
+      "description": "Drive-to resort/lodge on Lake of the Woods at Morson. (Similar name to New Moon Lodge but a distinct listing \u2014 relationship unconfirmed.)",
       "website": "http://www.newmoonlanding.ca",
       "phone": "807-488-5654",
       "email": null,
@@ -23890,7 +23890,7 @@
         "Northern Pike",
         "Smallmouth Bass"
       ],
-      "description": "Boat-in American Plan resort on a private island; family tradition since 1961. Note: listed under Ontario by Sunset Country but uses a Minnesota (218) area code — confirm the operation is on the Canadian side before booking.",
+      "description": "Boat-in American Plan resort on a private island; family tradition since 1961. Note: listed under Ontario by Sunset Country but uses a Minnesota (218) area code \u2014 confirm the operation is on the Canadian side before booking.",
       "website": "https://blackisland.com",
       "phone": "218-634-1996",
       "email": null,
@@ -24047,10 +24047,10 @@
       }
     ],
     "safety": [
-      "Manitoba is one of Canada's top ice fishing destinations, with a long winter season and thousands of lakes offering hardwater fishing from December through March. The signature target is the greenback walleye of Lake Winnipeg's south basin — a uniquely colored strain of walleye that draws trophy hunters from across North America — but the province's ice fisheries are far more diverse than one lake. Stocked trout lakes such as Foot Print Lake and Twin Lake produce rainbow, tiger, brown, and brook trout, while northern drive-to lakes like Cedar Lake and Lake Athapapuskow give up walleye, northern pike, lake trout, and burbot.\n\nAccess ranges from fully guided day trips to remote lodge stays. SnoBear outfitters on Lake Winnipeg rent heated, self-drive mobile ice shacks or run guided excursions that chase roaming walleye schools, and guides on the Red River put anglers on winter walleye at Lockport and trophy channel catfish through the ice. Lodges such as Bakers Narrows Lodge on Lake Athapapuskow, Moak Lodge on Cedar Lake, and Evergreen Lodge and Resort near The Pas host multi-day ice fishing stays, while experienced anglers can drive to DIY-friendly waters like Twin Lake near Roblin. Outfitters generally supply heated shelters, augers, rods, tackle, and local knowledge, making the sport accessible to first-timers as well as seasoned hardwater anglers.\n\nSafety comes first: Manitoba ice conditions change fast, and checking local ice reports is essential before heading out. Provincial fishing regulations — including seasons, slot limits, and licence requirements — apply on the ice exactly as they do in open water, so review the current Manitoba Angler's Guide before you fish.",
-      "Only go on ice at least 10 cm (4 in) thick for ice fishing on foot, 14 cm (5.5 in) for a snowmobile or ATV, and 32 cm (12.5 in) or more for a car or small truck. These minimums assume new, clear, solid ice — double the thickness for white or snow ice.",
+      "Manitoba is one of Canada's top ice fishing destinations, with a long winter season and thousands of lakes offering hardwater fishing from December through March. The signature target is the greenback walleye of Lake Winnipeg's south basin \u2014 a uniquely colored strain of walleye that draws trophy hunters from across North America \u2014 but the province's ice fisheries are far more diverse than one lake. Stocked trout lakes such as Foot Print Lake and Twin Lake produce rainbow, tiger, brown, and brook trout, while northern drive-to lakes like Cedar Lake and Lake Athapapuskow give up walleye, northern pike, lake trout, and burbot.\n\nAccess ranges from fully guided day trips to remote lodge stays. SnoBear outfitters on Lake Winnipeg rent heated, self-drive mobile ice shacks or run guided excursions that chase roaming walleye schools, and guides on the Red River put anglers on winter walleye at Lockport and trophy channel catfish through the ice. Lodges such as Bakers Narrows Lodge on Lake Athapapuskow, Moak Lodge on Cedar Lake, and Evergreen Lodge and Resort near The Pas host multi-day ice fishing stays, while experienced anglers can drive to DIY-friendly waters like Twin Lake near Roblin. Outfitters generally supply heated shelters, augers, rods, tackle, and local knowledge, making the sport accessible to first-timers as well as seasoned hardwater anglers.\n\nSafety comes first: Manitoba ice conditions change fast, and checking local ice reports is essential before heading out. Provincial fishing regulations \u2014 including seasons, slot limits, and licence requirements \u2014 apply on the ice exactly as they do in open water, so review the current Manitoba Angler's Guide before you fish.",
+      "Only go on ice at least 10 cm (4 in) thick for ice fishing on foot, 14 cm (5.5 in) for a snowmobile or ATV, and 32 cm (12.5 in) or more for a car or small truck. These minimums assume new, clear, solid ice \u2014 double the thickness for white or snow ice.",
       "Ice seldom freezes uniformly; it can be 30 cm thick in one spot and 10 cm a few metres away. Test thickness repeatedly with a spud bar or auger as you move, especially after traveling across cracks or pressure ridges.",
-      "Stay away from river inlets and outlets, streams, culverts, and bridge pilings — moving water is the last to freeze and the first to thaw, and ice there is often dangerously thin.",
+      "Stay away from river inlets and outlets, streams, culverts, and bridge pilings \u2014 moving water is the last to freeze and the first to thaw, and ice there is often dangerously thin.",
       "Never venture onto the ice alone; a slip, fall, or breakthrough can be fatal without help nearby.",
       "Before every trip, check local ice thickness reports and follow Manitoba provincial fishing regulations, including season dates and limits.",
       "Tell someone where you are going and when you expect to return, and carry ice picks, a rope, and a charged phone in a waterproof bag."
@@ -24096,7 +24096,7 @@
     },
     {
       "species": "Lake Trout",
-      "overview": "Deep, cold shield lakes in northern Manitoba — Lake Athapapuskow, Clearwater, the Cranberry Chain, Wekusko and Kississing — hold some of the biggest lake trout anywhere, and they're very catchable through the ice.",
+      "overview": "Deep, cold shield lakes in northern Manitoba \u2014 Lake Athapapuskow, Clearwater, the Cranberry Chain, Wekusko and Kississing \u2014 hold some of the biggest lake trout anywhere, and they're very catchable through the ice.",
       "techniques": [
         "Jigging heavy tubes, jigs and spoons on deep structure",
         "Dead sticking with ciscos on points or saddles",
@@ -24171,7 +24171,7 @@
     },
     {
       "species": "Burbot",
-      "overview": "Manitoba's freshwater cod is a winter specialty — Cedar Lake is famous for its burbot spawn under the ice, and the Red River's deeper stretches hold them too.",
+      "overview": "Manitoba's freshwater cod is a winter specialty \u2014 Cedar Lake is famous for its burbot spawn under the ice, and the Red River's deeper stretches hold them too.",
       "techniques": [
         "Night jigging with heavy glow spoons",
         "Dead sticking with scented bait near bottom",
@@ -24188,7 +24188,7 @@
     },
     {
       "species": "Lake Whitefish",
-      "overview": "An underrated ice-fishing target in Manitoba — Lake Winnipeg and Cedar Lake both hold trophy-class whitefish that reward a finesse approach.",
+      "overview": "An underrated ice-fishing target in Manitoba \u2014 Lake Winnipeg and Cedar Lake both hold trophy-class whitefish that reward a finesse approach.",
       "techniques": [
         "Finesse jigging with compact spoons and jigs",
         "Staying mobile to locate roaming schools",
@@ -24203,7 +24203,7 @@
     },
     {
       "species": "Goldeye",
-      "overview": "A Manitoba river classic — bright silver, eager biters in the Red, Assiniboine and Winnipeg Rivers, and the province's famous smoked fish delicacy.",
+      "overview": "A Manitoba river classic \u2014 bright silver, eager biters in the Red, Assiniboine and Winnipeg Rivers, and the province's famous smoked fish delicacy.",
       "techniques": [
         "Slip-bobber fishing with worms close to shore",
         "Casting small spinners, spoons and jigs"
@@ -24372,9 +24372,9 @@
   "youtube_shows": [
     {
       "name": "Uncut Angling",
-      "description": "Legendary Manitoba fishing channel by Aaron Wiebe — uncut, unscripted episodes chasing walleye, catfish, pike and smallmouth across the province.",
-      "url": "https://www.youtube.com/channel/UCBw8NvqAw4EZ6Ja0k8x6sHA",
-      "channel_id": "UCBw8NvqAw4EZ6Ja0k8x6sHA"
+      "description": "Legendary Manitoba fishing channel by Aaron Wiebe \u2014 uncut, unscripted episodes chasing walleye, catfish, pike and smallmouth across the province.",
+      "url": "https://www.youtube.com/channel/UCBDT-Kl4nHgEvpwYfLb315w",
+      "channel_id": "UCBDT-Kl4nHgEvpwYfLb315w"
     },
     {
       "name": "Jay Siemens",
@@ -24390,21 +24390,63 @@
     },
     {
       "name": "Nicole Stone Outdoors",
-      "description": "North Dakota-based angler and media entrepreneur who partners with Hunt Fish Manitoba — including a Manitoba girls' trip jigging lake trout at Bakers Narrows.",
+      "description": "North Dakota-based angler and media entrepreneur who partners with Hunt Fish Manitoba \u2014 including a Manitoba girls' trip jigging lake trout at Bakers Narrows.",
       "url": "https://www.youtube.com/channel/UCguFClYXRte1XA1d7gw0d7A",
       "channel_id": "UCguFClYXRte1XA1d7gw0d7A"
     },
     {
       "name": "Jessie Belot Angling",
-      "description": "Manitoba angler posting ice-fishing adventures — Lake Winnipeg greenbacks, burbot and whitefish at Moak Lodge, and burbot-underwater footage.",
+      "description": "Manitoba angler posting ice-fishing adventures \u2014 Lake Winnipeg greenbacks, burbot and whitefish at Moak Lodge, and burbot-underwater footage.",
       "url": "https://www.youtube.com/channel/UCQNNjBPOiz4f2R02tlqEg3w",
       "channel_id": "UCQNNjBPOiz4f2R02tlqEg3w"
     },
     {
       "name": "Finally Fishing",
-      "description": "Winnipeg bank angler documenting Red River, Lockport and Lake Winnipeg fishing — walleye, catfish, sturgeon and ice-fishing village trips.",
+      "description": "Winnipeg bank angler documenting Red River, Lockport and Lake Winnipeg fishing \u2014 walleye, catfish, sturgeon and ice-fishing village trips.",
       "url": "https://www.youtube.com/channel/UCbR56QqRylv_UHhhYdNm8qg",
       "channel_id": "UCbR56QqRylv_UHhhYdNm8qg"
+    },
+    {
+      "name": "Stagg On The Line",
+      "description": "Daniel Stagg \u2014 Manitoba kayak and hardwater angler competing in the Central Canada Kayak Trail; pike, walleye and lake trout across the province.",
+      "url": "https://www.youtube.com/channel/UCBw8NvqAw4EZ6Ja0k8x6sHA",
+      "channel_id": "UCBw8NvqAw4EZ6Ja0k8x6sHA"
+    },
+    {
+      "name": "Reel Life With Mike",
+      "description": "Mike Klatt \u2014 western Manitoba angler; Assiniboine River multispecies, first-ice tiger trout at Twin Lakes, Lake Winnipeg greenbacks and northern lake trout trips.",
+      "url": "https://www.youtube.com/channel/UCFJ_3q402Siy6PW8FW6gfbA",
+      "channel_id": "UCFJ_3q402Siy6PW8FW6gfbA"
+    },
+    {
+      "name": "Freshwater Fishing with Adrian",
+      "description": "Manitoba angler focused on trout and muskie \u2014 jigging lake trout at Clearwater Lake, fall brookies at Barbe Lake, Duck Mountain muskie strikes.",
+      "url": "https://www.youtube.com/channel/UCn483qRn9bmd2Sj9Aq_AIaA",
+      "channel_id": "UCn483qRn9bmd2Sj9Aq_AIaA"
+    },
+    {
+      "name": "North Mountain Adventures",
+      "description": "Manitoba outdoor channel (northmtnadventures.com) \u2014 northern lake trout at Clearwater Lake and ice-fishing episodes mixed with hunting content.",
+      "url": "https://www.youtube.com/channel/UC6H2dU397ykohfpitG8blig",
+      "channel_id": "UC6H2dU397ykohfpitG8blig"
+    },
+    {
+      "name": "Kickerfish",
+      "description": "Manitoba kayak-fishing media behind the Central Canada Kayak Trail \u2014 tournament livestreams (Pine Falls Walleye Challenge) and technique episodes.",
+      "url": "https://www.youtube.com/channel/UCpRKBDDkifkIMKvFZuO5wnw",
+      "channel_id": "UCpRKBDDkifkIMKvFZuO5wnw"
+    },
+    {
+      "name": "Dad Son Go Fishing",
+      "description": "Manitoba family fishing channel \u2014 dad-and-son walleye trips on Lake Winnipeg out of Hecla Island, plus kids' fishing shorts.",
+      "url": "https://www.youtube.com/channel/UCnllnHzrBFo-fWj-XI4Incw",
+      "channel_id": "UCnllnHzrBFo-fWj-XI4Incw"
+    },
+    {
+      "name": "Kingsland Outfitting",
+      "description": "Manitoba outfitter (The Pas area) \u2014 Lake Winnipeg ice-castle walleye trips, northern lake trout, plus live giveaway streams.",
+      "url": "https://www.youtube.com/channel/UCRigaZrQdkIV5oywOLk3L6w",
+      "channel_id": "UCRigaZrQdkIV5oywOLk3L6w"
     }
   ],
   "hot_lakes": [
@@ -24587,7 +24629,7 @@
     },
     {
       "name": "Dauphin",
-      "description": "City just west of the lake and the Parkland region's main service centre — groceries, bait, fuel and boat services.",
+      "description": "City just west of the lake and the Parkland region's main service centre \u2014 groceries, bait, fuel and boat services.",
       "lake_ids": [
         "dauphin-lake",
         "sandy-lake",
@@ -24678,7 +24720,7 @@
     },
     {
       "name": "Flin Flon",
-      "description": "Nearest full-service city, about 30 km southwest — the last stop for groceries, fuel and bait.",
+      "description": "Nearest full-service city, about 30 km southwest \u2014 the last stop for groceries, fuel and bait.",
       "lake_ids": [
         "kississing-lake",
         "lake-athapapuskow",
@@ -24712,7 +24754,7 @@
     },
     {
       "name": "Grand Rapids",
-      "description": "Town at the lake's north end, where Cedar Lake drains into Lake Winnipeg — full services for anglers and boaters.",
+      "description": "Town at the lake's north end, where Cedar Lake drains into Lake Winnipeg \u2014 full services for anglers and boaters.",
       "lake_ids": [
         "cedar-lake",
         "little-limestone-lake",
@@ -24737,7 +24779,7 @@
     },
     {
       "name": "Gypsumville",
-      "description": "Small community of under 300 on the lake's north bank — the closest roadside services to the lake.",
+      "description": "Small community of under 300 on the lake's north bank \u2014 the closest roadside services to the lake.",
       "lake_ids": [
         "lake-st-martin"
       ]
@@ -24751,7 +24793,7 @@
     },
     {
       "name": "Hecla Village",
-      "description": "Small village on Hecla Island; limited supplies — larger stores are in Gimli or Riverton.",
+      "description": "Small village on Hecla Island; limited supplies \u2014 larger stores are in Gimli or Riverton.",
       "lake_ids": [
         "bell-pond",
         "tower-pond"
@@ -24777,7 +24819,7 @@
     },
     {
       "name": "Kenora, ON",
-      "description": "The major city on Lake of the Woods, with marinas, bait shops, launches and full services — the natural base for reaching the lake's Manitoba portion by water.",
+      "description": "The major city on Lake of the Woods, with marinas, bait shops, launches and full services \u2014 the natural base for reaching the lake's Manitoba portion by water.",
       "lake_ids": [
         "lake-of-the-woods"
       ]
@@ -24823,7 +24865,7 @@
     },
     {
       "name": "Lundar",
-      "description": "Town south of the lake on Hwy 6 with fuel, groceries and supplies — the last full-service stop for anglers heading up the east side.",
+      "description": "Town south of the lake on Hwy 6 with fuel, groceries and supplies \u2014 the last full-service stop for anglers heading up the east side.",
       "lake_ids": [
         "lake-manitoba"
       ]
@@ -24849,7 +24891,7 @@
     },
     {
       "name": "Manitou",
-      "description": "Small town with heritage sites and cafés; the reservoir is a short drive west.",
+      "description": "Small town with heritage sites and caf\u00e9s; the reservoir is a short drive west.",
       "lake_ids": [
         "mary-jane-reservoir",
         "stephenfield-lake"
@@ -24950,14 +24992,14 @@
     },
     {
       "name": "Pine Falls",
-      "description": "Small community at the mouth of the Winnipeg River, at the lake's east shore — the main launch point for Traverse Bay's late-season walleye run.",
+      "description": "Small community at the mouth of the Winnipeg River, at the lake's east shore \u2014 the main launch point for Traverse Bay's late-season walleye run.",
       "lake_ids": [
         "lake-winnipeg"
       ]
     },
     {
       "name": "Rennie",
-      "description": "Nearest community, on Hwy 44/307 and home to the park district office — the last stop for gas and supplies before the lake.",
+      "description": "Nearest community, on Hwy 44/307 and home to the park district office \u2014 the last stop for gas and supplies before the lake.",
       "lake_ids": [
         "big-whiteshell-lake",
         "crowduck-lake",
@@ -24996,7 +25038,7 @@
     },
     {
       "name": "Roblin",
-      "description": "Town on the lake's north shore with groceries, fuel and lodging — the main base for fishing the lake.",
+      "description": "Town on the lake's north shore with groceries, fuel and lodging \u2014 the main base for fishing the lake.",
       "lake_ids": [
         "lake-of-the-prairies",
         "east-goose-lake",
@@ -25080,7 +25122,7 @@
     },
     {
       "name": "Snow Lake",
-      "description": "Mining town on Hwy 392 about 40 minutes east — the closest place for groceries, fuel, lodging and bait; several lodges along the way serve the lake.",
+      "description": "Mining town on Hwy 392 about 40 minutes east \u2014 the closest place for groceries, fuel, lodging and bait; several lodges along the way serve the lake.",
       "lake_ids": [
         "reed-lake",
         "wekusko-lake",
@@ -25096,7 +25138,7 @@
     },
     {
       "name": "St. Laurent",
-      "description": "Métis community on the west shore with public lake access — the main launch point for the west side of the lake.",
+      "description": "M\u00e9tis community on the west shore with public lake access \u2014 the main launch point for the west side of the lake.",
       "lake_ids": [
         "lake-manitoba",
         "shoal-lakes"
@@ -25134,14 +25176,14 @@
     },
     {
       "name": "Steinbach",
-      "description": "Large service centre in southeastern Manitoba — full groceries, tackle, and lodging.",
+      "description": "Large service centre in southeastern Manitoba \u2014 full groceries, tackle, and lodging.",
       "lake_ids": [
         "the-lily-pond"
       ]
     },
     {
       "name": "Swan River",
-      "description": "Nearest full-service town, about 96 km away on PR 367 — the gateway and last supply stop for Duck Mountain's trout lakes.",
+      "description": "Nearest full-service town, about 96 km away on PR 367 \u2014 the gateway and last supply stop for Duck Mountain's trout lakes.",
       "lake_ids": [
         "laurie-lake",
         "beautiful-lake",
@@ -25188,7 +25230,7 @@
     },
     {
       "name": "The Pas",
-      "description": "City on the lake's shore — full services, bait, launches, and the provincial park campground close by.",
+      "description": "City on the lake's shore \u2014 full services, bait, launches, and the provincial park campground close by.",
       "lake_ids": [
         "clearwater-lake",
         "moose-lake",
@@ -25200,7 +25242,7 @@
     },
     {
       "name": "Thompson",
-      "description": "Nearest full-service city — winter road and scheduled air service to Gods Lake Narrows run from here.",
+      "description": "Nearest full-service city \u2014 winter road and scheduled air service to Gods Lake Narrows run from here.",
       "lake_ids": [
         "gods-lake",
         "paint-lake",
@@ -25219,7 +25261,7 @@
     },
     {
       "name": "Wasagaming",
-      "description": "Park townsite on the lake's shore inside Riding Mountain — marina with boat rentals, bait, launches, restaurants and lodging.",
+      "description": "Park townsite on the lake's shore inside Riding Mountain \u2014 marina with boat rentals, bait, launches, restaurants and lodging.",
       "lake_ids": [
         "clear-lake",
         "grayling-lake",
@@ -25241,7 +25283,7 @@
     },
     {
       "name": "West Hawk Lake",
-      "description": "Adjacent resort townsite with restaurants, shops and its own lake — minutes away on the Trans-Canada.",
+      "description": "Adjacent resort townsite with restaurants, shops and its own lake \u2014 minutes away on the Trans-Canada.",
       "lake_ids": [
         "falcon-lake",
         "high-lake",
@@ -25260,7 +25302,7 @@
     },
     {
       "name": "Winnipegosis",
-      "description": "Small town right on the lake's southeast shore — the lake's main service stop, with a boat launch, lodging and supplies.",
+      "description": "Small town right on the lake's southeast shore \u2014 the lake's main service stop, with a boat launch, lodging and supplies.",
       "lake_ids": [
         "lake-winnipegosis"
       ]
