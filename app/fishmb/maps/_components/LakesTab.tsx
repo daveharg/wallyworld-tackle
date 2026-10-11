@@ -23,6 +23,18 @@ interface LakeCardData extends SavedLake {
   tempC: number | null;
   weatherCode: number | null;
   catchCount: number | null;
+  masters2yr: number;
+  stocked20yr: number;
+}
+
+/** 625000 → "625K", 2500000 → "2.5M" */
+function formatStocked(n: number): string {
+  if (n >= 1_000_000) {
+    const v = n / 1_000_000;
+    return `${v >= 10 ? Math.round(v) : v.toFixed(1)}M`;
+  }
+  if (n >= 1_000) return `${Math.round(n / 1_000)}K`;
+  return `${n}`;
 }
 
 function weatherEmoji(code: number | null): string {
@@ -114,6 +126,14 @@ export default function LakesTab({
         return ub.last - ua.last;
       });
 
+      // Lake aggregates (Master Anglers last 2 yrs, stocked last 20 yrs) — one fetch for all.
+      let lakeStats: Record<string, { masters_2yr: number; stocked_20yr: number }> = {};
+      try {
+        const s = await fishFetch("/api/fishmb/lake-stats");
+        lakeStats = s.stats ?? {};
+      } catch {
+        // Stats stay blank.
+      }
       // Enrich each lake with weather + catch count in parallel.
       const enriched = await Promise.all(
         sorted.map(async (lake): Promise<LakeCardData> => {
@@ -121,6 +141,9 @@ export default function LakesTab({
           let tempC: number | null = null;
           let weatherCode: number | null = null;
           let catchCount: number | null = null;
+          const st = lakeStats[lake.id];
+          const masters2yr = st?.masters_2yr ?? 0;
+          const stocked20yr = st?.stocked_20yr ?? 0;
           if (lake.lat !== null && lake.lng !== null) {
             try {
               const w = await fetch(
@@ -141,7 +164,7 @@ export default function LakesTab({
               // Count stays blank.
             }
           }
-          return { ...lake, species, tempC, weatherCode, catchCount };
+          return { ...lake, species, tempC, weatherCode, catchCount, masters2yr, stocked20yr };
         })
       );
       setCards(enriched);
@@ -178,6 +201,8 @@ export default function LakesTab({
           tempC: null,
           weatherCode: null,
           catchCount: null,
+          masters2yr: 0,
+          stocked20yr: 0,
         }))
       );
       setAdding(false);
@@ -219,6 +244,15 @@ export default function LakesTab({
                   {lake.region && (
                     <p className="text-[11px] text-pine/50 font-semibold mt-0.5">
                       {lake.region}
+                    </p>
+                  )}
+                  {(lake.masters2yr > 0 || lake.stocked20yr > 0) && (
+                    <p className="text-[11px] text-pine/50 font-semibold mt-0.5">
+                      {lake.masters2yr > 0 &&
+                        `${lake.masters2yr} Master Angler${lake.masters2yr === 1 ? "" : "s"} · last 2 yrs`}
+                      {lake.masters2yr > 0 && lake.stocked20yr > 0 && " · "}
+                      {lake.stocked20yr > 0 &&
+                        `${formatStocked(lake.stocked20yr)} stocked · last 20 yrs`}
                     </p>
                   )}
                 </div>
