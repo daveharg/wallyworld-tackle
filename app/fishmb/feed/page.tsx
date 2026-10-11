@@ -667,7 +667,9 @@ function Reactions({
   );
 }
 
-/** ⋯ menu on your own posts: Edit / Delete via a bottom action sheet. */
+/** ⋯ menu on your own posts: Edit / Delete via a bottom action sheet.
+ *  For catches, "delete" only removes the post from the feed — the catch
+ *  itself stays on your catch list. */
 function OwnPostMenu({
   item,
   dark,
@@ -760,7 +762,7 @@ function OwnPostMenu({
               onClick={() => setConfirmingDelete(true)}
               className="w-full text-left px-4 py-3.5 rounded-2xl font-bold text-signal-dark hover:bg-signal/10"
             >
-              🗑️ Delete post
+              {item.kind === "catch" ? "🗑️ Remove from feed" : "🗑️ Delete post"}
             </button>
             <button
               type="button"
@@ -818,8 +820,14 @@ function OwnPostMenu({
             className="relative w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl p-5 pb-8 text-center"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-display font-bold uppercase text-pine text-lg tracking-wide mb-2">Delete this post?</h3>
-            <p className="text-pine/60 text-sm mb-5">This can&apos;t be undone.</p>
+            <h3 className="font-display font-bold uppercase text-pine text-lg tracking-wide mb-2">
+              {item.kind === "catch" ? "Remove from feed?" : "Delete this post?"}
+            </h3>
+            <p className="text-pine/60 text-sm mb-5">
+              {item.kind === "catch"
+                ? "It'll stay on your catch list — just hidden from the feed."
+                : "This can't be undone."}
+            </p>
             <div className="flex gap-2">
               <button
                 type="button"

@@ -39,6 +39,12 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   if (!me) return unauthorized();
   const table = await ownedTable(params.id, me.id);
   if (!table) return notFound("Post not found.");
+  // Catches: removing from the feed just unshares it — the catch stays on
+  // the angler's catch list. Only discussion posts are truly deleted.
+  if (table === "fm_catches") {
+    await query(`UPDATE fm_catches SET visibility = 'private', personal_record = true WHERE id = $1`, [params.id]);
+    return NextResponse.json({ ok: true, unshared: true });
+  }
   // Clean up reactions + comments that reference this post, then the post itself.
   // (fm_post_reactions.post_id has no FK since a "post" is either table.)
   await query(`DELETE FROM fm_post_reactions WHERE post_id = $1`, [params.id]).catch(() => {});
