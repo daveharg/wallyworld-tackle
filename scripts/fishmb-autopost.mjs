@@ -41,10 +41,14 @@ async function ensureFishMBUser() {
 }
 
 async function alreadyPosted(userId, likePattern, days = 7) {
+  // Calendar-day comparison (America/Winnipeg), NOT a rolling window: the
+  // jobs fire at the same clock time every day, so "last 24h" would always
+  // see yesterday's post and skip forever.
   const r = await sql`
     SELECT id FROM fm_discussions
      WHERE user_id = ${userId} AND body LIKE ${likePattern}
-       AND created_at > now() - (${days} || ' days')::interval
+       AND (created_at AT TIME ZONE 'America/Winnipeg')::date
+           > (now() AT TIME ZONE 'America/Winnipeg')::date - ${days}
      LIMIT 1`;
   return r.length > 0;
 }
@@ -67,7 +71,7 @@ const dayNo = Math.floor(Date.now() / (24 * 3600 * 1000));
 async function youtubePost(userId) {
   if (SHOWS.length === 0) return;
   if (!FORCE && (await alreadyPosted(userId, "%Manitoba Fishing Video of the Day%", 1))) {
-    console.log("YouTube daily post: already posted in the last 24h, skipping.");
+    console.log("YouTube daily post: already posted today, skipping.");
     return;
   }
   const show = SHOWS[dayNo % SHOWS.length];
@@ -287,7 +291,7 @@ function biteOutlook(p, trend, cloud, wind) {
 
 async function weatherPost(userId) {
   if (await alreadyPosted(userId, "%FishMB Morning Weather Report%", 1)) {
-    console.log("Weather post: already posted in the last 24h, skipping.");
+    console.log("Weather post: already posted today, skipping.");
     return;
   }
   const url = "https://api.open-meteo.com/v1/forecast?latitude=49.9&longitude=-97.14" +
