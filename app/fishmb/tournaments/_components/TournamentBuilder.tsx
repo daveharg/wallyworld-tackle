@@ -7,7 +7,9 @@ import { useFishAuth } from "../../_components/FishAuth";
 import { fishFetch } from "../../_components/fishFetch";
 import { compressImage } from "../../_components/compressImage";
 import { PayoutEditor } from "./PayoutEditor";
+import { PrizePot } from "./PrizePot";
 import { RULE_TEMPLATES } from "./ruleTemplates";
+import { formatDateTime } from "../../_components/formatDate";
 import type { PayoutTier } from "@/lib/fish/tournaments";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 import type { ZoneBox, ZonePoint } from "./ZoneMapPicker";
@@ -115,6 +117,19 @@ function CheckRow({
         <span className="font-bold text-sm text-pine">{title}</span>
         {hint && <span className="block text-xs text-pine/50 mt-0.5">{hint}</span>}
       </span>
+    </button>
+  );
+}
+
+/** Small "Edit" button used on each preview section — jumps back to the right step. */
+function EditBtn({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="absolute top-3 right-3 text-xs font-bold uppercase tracking-wider text-signal-dark bg-signal/10 hover:bg-signal/20 rounded-full px-4 py-1.5 transition-colors"
+    >
+      Edit
     </button>
   );
 }
@@ -776,22 +791,120 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
 
       {step === 2 && (
         <div className="space-y-4">
-          <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide">Review</h3>
-          <dl className="bg-white rounded-2xl border border-pine/10 p-5 space-y-2.5 text-sm">
-            <div className="flex justify-between"><dt className="text-pine/55 font-bold uppercase text-xs tracking-wider">Name</dt><dd className="text-pine font-bold text-right">{name}</dd></div>
-            {(showVenueName && venueName.trim()) || (showVenueAddress && venueAddress.trim()) ? (
-              <div className="flex justify-between"><dt className="text-pine/55 font-bold uppercase text-xs tracking-wider">Where</dt><dd className="text-pine text-right">{[showVenueName ? venueName.trim() : "", showVenueAddress ? venueAddress.trim() : ""].filter(Boolean).join(" — ")}</dd></div>
-            ) : null}
-            <div className="flex justify-between"><dt className="text-pine/55 font-bold uppercase text-xs tracking-wider">Dates</dt><dd className="text-pine text-right">{fmtDT(startsAt)} → {fmtDT(endsAt)}</dd></div>
-            <div className="flex justify-between"><dt className="text-pine/55 font-bold uppercase text-xs tracking-wider">Scoring</dt><dd className="text-pine text-right">{scoringLabel}</dd></div>
-            <div className="flex justify-between"><dt className="text-pine/55 font-bold uppercase text-xs tracking-wider">Waters</dt><dd className="text-pine text-right">{boundaryLabel}</dd></div>
-            <div className="flex justify-between"><dt className="text-pine/55 font-bold uppercase text-xs tracking-wider">Species</dt><dd className="text-pine text-right">{species.join(", ") || "—"}</dd></div>
-            <div className="flex justify-between"><dt className="text-pine/55 font-bold uppercase text-xs tracking-wider">Entry fee</dt><dd className="text-pine text-right">{entryFeeCents > 0 ? `$${(entryFeeCents / 100).toFixed(2)} / angler` : "Free"}</dd></div>
-            {payouts.length > 0 && (
-              <div className="flex justify-between"><dt className="text-pine/55 font-bold uppercase text-xs tracking-wider">Payouts</dt><dd className="text-pine text-right">{payouts.map((p) => `${p.place}${p.type === "percent" ? ` (${p.value}%)` : ` ($${p.value})`}`).join(", ")}</dd></div>
+          <div className="bg-gold/15 border border-gold/40 rounded-2xl p-4">
+            <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide">Preview</h3>
+            <p className="text-sm text-pine/65 mt-1">
+              This is exactly what other anglers will see. Tap <span className="font-bold">Edit</span> on
+              any section to change it before you submit.
+            </p>
+          </div>
+
+          {/* Cover hero — mirrors the tournament page */}
+          <div className="relative">
+            {coverPhotoUrl ? (
+              <div className="relative rounded-3xl overflow-hidden bg-pine-deep">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={coverPhotoUrl} alt={name} className="w-full h-48 object-cover" />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-pine-deep/90 via-pine-deep/40 to-transparent pt-16 pb-5 px-5">
+                  <p className="text-gold font-bold uppercase tracking-[0.24em] text-xs mb-1.5">Upcoming</p>
+                  <h1 className="font-display font-bold uppercase text-white text-3xl tracking-wide">{name}</h1>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <p className="text-signal font-bold uppercase tracking-[0.24em] text-xs mb-1.5">Upcoming</p>
+                <h1 className="font-display font-bold uppercase text-pine text-3xl tracking-wide">{name}</h1>
+              </div>
             )}
-            <div className="flex justify-between"><dt className="text-pine/55 font-bold uppercase text-xs tracking-wider">Photo proof</dt><dd className="text-pine text-right">{entryFeeCents > 0 ? "Strict — app camera only" : photoProof === "bump" ? "Bump board" : photoProof === "none" ? "No measure needed" : "Any tape"}{requireHoldPhoto ? " + holding photo" : ""}</dd></div>
-          </dl>
+            <EditBtn onClick={() => setStep(0)} />
+          </div>
+
+          <div className="relative">
+            <p className="text-pine/60 text-sm">
+              Organized by you · {formatDateTime(startsAt)} → {formatDateTime(endsAt)}
+            </p>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {effectivePhotoMode === "measure_only" && (
+                <span className="text-xs font-bold uppercase tracking-wider text-pine bg-pine/10 rounded-full px-4 py-2">
+                  Measure-only photos — no posed photo with the fish needed
+                </span>
+              )}
+              {effectivePhotoMode === "strict" && (
+                <span className="text-xs font-bold uppercase tracking-wider text-pine bg-pine/10 rounded-full px-4 py-2">
+                  Strict camera-only — entries must be taken with the FishMB app&apos;s in-app camera
+                </span>
+              )}
+              {effectivePhotoMode === "no_measure" && (
+                <span className="text-xs font-bold uppercase tracking-wider text-pine bg-pine/10 rounded-full px-4 py-2">
+                  No measuring needed — just a clear fish photo
+                </span>
+              )}
+              <span className="text-xs font-bold uppercase tracking-wider text-pine bg-pine/10 rounded-full px-4 py-2">
+                {scoringLabel}
+              </span>
+            </div>
+            <EditBtn onClick={() => setStep(1)} />
+          </div>
+
+          {/* Where */}
+          {(showVenueName && venueName.trim()) || (showVenueAddress && venueAddress.trim()) ? (
+            <div className="relative bg-white border border-pine/10 rounded-2xl p-5">
+              <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-1.5">Where</h3>
+              {showVenueName && venueName.trim() && <p className="text-pine font-bold text-lg">{venueName.trim()}</p>}
+              {showVenueAddress && venueAddress.trim() && <p className="text-pine/60 text-sm">{venueAddress.trim()}</p>}
+              <EditBtn onClick={() => setStep(0)} />
+            </div>
+          ) : null}
+
+          {/* Waters / Species / Invite */}
+          <div className="grid grid-cols-1 gap-3">
+            <div className="relative bg-white border border-pine/10 rounded-2xl p-5">
+              <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-2">Waters</h3>
+              <p className="text-pine text-sm">{boundaryLabel}</p>
+              <EditBtn onClick={() => setStep(1)} />
+            </div>
+            <div className="relative bg-white border border-pine/10 rounded-2xl p-5">
+              <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-2">Species</h3>
+              <p className="text-pine text-sm">{species.join(", ") || "All species"}</p>
+              <EditBtn onClick={() => setStep(0)} />
+            </div>
+            <div className="bg-white border border-pine/10 rounded-2xl p-5">
+              <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-2">Invite code</h3>
+              <p className="text-pine/55 text-sm">Your invite code is created when you submit.</p>
+            </div>
+          </div>
+
+          {/* Rules */}
+          {rules.trim() ? (
+            <div className="relative">
+              <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-3">
+                Tournament rules
+              </h2>
+              <div className="bg-white border border-pine/10 rounded-3xl p-6">
+                <p className="text-pine/80 whitespace-pre-line leading-relaxed text-sm">{rules.trim()}</p>
+              </div>
+              <EditBtn onClick={() => setStep(1)} />
+            </div>
+          ) : null}
+
+          {/* Prize pot */}
+          {(entryFeeCents > 0 || payouts.length > 0) && (
+            <div className="relative">
+              <PrizePot entryFeeCents={entryFeeCents} participantCount={1} payouts={payouts} />
+              <EditBtn onClick={() => setStep(1)} />
+            </div>
+          )}
+
+          {/* Leaderboard — as it will appear before any catches */}
+          <div>
+            <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-3">
+              Leaderboard
+            </h2>
+            <p className="text-pine/55 text-sm bg-white border border-pine/10 rounded-2xl p-5">
+              No approved catches yet — the board lights up once you approve entries.
+            </p>
+          </div>
+
           {!user && (
             <p className="text-sm text-pine/60 bg-gold/15 border border-gold/40 rounded-2xl p-4">
               You&apos;ll log in with Google to save it — the same account as the FishMB app. Your tournament draft stays right here.
