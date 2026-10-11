@@ -6,6 +6,7 @@ import { fishFetch } from "../../_components/fishFetch";
 import {
   decryptText,
   encryptText,
+  publicKeyB64,
   sharedSecret,
   type MsgKeypair,
 } from "./msgCrypto";
@@ -102,6 +103,17 @@ export default function ThreadView({
         setMissingNames(
           members.filter((m) => !m.public_key && m.user_id !== myId).map((m) => m.name || "Someone")
         );
+        // Ensure our own server key matches our local keypair — if not,
+        // upload it now so others encrypt with the right key.
+        const me = members.find((m) => m.user_id === myId);
+        const localPub = publicKeyB64(keypair);
+        if (me && me.public_key !== localPub) {
+          fishFetch("/api/fishmb/msg/keys", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ public_key: localPub }),
+          }).catch(() => {});
+        }
         const keyed = members.filter((m) => m.public_key);
         const s = keyed.map((m) => ({
           user_id: m.user_id,
