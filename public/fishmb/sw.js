@@ -30,6 +30,19 @@ self.addEventListener("push", (event) => {
   };
   event.waitUntil(
     (async () => {
+      // Don't notify if the user is already looking at messages.
+      try {
+        const clients = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+        for (const client of clients) {
+          if (client.url.includes("/fishmb/messages") && client.focused) {
+            // Update the badge silently, skip the visible notification.
+            if (typeof self.navigator.setAppBadge === "function" && typeof data.unread === "number" && data.unread > 0) {
+              await self.navigator.setAppBadge(data.unread);
+            }
+            return;
+          }
+        }
+      } catch (e) {}
       // Update the app icon badge if the payload carries a count.
       try {
         if (typeof self.navigator.setAppBadge === "function" && typeof data.unread === "number" && data.unread > 0) {
