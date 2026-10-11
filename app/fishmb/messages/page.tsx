@@ -522,25 +522,28 @@ function MessagesPageInner() {
   }
 
   // Check push notification status.
+  // TEMPORARILY DISABLED — debugging client-side crash.
   useEffect(() => {
-    if (!user || setup !== "ready") return;
-    (async () => {
-      try {
-        if (!("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)) {
-          setPushState("unsupported");
-          return;
-        }
-        if (Notification.permission === "denied") {
-          setPushState("denied");
-          return;
-        }
-        const reg = await navigator.serviceWorker.ready;
-        const sub = await reg.pushManager.getSubscription();
-        setPushState(sub ? "enabled" : "prompt");
-      } catch {
-        setPushState("unsupported");
-      }
-    })();
+    setPushState("unsupported");
+    return;
+    // if (!user || setup !== "ready") return;
+    // (async () => {
+    //   try {
+    //     if (!("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)) {
+    //       setPushState("unsupported");
+    //       return;
+    //     }
+    //     if (Notification.permission === "denied") {
+    //       setPushState("denied");
+    //       return;
+    //     }
+    //     const reg = await navigator.serviceWorker.ready;
+    //     const sub = await reg.pushManager.getSubscription();
+    //     setPushState(sub ? "enabled" : "prompt");
+    //   } catch {
+    //     setPushState("unsupported");
+    //   }
+    // })();
   }, [user, setup]);
 
   const enablePush = async () => {
