@@ -103,6 +103,12 @@ function formatStockDate(iso: string | null): string {  if (!iso) return "—";
   return `${months[m - 1]} ${d}, ${y}`;
 }
 
+/** Show the exact date when known, otherwise fall back to the stocking year. */
+function formatStockWhen(e: StockingEvent): string {
+  if (e.date) return formatStockDate(e.date);
+  return e.year != null ? String(e.year) : "—";
+}
+
 /** Biggest documented catches for one lake, from the Master Angler record book.
  *  Scrollable with sort by date, species, or size. */
 function TrophyCatches({ lakeId }: { lakeId: string }) {
@@ -139,7 +145,7 @@ function StockingTable({ lakeId }: { lakeId: string }) {
             {events.map((e, i) => (
               <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-pine/[0.03]"}>
                 <td className="px-4 py-2.5 text-pine font-bold whitespace-nowrap">
-                  {formatStockDate(e.date)}
+                  {formatStockWhen(e)}
                 </td>
                 <td className="px-4 py-2.5 text-pine/80">{e.species}</td>
                 <td className="px-4 py-2.5 text-pine/80 whitespace-nowrap">{e.size || "—"}</td>
@@ -156,7 +162,7 @@ function StockingTable({ lakeId }: { lakeId: string }) {
         {events.map((e, i) => (
           <div key={i} className="px-4 py-2.5 flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-sm font-bold text-pine">{formatStockDate(e.date)}</p>
+              <p className="text-sm font-bold text-pine">{formatStockWhen(e)}</p>
               <p className="text-xs text-pine/60 truncate">
                 {e.species}
                 {e.size ? ` · ${e.size}` : ""}

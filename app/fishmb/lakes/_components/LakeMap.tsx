@@ -38,6 +38,11 @@ export function LakeMap({ lakes }: { lakes: MapLake[] }) {
       m.on("focus", () => m.scrollWheelZoom.enable());
       m.on("blur", () => m.scrollWheelZoom.disable());
       if (!cancelled) setMap(m);
+      // If the container had no layout yet at init (blank gray tiles),
+      // force Leaflet to re-measure once the page settles.
+      setTimeout(() => {
+        if (!cancelled) m.invalidateSize();
+      }, 500);
     })();
     return () => {
       cancelled = true;
