@@ -235,6 +235,7 @@ function Bar() {
       className={`fixed bottom-0 inset-x-0 flex justify-center pointer-events-none ${
         menuOpen ? "z-[1100]" : "z-40"
       }`}
+      style={{ transform: "translateZ(0)", WebkitTransform: "translateZ(0)" }}
     >
       <style>{`@keyframes fmb-rise { from { opacity: 0; transform: translateY(14px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }`}</style>
       {/* + menu: shade out the background, circular action buttons stacked
