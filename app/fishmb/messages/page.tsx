@@ -152,6 +152,8 @@ function MessagesPageInner() {
   const [chatTab, setChatTab] = useState<"friends" | "other">("friends");
   const [note, setNote] = useState<string | null>(null);
   const [sheetConvo, setSheetConvo] = useState<Convo | null>(null);
+  const [pushState, setPushState] = useState<"unknown" | "enabled" | "prompt" | "denied" | "unsupported">("unknown");
+  const [enablingPush, setEnablingPush] = useState(false);
   const pressTimer = useRef<number | null>(null);
   const longPressed = useRef(false);
 
@@ -373,6 +375,58 @@ function MessagesPageInner() {
     return () => window.clearTimeout(t);
   }, [newOpen, newChatMode, unameQuery]);
 
+  // Check push notification status. Must be before any early returns.
+  useEffect(() => {
+    if (!user || setup !== "ready") return;
+    (async () => {
+      try {
+        if (!("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)) {
+          setPushState("unsupported");
+          return;
+        }
+        if (Notification.permission === "denied") {
+          setPushState("denied");
+          return;
+        }
+        const reg = await navigator.serviceWorker.ready;
+        const sub = await reg.pushManager.getSubscription();
+        setPushState(sub ? "enabled" : "prompt");
+      } catch {
+        setPushState("unsupported");
+      }
+    })();
+  }, [user, setup]);
+
+  const enablePush = async () => {
+    setEnablingPush(true);
+    try {
+      const perm = await Notification.requestPermission();
+      if (perm !== "granted") {
+        setPushState("denied");
+        return;
+      }
+      const keyRes = await fishFetch("/api/fishmb/push/vapid-key");
+      const publicKey = (keyRes as { publicKey?: string }).publicKey;
+      if (!publicKey) throw new Error("No key");
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: Uint8Array.from(atob(publicKey.replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0)),
+      });
+      const json = sub.toJSON();
+      await fishFetch("/api/fishmb/push/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ endpoint: json.endpoint, keys: json.keys }),
+      });
+      setPushState("enabled");
+    } catch {
+      setPushState("prompt");
+    } finally {
+      setEnablingPush(false);
+    }
+  };
+
   // Pastel avatar colors, deterministic per name (Telegram-style).
   const AVATAR_COLORS = [
     ["#D6E9F8", "#1B7AC4"], // blue
@@ -523,6 +577,23 @@ function MessagesPageInner() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 md:py-10">
+      {pushState === "prompt" && (
+        <button
+          type="button"
+          onClick={enablePush}
+          disabled={enablingPush}
+          className="w-full mb-4 flex items-center gap-3 rounded-2xl bg-pine text-cream px-4 py-3 text-left shadow-sm active:scale-[0.99] transition disabled:opacity-60"
+        >
+          <span className="text-2xl">🔔</span>
+          <span className="flex-1">
+            <span className="block font-semibold text-sm">Get notified of new messages</span>
+            <span className="block text-cream/70 text-xs">Turn on push notifications for FishMB chat.</span>
+          </span>
+          <span className="text-sm font-semibold bg-cream text-pine rounded-full px-4 py-1.5">
+            {enablingPush ? "Turning on…" : "Turn on"}
+          </span>
+        </button>
+      )}
       <div className="relative flex items-center justify-between mb-6">
         {/* User avatar */}
         <div className="w-12 h-12 rounded-full bg-pine/10 flex items-center justify-center shrink-0">

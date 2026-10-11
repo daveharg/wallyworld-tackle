@@ -3,7 +3,7 @@
 import { NextResponse } from "next/server";
 
 const VAPID_PUBLIC_KEY =
-  "BPQnbbCGJ6JfzAuF1N7bZ9zbN3fosbdHeVFAjlTCalWqybPwEmWzI1vmtRHaBMB4-Ta1sKVSzn0HUy1Ppm1zJ8Q";
+  "BPijWs62LtGHaH2ixc6fYHQNiJjzmOJ32_o4cd1R_PHLt5o33dIPvvtZk29hF-V9MA8xs-HYqAR3k7xZ7hBha0g";
 
 export async function GET() {
   return NextResponse.json({ publicKey: VAPID_PUBLIC_KEY });
