@@ -32,32 +32,41 @@ function splitDateTime(v: string): [string, string] {
   return [d || "", (t || "").slice(0, 5)];
 }
 
-// Separate date + time inputs: iOS Safari renders a single datetime-local
-// input as an oversized empty box, so we split them for a clean compact look.
+// Compact date + time row: small labeled inputs side by side instead of
+// big stacked boxes.
 export function DateTimeField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   const [d, t] = splitDateTime(value);
   const update = (nd: string, nt: string) => {
     if (!nd) return onChange("");
     onChange(`${nd}T${nt || "08:00"}`);
   };
+  const smallInput =
+    "w-full min-w-0 bg-white border border-pine/20 rounded-xl px-3 py-2 text-sm text-pine focus:outline-none focus:border-signal";
+  const miniLabel = "block text-[10px] font-bold uppercase tracking-wider text-pine/50 mb-1";
   return (
     <div className="min-w-0">
       {label && <label className={labelCls}>{label}</label>}
-      <div className="grid grid-cols-1 gap-2">
-        <input
-          type="date"
-          value={d}
-          onChange={(e) => update(e.target.value, t)}
-          className={`${inputCls} min-w-0 block`}
-          aria-label="Date"
-        />
-        <input
-          type="time"
-          value={t}
-          onChange={(e) => update(d, e.target.value)}
-          className={`${inputCls} min-w-0 block`}
-          aria-label="Time"
-        />
+      <div className="flex gap-2">
+        <div className="flex-1 min-w-0">
+          <span className={miniLabel}>Date</span>
+          <input
+            type="date"
+            value={d}
+            onChange={(e) => update(e.target.value, t)}
+            className={smallInput}
+            aria-label="Date"
+          />
+        </div>
+        <div className="w-32 shrink-0">
+          <span className={miniLabel}>Time</span>
+          <input
+            type="time"
+            value={t}
+            onChange={(e) => update(d, e.target.value)}
+            className={smallInput}
+            aria-label="Time"
+          />
+        </div>
       </div>
     </div>
   );
