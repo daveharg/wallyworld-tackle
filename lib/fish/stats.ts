@@ -215,7 +215,7 @@ export async function getAllUserStats(limit = 500): Promise<AdminUserStats[]> {
     created_at: string | null;
   }>(
     `SELECT id, name, avatar_url, created_at::text AS created_at
-     FROM fm_users ORDER BY created_at DESC LIMIT $1`,
+     FROM fm_users WHERE google_sub NOT LIKE 'anon:%' ORDER BY created_at DESC LIMIT $1`,
     [limit]
   );
   if (users.length === 0) return [];
