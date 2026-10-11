@@ -27,14 +27,46 @@ interface LakeCardData extends SavedLake {
   stocked20yr: number;
 }
 
-/** 625000 → "625K", 2500000 → "2.5M" */
+/** 625000 → "625K", 10300000 → "10.3mil" */
 function formatStocked(n: number): string {
   if (n >= 1_000_000) {
     const v = n / 1_000_000;
-    return `${v >= 10 ? Math.round(v) : v.toFixed(1)}M`;
+    return `${v >= 10 ? Math.round(v) : v.toFixed(1)}mil`;
   }
   if (n >= 1_000) return `${Math.round(n / 1_000)}K`;
   return `${n}`;
+}
+
+/** Right-side stat block shared by saved-lake and recommended-lake rows:
+ *  current weather, stocked total, Master Angler count. */
+function LakeStatBlock({
+  tempC,
+  stocked20yr,
+  masters,
+}: {
+  tempC: number | null;
+  stocked20yr: number;
+  masters: number;
+}) {
+  return (
+    <div className="shrink-0 flex items-start gap-4">
+      {tempC !== null && (
+        <div className="text-right">
+          <p className="text-[15px] font-extrabold text-pine">{tempC}°</p>
+        </div>
+      )}
+      {stocked20yr > 0 && (
+        <div className="text-right">
+          <p className="text-[15px] font-extrabold text-pine">{formatStocked(stocked20yr)}</p>
+          <p className="text-[11px] font-bold text-pine/55 mt-0.5">Stocked</p>
+        </div>
+      )}
+      <div className="text-right">
+        <p className="text-[15px] font-extrabold text-signal">{masters.toLocaleString()}</p>
+        <p className="text-[11px] font-bold text-pine/55 mt-0.5">Master Anglers</p>
+      </div>
+    </div>
+  );
 }
 
 function weatherEmoji(code: number | null): string {
@@ -93,6 +125,9 @@ export default function LakesTab({
   const [addId, setAddId] = useState("");
   const [addQuery, setAddQuery] = useState("");
   const [saving, setSaving] = useState(false);
+  // Shared by recommended rows: aggregates + weather keyed by lake id.
+  const [lakeStats, setLakeStats] = useState<Record<string, { masters_2yr: number; stocked_20yr: number }>>({});
+  const [recWeather, setRecWeather] = useState<Record<string, number | null>>({});
 
   useEffect(() => {
     (async () => {
@@ -127,12 +162,37 @@ export default function LakesTab({
       });
 
       // Lake aggregates (Master Anglers last 2 yrs, stocked last 20 yrs) — one fetch for all.
-      let lakeStats: Record<string, { masters_2yr: number; stocked_20yr: number }> = {};
+      let stats: Record<string, { masters_2yr: number; stocked_20yr: number }> = {};
       try {
         const s = await fishFetch("/api/fishmb/lake-stats");
-        lakeStats = s.stats ?? {};
+        stats = s.stats ?? {};
       } catch {
         // Stats stay blank.
+      }
+      const lakeStatsLocal = stats;
+      setLakeStats(stats);
+      // Weather for the recommended lakes (coords from lake-coords.json).
+      try {
+        const coords = await fetch("/fishmb/lake-coords.json").then((r) => r.json()).catch(() => ({}));
+        const w: Record<string, number | null> = {};
+        await Promise.all(
+          RECOMMENDED.map(async (r) => {
+            const c = coords[r.id];
+            if (!c || c.lat == null || c.lng == null) return;
+            try {
+              const wr = await fetch(
+                `https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lng}&current=temperature_2m&timezone=auto`
+              ).then((x) => x.json());
+              const t = Math.round(wr?.current?.temperature_2m ?? NaN);
+              w[r.id] = Number.isNaN(t) ? null : t;
+            } catch {
+              // Weather stays blank.
+            }
+          })
+        );
+        setRecWeather(w);
+      } catch {
+        // Recommended weather stays blank.
       }
       // Enrich each lake with weather + catch count in parallel.
       const enriched = await Promise.all(
@@ -141,7 +201,7 @@ export default function LakesTab({
           let tempC: number | null = null;
           let weatherCode: number | null = null;
           let catchCount: number | null = null;
-          const st = lakeStats[lake.id];
+          const st = lakeStatsLocal[lake.id];
           const masters2yr = st?.masters_2yr ?? 0;
           const stocked20yr = st?.stocked_20yr ?? 0;
           if (lake.lat !== null && lake.lng !== null) {
@@ -241,35 +301,17 @@ export default function LakesTab({
                   <p className="font-extrabold text-pine text-[16px] leading-tight truncate">
                     {lake.name}
                   </p>
-                  {lake.region && (
-                    <p className="text-[11px] text-pine/50 font-semibold mt-0.5">
-                      {lake.region}
-                    </p>
-                  )}
-                  {(lake.masters2yr > 0 || lake.stocked20yr > 0) && (
-                    <p className="text-[11px] text-pine/50 font-semibold mt-0.5">
-                      {lake.masters2yr > 0 &&
-                        `${lake.masters2yr} Master Angler${lake.masters2yr === 1 ? "" : "s"} · last 2 yrs`}
-                      {lake.masters2yr > 0 && lake.stocked20yr > 0 && " · "}
-                      {lake.stocked20yr > 0 &&
-                        `${formatStocked(lake.stocked20yr)} stocked · last 20 yrs`}
-                    </p>
-                  )}
+                  <p className="text-[11px] text-pine/50 font-semibold mt-0.5">
+                    {lake.region}
+                    {lake.catchCount !== null && lake.catchCount > 0 &&
+                      ` · ${lake.catchCount} ${lake.catchCount === 1 ? "catch" : "catches"}`}
+                  </p>
                 </div>
-                <div className="shrink-0 text-right">
-                  {lake.tempC !== null ? (
-                    <p className="text-[15px] font-extrabold text-pine">
-                      {weatherEmoji(lake.weatherCode)} {lake.tempC}°
-                    </p>
-                  ) : (
-                    <p className="text-[15px] font-extrabold text-pine/30">—</p>
-                  )}
-                  {lake.catchCount !== null && lake.catchCount > 0 && (
-                    <p className="text-[11px] font-bold text-pine/55 mt-0.5">
- {lake.catchCount} {lake.catchCount === 1 ? "catch" : "catches"}
-                    </p>
-                  )}
-                </div>
+                <LakeStatBlock
+                  tempC={lake.tempC}
+                  stocked20yr={lake.stocked20yr}
+                  masters={lake.masters2yr}
+                />
               </div>
               {lake.species.length > 0 && (
                 <p className="text-[11px] text-pine/55 font-semibold mt-1 truncate">
@@ -309,14 +351,11 @@ export default function LakesTab({
                     {lake.region}
                   </p>
                 </div>
-                <div className="shrink-0 text-right">
-                  <p className="text-[15px] font-extrabold text-signal">
-                    {lake.entries.toLocaleString()}
-                  </p>
-                  <p className="text-[11px] font-bold text-pine/55 mt-0.5">
-                    Master Anglers
-                  </p>
-                </div>
+                <LakeStatBlock
+                  tempC={recWeather[lake.id] ?? null}
+                  stocked20yr={lakeStats[lake.id]?.stocked_20yr ?? 0}
+                  masters={lake.entries}
+                />
               </div>
             </button>
           ))}
