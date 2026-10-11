@@ -73,10 +73,11 @@ export default function ThreadView({
   const [themeOpen, setThemeOpen] = useState(false);
   const [themeName, setThemeName] = useState<string>("Default");
   const [resyncing, setResyncing] = useState(false);
+  const autoResyncDone = useRef(false);
 
   /** Force re-upload our public key and refetch all member keys. Fixes "couldn't decrypt" when keys are stale. */
-  const resyncKeys = async () => {
-    setResyncing(true);
+  const resyncKeys = async (silent: boolean = false) => {
+    if (!silent) setResyncing(true);
     try {
       const localPub = publicKeyB64(keypair);
       await fishFetch("/api/fishmb/msg/keys", {
@@ -93,13 +94,28 @@ export default function ThreadView({
       }));
       secretsRef.current = s;
       setSecrets(s);
-      setNote("Keys re-synced. New messages should decrypt. Old messages encrypted with a lost key can't be recovered.");
+      if (!silent) {
+        setNote("Keys re-synced. New messages should decrypt. Old messages encrypted with a lost key can't be recovered.");
+      }
+      return true;
     } catch {
-      setNote("Couldn't re-sync keys. Try again.");
+      if (!silent) setNote("Couldn't re-sync keys. Try again.");
+      return false;
     } finally {
-      setResyncing(false);
+      if (!silent) setResyncing(false);
     }
   };
+
+  // Auto re-sync once when messages fail to decrypt (keys likely stale).
+  useEffect(() => {
+    if (autoResyncDone.current || !secrets || msgs.length === 0) return;
+    const failed = msgs.some((m) => !m.text && !m.noKey && !m.mine);
+    if (failed) {
+      autoResyncDone.current = true;
+      resyncKeys(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [msgs, secrets]);
 
   // Curated themes — every combination is designed to be readable.
   const THEMES: {
@@ -927,17 +943,6 @@ export default function ThreadView({
                   >
                     {m.text ?? (m.noKey ? "Waiting for encryption key…" : "Couldn't decrypt this message.")}
                   </p>
-                )}
-                {!m.text && !m.noKey && !m.mine && (
-                  <button
-                    type="button"
-                    onClick={resyncKeys}
-                    disabled={resyncing}
-                    className="mt-1 text-xs underline opacity-70"
-                    style={{ color: m.mine ? theme.sentText : theme.receivedText }}
-                  >
-                    {resyncing ? "Fixing…" : "Tap to fix encryption"}
-                  </button>
                 )}
               </div>
             </div>

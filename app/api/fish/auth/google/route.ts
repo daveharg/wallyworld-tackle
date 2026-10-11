@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
                 SET google_sub = $2,
                     name = CASE WHEN name = 'Guest Angler' THEN $3 ELSE name END,
                     email = COALESCE($4, email),
-                    avatar_url = COALESCE($5, avatar_url),
+                    avatar_url = COALESCE(avatar_url, $5),
                     age_confirmed = true,
                     terms_accepted = true
               WHERE id = $1 RETURNING *`,
@@ -147,11 +147,12 @@ export async function POST(req: NextRequest) {
     if (existing) {
       // Refresh profile details on each sign-in, but never steal another
       // angler's display name — keep the current one if Google's is taken.
+      // Never overwrite a custom avatar with Google's picture.
       const safeName = await uniqueDisplayName(profile.name, client, existing.id);
       const updated = await txQueryOne<FishUser>(
         client,
         `UPDATE fm_users
-            SET name = $2, email = COALESCE($3, email), avatar_url = COALESCE($4, avatar_url),
+            SET name = $2, email = COALESCE($3, email), avatar_url = COALESCE(avatar_url, $4),
                 age_confirmed = age_confirmed OR $5,
                 terms_accepted = terms_accepted OR $6
           WHERE id = $1 RETURNING *`,
