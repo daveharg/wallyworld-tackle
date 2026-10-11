@@ -4,7 +4,11 @@
 
 import nacl from "tweetnacl";
 
-const PRIV_KEY_STORAGE = "fishmb-msg-privkey";
+const PRIV_KEY_PREFIX = "fishmb-msg-privkey-";
+
+function keyFor(userId: string): string {
+  return `${PRIV_KEY_PREFIX}${userId}`;
+}
 
 function bytesToB64(bytes: Uint8Array): string {
   let s = "";
@@ -24,10 +28,10 @@ export interface MsgKeypair {
   secretKey: Uint8Array;
 }
 
-/** Load the device keypair, generating and storing one if absent. */
-export function getOrCreateKeypair(): MsgKeypair {
+/** Load the device keypair for a user, generating and storing one if absent. */
+export function getOrCreateKeypair(userId: string): MsgKeypair {
   try {
-    const stored = localStorage.getItem(PRIV_KEY_STORAGE);
+    const stored = localStorage.getItem(keyFor(userId));
     if (stored) {
       const secretKey = b64ToBytes(stored);
       if (secretKey.length === nacl.box.secretKeyLength) {
@@ -39,16 +43,16 @@ export function getOrCreateKeypair(): MsgKeypair {
   }
   const kp = nacl.box.keyPair();
   try {
-    localStorage.setItem(PRIV_KEY_STORAGE, bytesToB64(kp.secretKey));
+    localStorage.setItem(keyFor(userId), bytesToB64(kp.secretKey));
   } catch {
     // storage unavailable — keys live for this session only
   }
   return kp;
 }
 
-export function hasLocalKeypair(): boolean {
+export function hasLocalKeypair(userId: string): boolean {
   try {
-    const stored = localStorage.getItem(PRIV_KEY_STORAGE);
+    const stored = localStorage.getItem(keyFor(userId));
     return !!stored && b64ToBytes(stored).length === nacl.box.secretKeyLength;
   } catch {
     return false;

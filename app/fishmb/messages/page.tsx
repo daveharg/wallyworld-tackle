@@ -218,24 +218,27 @@ function MessagesPageInner() {
   };
 
   // Setup check: local keypair + server public key. Auto-uploads the public
-  // key if missing — no manual setup step needed.
+  // key if missing or mismatched — no manual setup step needed.
   useEffect(() => {
     if (!user) return;
     (async () => {
       try {
         const d = await fishFetch("/api/fishmb/msg/keys");
-        const kp = getOrCreateKeypair();
+        const kp = getOrCreateKeypair(user.id);
         setKeypair(kp);
-        if ((d as { public_key: string | null }).public_key) {
+        const serverKey = (d as { public_key: string | null }).public_key;
+        const localKey = publicKeyB64(kp);
+        if (serverKey && serverKey === localKey) {
           setSetup("ready");
           loadConvos();
         } else {
-          // No public key on server yet — upload it automatically.
+          // No public key on server, or local keypair changed (new device,
+          // cleared data) — upload the current public key automatically.
           try {
             await fishFetch("/api/fishmb/msg/keys", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ public_key: publicKeyB64(kp) }),
+              body: JSON.stringify({ public_key: localKey }),
             });
             setSetup("ready");
             loadConvos();
@@ -256,7 +259,7 @@ function MessagesPageInner() {
     setEnabling(true);
     setNote(null);
     try {
-      const kp = getOrCreateKeypair();
+      const kp = getOrCreateKeypair(user!.id);
       setKeypair(kp);
       await fishFetch("/api/fishmb/msg/keys", {
         method: "POST",
