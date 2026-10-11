@@ -950,6 +950,8 @@ function FeedPageInner() {
   const [composerOpen, setComposerOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [friendRequestCount, setFriendRequestCount] = useState(0);
   const [q, setQ] = useState("");
   const [activeQ, setActiveQ] = useState("");
   const [mode, setMode] = useState<"post" | "catch">("post");
@@ -1001,6 +1003,16 @@ function FeedPageInner() {
   useEffect(() => { friendsOnlyRef.current = friendsOnly; }, [friendsOnly]);
   useEffect(() => { activeQRef.current = activeQ; }, [activeQ]);
   useEffect(() => { itemsRef.current = items; }, [items]);
+
+  // Fetch pending friend request count for the profile menu badge.
+  useEffect(() => {
+    if (!user) return;
+    fishFetch("/api/fish/friends")
+      .then((d) => {
+        setFriendRequestCount(((d as { pending_incoming?: unknown[] }).pending_incoming ?? []).length);
+      })
+      .catch(() => {});
+  }, [user]);
 
   const applyPage = useCallback((d: { items?: FeedItem[]; nextCursor?: string | null; hasMore?: boolean }) => {
     setItems(d.items ?? []);
@@ -1646,16 +1658,66 @@ function FeedPageInner() {
       {/* Mobile top section — FishMB logo, profile circle, 3 feed tabs */}
       <div className="md:hidden">
         <div className="relative flex items-center justify-between mb-3">
-          <Link href="/fishmb/dashboard?tab=profile" aria-label="Your profile">
-            {user?.avatar_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={user.avatar_url} alt={user.name} className="w-10 h-10 rounded-full object-cover" />
-            ) : (
-              <span className="w-10 h-10 rounded-full bg-pine/10 text-pine flex items-center justify-center font-bold text-lg">
-                {(user?.name ?? "?").charAt(0).toUpperCase()}
-              </span>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setProfileMenuOpen((v) => !v)}
+              aria-label="Account menu"
+            >
+              {user?.avatar_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={user.avatar_url} alt={user.name} className="w-10 h-10 rounded-full object-cover" />
+              ) : (
+                <span className="w-10 h-10 rounded-full bg-pine/10 text-pine flex items-center justify-center font-bold text-lg">
+                  {(user?.name ?? "?").charAt(0).toUpperCase()}
+                </span>
+              )}
+              {friendRequestCount > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 rounded-full bg-signal text-white text-[11px] font-bold flex items-center justify-center border-2 border-white">
+                  {friendRequestCount > 99 ? "99+" : friendRequestCount}
+                </span>
+              )}
+            </button>
+            {profileMenuOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-40"
+                  onClick={() => setProfileMenuOpen(false)}
+                />
+                <div className="absolute left-0 top-12 z-50 w-56 bg-white rounded-2xl shadow-xl border border-pine/10 py-2">
+                  <Link
+                    href="/fishmb/dashboard?tab=profile"
+                    onClick={() => setProfileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-pine/5 transition-colors"
+                  >
+                    <span className="text-xl">👤</span>
+                    <span className="font-bold text-pine text-sm">My Account</span>
+                  </Link>
+                  <Link
+                    href="/fishmb/friends"
+                    onClick={() => setProfileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-pine/5 transition-colors"
+                  >
+                    <span className="text-xl">👥</span>
+                    <span className="font-bold text-pine text-sm">Friends</span>
+                  </Link>
+                  <Link
+                    href="/fishmb/friends?tab=requests"
+                    onClick={() => setProfileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-pine/5 transition-colors"
+                  >
+                    <span className="text-xl">📨</span>
+                    <span className="font-bold text-pine text-sm">Friend Requests</span>
+                    {friendRequestCount > 0 && (
+                      <span className="ml-auto min-w-[22px] h-[22px] px-1.5 rounded-full bg-signal text-white text-xs font-bold flex items-center justify-center">
+                        {friendRequestCount > 99 ? "99+" : friendRequestCount}
+                      </span>
+                    )}
+                  </Link>
+                </div>
+              </>
             )}
-          </Link>
+          </div>
           <span className="absolute left-1/2 -translate-x-1/2 font-display font-black text-2xl tracking-tight">
             <span className="text-pine">Fish</span><span className="text-signal-dark">MB</span>
           </span>

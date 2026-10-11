@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useFishAuth } from "../../_components/FishAuth";
 import ProfileView from "../../profile/_components/ProfileView";
 import ProfileFriends from "./ProfileFriends";
+import FriendRequests from "./FriendRequests";
 import BusinessSettings from "./BusinessSettings";
 
 export default function DashboardProfile() {
@@ -19,6 +20,7 @@ export default function DashboardProfile() {
 
   return (
     <>
+      <FriendRequests />
       <ProfileView userId={user.id} />
       <ProfileFriends />
       {isBusiness && (
