@@ -70,6 +70,29 @@ export default function ThreadView({
   const [note, setNote] = useState<string | null>(null);
   const [showMembers, setShowMembers] = useState(false);
   const [editingGroup, setEditingGroup] = useState(false);
+  const [themeOpen, setThemeOpen] = useState(false);
+  const [chatBg, setChatBg] = useState<string>("#ffffff");
+  const [chatText, setChatText] = useState<string>("#0b231f");
+
+  // Load per-chat theme from localStorage.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(`fishmb-chat-theme-${peer.id}`);
+      if (saved) {
+        const t = JSON.parse(saved) as { bg?: string; text?: string };
+        if (t.bg) setChatBg(t.bg);
+        if (t.text) setChatText(t.text);
+      }
+    } catch {}
+  }, [peer.id]);
+
+  const saveTheme = (bg: string, text: string) => {
+    setChatBg(bg);
+    setChatText(text);
+    try {
+      localStorage.setItem(`fishmb-chat-theme-${peer.id}`, JSON.stringify({ bg, text }));
+    } catch {}
+  };
   const [editName, setEditName] = useState("");
   const [editAvatar, setEditAvatar] = useState<string | null>(null);
   const [savingGroup, setSavingGroup] = useState(false);
@@ -547,7 +570,17 @@ export default function ThreadView({
             {peer.is_group ? `${peer.members.length} members` : "Direct message"}
           </p>
         </div>
-        <span className="w-8 md:hidden shrink-0" />
+        <button
+          type="button"
+          onClick={() => setThemeOpen(true)}
+          className="w-8 h-8 md:hidden flex items-center justify-center text-pine/60 shrink-0"
+          aria-label="Chat appearance"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+        </button>
       </div>
 
       {editingGroup && (
@@ -773,7 +806,10 @@ export default function ThreadView({
         </p>
       )}
 
-      <div className="flex-1 min-h-0 overflow-y-auto py-4 space-y-1">
+      <div
+        className="flex-1 min-h-0 overflow-y-auto py-4 space-y-1 -mx-4 px-4"
+        style={{ backgroundColor: chatBg }}
+      >
         {msgs.length === 0 && secrets && (
           <p className="text-center text-pine/45 text-sm mt-8">
  No messages yet — say hey. 
@@ -815,7 +851,10 @@ export default function ThreadView({
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={photo} alt="Shared photo" className="rounded-2xl max-h-64 object-cover" loading="lazy" />
                 ) : (
-                  <p className="text-[17px] leading-snug whitespace-pre-wrap break-words">
+                  <p
+                    className="text-[17px] leading-snug whitespace-pre-wrap break-words"
+                    style={{ color: chatText }}
+                  >
                     {m.text ?? (m.noKey ? "Waiting for encryption key…" : "Couldn't decrypt this message.")}
                   </p>
                 )}
@@ -870,6 +909,103 @@ export default function ThreadView({
           {sending ? "…" : "↑"}
         </button>
       </div>
+
+      {/* Chat appearance settings */}
+      {themeOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-4"
+          onClick={() => setThemeOpen(false)}
+        >
+          <div
+            className="bg-white rounded-3xl w-full max-w-sm p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="font-bold text-pine text-lg mb-4">Chat appearance</h3>
+
+            <p className="text-sm font-bold text-pine/70 mb-2">Background</p>
+            <div className="flex flex-wrap gap-2 mb-5">
+              {[
+                ["#ffffff", "White"],
+                ["#f5f1e8", "Cream"],
+                ["#0b231f", "Dark"],
+                ["#1a3a4a", "Ocean"],
+                ["#3a1a2a", "Plum"],
+                ["#1a2f1a", "Forest"],
+                ["#f0e6f6", "Lavender"],
+                ["#fff3e0", "Peach"],
+              ].map(([color, name]) => (
+                <button
+                  key={color}
+                  type="button"
+                  onClick={() => saveTheme(color, chatText)}
+                  className={`w-10 h-10 rounded-full border-2 transition-transform ${
+                    chatBg === color ? "border-signal scale-110" : "border-pine/20"
+                  }`}
+                  style={{ backgroundColor: color }}
+                  aria-label={name}
+                  title={name}
+                />
+              ))}
+            </div>
+
+            <p className="text-sm font-bold text-pine/70 mb-2">Text</p>
+            <div className="flex flex-wrap gap-2 mb-5">
+              {[
+                ["#0b231f", "Dark"],
+                ["#ffffff", "White"],
+                ["#e4572e", "Orange"],
+                ["#1a73e8", "Blue"],
+                ["#0d8043", "Green"],
+                ["#b31448", "Red"],
+                ["#7c4dff", "Purple"],
+              ].map(([color, name]) => (
+                <button
+                  key={color}
+                  type="button"
+                  onClick={() => saveTheme(chatBg, color)}
+                  className={`w-10 h-10 rounded-full border-2 transition-transform flex items-center justify-center ${
+                    chatText === color ? "border-signal scale-110" : "border-pine/20"
+                  }`}
+                  style={{ backgroundColor: color }}
+                  aria-label={name}
+                  title={name}
+                >
+                  <span className="text-lg font-bold" style={{ color: color === "#ffffff" ? "#0b231f" : "#ffffff" }}>
+                    A
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            {/* Preview */}
+            <div
+              className="rounded-2xl p-3 mb-4"
+              style={{ backgroundColor: chatBg }}
+            >
+              <p className="text-sm" style={{ color: chatText }}>
+                This is how your messages will look
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                saveTheme("#ffffff", "#0b231f");
+              }}
+              className="w-full py-2.5 rounded-full border border-pine/20 text-pine font-bold text-sm mb-2"
+            >
+              Reset to default
+            </button>
+            <button
+              type="button"
+              onClick={() => setThemeOpen(false)}
+              className="w-full py-3 rounded-full bg-pine text-white font-bold text-sm"
+            >
+              Done
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
