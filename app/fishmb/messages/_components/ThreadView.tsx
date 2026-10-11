@@ -72,6 +72,34 @@ export default function ThreadView({
   const [editingGroup, setEditingGroup] = useState(false);
   const [themeOpen, setThemeOpen] = useState(false);
   const [themeName, setThemeName] = useState<string>("Default");
+  const [resyncing, setResyncing] = useState(false);
+
+  /** Force re-upload our public key and refetch all member keys. Fixes "couldn't decrypt" when keys are stale. */
+  const resyncKeys = async () => {
+    setResyncing(true);
+    try {
+      const localPub = publicKeyB64(keypair);
+      await fishFetch("/api/fishmb/msg/keys", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ public_key: localPub }),
+      });
+      const d = await fishFetch(`/api/fishmb/msg/conversations/${peer.id}/members`);
+      const members = (d.members ?? []) as { user_id: string; public_key: string | null }[];
+      const keyed = members.filter((m) => m.public_key);
+      const s = keyed.map((m) => ({
+        user_id: m.user_id,
+        shared: sharedSecret(m.public_key as string, keypair.secretKey),
+      }));
+      secretsRef.current = s;
+      setSecrets(s);
+      setNote("Keys re-synced. New messages should decrypt. Old messages encrypted with a lost key can't be recovered.");
+    } catch {
+      setNote("Couldn't re-sync keys. Try again.");
+    } finally {
+      setResyncing(false);
+    }
+  };
 
   // Curated themes — every combination is designed to be readable.
   const THEMES: {
@@ -899,6 +927,17 @@ export default function ThreadView({
                   >
                     {m.text ?? (m.noKey ? "Waiting for encryption key…" : "Couldn't decrypt this message.")}
                   </p>
+                )}
+                {!m.text && !m.noKey && !m.mine && (
+                  <button
+                    type="button"
+                    onClick={resyncKeys}
+                    disabled={resyncing}
+                    className="mt-1 text-xs underline opacity-70"
+                    style={{ color: m.mine ? theme.sentText : theme.receivedText }}
+                  >
+                    {resyncing ? "Fixing…" : "Tap to fix encryption"}
+                  </button>
                 )}
               </div>
             </div>
