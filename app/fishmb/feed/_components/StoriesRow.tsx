@@ -161,7 +161,13 @@ export default function StoriesRow() {
         </button>
 
         {/* Story cards */}
-        {cards.map((c) => (
+        {cards.map((c) => {
+          // Videos store a Mux HLS URL — use the Mux thumbnail image for the card.
+          const coverSrc =
+            c.cover.media_type === "video"
+              ? c.cover.media_url.replace("stream.mux.com/", "image.mux.com/").replace(/\.m3u8.*$/, "/thumbnail.jpg")
+              : c.cover.media_url;
+          return (
           <button
             key={c.userId}
             type="button"
@@ -169,7 +175,7 @@ export default function StoriesRow() {
             className="shrink-0 w-28 h-44 rounded-3xl overflow-hidden relative text-left"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={c.cover.media_url} alt="" className="absolute inset-0 w-full h-full object-cover" />
+            <img src={coverSrc} alt="" className="absolute inset-0 w-full h-full object-cover" />
             <span className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
             {c.avatarUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -193,7 +199,8 @@ export default function StoriesRow() {
               {c.userName}
             </span>
           </button>
-        ))}
+          );
+        })}
       </div>
 
       {/* Full-screen story creator */}
