@@ -450,14 +450,26 @@ export async function storeMessage(
     });
     const recipients = Array.from(recipientSet);
     await Promise.allSettled(
-      recipients.map((rid) =>
-        sendPushToUser(rid, {
+      recipients.map(async (rid) => {
+        // Count total unread for the app icon badge.
+        let unread = 0;
+        try {
+          const r = await queryOne<{ n: string }>(
+            `SELECT COUNT(*) AS n FROM fm_messages m
+             JOIN fm_conversation_members cm ON cm.conversation_id = m.conversation_id
+             WHERE m.recipient_id = $1 AND m.created_at > COALESCE(cm.last_read_at, '1970-01-01')`,
+            [rid]
+          );
+          unread = parseInt(r?.n ?? "0", 10) || 0;
+        } catch {}
+        return sendPushToUser(rid, {
           title: senderName,
           body: "Sent you a message.",
           url: `/fishmb/messages?c=${conversationId}`,
           tag: `fishmb-msg-${conversationId}`,
-        })
-      )
+          unread,
+        });
+      })
     );
   } catch {
     // ignore

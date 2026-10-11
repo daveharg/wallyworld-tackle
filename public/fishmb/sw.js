@@ -28,7 +28,17 @@ self.addEventListener("push", (event) => {
     data: { url: data.url || "/fishmb/messages" },
     tag: data.tag || "fishmb-message",
   };
-  event.waitUntil(self.registration.showNotification(title, options));
+  event.waitUntil(
+    (async () => {
+      // Update the app icon badge if the payload carries a count.
+      try {
+        if (typeof self.navigator.setAppBadge === "function" && typeof data.unread === "number" && data.unread > 0) {
+          await self.navigator.setAppBadge(data.unread);
+        }
+      } catch (e) {}
+      await self.registration.showNotification(title, options);
+    })()
+  );
 });
 
 self.addEventListener("notificationclick", (event) => {

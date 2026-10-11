@@ -20,7 +20,7 @@ export async function ensurePushTable() {
 /** Send a push notification to all of a user's subscribed devices. */
 export async function sendPushToUser(
   userId: string,
-  payload: { title: string; body: string; url?: string; tag?: string }
+  payload: { title: string; body: string; url?: string; tag?: string; unread?: number }
 ): Promise<void> {
   const privateKey = process.env.VAPID_PRIVATE_KEY;
   if (!privateKey) return;
@@ -35,7 +35,7 @@ export async function sendPushToUser(
     const webpush = (await import("web-push")).default;
     webpush.setVapidDetails(
       "mailto:noreply@fishmb.ca",
-      "BPQnbbCGJ6JfzAuF1N7bZ9zbN3fosbdHeVFAjlTCalWqybPwEmWzI1vmtRHaBMB4-Ta1sKVSzn0HUy1Ppm1zJ8Q",
+      "BPijWs62LtGHaH2ixc6fYHQNiJjzmOJ32_o4cd1R_PHLt5o33dIPvvtZk29hF-V9MA8xs-HYqAR3k7xZ7hBha0g",
       privateKey
     );
     await Promise.allSettled(

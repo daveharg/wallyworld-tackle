@@ -427,6 +427,25 @@ function MessagesPageInner() {
     }
   };
 
+  // App icon badge: show total unread count on the home-screen icon.
+  // Must be before any early returns.
+  const totalUnread = convos.reduce((sum, c) => sum + (c.unread ?? 0), 0);
+  useEffect(() => {
+    try {
+      const nav = navigator as Navigator & {
+        setAppBadge?: (n: number) => Promise<void>;
+        clearAppBadge?: () => Promise<void>;
+      };
+      if (typeof nav.setAppBadge === "function") {
+        if (totalUnread > 0) {
+          nav.setAppBadge(totalUnread).catch(() => {});
+        } else if (typeof nav.clearAppBadge === "function") {
+          nav.clearAppBadge().catch(() => {});
+        }
+      }
+    } catch {}
+  }, [totalUnread]);
+
   // Pastel avatar colors, deterministic per name (Telegram-style).
   const AVATAR_COLORS = [
     ["#D6E9F8", "#1B7AC4"], // blue
@@ -582,14 +601,14 @@ function MessagesPageInner() {
           type="button"
           onClick={enablePush}
           disabled={enablingPush}
-          className="w-full mb-4 flex items-center gap-3 rounded-2xl bg-pine text-cream px-4 py-3 text-left shadow-sm active:scale-[0.99] transition disabled:opacity-60"
+          className="w-full mb-4 flex items-center gap-3 rounded-2xl bg-pine text-white px-4 py-3 text-left shadow-sm active:scale-[0.99] transition disabled:opacity-60"
         >
           <span className="text-2xl">🔔</span>
           <span className="flex-1">
             <span className="block font-semibold text-sm">Get notified of new messages</span>
-            <span className="block text-cream/70 text-xs">Turn on push notifications for FishMB chat.</span>
+            <span className="block text-white/70 text-xs">Turn on push notifications for FishMB chat.</span>
           </span>
-          <span className="text-sm font-semibold bg-cream text-pine rounded-full px-4 py-1.5">
+          <span className="text-sm font-semibold bg-white text-pine rounded-full px-4 py-1.5">
             {enablingPush ? "Turning on…" : "Turn on"}
           </span>
         </button>
