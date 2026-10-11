@@ -48,7 +48,7 @@ async function alreadyPosted(userId, likePattern, days = 7) {
     SELECT id FROM fm_discussions
      WHERE user_id = ${userId} AND body LIKE ${likePattern}
        AND (created_at AT TIME ZONE 'America/Winnipeg')::date
-           > (now() AT TIME ZONE 'America/Winnipeg')::date - ${days}
+           > (now() AT TIME ZONE 'America/Winnipeg')::date - make_interval(days => ${days})
      LIMIT 1`;
   return r.length > 0;
 }
