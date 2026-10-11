@@ -1369,6 +1369,7 @@ export default function MapsHub() {
       {/* Quick-add modal after a map long-press / tap-to-drop */}
       {quickAdd && (
         <QuickAddModal
+          ready={quickReady}
           onClose={() => {
             setQuickAdd(null);
             setQuickMode("choose");
@@ -1409,11 +1410,12 @@ export default function MapsHub() {
                 </div>
                 <button
                   type="button"
+                  disabled={!quickReady}
                   onClick={() => {
                     setQuickAdd(null);
                     setQuickMode("choose");
                   }}
-                  className="w-full mt-3 text-pine/60 font-bold uppercase tracking-wider text-xs py-2"
+                  className="w-full mt-3 text-pine/60 font-bold uppercase tracking-wider text-xs py-2 disabled:opacity-50"
                 >
                   Cancel
                 </button>
@@ -1498,9 +1500,11 @@ export default function MapsHub() {
  *  sliding on the popup can't pan the page underneath. */
 function QuickAddModal({
   onClose,
+  ready,
   children,
 }: {
   onClose: () => void;
+  ready: boolean;
   children: React.ReactNode;
 }) {
   useEffect(() => {
@@ -1514,7 +1518,11 @@ function QuickAddModal({
     <div
       className="fixed inset-0 z-[1200] flex items-center justify-center p-4 bg-pine-deep/60 backdrop-blur-sm overscroll-contain"
       style={{ touchAction: "none" }}
-      onClick={onClose}
+      onClick={() => {
+        // Ignore the touch-up that opened the sheet — require a deliberate
+        // second tap to dismiss via the backdrop.
+        if (ready) onClose();
+      }}
     >
       {children}
     </div>
