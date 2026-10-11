@@ -74,22 +74,36 @@ async function youtubePost(userId) {
     console.log("YouTube daily post: already posted today, skipping.");
     return;
   }
-  const show = SHOWS[dayNo % SHOWS.length];
-  const video = await latestVideo(show);
-  const videoLine = video
-    ? `🎥 Watch: ${video.title}\nhttps://www.youtube.com/watch?v=${video.id}`
-    : `Give them a watch: ${show.url}`;
-  const aboutLine = show.description ? `\n\nAbout ${show.name}: ${show.description}` : "";
-  const body =
-    `🎬 Manitoba Fishing Video of the Day\n\n` +
-    `Today's pick: ${show.name} — some of the best Manitoba fishing content on YouTube.${aboutLine}\n\n` +
-    `${videoLine}\n\n` +
-    `Know a Manitoba fishing channel we should feature? Drop it in the comments! 👇`;
-  await post(userId, body);
+  // Never re-post a video that's already been featured. Collect every
+  // YouTube video ID ever posted by the FishMB user.
+  const posted = await sql`
+    SELECT body FROM fm_discussions
+     WHERE user_id = ${userId} AND body LIKE '%youtube.com/watch?v=%'`;
+  const seenIds = new Set();
+  for (const r of posted) {
+    for (const m of r.body.matchAll(/youtube\.com\/watch\?v=([\w-]{11})/g)) seenIds.add(m[1]);
+  }
+  // Walk the rotation starting at today's show; for each show take the
+  // newest RSS entry whose video hasn't been featured yet.
+  for (let s = 0; s < SHOWS.length; s++) {
+    const show = SHOWS[(dayNo + s) % SHOWS.length];
+    const video = await newestUnseenVideo(show, seenIds);
+    if (!video) continue;
+    const videoLine = `🎥 Watch: ${video.title}\nhttps://www.youtube.com/watch?v=${video.id}`;
+    const aboutLine = show.description ? `\n\nAbout ${show.name}: ${show.description}` : "";
+    const body =
+      `🎬 Manitoba Fishing Video of the Day\n\n` +
+      `Today's pick: ${show.name} — some of the best Manitoba fishing content on YouTube.${aboutLine}\n\n` +
+      `${videoLine}\n\n` +
+      `Know a Manitoba fishing channel we should feature? Drop it in the comments! 👇`;
+    await post(userId, body);
+    return;
+  }
+  console.log("YouTube daily post: no new videos from any show, skipping (won't repost).");
 }
 
-/** Newest video on a YouTube channel via its public RSS feed (no API key). */
-async function latestVideo(show) {
+/** Newest RSS entry for a show whose video ID is not in seenIds. */
+async function newestUnseenVideo(show, seenIds) {
   const param = show.channel_id
     ? `channel_id=${show.channel_id}`
     : show.rss_user
@@ -103,12 +117,14 @@ async function latestVideo(show) {
     });
     if (!r.ok) return null;
     const xml = await r.text();
-    const entry = xml.match(/<entry>([\s\S]*?)<\/entry>/);
-    if (!entry) return null;
-    const idMatch = entry[1].match(/<yt:videoId>([^<]+)<\/yt:videoId>/);
-    const titleMatch = entry[1].match(/<title>([^<]+)<\/title>/);
-    if (!idMatch) return null;
-    return { id: idMatch[1], title: titleMatch ? decodeXml(titleMatch[1]) : "their latest video" };
+    for (const m of xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)) {
+      const entry = m[1];
+      const idMatch = entry.match(/<yt:videoId>([^<]+)<\/yt:videoId>/);
+      if (!idMatch || seenIds.has(idMatch[1])) continue;
+      const titleMatch = entry.match(/<title>([^<]+)<\/title>/);
+      return { id: idMatch[1], title: titleMatch ? decodeXml(titleMatch[1]) : "their latest video" };
+    }
+    return null;
   } catch {
     return null;
   }
