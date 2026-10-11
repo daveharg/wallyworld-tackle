@@ -8,8 +8,9 @@ export async function GET(req: NextRequest) {
   const me = await fishUserFromRequest(req);
   if (!me) return unauthorized();
 
-  // Regular catches.
-  const regular = await query<{
+  try {
+    // Regular catches.
+    const regular = await query<{
     id: string;
     species: string;
     length_in: string | null;
@@ -40,11 +41,12 @@ export async function GET(req: NextRequest) {
     tournament_name: string;
   }>(
     `SELECT e.id, e.species, e.length_inches AS length_in, e.photo_url AS photo_hold_url,
-            NULL AS photo_measure_url, e.caught_at, e.tournament_id, t.name AS tournament_name
+            NULL AS photo_measure_url, COALESCE(e.captured_at, e.created_at) AS caught_at,
+            e.tournament_id, t.name AS tournament_name
      FROM fm_tournament_entries e
      JOIN fm_tournaments t ON t.id = e.tournament_id
      WHERE e.user_id = $1 AND e.status = 'approved'
-     ORDER BY e.caught_at DESC LIMIT 100`,
+     ORDER BY COALESCE(e.captured_at, e.created_at) DESC LIMIT 100`,
     [me.id]
   );
 
@@ -54,4 +56,11 @@ export async function GET(req: NextRequest) {
   ].sort((a, b) => new Date(b.caught_at).getTime() - new Date(a.caught_at).getTime());
 
   return NextResponse.json({ catches });
+  } catch (e) {
+    console.error("my-catches failed:", e);
+    return NextResponse.json(
+      { error: e instanceof Error ? e.message : "my-catches query failed" },
+      { status: 500 }
+    );
+  }
 }
