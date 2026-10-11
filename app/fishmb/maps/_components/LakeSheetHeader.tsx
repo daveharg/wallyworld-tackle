@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { fishFetch } from "../../_components/fishFetch";
 import type { SavedLake } from "./types";
 
@@ -28,6 +29,21 @@ export default function LakeSheetHeader({
   const [tempC, setTempC] = useState<number | null>(null);
   const [weatherCode, setWeatherCode] = useState<number | null>(null);
   const [catchCount, setCatchCount] = useState<number | null>(null);
+  const router = useRouter();
+
+  // Tap the weather card → open the Weather tab showing this lake's weather.
+  const openLakeWeather = () => {
+    if (lake.lat === null || lake.lng === null) return;
+    try {
+      localStorage.setItem(
+        "fishmb-wx-current",
+        JSON.stringify({ lat: lake.lat, lon: lake.lng, label: lake.name })
+      );
+    } catch {
+      // Weather page will fall back to its default location.
+    }
+    router.push("/fishmb/weather");
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -86,7 +102,11 @@ export default function LakeSheetHeader({
       </div>
 
       <div className="flex gap-2.5">
-        <div className="flex-1 bg-paper-deep border border-pine/10 rounded-2xl px-4 py-3">
+        <button
+          type="button"
+          onClick={openLakeWeather}
+          className="flex-1 text-left bg-paper-deep border border-pine/10 rounded-2xl px-4 py-3 hover:border-signal/40 active:bg-pine/5 transition-colors"
+        >
           <p className="text-[11px] font-black uppercase tracking-[0.14em] text-pine/45 mb-1">
             Now
           </p>
@@ -98,7 +118,7 @@ export default function LakeSheetHeader({
               </span>
             )}
           </p>
-        </div>
+        </button>
         <Link
           href={`/fishmb/maps/lake/${lake.id}/catches`}
           className="flex-1 bg-paper-deep border border-pine/10 rounded-2xl px-4 py-3 hover:border-signal/40 transition-colors"

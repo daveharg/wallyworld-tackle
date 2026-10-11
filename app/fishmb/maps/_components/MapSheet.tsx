@@ -198,7 +198,7 @@ export default function MapSheet({
       {/* Scrollable page content */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto overscroll-contain px-4 pb-10"
+        className="flex-1 overflow-y-auto overscroll-contain px-4 pb-36"
       >
         {children}
       </div>

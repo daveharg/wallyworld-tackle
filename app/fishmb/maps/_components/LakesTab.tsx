@@ -38,26 +38,19 @@ function formatStocked(n: number): string {
 }
 
 /** Right-side stat block shared by saved-lake and recommended-lake rows:
- *  current weather, stocked total, Master Angler count. */
+ *  stocked total + Master Angler count. */
 function LakeStatBlock({
-  tempC,
   stocked20yr,
   masters,
 }: {
-  tempC: number | null;
   stocked20yr: number;
   masters: number;
 }) {
   return (
     <div className="shrink-0 flex items-start gap-4">
-      {tempC !== null && (
-        <div className="text-right">
-          <p className="text-[15px] font-extrabold text-pine">{tempC}°</p>
-        </div>
-      )}
       {stocked20yr > 0 && (
         <div className="text-right">
-          <p className="text-[15px] font-extrabold text-pine">{formatStocked(stocked20yr)}</p>
+          <p className="text-[15px] font-extrabold text-signal">{formatStocked(stocked20yr)}</p>
           <p className="text-[11px] font-bold text-pine/55 mt-0.5">Stocked</p>
         </div>
       )}
@@ -300,6 +293,9 @@ export default function LakesTab({
                 <div className="min-w-0">
                   <p className="font-extrabold text-pine text-[16px] leading-tight truncate">
                     {lake.name}
+                    {lake.tempC !== null && (
+                      <span className="ml-2 font-bold text-pine/55">{lake.tempC}°</span>
+                    )}
                   </p>
                   <p className="text-[11px] text-pine/50 font-semibold mt-0.5">
                     {lake.region}
@@ -308,7 +304,6 @@ export default function LakesTab({
                   </p>
                 </div>
                 <LakeStatBlock
-                  tempC={lake.tempC}
                   stocked20yr={lake.stocked20yr}
                   masters={lake.masters2yr}
                 />
@@ -346,13 +341,15 @@ export default function LakesTab({
                 <div className="min-w-0">
                   <p className="font-extrabold text-pine text-[16px] leading-tight truncate">
                     {lake.name}
+                    {recWeather[lake.id] != null && (
+                      <span className="ml-2 font-bold text-pine/55">{recWeather[lake.id]}°</span>
+                    )}
                   </p>
                   <p className="text-[11px] text-pine/50 font-semibold mt-0.5">
                     {lake.region}
                   </p>
                 </div>
                 <LakeStatBlock
-                  tempC={recWeather[lake.id] ?? null}
                   stocked20yr={lakeStats[lake.id]?.stocked_20yr ?? 0}
                   masters={lake.entries}
                 />
@@ -378,29 +375,45 @@ export default function LakesTab({
             />
             {addQuery.trim().length > 0 && (
               <div className="max-h-48 overflow-y-auto bg-white border border-pine/15 rounded-2xl divide-y divide-pine/5">
-                {allLakes
-                  .filter((l) => !cards.some((c) => c.id === l.id))
-                  .filter((l) =>
-                    l.name.toLowerCase().includes(addQuery.trim().toLowerCase())
-                  )
-                  .sort((a, b) => a.name.localeCompare(b.name))
-                  .slice(0, 20)
-                  .map((l) => (
-                    <button
-                      key={l.id}
-                      type="button"
-                      onClick={() => {
-                        setAddId(l.id);
-                        setAddQuery(l.name);
-                      }}
-                      className={`w-full text-left px-4 py-2.5 text-sm font-bold text-pine hover:bg-pine/5 ${
-                        addId === l.id ? "bg-signal/10" : ""
-                      }`}
-                    >
-                      {l.name}
-                      {l.region ? <span className="text-pine/45 font-normal"> — {l.region}</span> : null}
-                    </button>
-                  ))}
+                {(() => {
+                  const q = addQuery.trim().toLowerCase();
+                  const matches = allLakes
+                    .filter((l) => l.name.toLowerCase().includes(q))
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .slice(0, 20);
+                  if (matches.length === 0) {
+                    return (
+                      <p className="px-4 py-3.5 text-sm text-pine/50">
+                        No lakes found for “{addQuery.trim()}”.
+                      </p>
+                    );
+                  }
+                  return matches.map((l) => {
+                    const alreadySaved = cards.some((c) => c.id === l.id);
+                    return (
+                      <button
+                        key={l.id}
+                        type="button"
+                        disabled={alreadySaved}
+                        onClick={() => {
+                          setAddId(l.id);
+                          setAddQuery(l.name);
+                        }}
+                        className={`w-full text-left px-4 py-2.5 text-sm font-bold text-pine ${
+                          alreadySaved ? "opacity-50" : "hover:bg-pine/5"
+                        } ${addId === l.id ? "bg-signal/10" : ""}`}
+                      >
+                        {l.name}
+                        {l.region ? <span className="text-pine/45 font-normal"> — {l.region}</span> : null}
+                        {alreadySaved && (
+                          <span className="ml-2 text-[10px] font-black uppercase tracking-wider text-pine/40">
+                            Saved
+                          </span>
+                        )}
+                      </button>
+                    );
+                  });
+                })()}
               </div>
             )}
             <div className="flex gap-2">
