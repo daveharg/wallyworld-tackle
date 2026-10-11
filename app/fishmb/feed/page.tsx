@@ -666,8 +666,184 @@ function Reactions({
   );
 }
 
-function Comments({ postId, uploadPhoto }: { postId: string; uploadPhoto: (f: File) => Promise<string> }) {
-  const { user, openLogin } = useFishAuth();
+/** ⋯ menu on your own posts: Edit / Delete via a bottom action sheet. */
+function OwnPostMenu({
+  item,
+  dark,
+  onEdited,
+  onDeleted,
+}: {
+  item: FeedItem;
+  dark?: boolean;
+  onEdited: (id: string, body: string) => void;
+  onDeleted: (id: string) => void;
+}) {
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [draft, setDraft] = useState(item.body ?? "");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const saveEdit = async () => {
+    const text = draft.trim();
+    if (!text || busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await fishFetch(`/api/fishmb/feed/${item.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ body: text }),
+      });
+      onEdited(item.id, text);
+      setEditing(false);
+      setSheetOpen(false);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not save.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const doDelete = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await fishFetch(`/api/fishmb/feed/${item.id}`, { method: "DELETE" });
+      onDeleted(item.id);
+      setSheetOpen(false);
+      setConfirmingDelete(false);
+    } catch {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <>
+      <button
+        type="button"
+        aria-label="Post options"
+        onClick={(e) => {
+          e.stopPropagation();
+          setSheetOpen(true);
+        }}
+        className={`w-8 h-8 rounded-full flex items-center justify-center text-lg leading-none transition-colors ${
+          dark ? "bg-black/45 text-white" : "text-pine/45 hover:bg-pine/10"
+        }`}
+      >
+        ⋯
+      </button>
+
+      {sheetOpen && !editing && !confirmingDelete && (
+        <div className="fixed inset-0 z-[3000] flex items-end justify-center" onClick={() => setSheetOpen(false)}>
+          <div className="absolute inset-0 bg-pine-deep/60" />
+          <div
+            className="relative w-full max-w-md bg-white rounded-t-3xl p-4 pb-8 space-y-1"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-10 h-1 rounded-full bg-pine/20 mx-auto mb-3" />
+            <button
+              type="button"
+              onClick={() => {
+                setDraft(item.body ?? "");
+                setError(null);
+                setEditing(true);
+              }}
+              className="w-full text-left px-4 py-3.5 rounded-2xl font-bold text-pine hover:bg-pine/5"
+            >
+              ✏️ Edit post
+            </button>
+            <button
+              type="button"
+              onClick={() => setConfirmingDelete(true)}
+              className="w-full text-left px-4 py-3.5 rounded-2xl font-bold text-signal-dark hover:bg-signal/10"
+            >
+              🗑️ Delete post
+            </button>
+            <button
+              type="button"
+              onClick={() => setSheetOpen(false)}
+              className="w-full text-center px-4 py-3.5 rounded-2xl font-bold text-pine/50"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {sheetOpen && editing && (
+        <div className="fixed inset-0 z-[3000] flex items-end justify-center sm:items-center" onClick={() => { setEditing(false); setSheetOpen(false); }}>
+          <div className="absolute inset-0 bg-pine-deep/60" />
+          <div
+            className="relative w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl p-5 pb-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="font-display font-bold uppercase text-pine text-lg tracking-wide mb-3">Edit post</h3>
+            <textarea
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              rows={5}
+              maxLength={2000}
+              autoFocus
+              className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm focus:outline-none focus:border-signal resize-y"
+            />
+            {error && <p className="text-signal-dark text-sm mt-2">{error}</p>}
+            <div className="flex gap-2 mt-4">
+              <button
+                type="button"
+                onClick={() => { setEditing(false); setSheetOpen(false); }}
+                className="flex-1 py-3 rounded-full font-bold text-pine/60 text-sm uppercase tracking-wider"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={saveEdit}
+                disabled={!draft.trim() || busy}
+                className="flex-1 py-3 rounded-full bg-signal hover:bg-signal-dark text-white font-bold text-sm uppercase tracking-wider disabled:opacity-40 transition-colors"
+              >
+                {busy ? "Saving…" : "Save"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {sheetOpen && confirmingDelete && (
+        <div className="fixed inset-0 z-[3000] flex items-end justify-center sm:items-center" onClick={() => { setConfirmingDelete(false); setSheetOpen(false); }}>
+          <div className="absolute inset-0 bg-pine-deep/60" />
+          <div
+            className="relative w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl p-5 pb-8 text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="font-display font-bold uppercase text-pine text-lg tracking-wide mb-2">Delete this post?</h3>
+            <p className="text-pine/60 text-sm mb-5">This can&apos;t be undone.</p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => { setConfirmingDelete(false); setSheetOpen(false); }}
+                className="flex-1 py-3 rounded-full font-bold text-pine/60 text-sm uppercase tracking-wider"
+              >
+                Keep it
+              </button>
+              <button
+                type="button"
+                onClick={doDelete}
+                disabled={busy}
+                className="flex-1 py-3 rounded-full bg-signal-dark text-white font-bold text-sm uppercase tracking-wider disabled:opacity-40"
+              >
+                {busy ? "Deleting…" : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function Comments({ postId, uploadPhoto }: { postId: string; uploadPhoto: (f: File) => Promise<string> }) {  const { user, openLogin } = useFishAuth();
   const [comments, setComments] = useState<FeedComment[]>([]);
   const [draft, setDraft] = useState("");
   const [photo, setPhoto] = useState<string | null>(null);
@@ -940,6 +1116,12 @@ function FeedPageInner() {
   const router = useRouter();
   const { user, loading: authLoading, openLogin, logout } = useFishAuth();
   const [items, setItems] = useState<FeedItem[]>([]);
+  const handlePostEdited = useCallback((id: string, body: string) => {
+    setItems((prev) => prev.map((it) => (it.id === id ? { ...it, body } : it)));
+  }, []);
+  const handlePostDeleted = useCallback((id: string) => {
+    setItems((prev) => prev.filter((it) => it.id !== id));
+  }, []);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -1936,11 +2118,21 @@ function FeedPageInner() {
                     </p>
                   </div>
                 </div>
-                {item.kind === "catch" && (
-                  <span className="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider bg-black/55 text-white px-3 py-1 rounded-full">
- Catch
-                  </span>
-                )}
+                <div className="absolute top-3 right-3 flex items-center gap-2">
+                  {user?.id === item.user_id && (
+                    <OwnPostMenu
+                      item={item}
+                      dark
+                      onEdited={handlePostEdited}
+                      onDeleted={handlePostDeleted}
+                    />
+                  )}
+                  {item.kind === "catch" && (
+                    <span className="text-[10px] font-bold uppercase tracking-wider bg-black/55 text-white px-3 py-1 rounded-full">
+                      Catch
+                    </span>
+                  )}
+                </div>
               </>
             );
             return (
@@ -1976,6 +2168,15 @@ function FeedPageInner() {
                   {item.kind === "catch" && (
                     <span className="ml-auto text-[10px] font-bold uppercase tracking-wider bg-accentTeal/15 text-accentTeal px-3 py-1 rounded-full">
                       Catch
+                    </span>
+                  )}
+                  {user?.id === item.user_id && (
+                    <span className={item.kind === "catch" ? "" : "ml-auto"}>
+                      <OwnPostMenu
+                        item={item}
+                        onEdited={handlePostEdited}
+                        onDeleted={handlePostDeleted}
+                      />
                     </span>
                   )}
                 </div>
