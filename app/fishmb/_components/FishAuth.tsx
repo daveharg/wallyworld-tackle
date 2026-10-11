@@ -531,7 +531,7 @@ export function FishLoginButton() {
                 {joinDetails.map((d, i) => (
                   <Link
                     key={i}
-                    href={`/fishmb/tournaments/${d.tournament_id}/manage`}
+                    href={`/fishmb/dashboard?tab=tournaments&manage=${d.tournament_id}`}
                     onClick={() => setMenu(false)}
                     className="block bg-pine/5 rounded-xl px-3 py-2 hover:bg-pine/10"
                   >

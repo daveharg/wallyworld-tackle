@@ -4,11 +4,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useFishAuth } from "../../_components/FishAuth";
 import { fishFetch } from "../../_components/fishFetch";
 import { JoinByCode } from "../../tournaments/_components/JoinByCode";
 import { LicenceNotice } from "../../tournaments/_components/PrizePot";
 import TournamentCreateSection from "./TournamentCreateSection";
+import OrganizerPanel from "./OrganizerPanel";
 
 interface MyTournament {
   id: string;
@@ -41,10 +43,20 @@ function fmtRange(start: string, end: string): string {
 
 export default function DashboardTournaments() {
   const { user } = useFishAuth();
+  const searchParams = useSearchParams();
   const [tournaments, setTournaments] = useState<MyTournament[]>([]);
   const [standings, setStandings] = useState<Standing[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  // Organizer view: when set, the HQ tournaments tab shows this tournament's
+  // organizer panel instead of the list. Synced with ?manage= for deep links.
+  const [managingId, setManagingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const m = searchParams.get("manage");
+    if (m) setManagingId(m);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     fishFetch("/api/fishmb/tournaments?mine=1")
@@ -116,6 +128,20 @@ export default function DashboardTournaments() {
     const standing = standings.find((s) => s.tournamentId === t.id);
     const status = getStatus(t);
     const isOrganizer = t.organizer_id === user?.id;
+    // Organizers open the organizer panel right here in HQ; everyone else
+    // goes to the tournament page (live tournaments go to the live hub).
+    if (isOrganizer) {
+      return (
+        <button
+          key={t.id}
+          type="button"
+          onClick={() => setManagingId(t.id)}
+          className="w-full text-left flex items-center gap-3 bg-white border border-pine/10 rounded-2xl px-4 py-3.5 hover:border-signal/40 transition-colors"
+        >
+          {rowInner(t, standing, status, isOrganizer)}
+        </button>
+      );
+    }
     // Live tournaments you're in go to the live hub.
     const href = status.label === "Live" ? `/fishmb/tournaments/${t.id}/live` : `/fishmb/tournaments/${t.id}`;
     return (
@@ -124,42 +150,53 @@ export default function DashboardTournaments() {
         href={href}
         className="flex items-center gap-3 bg-white border border-pine/10 rounded-2xl px-4 py-3.5 hover:border-signal/40 transition-colors"
       >
-        <span
-          className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm shrink-0 ${
-            standing
-              ? "bg-gold/20 border border-gold/40 text-pine"
-              : "bg-pine/5 border border-pine/10 text-pine/30"
-          }`}
-        >
-          {standing ? `#${standing.rank}` : "NR"}
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="flex flex-wrap items-center gap-1.5 mb-1">
-            <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${status.color}`}>
-              {status.label}
-            </span>
-            {isOrganizer && (
-              <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full text-white bg-pine">
-                Organizer
-              </span>
-            )}
-          </span>
-          <span className="block font-bold text-pine truncate">{t.name}</span>
-          <span className="block text-xs text-pine/50 mt-0.5">
-            {fmtRange(t.starts_at, t.ends_at)}
-            {standing ? (
-              <span className="font-bold text-signal-dark">
-                {" "}· Rank {standing.rank} of {standing.total}
-              </span>
-            ) : (
-              <span className="text-pine/40"> · Not ranked yet</span>
-            )}
-          </span>
-        </span>
-        <span className="text-pine/25 text-xl leading-none shrink-0">›</span>
+        {rowInner(t, standing, status, isOrganizer)}
       </Link>
     );
   };
+
+  const rowInner = (
+    t: MyTournament,
+    standing: Standing | undefined,
+    status: { label: string; color: string },
+    isOrganizer: boolean
+  ) => (
+    <>
+      <span
+        className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm shrink-0 ${
+          standing
+            ? "bg-gold/20 border border-gold/40 text-pine"
+            : "bg-pine/5 border border-pine/10 text-pine/30"
+        }`}
+      >
+        {standing ? `#${standing.rank}` : "NR"}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="flex flex-wrap items-center gap-1.5 mb-1">
+          <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${status.color}`}>
+            {status.label}
+          </span>
+          {isOrganizer && (
+            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full text-white bg-pine">
+              Organizer
+            </span>
+          )}
+        </span>
+        <span className="block font-bold text-pine truncate">{t.name}</span>
+        <span className="block text-xs text-pine/50 mt-0.5">
+          {fmtRange(t.starts_at, t.ends_at)}
+          {standing ? (
+            <span className="font-bold text-signal-dark">
+              {" "}· Rank {standing.rank} of {standing.total}
+            </span>
+          ) : (
+            <span className="text-pine/40"> · Not ranked yet</span>
+          )}
+        </span>
+      </span>
+      <span className="text-pine/25 text-xl leading-none shrink-0">›</span>
+    </>
+  );
 
   // Summary leaderboard across all tournaments with a known standing.
   const rankedStandings = standings
@@ -201,6 +238,10 @@ export default function DashboardTournaments() {
 
   return (
     <div className="space-y-6">
+      {managingId ? (
+        <OrganizerPanel tournamentId={managingId} onBack={() => setManagingId(null)} />
+      ) : (
+        <>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <h3 className="text-xs font-black uppercase tracking-wider text-pine/45">
@@ -352,6 +393,8 @@ export default function DashboardTournaments() {
               </div>
             )}
           </div>
+        </>
+      )}
         </>
       )}
     </div>

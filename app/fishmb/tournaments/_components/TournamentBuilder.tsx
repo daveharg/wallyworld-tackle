@@ -352,7 +352,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
           ...(useWorldBounds ? { gps_north: 90, gps_south: -90, gps_east: 180, gps_west: -180 } : {}),
         }),
       });
-      router.push(`/fishmb/tournaments/${data.tournament.id}/manage`);
+      router.push(`/fishmb/dashboard?tab=tournaments&manage=${data.tournament.id}`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not create the tournament.");
     } finally {

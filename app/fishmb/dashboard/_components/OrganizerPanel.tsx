@@ -2,14 +2,13 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useFishAuth } from "../../../_components/FishAuth";
-import { fishFetch, formatDateTime } from "../../../_components/fishFetch";
-import { compressImage } from "../../../_components/compressImage";
+import { useFishAuth } from "../../_components/FishAuth";
+import { fishFetch, formatDateTime } from "../../_components/fishFetch";
+import { compressImage } from "../../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
-import { CatchMap } from "../../_components/CatchMap";
-import { EntryKeys } from "../../_components/EntryKeys";
-import { PayoutEditor } from "../../_components/PayoutEditor";
+import { CatchMap } from "../../tournaments/_components/CatchMap";
+import { EntryKeys } from "../../tournaments/_components/EntryKeys";
+import { PayoutEditor } from "../../tournaments/_components/PayoutEditor";
 import type { PayoutTier } from "@/lib/fish/tournaments";
 
 interface Entry {
@@ -726,8 +725,8 @@ function AnglersDashboard({ tournamentId, inviteCode, entryFeeCents }: { tournam
 }
 
 
-export default function ManageTournamentPage({ params }: { params: { id: string } }) {  const { user, openLogin } = useFishAuth();
-  const router = useRouter();
+export default function OrganizerPanel({ tournamentId, onBack }: { tournamentId: string; onBack: () => void }) {
+  const { user, openLogin } = useFishAuth();
   const [editOpen, setEditOpen] = useState(false);
   const [detail, setDetail] = useState<Detail | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -736,12 +735,12 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
 
   const load = useCallback(async () => {
     try {
-      const d = await fishFetch(`/api/fishmb/tournaments/${params.id}/entries`);
+      const d = await fishFetch(`/api/fishmb/tournaments/${tournamentId}/entries`);
       setDetail(d as Detail);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not load.");
     }
-  }, [params.id]);
+  }, [tournamentId]);
 
   useEffect(() => {
     if (user) load();
@@ -752,7 +751,7 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
     fishFetch("/api/fishmb/tournaments/notifications", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tournament_id: params.id }),
+      body: JSON.stringify({ tournament_id: tournamentId }),
     }).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -761,7 +760,7 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
     const note = status === "rejected" ? window.prompt("Reason for rejection (shown to the angler):") ?? "" : "";
     setReviewing(entryId);
     try {
-      await fishFetch(`/api/fishmb/tournaments/${params.id}/entries/${entryId}`, {
+      await fishFetch(`/api/fishmb/tournaments/${tournamentId}/entries/${entryId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status, review_note: note }),
@@ -776,7 +775,7 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
 
   if (!user) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+      <div className="py-16 text-center">
         <h1 className="font-display font-bold uppercase text-pine text-3xl mb-4">Organizer dashboard</h1>
         <p className="text-pine/60 mb-6">Log in to manage your tournament.</p>
         <button onClick={openLogin} className="bg-signal text-white font-bold uppercase tracking-wider text-sm px-7 py-3.5 rounded-full">
@@ -788,23 +787,23 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
 
   if (error) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+      <div className="py-16 text-center">
         <p className="text-signal-dark">{error}</p>
-        <button type="button" onClick={() => router.back()} className="text-signal font-bold text-sm uppercase tracking-wider">← Back</button>
+        <button type="button" onClick={onBack} className="text-signal font-bold text-sm uppercase tracking-wider">← Back</button>
       </div>
     );
   }
 
   if (!detail) {
-    return <div className="max-w-5xl mx-auto px-4 py-16"><div className="h-64 bg-pine/5 rounded-3xl animate-pulse" /></div>;
+    return <div><div className="h-64 bg-pine/5 rounded-3xl animate-pulse" /></div>;
   }
 
   if (!detail.is_organizer) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
+      <div className="py-16 text-center">
         <h1 className="font-display font-bold uppercase text-pine text-3xl mb-4">Not your tournament</h1>
         <p className="text-pine/60 mb-6">Only the organizer can open this dashboard.</p>
-        <Link href={`/fishmb/tournaments/${params.id}`} className="text-signal font-bold text-sm uppercase tracking-wider">View tournament →</Link>
+        <button type="button" onClick={onBack} className="text-signal font-bold text-sm uppercase tracking-wider">← Back</button>
       </div>
     );
   }
@@ -815,10 +814,10 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
   const inviteUrl = typeof window !== "undefined" ? `${window.location.origin}/fishmb/tournaments/join/${t.invite_code}` : "";
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10 md:py-14">
-      <Link href={`/fishmb/tournaments/${t.id}`} className="text-sm font-bold text-signal uppercase tracking-wider">
-        ← View tournament
-      </Link>
+    <div>
+      <button type="button" onClick={onBack} className="text-sm font-bold text-signal uppercase tracking-wider">
+        ← Your tournaments
+      </button>
       <h1 className="font-display font-bold uppercase text-pine text-4xl tracking-wide mt-4 mb-2">{t.name}</h1>
       <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
         <p className="text-pine/60">Organizer dashboard</p>

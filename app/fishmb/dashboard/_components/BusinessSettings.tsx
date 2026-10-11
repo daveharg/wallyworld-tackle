@@ -385,7 +385,7 @@ function TournamentGroup({
               </div>
               {statusBadge(t.status)}
               <Link
-                href={`/fishmb/tournaments/${t.id}/manage`}
+                href={`/fishmb/dashboard?tab=tournaments&manage=${t.id}`}
                 className="bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-xs px-4 py-2 rounded-full transition-colors shrink-0"
               >
                 Manage

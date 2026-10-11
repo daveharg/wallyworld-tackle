@@ -66,7 +66,7 @@ export function TournamentActions({ tournamentId }: { tournamentId: string }) {
       <div className="flex flex-wrap gap-2">
         {detail.is_organizer && (
           <Link
-            href={`/fishmb/tournaments/${tournamentId}/manage`}
+            href={`/fishmb/dashboard?tab=tournaments&manage=${tournamentId}`}
             className="bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
           >
             Manage
