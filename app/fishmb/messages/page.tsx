@@ -217,7 +217,8 @@ function MessagesPageInner() {
     }
   };
 
-  // Setup check: local keypair + server public key.
+  // Setup check: local keypair + server public key. Auto-uploads the public
+  // key if missing — no manual setup step needed.
   useEffect(() => {
     if (!user) return;
     (async () => {
@@ -229,7 +230,18 @@ function MessagesPageInner() {
           setSetup("ready");
           loadConvos();
         } else {
-          setSetup("needed");
+          // No public key on server yet — upload it automatically.
+          try {
+            await fishFetch("/api/fishmb/msg/keys", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ public_key: publicKeyB64(kp) }),
+            });
+            setSetup("ready");
+            loadConvos();
+          } catch {
+            setSetup("needed");
+          }
         }
       } catch {
         setSetup("needed");
