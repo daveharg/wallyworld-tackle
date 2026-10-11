@@ -112,10 +112,12 @@ export default function DashboardStats() {
   const [catchesExpanded, setCatchesExpanded] = useState(false);
   const [sharingId, setSharingId] = useState<string | null>(null);
   const [catchesError, setCatchesError] = useState<string | null>(null);
+  const [sharedOk, setSharedOk] = useState<string | null>(null);
 
   const shareCatch = async (c: Catch) => {
     if (sharingId) return;
     setSharingId(c.id);
+    setSharedOk(null);
     try {
       await fishFetch(`/api/fish/catches/${c.id}`, {
         method: "PATCH",
@@ -125,8 +127,10 @@ export default function DashboardStats() {
       setCatches((prev) =>
         prev.map((x) => (x.id === c.id ? { ...x, personal_record: false, visibility: "public" } : x))
       );
-    } catch {
-      // Leave the catch as-is on failure.
+      setSharedOk(c.id);
+      setTimeout(() => setSharedOk(null), 3000);
+    } catch (e) {
+      setCatchesError(e instanceof Error ? e.message : "Couldn't share that catch.");
     } finally {
       setSharingId(null);
     }
@@ -399,7 +403,7 @@ export default function DashboardStats() {
                           disabled={sharingId === c.id}
                           className="mt-1 text-[11px] font-bold text-signal-dark disabled:opacity-40"
                         >
-                          {sharingId === c.id ? "Sharing…" : "📤 Share to feed"}
+                          {sharingId === c.id ? "Sharing…" : sharedOk === c.id ? "✓ Shared!" : "📤 Share to feed"}
                         </button>
                       )}
                     </span>
