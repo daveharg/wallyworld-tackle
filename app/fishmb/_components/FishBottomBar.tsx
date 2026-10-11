@@ -158,6 +158,7 @@ function Bar() {
   const searchParams = useSearchParams();
   const { user, openLogin } = useFishAuth();
   const [unread, setUnread] = useState(0);
+  const [friendRequests, setFriendRequests] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [postGateOpen, setPostGateOpen] = useState(false);
   // Which tab was just tapped — highlights instantly while the page loads.
@@ -175,6 +176,8 @@ function Bar() {
         if (!user || stop) return;
         const d = await fishFetch("/api/fishmb/msg/unread");
         if (!stop) setUnread((d as { unread?: number }).unread ?? 0);
+        const f = await fishFetch("/api/fish/friends");
+        if (!stop) setFriendRequests(((f as { pending_incoming?: unknown[] }).pending_incoming ?? []).length);
       } catch {
         // non-fatal (signed out, offline, etc.)
       }
@@ -283,7 +286,14 @@ function Bar() {
             </div>
           ))}
           <div className="flex-1 flex justify-center">
-            <PlusButton onClick={onPlusTap} label={menuOpen ? "Close menu" : "Create"} open={menuOpen} />
+            <div className="relative">
+              <PlusButton onClick={onPlusTap} label={menuOpen ? "Close menu" : "Create"} open={menuOpen} />
+              {friendRequests > 0 && !menuOpen && (
+                <span className="absolute -top-1 -right-1 min-w-[22px] h-[22px] px-1 rounded-full bg-signal text-white text-xs font-bold flex items-center justify-center border-2 border-white">
+                  {friendRequests > 99 ? "99+" : friendRequests}
+                </span>
+              )}
+            </div>
           </div>
           {RIGHT.map((item) => (
             <div key={item.href} className="flex-1 flex justify-center">
