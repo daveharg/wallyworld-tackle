@@ -11,6 +11,12 @@ import {
   type MsgKeypair,
 } from "./msgCrypto";
 
+interface Reaction {
+  emoji: string;
+  n: number;
+  mine: boolean;
+}
+
 interface StoredMessage {
   id: string;
   sender_id: string;
@@ -18,6 +24,7 @@ interface StoredMessage {
   nonce: string;
   ciphertext: string;
   created_at: string;
+  reactions?: Reaction[];
 }
 
 interface Decrypted {
@@ -27,6 +34,7 @@ interface Decrypted {
   text: string | null;
   noKey: boolean;
   created_at: string;
+  reactions: Reaction[];
 }
 
 export interface ThreadPeer {
@@ -71,6 +79,44 @@ export default function ThreadView({
   const [showMembers, setShowMembers] = useState(false);
   const [editingGroup, setEditingGroup] = useState(false);
   const [themeOpen, setThemeOpen] = useState(false);
+  const [reactingTo, setReactingTo] = useState<string | null>(null);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const REACTION_EMOJIS = ["❤️", "🖕", "😂", "😮", "😢", "👍", "👎", "🔥"];
+
+  const startLongPress = (id: string) => {
+    longPressTimer.current = setTimeout(() => {
+      setReactingTo(id);
+      // Haptic feedback on supported devices.
+      try {
+        (navigator as { vibrate?: (p: number) => void }).vibrate?.(10);
+      } catch {}
+    }, 450);
+  };
+
+  const cancelLongPress = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
+
+  const sendReaction = async (messageId: string, emoji: string) => {
+    setReactingTo(null);
+    try {
+      const d = await fishFetch(`/api/fishmb/msg/messages/${messageId}/react`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ emoji }),
+      });
+      const reactions = ((d as { reactions?: Reaction[] }).reactions ?? []) as Reaction[];
+      setMsgs((prev) =>
+        prev.map((m) => (m.id === messageId ? { ...m, reactions } : m))
+      );
+    } catch {
+      // ignore
+    }
+  };
   const [themeName, setThemeName] = useState<string>("Default");
 
   // Curated themes — every combination is designed to be readable.
@@ -188,6 +234,7 @@ export default function ThreadView({
         text,
         noKey: !sec,
         created_at: m.created_at,
+        reactions: (m.reactions ?? []) as Reaction[],
       };
     });
 
@@ -275,7 +322,7 @@ export default function ThreadView({
           if (prev.some((m) => m.id === mine.id)) return prev;
           return [
             ...prev,
-            { id: mine.id, mine: true, sender_id: myId, text: optimisticText ?? payload, noKey: false, created_at: mine.created_at },
+            { id: mine.id, mine: true, sender_id: myId, text: optimisticText ?? payload, noKey: false, created_at: mine.created_at, reactions: [] },
           ];
         });
         lastAtRef.current = mine.created_at;
@@ -878,14 +925,48 @@ export default function ThreadView({
               {!m.mine && peer.is_group && (
                 <span className="w-7 shrink-0">{showAvatar ? senderAvatar(m, "w-7 h-7") : null}</span>
               )}
-              <div
-                className={`max-w-[75%] px-3.5 py-2 rounded-[1.25rem] ${
-                  m.mine ? "rounded-br-md" : "rounded-bl-md"
-                }`}
-                style={{
-                  backgroundColor: m.mine ? theme.sentBg : theme.receivedBg,
-                }}
-              >
+              <div className="relative max-w-[75%]">
+                {/* Reaction picker popup */}
+                {reactingTo === m.id && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setReactingTo(null)}
+                      onTouchStart={() => setReactingTo(null)}
+                    />
+                    <div
+                      className={`absolute z-50 -top-14 flex items-center gap-1 bg-white rounded-full shadow-xl border border-pine/10 px-2 py-1.5 ${
+                        m.mine ? "right-0" : "left-0"
+                      }`}
+                    >
+                      {REACTION_EMOJIS.map((e) => (
+                        <button
+                          key={e}
+                          type="button"
+                          onClick={() => sendReaction(m.id, e)}
+                          className="text-2xl p-1 hover:scale-125 active:scale-110 transition-transform"
+                        >
+                          {e}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+                <div
+                  onTouchStart={() => startLongPress(m.id)}
+                  onTouchEnd={cancelLongPress}
+                  onTouchMove={cancelLongPress}
+                  onMouseDown={() => startLongPress(m.id)}
+                  onMouseUp={cancelLongPress}
+                  onMouseLeave={cancelLongPress}
+                  onContextMenu={(e) => e.preventDefault()}
+                  className={`px-3.5 py-2 rounded-[1.25rem] select-none transition-transform ${
+                    m.mine ? "rounded-br-md" : "rounded-bl-md"
+                  } ${reactingTo === m.id ? "scale-105 shadow-lg" : ""}`}
+                  style={{
+                    backgroundColor: m.mine ? theme.sentBg : theme.receivedBg,
+                  }}
+                >
                 {showName && (
                   <p className="text-[11px] font-semibold text-pine/50 mb-0.5">{senderName}</p>
                 )}
@@ -899,6 +980,25 @@ export default function ThreadView({
                   >
                     {m.text ?? (m.noKey ? "Waiting for encryption key…" : "Couldn't decrypt this message.")}
                   </p>
+                )}
+                </div>
+                {/* Reactions display */}
+                {m.reactions.length > 0 && (
+                  <div className={`flex gap-1 mt-1 ${m.mine ? "justify-end" : "justify-start"}`}>
+                    {m.reactions.map((r) => (
+                      <button
+                        key={r.emoji}
+                        type="button"
+                        onClick={() => sendReaction(m.id, r.emoji)}
+                        className={`flex items-center gap-0.5 rounded-full px-2 py-0.5 text-sm border ${
+                          r.mine ? "bg-signal/15 border-signal/40" : "bg-white border-pine/15 shadow-sm"
+                        }`}
+                      >
+                        <span>{r.emoji}</span>
+                        {r.n > 1 && <span className="text-[11px] font-bold text-pine/60">{r.n}</span>}
+                      </button>
+                    ))}
+                  </div>
                 )}
               </div>
             </div>

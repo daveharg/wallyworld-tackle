@@ -7,7 +7,7 @@ import {
   badRequest,
   forbidden,
 } from "@/lib/fish/auth";
-import { isMember, listMessages, storeMessage } from "@/lib/fish/messages";
+import { isMember, listMessages, storeMessage, getReactions } from "@/lib/fish/messages";
 
 const B64 = /^[A-Za-z0-9+/=]+$/;
 
@@ -27,7 +27,15 @@ export async function GET(
   if (g.err) return g.err;
   const after = new URL(req.url).searchParams.get("after") ?? undefined;
   const messages = await listMessages(id, g.me!.id, after);
-  return NextResponse.json({ messages });
+  const reactionMap = await getReactions(
+    messages.map((m) => m.id),
+    g.me!.id
+  );
+  const withReactions = messages.map((m) => ({
+    ...m,
+    reactions: reactionMap.get(m.id) ?? [],
+  }));
+  return NextResponse.json({ messages: withReactions });
 }
 
 export async function POST(

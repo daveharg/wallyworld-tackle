@@ -45,6 +45,30 @@ export interface StoredMessage {
   nonce: string;
   ciphertext: string;
   created_at: string;
+  reactions?: { emoji: string; n: number; mine: boolean }[];
+}
+
+/** Fetch reaction summaries for a batch of message IDs. */
+export async function getReactions(
+  messageIds: string[],
+  viewerId: string
+): Promise<Map<string, { emoji: string; n: number; mine: boolean }[]>> {
+  const map = new Map<string, { emoji: string; n: number; mine: boolean }[]>();
+  if (messageIds.length === 0) return map;
+  await ensureMsgTables();
+  const rows = (await query(
+    `SELECT message_id, emoji, COUNT(*)::int AS n, BOOL_OR(user_id = $2) AS mine
+       FROM fm_message_reactions
+      WHERE message_id = ANY($1)
+      GROUP BY message_id, emoji`,
+    [messageIds, viewerId]
+  )) as { message_id: string; emoji: string; n: number; mine: boolean }[];
+  for (const r of rows) {
+    const arr = map.get(r.message_id) ?? [];
+    arr.push({ emoji: r.emoji, n: r.n, mine: r.mine });
+    map.set(r.message_id, arr);
+  }
+  return map;
 }
 
 export interface MessagePart {
@@ -91,6 +115,17 @@ export async function ensureMsgTables(): Promise<void> {
   );
   await query(
     `CREATE INDEX IF NOT EXISTS fm_messages_recipient_idx ON fm_messages (conversation_id, recipient_id, created_at)`
+  );
+  // Message reactions (e.g. ❤️, 🖕).
+  await query(`CREATE TABLE IF NOT EXISTS fm_message_reactions (
+    message_id uuid NOT NULL REFERENCES fm_messages(id) ON DELETE CASCADE,
+    user_id uuid NOT NULL REFERENCES fm_users(id) ON DELETE CASCADE,
+    emoji text NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (message_id, user_id, emoji)
+  )`);
+  await query(
+    `CREATE INDEX IF NOT EXISTS fm_reactions_msg_idx ON fm_message_reactions (message_id)`
   );
   ensured = true;
 }
