@@ -540,6 +540,14 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
 
           {note && <p className="px-4 py-2 text-sm text-amber-700 bg-amber-50">{note}</p>}
 
+          {/* Loading overlay while a video/photo uploads */}
+          {uploading && (
+            <div className="mx-4 mb-3 bg-pine/5 border border-pine/10 rounded-2xl px-4 py-3 flex items-center gap-3">
+              <div className="w-5 h-5 border-2 border-pine/20 border-t-signal rounded-full animate-spin shrink-0" />
+              <p className="text-sm font-bold text-pine/70">Loading your video… this can take a moment</p>
+            </div>
+          )}
+
           {/* Draft grid with plus boxes */}
           <div className="flex-1 overflow-y-auto px-4 pb-4">
             <div className="grid grid-cols-3 gap-1">
