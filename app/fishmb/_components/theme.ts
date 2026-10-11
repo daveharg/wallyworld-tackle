@@ -21,16 +21,32 @@ export const THEMES = [
     desc: "Warm prairie dusk",
     swatch: ["#4a2416", "#d9481f", "#c47d14"],
   },
+  {
+    id: "prairie",
+    name: "Prairie",
+    desc: "Golden wheat fields",
+    swatch: ["#3a3a20", "#c86e23", "#b49628"],
+  },
+  {
+    id: "ice",
+    name: "Ice",
+    desc: "Hardwater steel blue",
+    swatch: ["#264458", "#2e9bc6", "#c9962e"],
+  },
 ] as const;
 
 export type ThemeId = (typeof THEMES)[number]["id"];
 
 const KEY = "fishmb-theme";
 
+export const DEFAULT_THEME: ThemeId = "forest";
+
+const VALID: readonly string[] = THEMES.map((t) => t.id);
+
 export function getTheme(): ThemeId {
-  if (typeof window === "undefined") return "forest";
+  if (typeof window === "undefined") return DEFAULT_THEME;
   const t = window.localStorage.getItem(KEY);
-  return t === "ocean" || t === "sunset" || t === "forest" ? t : "forest";
+  return (VALID as string[]).includes(t ?? "") ? (t as ThemeId) : DEFAULT_THEME;
 }
 
 export function setTheme(id: ThemeId) {
