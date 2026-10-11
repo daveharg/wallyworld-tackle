@@ -71,26 +71,45 @@ export default function ThreadView({
   const [showMembers, setShowMembers] = useState(false);
   const [editingGroup, setEditingGroup] = useState(false);
   const [themeOpen, setThemeOpen] = useState(false);
-  const [chatBg, setChatBg] = useState<string>("#ffffff");
-  const [chatText, setChatText] = useState<string>("#0b231f");
+  const [themeName, setThemeName] = useState<string>("Default");
+
+  // Curated themes — every combination is designed to be readable.
+  const THEMES: {
+    name: string;
+    chatBg: string;
+    sentBg: string;
+    sentText: string;
+    receivedBg: string;
+    receivedText: string;
+  }[] = [
+    { name: "Default", chatBg: "#ffffff", sentBg: "#0b231f", sentText: "#ffffff", receivedBg: "#e9e9eb", receivedText: "#0b231f" },
+    { name: "Dark", chatBg: "#0b231f", sentBg: "#e4572e", sentText: "#ffffff", receivedBg: "#1e3a34", receivedText: "#ffffff" },
+    { name: "Ocean", chatBg: "#e8f1f8", sentBg: "#0a4d8c", sentText: "#ffffff", receivedBg: "#ffffff", receivedText: "#0a2a4a" },
+    { name: "Forest", chatBg: "#f2f0e4", sentBg: "#2d5a27", sentText: "#ffffff", receivedBg: "#dce5d0", receivedText: "#1a2f1a" },
+    { name: "Sunset", chatBg: "#fff5ec", sentBg: "#c94826", sentText: "#ffffff", receivedBg: "#ffe8d6", receivedText: "#5a2310" },
+    { name: "Midnight", chatBg: "#121212", sentBg: "#7c4dff", sentText: "#ffffff", receivedBg: "#2a2a2a", receivedText: "#f0f0f0" },
+    { name: "Lavender", chatBg: "#f3eefb", sentBg: "#5e35b1", sentText: "#ffffff", receivedBg: "#ffffff", receivedText: "#3a245e" },
+    { name: "Arctic", chatBg: "#eef6fb", sentBg: "#0f2a44", sentText: "#ffffff", receivedBg: "#ffffff", receivedText: "#0f2a44" },
+  ];
+
+  const theme = THEMES.find((t) => t.name === themeName) ?? THEMES[0];
 
   // Load per-chat theme from localStorage.
   useEffect(() => {
     try {
       const saved = localStorage.getItem(`fishmb-chat-theme-${peer.id}`);
       if (saved) {
-        const t = JSON.parse(saved) as { bg?: string; text?: string };
-        if (t.bg) setChatBg(t.bg);
-        if (t.text) setChatText(t.text);
+        const t = JSON.parse(saved) as { name?: string };
+        if (t.name && THEMES.some((x) => x.name === t.name)) setThemeName(t.name);
       }
     } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [peer.id]);
 
-  const saveTheme = (bg: string, text: string) => {
-    setChatBg(bg);
-    setChatText(text);
+  const saveTheme = (name: string) => {
+    setThemeName(name);
     try {
-      localStorage.setItem(`fishmb-chat-theme-${peer.id}`, JSON.stringify({ bg, text }));
+      localStorage.setItem(`fishmb-chat-theme-${peer.id}`, JSON.stringify({ name }));
     } catch {}
   };
   const [editName, setEditName] = useState("");
@@ -808,7 +827,7 @@ export default function ThreadView({
 
       <div
         className="flex-1 min-h-0 overflow-y-auto py-4 space-y-1 -mx-4 px-4"
-        style={{ backgroundColor: chatBg }}
+        style={{ backgroundColor: theme.chatBg }}
       >
         {msgs.length === 0 && secrets && (
           <p className="text-center text-pine/45 text-sm mt-8">
@@ -839,10 +858,11 @@ export default function ThreadView({
               )}
               <div
                 className={`max-w-[75%] px-3.5 py-2 rounded-[1.25rem] ${
-                  m.mine
-                    ? "bg-pine text-white rounded-br-md"
-                    : "bg-[rgb(233,233,235)] text-pine rounded-bl-md"
+                  m.mine ? "rounded-br-md" : "rounded-bl-md"
                 }`}
+                style={{
+                  backgroundColor: m.mine ? theme.sentBg : theme.receivedBg,
+                }}
               >
                 {showName && (
                   <p className="text-[11px] font-semibold text-pine/50 mb-0.5">{senderName}</p>
@@ -853,7 +873,7 @@ export default function ThreadView({
                 ) : (
                   <p
                     className="text-[17px] leading-snug whitespace-pre-wrap break-words"
-                    style={{ color: chatText }}
+                    style={{ color: m.mine ? theme.sentText : theme.receivedText }}
                   >
                     {m.text ?? (m.noKey ? "Waiting for encryption key…" : "Couldn't decrypt this message.")}
                   </p>
@@ -910,92 +930,59 @@ export default function ThreadView({
         </button>
       </div>
 
-      {/* Chat appearance settings */}
+      {/* Chat appearance settings — curated themes */}
       {themeOpen && (
         <div
           className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-4"
           onClick={() => setThemeOpen(false)}
         >
           <div
-            className="bg-white rounded-3xl w-full max-w-sm p-6"
+            className="bg-white rounded-3xl w-full max-w-sm p-6 max-h-[80vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-bold text-pine text-lg mb-4">Chat appearance</h3>
+            <h3 className="font-bold text-pine text-lg mb-1">Chat theme</h3>
+            <p className="text-xs text-pine/50 mb-4">Applies to this chat only.</p>
 
-            <p className="text-sm font-bold text-pine/70 mb-2">Background</p>
-            <div className="flex flex-wrap gap-2 mb-5">
-              {[
-                ["#ffffff", "White"],
-                ["#f5f1e8", "Cream"],
-                ["#0b231f", "Dark"],
-                ["#1a3a4a", "Ocean"],
-                ["#3a1a2a", "Plum"],
-                ["#1a2f1a", "Forest"],
-                ["#f0e6f6", "Lavender"],
-                ["#fff3e0", "Peach"],
-              ].map(([color, name]) => (
+            <div className="space-y-2.5 mb-4">
+              {THEMES.map((t) => (
                 <button
-                  key={color}
+                  key={t.name}
                   type="button"
-                  onClick={() => saveTheme(color, chatText)}
-                  className={`w-10 h-10 rounded-full border-2 transition-transform ${
-                    chatBg === color ? "border-signal scale-110" : "border-pine/20"
+                  onClick={() => saveTheme(t.name)}
+                  className={`w-full rounded-2xl p-3 text-left border-2 transition-transform ${
+                    themeName === t.name ? "border-signal" : "border-pine/10"
                   }`}
-                  style={{ backgroundColor: color }}
-                  aria-label={name}
-                  title={name}
-                />
-              ))}
-            </div>
-
-            <p className="text-sm font-bold text-pine/70 mb-2">Text</p>
-            <div className="flex flex-wrap gap-2 mb-5">
-              {[
-                ["#0b231f", "Dark"],
-                ["#ffffff", "White"],
-                ["#e4572e", "Orange"],
-                ["#1a73e8", "Blue"],
-                ["#0d8043", "Green"],
-                ["#b31448", "Red"],
-                ["#7c4dff", "Purple"],
-              ].map(([color, name]) => (
-                <button
-                  key={color}
-                  type="button"
-                  onClick={() => saveTheme(chatBg, color)}
-                  className={`w-10 h-10 rounded-full border-2 transition-transform flex items-center justify-center ${
-                    chatText === color ? "border-signal scale-110" : "border-pine/20"
-                  }`}
-                  style={{ backgroundColor: color }}
-                  aria-label={name}
-                  title={name}
+                  style={{ backgroundColor: t.chatBg }}
                 >
-                  <span className="text-lg font-bold" style={{ color: color === "#ffffff" ? "#0b231f" : "#ffffff" }}>
-                    A
+                  <span className="flex items-center justify-between mb-2">
+                    <span
+                      className="text-sm font-bold"
+                      style={{ color: t.chatBg === "#ffffff" || t.chatBg === "#e8f1f8" || t.chatBg === "#f2f0e4" || t.chatBg === "#fff5ec" || t.chatBg === "#f3eefb" || t.chatBg === "#eef6fb" ? "#0b231f" : "#ffffff" }}
+                    >
+                      {t.name}
+                    </span>
+                    {themeName === t.name && (
+                      <span className="text-signal text-lg leading-none">✓</span>
+                    )}
+                  </span>
+                  <span className="flex flex-col gap-1.5">
+                    <span
+                      className="self-end max-w-[75%] px-3 py-1.5 rounded-2xl rounded-br-md text-xs"
+                      style={{ backgroundColor: t.sentBg, color: t.sentText }}
+                    >
+                      Hey, how's the fishing?
+                    </span>
+                    <span
+                      className="self-start max-w-[75%] px-3 py-1.5 rounded-2xl rounded-bl-md text-xs"
+                      style={{ backgroundColor: t.receivedBg, color: t.receivedText }}
+                    >
+                      Pretty good, you?
+                    </span>
                   </span>
                 </button>
               ))}
             </div>
 
-            {/* Preview */}
-            <div
-              className="rounded-2xl p-3 mb-4"
-              style={{ backgroundColor: chatBg }}
-            >
-              <p className="text-sm" style={{ color: chatText }}>
-                This is how your messages will look
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                saveTheme("#ffffff", "#0b231f");
-              }}
-              className="w-full py-2.5 rounded-full border border-pine/20 text-pine font-bold text-sm mb-2"
-            >
-              Reset to default
-            </button>
             <button
               type="button"
               onClick={() => setThemeOpen(false)}
