@@ -131,12 +131,16 @@ function CheckRow({
 }
 
 /** Small "Edit" button used on each preview section — jumps back to the right step. */
-function EditBtn({ onClick }: { onClick: () => void }) {
+function EditBtn({ onClick, overlay = false }: { onClick: () => void; overlay?: boolean }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="absolute top-3 right-3 text-xs font-bold uppercase tracking-wider text-signal-dark bg-signal/10 hover:bg-signal/20 rounded-full px-4 py-1.5 transition-colors"
+      className={
+        overlay
+          ? "absolute top-3 right-3 text-xs font-bold uppercase tracking-wider text-white bg-pine-deep/70 hover:bg-pine-deep rounded-full px-4 py-1.5 transition-colors"
+          : "shrink-0 text-xs font-bold uppercase tracking-wider text-signal-dark bg-signal/10 hover:bg-signal/20 rounded-full px-4 py-1.5 transition-colors"
+      }
     >
       Edit
     </button>
@@ -172,6 +176,14 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
   const router = useRouter();
   const { user, openLogin } = useFishAuth();
   const [step, setStep] = useState(0);
+  const topRef = useRef<HTMLDivElement>(null);
+
+  // Every step (Basics → Payment and rules → Review) starts at the top of
+  // the builder — otherwise a long step leaves the next one scrolled to
+  // wherever the previous step ended.
+  useEffect(() => {
+    topRef.current?.scrollIntoView({ block: "start" });
+  }, [step]);
 
   // Step 0 — Basics
   const [name, setName] = useState("");
@@ -349,7 +361,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
   };
 
   return (
-    <div className="bg-paper-deep border border-pine/10 rounded-3xl p-6 md:p-8">
+    <div ref={topRef} className="bg-paper-deep border border-pine/10 rounded-3xl p-6 md:p-8 scroll-mt-4">
       {/* Stepper */}
       <div className="flex gap-2 mb-8">
         {["Basics", "Payment and rules", "Review"].map((s, i) => (
@@ -809,7 +821,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
           </div>
 
           {/* Cover hero — mirrors the tournament page */}
-          <div className="relative">
+          <div>
             {coverPhotoUrl ? (
               <div className="relative rounded-3xl overflow-hidden bg-pine-deep">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -818,20 +830,26 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
                   <p className="text-gold font-bold uppercase tracking-[0.24em] text-xs mb-1.5">Upcoming</p>
                   <h1 className="font-display font-bold uppercase text-white text-3xl tracking-wide">{name}</h1>
                 </div>
+                <EditBtn overlay onClick={() => setStep(0)} />
               </div>
             ) : (
               <div>
-                <p className="text-signal font-bold uppercase tracking-[0.24em] text-xs mb-1.5">Upcoming</p>
+                <div className="flex items-start justify-between gap-3">
+                  <p className="text-signal font-bold uppercase tracking-[0.24em] text-xs mb-1.5 pt-1.5">Upcoming</p>
+                  <EditBtn onClick={() => setStep(0)} />
+                </div>
                 <h1 className="font-display font-bold uppercase text-pine text-3xl tracking-wide">{name}</h1>
               </div>
             )}
-            <EditBtn onClick={() => setStep(0)} />
           </div>
 
-          <div className="relative">
-            <p className="text-pine/60 text-sm">
-              Organized by you · {formatDateTime(startsAt)} → {formatDateTime(endsAt)}
-            </p>
+          <div>
+            <div className="flex items-start justify-between gap-3">
+              <p className="text-pine/60 text-sm flex-1 min-w-0">
+                Organized by you · {formatDateTime(startsAt)} → {formatDateTime(endsAt)}
+              </p>
+              <EditBtn onClick={() => setStep(1)} />
+            </div>
             <div className="flex flex-wrap gap-2 mt-2">
               {effectivePhotoMode === "measure_only" && (
                 <span className="text-xs font-bold uppercase tracking-wider text-pine bg-pine/10 rounded-full px-4 py-2">
@@ -852,30 +870,35 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
                 {scoringLabel}
               </span>
             </div>
-            <EditBtn onClick={() => setStep(1)} />
           </div>
 
           {/* Where */}
           {(showVenueName && venueName.trim()) || (showVenueAddress && venueAddress.trim()) ? (
-            <div className="relative bg-white border border-pine/10 rounded-2xl p-5">
-              <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-1.5">Where</h3>
+            <div className="bg-white border border-pine/10 rounded-2xl p-5">
+              <div className="flex items-center justify-between gap-3 mb-1.5">
+                <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55">Where</h3>
+                <EditBtn onClick={() => setStep(0)} />
+              </div>
               {showVenueName && venueName.trim() && <p className="text-pine font-bold text-lg">{venueName.trim()}</p>}
               {showVenueAddress && venueAddress.trim() && <p className="text-pine/60 text-sm">{venueAddress.trim()}</p>}
-              <EditBtn onClick={() => setStep(0)} />
             </div>
           ) : null}
 
           {/* Waters / Species / Invite */}
           <div className="grid grid-cols-1 gap-3">
-            <div className="relative bg-white border border-pine/10 rounded-2xl p-5">
-              <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-2">Waters</h3>
+            <div className="bg-white border border-pine/10 rounded-2xl p-5">
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55">Waters</h3>
+                <EditBtn onClick={() => setStep(1)} />
+              </div>
               <p className="text-pine text-sm">{boundaryLabel}</p>
-              <EditBtn onClick={() => setStep(1)} />
             </div>
-            <div className="relative bg-white border border-pine/10 rounded-2xl p-5">
-              <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-2">Species</h3>
+            <div className="bg-white border border-pine/10 rounded-2xl p-5">
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55">Species</h3>
+                <EditBtn onClick={() => setStep(0)} />
+              </div>
               <p className="text-pine text-sm">{species.join(", ") || "All species"}</p>
-              <EditBtn onClick={() => setStep(0)} />
             </div>
             <div className="bg-white border border-pine/10 rounded-2xl p-5">
               <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-2">Invite code</h3>
@@ -885,22 +908,26 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
 
           {/* Rules */}
           {rules.trim() ? (
-            <div className="relative">
-              <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-3">
-                Tournament rules
-              </h2>
+            <div>
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide">
+                  Tournament rules
+                </h2>
+                <EditBtn onClick={() => setStep(1)} />
+              </div>
               <div className="bg-white border border-pine/10 rounded-3xl p-6">
                 <p className="text-pine/80 whitespace-pre-line leading-relaxed text-sm">{rules.trim()}</p>
               </div>
-              <EditBtn onClick={() => setStep(1)} />
             </div>
           ) : null}
 
           {/* Prize pot */}
           {(entryFeeCents > 0 || payouts.length > 0) && (
-            <div className="relative">
+            <div>
+              <div className="flex justify-end mb-2">
+                <EditBtn onClick={() => setStep(1)} />
+              </div>
               <PrizePot entryFeeCents={entryFeeCents} participantCount={1} payouts={payouts} />
-              <EditBtn onClick={() => setStep(1)} />
             </div>
           )}
 
