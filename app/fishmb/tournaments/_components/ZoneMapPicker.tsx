@@ -151,67 +151,70 @@ export default function ZoneMapPicker({
     renderPolygon(map, []);
   };
 
-  const mapUi = (
-    <>
-      <div
-        ref={mapRef}
-        className={expanded ? "w-full h-full" : "w-full h-64 rounded-2xl border border-pine/15"}
-        style={expanded ? undefined : { zIndex: 0 }}
-      />
-      {expanded ? (
-        <button
-          type="button"
-          onClick={() => setExpanded(false)}
-          className="absolute top-4 left-4 z-[1000] bg-pine text-white text-sm font-bold px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2"
-        >
-          ← Back
-        </button>
-      ) : (
-        <button
-          type="button"
-          onClick={() => setExpanded(true)}
-          className="absolute top-2 right-2 z-[1000] bg-white/95 text-pine text-xs font-bold px-3 py-2 rounded-full shadow border border-pine/15"
-        >
-          ⤢ Expand
-        </button>
-      )}
-    </>
-  );
+  // Lock background scroll while the fullscreen map is open.
+  useEffect(() => {
+    if (!expanded) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [expanded]);
 
   return (
-    <div>
+    // NOTE: the map div below must NEVER unmount/remount when `expanded`
+    // toggles — Leaflet binds to the DOM node, so only classNames change here.
+    <div className={expanded ? "fixed inset-0 z-[2000] bg-pine-deep/60 flex flex-col" : undefined}>
+      <div className={expanded ? "relative flex-1 m-3 rounded-3xl overflow-hidden" : "relative"}>
+        <div
+          ref={mapRef}
+          className={expanded ? "w-full h-full" : "w-full h-64 rounded-2xl border border-pine/15"}
+          style={expanded ? undefined : { zIndex: 0 }}
+        />
+        {expanded ? (
+          <button
+            type="button"
+            onClick={() => setExpanded(false)}
+            className="absolute top-4 left-4 z-[1000] bg-pine text-white text-sm font-bold px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2"
+          >
+            ← Back
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setExpanded(true)}
+            className="absolute top-2 right-2 z-[1000] bg-white/95 text-pine text-xs font-bold px-3 py-2 rounded-full shadow border border-pine/15"
+          >
+            ⤢ Expand
+          </button>
+        )}
+      </div>
       {expanded ? (
-        <div className="fixed inset-0 z-[2000] bg-pine-deep/60 flex flex-col">
-          <div className="relative flex-1 m-3 rounded-3xl overflow-hidden">
-            {mapUi}
-          </div>
-          <div className="px-4 pb-6 pt-1">
-            <p className="text-white/80 text-xs text-center mb-2">
-              Tap the map to place points around your zone. Drag points to adjust.
-            </p>
-            {polygon.length > 0 && (
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={undoPoint}
-                  className="flex-1 py-2.5 rounded-full text-xs font-bold bg-white text-pine"
-                >
-                  ↩ Undo point
-                </button>
-                <button
-                  type="button"
-                  onClick={clearPolygon}
-                  className="flex-1 py-2.5 rounded-full text-xs font-bold bg-white text-pine"
-                >
-                  🗑 Clear
-                </button>
-              </div>
-            )}
-          </div>
+        <div className="px-4 pb-6 pt-1">
+          <p className="text-white/80 text-xs text-center mb-2">
+            Tap the map to place points around your zone. Drag points to adjust.
+          </p>
+          {polygon.length > 0 && (
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={undoPoint}
+                className="flex-1 py-2.5 rounded-full text-xs font-bold bg-white text-pine"
+              >
+                ↩ Undo point
+              </button>
+              <button
+                type="button"
+                onClick={clearPolygon}
+                className="flex-1 py-2.5 rounded-full text-xs font-bold bg-white text-pine"
+              >
+                🗑 Clear
+              </button>
+            </div>
+          )}
         </div>
       ) : (
-        <div className="relative">
-          {mapUi}
+        <>
           <p className="text-[11px] text-pine/50 mt-1.5">
             Tap the map to place points around your zone. Drag points to adjust.
           </p>
@@ -233,7 +236,7 @@ export default function ZoneMapPicker({
               </button>
             </div>
           )}
-        </div>
+        </>
       )}
     </div>
   );
