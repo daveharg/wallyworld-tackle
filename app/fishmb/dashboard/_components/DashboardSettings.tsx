@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { upload } from "@vercel/blob/client";
 import { useFishAuth } from "../../_components/FishAuth";
@@ -17,8 +17,11 @@ export default function DashboardSettings({ afterSaveHref }: { afterSaveHref?: s
   const [accountType, setAccountType] = useState("personal");
   const [allowFollow, setAllowFollow] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [note, setNote] = useState<string | null>(null);
+  // Pending avatar: picked but not yet saved. Shown immediately as a preview.
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [pendingAvatar, setPendingAvatar] = useState<File | null>(null);
+  const previewUrl = useRef<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -29,56 +32,77 @@ export default function DashboardSettings({ afterSaveHref }: { afterSaveHref?: s
     }
   }, [user]);
 
+  useEffect(() => {
+    return () => {
+      if (previewUrl.current) URL.revokeObjectURL(previewUrl.current);
+    };
+  }, []);
+
+  const initials = (name.trim() || user?.name || "?")
+    .split(/\s+/)
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  // Pick a picture → show it immediately. Nothing uploads until Save.
   const pickAvatar = async (file: File) => {
-    setUploading(true);
     setNote(null);
     try {
-      const token = localStorage.getItem(FISHMB_TOKEN_KEY);
       // Compress first (HEIC → JPEG, resize if large). Force re-encode to
       // strip malformed EXIF that some photos carry.
       const compressed = await compressImage(file, true);
-      // Upload directly to Blob (bypasses serverless body limit).
-      const blob = await upload(`fish-avatars/${Date.now()}-${compressed.name}`, compressed, {
-        access: "public",
-        handleUploadUrl: "/api/fish/photos/upload-url",
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      // Verify the uploaded image is actually reachable before saving.
-      try {
-        const check = await fetch(blob.url, { method: "HEAD" });
-        if (!check.ok) throw new Error(`Upload verification failed (${check.status}).`);
-      } catch {
-        throw new Error("Upload didn't stick — please try again.");
-      }
-      const updated = await fishFetch("/api/fish/auth/me", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ avatar_url: blob.url }),
-      });
-      await refresh();
-      setNote("Profile picture updated!");
-    } catch (e) {
-      setNote(e instanceof Error ? e.message : "Could not upload.");
-    } finally {
-      setUploading(false);
+      if (previewUrl.current) URL.revokeObjectURL(previewUrl.current);
+      previewUrl.current = URL.createObjectURL(compressed);
+      setAvatarPreview(previewUrl.current);
+      setPendingAvatar(compressed);
+    } catch {
+      setNote("Could not read that image.");
     }
+  };
+
+  const uploadPendingAvatar = async (): Promise<string | null> => {
+    if (!pendingAvatar) return null;
+    const token = localStorage.getItem(FISHMB_TOKEN_KEY);
+    const blob = await upload(`fish-avatars/${Date.now()}-${pendingAvatar.name}`, pendingAvatar, {
+      access: "public",
+      handleUploadUrl: "/api/fish/photos/upload-url",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    // Verify the uploaded image is actually reachable before saving.
+    try {
+      const check = await fetch(blob.url, { method: "HEAD" });
+      if (!check.ok) throw new Error(`Upload verification failed (${check.status}).`);
+    } catch {
+      throw new Error("Upload didn't stick — please try again.");
+    }
+    return blob.url;
   };
 
   const save = async () => {
     setSaving(true);
     setNote(null);
     try {
+      const avatarUrl = await uploadPendingAvatar();
+      const patch: Record<string, unknown> = {
+        name: name.trim(),
+        bio: bio.trim(),
+        account_type: accountType,
+        allow_follow: allowFollow,
+      };
+      if (avatarUrl) patch.avatar_url = avatarUrl;
       await fishFetch("/api/fish/auth/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name.trim(),
-          bio: bio.trim(),
-          account_type: accountType,
-          allow_follow: allowFollow,
-        }),
+        body: JSON.stringify(patch),
       });
       await refresh();
+      if (previewUrl.current) {
+        URL.revokeObjectURL(previewUrl.current);
+        previewUrl.current = null;
+      }
+      setAvatarPreview(null);
+      setPendingAvatar(null);
       setNote("Profile saved!");
       if (afterSaveHref) {
         setTimeout(() => router.push(afterSaveHref), 600);
@@ -90,31 +114,62 @@ export default function DashboardSettings({ afterSaveHref }: { afterSaveHref?: s
     }
   };
 
+  const avatarSrc = avatarPreview ?? user?.avatar_url ?? null;
+
   return (
     <div className="bg-white border border-pine/10 rounded-3xl p-6 space-y-5">
-      <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide">
- Settings
-      </h2>
+      {/* Top: profile pic + name on the left, Save top-right. */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-4 min-w-0">
+          {avatarSrc ? (
+            <img
+              src={avatarSrc}
+              alt="Profile picture"
+              className="w-20 h-20 rounded-full object-cover border border-pine/10 shrink-0"
+            />
+          ) : (
+            <div className="w-20 h-20 rounded-full bg-pine text-white flex items-center justify-center text-2xl font-black shrink-0">
+              {initials}
+            </div>
+          )}
+          <div className="min-w-0">
+            <p className="text-xl font-black text-pine truncate">
+              {name.trim() || user?.name || "Your profile"}
+            </p>
+            <label className="text-xs font-bold uppercase tracking-wider text-signal hover:text-signal-dark cursor-pointer transition-colors">
+              {pendingAvatar ? "Change again" : "Change picture"}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) pickAvatar(f);
+                  e.target.value = "";
+                }}
+              />
+            </label>
+          </div>
+        </div>
+        <button
+          onClick={save}
+          disabled={saving}
+          className="shrink-0 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-6 py-3 rounded-full disabled:opacity-50 transition-colors"
+        >
+          {saving ? "Saving…" : "Save"}
+        </button>
+      </div>
+
       {note && (
         <p className="text-sm text-pine bg-gold/20 border border-gold/50 rounded-2xl px-4 py-3">
           {note}
         </p>
       )}
-      <div>
-        <label className="bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-xs px-5 py-2.5 rounded-full cursor-pointer transition-colors inline-block">
-          {uploading ? "Uploading…" : "Change picture"}
-          <input
-            type="file"
-            accept="image/*"
-            className="hidden"
-            disabled={uploading}
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) pickAvatar(f);
-            }}
-          />
-        </label>
-      </div>
+      {pendingAvatar && (
+        <p className="text-xs text-pine/55 -mt-3">
+          Previewing your new picture — tap Save to keep it.
+        </p>
+      )}
       <div>
         <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-2">
           Display name
@@ -181,13 +236,6 @@ export default function DashboardSettings({ afterSaveHref }: { afterSaveHref?: s
           </span>
         </button>
       </div>
-      <button
-        onClick={save}
-        disabled={saving}
-        className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-8 py-3.5 rounded-full disabled:opacity-50 transition-colors"
-      >
-        {saving ? "Saving…" : "Save profile"}
-      </button>
     </div>
   );
 }
