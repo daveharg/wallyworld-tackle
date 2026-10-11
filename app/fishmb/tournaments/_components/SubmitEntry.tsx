@@ -96,7 +96,7 @@ export function SubmitEntry({
       const toUpload = [bumpFile, holdFile].filter((f): f is File => f !== null);
       for (const file of toUpload) {
         const form = new FormData();
-        form.append("file", await compressImage(file));
+        form.append("file", await compressImage(file, true));
         const upRes = await fetch("/api/fish/photos/upload", {
           method: "POST",
           headers: token ? { Authorization: `Bearer ${token}` } : {},

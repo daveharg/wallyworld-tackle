@@ -294,7 +294,7 @@ export function TournamentBuilder({ lakes }: { lakes: LakeOpt[] }) {
     try {
       const token = localStorage.getItem(FISHMB_TOKEN_KEY);
       const form = new FormData();
-      form.append("file", await compressImage(file));
+      form.append("file", await compressImage(file, true));
       const upRes = await fetch("/api/fish/photos/upload", {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : {},

@@ -1555,7 +1555,9 @@ function FeedPageInner() {
   const uploadPhoto = async (file: File): Promise<string> => {
     const token = localStorage.getItem(FISHMB_TOKEN_KEY);
     const form = new FormData();
-    form.append("file", await compressImage(file));
+    // Force re-encode: strips malformed EXIF (e.g. Dave's pike photo) that
+    // otherwise passes through untouched on small JPEGs.
+    form.append("file", await compressImage(file, true));
     const upRes = await fetch("/api/fish/photos/upload", {
       method: "POST",
       headers: token ? { Authorization: `Bearer ${token}` } : {},
