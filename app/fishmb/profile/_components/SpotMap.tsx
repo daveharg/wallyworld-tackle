@@ -181,6 +181,13 @@ export default function SpotMap({
         [56, -106],
         5
       );
+      // Force the Canada view after the container settles — Leaflet can
+      // miscalculate the zoom if the container had no size at init.
+      setTimeout(() => {
+        if (cancelled) return;
+        m.invalidateSize();
+        m.setView([56, -106], 5, { animate: false });
+      }, 300);
       const streets = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
