@@ -171,6 +171,7 @@ export default function FishingSpots() {
   const [favs, setFavs] = useState<FavLake[]>([]);
   const [allLakes, setAllLakes] = useState<{ id: string; name: string; region?: string }[]>([]);
   const [addLakeId, setAddLakeId] = useState("");
+  const [addLakeQuery, setAddLakeQuery] = useState("");
   const [addingLake, setAddingLake] = useState(false);
   const [focus, setFocus] = useState<{ lat: number; lng: number; key: string; zoom?: number } | null>(null);
   const [selectedFav, setSelectedFav] = useState("");
@@ -669,22 +670,68 @@ export default function FishingSpots() {
         )}
         {selectedFav === "__add__" && (
           <div className="mt-2">
-            <select
-              value={addLakeId}
-              onChange={(e) => setAddLakeId(e.target.value)}
-              aria-label="Choose a lake to save"
-              className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold focus:outline-none focus:border-signal"
-            >
-              <option value="">Pick a lake…</option>
-              {allLakes
-                .filter((l) => !favIds.has(l.id))
-                .map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.name}
-                    {l.region ? ` — ${l.region}` : ""}
-                  </option>
-                ))}
-            </select>
+            {addLakeId ? (
+              <div className="flex items-center justify-between gap-2 bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3">
+                <span className="text-sm font-bold text-pine truncate">
+                  {allLakes.find((l) => l.id === addLakeId)?.name ?? "Selected lake"}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAddLakeId("");
+                    setAddLakeQuery("");
+                  }}
+                  className="text-xs font-bold uppercase tracking-wider text-signal-dark shrink-0"
+                >
+                  Change
+                </button>
+              </div>
+            ) : (
+              <>
+                <input
+                  value={addLakeQuery}
+                  onChange={(e) => setAddLakeQuery(e.target.value)}
+                  placeholder="Search lakes…"
+                  aria-label="Search for a lake to save"
+                  className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm font-bold placeholder:text-pine/35 placeholder:font-normal focus:outline-none focus:border-signal"
+                />
+                {addLakeQuery.trim().length > 0 && (
+                  <div className="max-h-40 overflow-y-auto bg-white border border-pine/15 rounded-2xl divide-y divide-pine/5 mt-1">
+                    {(() => {
+                      const matches = allLakes
+                        .filter(
+                          (l) =>
+                            !favIds.has(l.id) &&
+                            l.name.toLowerCase().includes(addLakeQuery.trim().toLowerCase())
+                        )
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .slice(0, 15);
+                      if (matches.length === 0) {
+                        return (
+                          <p className="px-4 py-3 text-sm text-pine/50">
+                            No lakes found for “{addLakeQuery.trim()}”.
+                          </p>
+                        );
+                      }
+                      return matches.map((l) => (
+                        <button
+                          key={l.id}
+                          type="button"
+                          onClick={() => {
+                            setAddLakeId(l.id);
+                            setAddLakeQuery(l.name);
+                          }}
+                          className="w-full text-left px-4 py-2.5 text-sm font-bold text-pine hover:bg-pine/5"
+                        >
+                          {l.name}
+                          {l.region ? <span className="text-pine/45 font-normal"> — {l.region}</span> : null}
+                        </button>
+                      ));
+                    })()}
+                  </div>
+                )}
+              </>
+            )}
             <button
               type="button"
               onClick={async () => {
