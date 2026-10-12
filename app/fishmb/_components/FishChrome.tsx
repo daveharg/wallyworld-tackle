@@ -30,11 +30,11 @@ export function FishChrome({ children }: { children: React.ReactNode }) {
   // mobile header now. Desktop keeps it.
   if (bare) return <>{children}</>;
   return (
-    <div className="min-h-screen bg-paper font-body text-pine">
+    <div className="min-h-dvh flex flex-col bg-paper font-body text-pine">
       <div className="hidden md:block">
         <FishHeader />
       </div>
-      <main className="min-h-[70vh] pb-28 md:pb-32">{children}</main>
+      <main className="flex-1 min-h-[70vh] pb-28 md:pb-32">{children}</main>
       {!hideFooter && <FishFooter />}
       <FishBottomBar />
     </div>
