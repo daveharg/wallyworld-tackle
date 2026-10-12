@@ -79,6 +79,8 @@ export default function MapsHub() {
   const [catchEditLoading, setCatchEditLoading] = useState(false);
   const [catchEditNote, setCatchEditNote] = useState("");
   const [catchEditDepth, setCatchEditDepth] = useState("");
+  const [catchEditLength, setCatchEditLength] = useState("");
+  const [catchEditWeight, setCatchEditWeight] = useState("");
   const [catchEditPhotos, setCatchEditPhotos] = useState<string[]>([]);
   const [catchEditFiles, setCatchEditFiles] = useState<File[]>([]);
   const [catchEditPreviews, setCatchEditPreviews] = useState<string[]>([]);
@@ -802,6 +804,8 @@ export default function MapsHub() {
       };
       setCatchEditNote(full.note ?? "");
       setCatchEditDepth(full.depth_ft != null ? String(Number(full.depth_ft)) : "");
+      setCatchEditLength(c.length_in != null ? String(c.length_in) : "");
+      setCatchEditWeight(c.weight_lb != null ? String(c.weight_lb) : "");
       const ph =
         Array.isArray(full.photos) && full.photos.length > 0
           ? full.photos
@@ -819,6 +823,12 @@ export default function MapsHub() {
 
   const saveCatchEdit = async () => {
     if (!selectedCatch || catchSaving) return;
+    const lenVal = parseFloat(catchEditLength);
+    if (!Number.isFinite(lenVal) || lenVal <= 0 || lenVal > 999) {
+      setNote("Enter the fish's length in inches.");
+      setTimeout(() => setNote(null), 3000);
+      return;
+    }
     setCatchSaving(true);
     try {
       const uploaded: string[] = [];
@@ -827,9 +837,9 @@ export default function MapsHub() {
       await fishFetch(`/api/fish/catches/${selectedCatch.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ note: catchEditNote.trim() || null, photos, depth_ft: (() => { const d = parseFloat(catchEditDepth); return Number.isFinite(d) && d > 0 && d <= 1000 ? Math.round(d * 10) / 10 : null; })() }),
+        body: JSON.stringify({ note: catchEditNote.trim() || null, photos, length_in: parseFloat(catchEditLength), weight_lb: (() => { const w = parseFloat(catchEditWeight); return Number.isFinite(w) && w > 0 ? Math.round(w * 100) / 100 : null; })(), depth_ft: (() => { const d = parseFloat(catchEditDepth); return Number.isFinite(d) && d > 0 && d <= 1000 ? Math.round(d * 10) / 10 : null; })() }),
       });
-      setSelectedCatch({ ...selectedCatch, photo_url: photos[0] ?? null });
+      setSelectedCatch({ ...selectedCatch, photo_url: photos[0] ?? null, length_in: parseFloat(catchEditLength), weight_lb: (() => { const w = parseFloat(catchEditWeight); return Number.isFinite(w) && w > 0 ? Math.round(w * 100) / 100 : null; })() });
       setCatchEditing(false);
       setCatchEditFiles([]);
       setCatchEditPreviews([]);
@@ -1833,6 +1843,32 @@ export default function MapsHub() {
                 <p className="text-sm text-pine/50 font-semibold py-4 text-center">Loading…</p>
               ) : (
                 <>
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wider text-pine/55 mb-2">
+                        Length (in)
+                      </p>
+                      <input
+                        value={catchEditLength}
+                        onChange={(e) => setCatchEditLength(e.target.value.replace(/[^0-9.]/g, ""))}
+                        inputMode="decimal"
+                        placeholder="e.g. 24.5"
+                        className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm focus:outline-none focus:border-signal"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-wider text-pine/55 mb-2">
+                        Weight (lb)
+                      </p>
+                      <input
+                        value={catchEditWeight}
+                        onChange={(e) => setCatchEditWeight(e.target.value.replace(/[^0-9.]/g, ""))}
+                        inputMode="decimal"
+                        placeholder="Optional"
+                        className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm focus:outline-none focus:border-signal"
+                      />
+                    </div>
+                  </div>
                   <p className="text-xs font-bold uppercase tracking-wider text-pine/55 mb-2">
                     Notes (only you see these)
                   </p>

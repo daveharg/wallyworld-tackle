@@ -84,6 +84,27 @@ export async function PATCH(
     sets.push(`personal_record = $${i++}`);
     vals.push(body.personal_record === true);
   }
+  if (body.length_in !== undefined) {
+    const l = Number(body.length_in);
+    if (!Number.isFinite(l) || l <= 0 || l > 999) {
+      return badRequest("length_in must be a positive number of inches.");
+    }
+    sets.push(`length_in = $${i++}`);
+    vals.push(Math.round(l * 100) / 100);
+  }
+  if (body.weight_lb !== undefined) {
+    if (body.weight_lb !== null) {
+      const w = Number(body.weight_lb);
+      if (!Number.isFinite(w) || w <= 0 || w > 999) {
+        return badRequest("weight_lb must be a positive number of pounds, or null.");
+      }
+      sets.push(`weight_lb = $${i++}`);
+      vals.push(Math.round(w * 100) / 100);
+    } else {
+      sets.push(`weight_lb = $${i++}`);
+      vals.push(null);
+    }
+  }
   if (body.depth_ft !== undefined) {
     if (body.depth_ft !== null) {
       const d = Number(body.depth_ft);
