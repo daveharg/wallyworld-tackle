@@ -375,9 +375,10 @@ function MessagesPageInner() {
     return () => window.clearTimeout(t);
   }, [newOpen, newChatMode, unameQuery]);
 
-  // Check push notification status. Must be before any early returns.
+  // Check push notification status and auto-enable. Must be before any early returns.
   useEffect(() => {
     if (!user || setup !== "ready") return;
+    let cancelled = false;
     (async () => {
       try {
         if (!("Notification" in window) || !("serviceWorker" in navigator) || !("PushManager" in window)) {
@@ -390,11 +391,41 @@ function MessagesPageInner() {
         }
         const reg = await navigator.serviceWorker.ready;
         const sub = await reg.pushManager.getSubscription();
-        setPushState(sub ? "enabled" : "prompt");
+        if (sub) {
+          setPushState("enabled");
+          return;
+        }
+        // No subscription — try to enable automatically. Stays on until the
+        // user turns it off. If the browser blocks the auto-prompt, fall back
+        // to the manual button.
+        setPushState("prompt");
+        try {
+          const perm = await Notification.requestPermission();
+          if (cancelled || perm !== "granted") return;
+          const keyRes = await fishFetch("/api/fishmb/push/vapid-key");
+          const publicKey = (keyRes as { publicKey?: string }).publicKey;
+          if (!publicKey) return;
+          const sub2 = await reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: Uint8Array.from(atob(publicKey.replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0)),
+          });
+          const json = sub2.toJSON();
+          await fishFetch("/api/fishmb/push/subscribe", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ endpoint: json.endpoint, keys: json.keys }),
+          });
+          if (!cancelled) setPushState("enabled");
+        } catch {
+          // Auto-enable failed — the manual prompt stays visible.
+        }
       } catch {
         setPushState("unsupported");
       }
     })();
+    return () => {
+      cancelled = true;
+    };
   }, [user, setup]);
 
   const enablePush = async () => {
