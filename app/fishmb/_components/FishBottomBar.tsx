@@ -294,8 +294,13 @@ function Bar() {
                 className="relative flex justify-center"
                 style={{ animation: "fmb-rise 0.25s ease-out both", animationDelay: `${i * 60}ms` }}
               >
-                <span className="w-16 h-16 shrink-0 rounded-full bg-white shadow-2xl flex items-center justify-center">
+                <span className="relative w-16 h-16 shrink-0 rounded-full bg-white shadow-2xl flex items-center justify-center">
                   {a.icon}
+                  {a.href === "/fishmb/dashboard" && friendRequests > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[22px] h-[22px] px-1 rounded-full bg-signal text-white text-xs font-bold flex items-center justify-center border-2 border-white">
+                      {friendRequests > 99 ? "99+" : friendRequests}
+                    </span>
+                  )}
                 </span>
                 <span className="absolute left-[calc(50%+2.75rem)] top-1/2 -translate-y-1/2 whitespace-nowrap text-white text-2xl font-bold tracking-tight">
                   {a.label}

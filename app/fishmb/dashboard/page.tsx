@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useFishAuth } from "../_components/FishAuth";
+import { fishFetch } from "../_components/fishFetch";
 import DashboardStats from "./_components/DashboardStats";
 import DashboardProfile from "./_components/DashboardProfile";
 import DashboardLicence from "./_components/DashboardLicence";
@@ -29,6 +30,20 @@ export default function DashboardPage() {
     return t === "tournaments" || t === "licence" || t === "profile" ? t : "stats";
   })();
   const [tab, setTab] = useState<TabId>(initialTab);
+  // Friend-request badge on the Profile tab — the trail from the bottom
+  // bar's badge leads here (requests live at the top of the Profile tab).
+  const [friendReqCount, setFriendReqCount] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    fishFetch("/api/fish/friends")
+      .then((d) =>
+        setFriendReqCount(
+          ((d as { pending_incoming?: unknown[] }).pending_incoming ?? []).length
+        )
+      )
+      .catch(() => {});
+  }, [user]);
 
   // Keep the tab in sync when navigating with ?tab= (e.g. the bottom-bar
   // Tournaments shortcut) while already on this page.
@@ -108,7 +123,7 @@ export default function DashboardPage() {
             key={t.id}
             type="button"
             onClick={() => setTab(t.id)}
-            className={`rounded-3xl border flex flex-col items-center justify-center gap-1.5 py-5 transition-colors ${
+            className={`relative rounded-3xl border flex flex-col items-center justify-center gap-1.5 py-5 transition-colors ${
               tab === t.id
                 ? "bg-pine text-white border-pine shadow-lg"
                 : "bg-white text-pine border-pine/10 hover:border-signal/40"
@@ -116,6 +131,11 @@ export default function DashboardPage() {
           >
             <span className="text-3xl leading-none">{t.icon}</span>
             <span className="font-bold uppercase tracking-wider text-xs">{t.label}</span>
+            {t.id === "profile" && friendReqCount > 0 && (
+              <span className="absolute top-2.5 right-2.5 min-w-[22px] h-[22px] px-1 rounded-full bg-signal text-white text-xs font-bold flex items-center justify-center border-2 border-white">
+                {friendReqCount > 99 ? "99+" : friendReqCount}
+              </span>
+            )}
           </button>
         ))}
       </div>
