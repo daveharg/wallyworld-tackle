@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import "leaflet/dist/leaflet.css";
 import ContoursToggle from "../../_components/ContoursToggle";
 import { fishFetch } from "../../_components/fishFetch";
 import { SPOT_ICON_CHOICES, spotIconHtml, spotIconSize } from "./spotIcons";
@@ -181,7 +182,6 @@ export default function SpotMap({
     let cancelled = false;
     (async () => {
       const L = (await import("leaflet")).default;
-      await import("leaflet/dist/leaflet.css");
       if (cancelled || !containerRef.current) return;
       // Open halfway zoomed in: Manitoba province view — not all the way
       // out on Canada, not street level. No zoom animation, just open there.

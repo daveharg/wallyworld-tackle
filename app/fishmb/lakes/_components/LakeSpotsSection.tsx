@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import "leaflet/dist/leaflet.css";
 import Link from "next/link";
 import { fishFetch } from "../../_components/fishFetch";
 
@@ -72,7 +73,6 @@ export function LakeSpotsSection({
     let cancelled = false;
     (async () => {
       const L = (await import("leaflet")).default;
-      await import("leaflet/dist/leaflet.css");
       if (cancelled || !mapRef.current) return;
       const m = L.map(mapRef.current, {
         scrollWheelZoom: false,

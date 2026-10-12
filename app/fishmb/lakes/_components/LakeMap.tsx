@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import "leaflet/dist/leaflet.css";
 import Link from "next/link";
 import ContoursToggle from "../../_components/ContoursToggle";
 
@@ -26,7 +27,6 @@ export function LakeMap({ lakes }: { lakes: MapLake[] }) {
     let cancelled = false;
     (async () => {
       const L = (await import("leaflet")).default;
-      await import("leaflet/dist/leaflet.css");
       if (cancelled || !containerRef.current) return;
       const m = L.map(containerRef.current, {
         scrollWheelZoom: false,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import "leaflet/dist/leaflet.css";
 import type { MapCell } from "@/app/api/fishmb/admin/user-map/route";
 
 /**
@@ -17,7 +18,6 @@ export function UserActivityMap({ cells }: { cells: MapCell[] }) {
     (async () => {
       if (!containerRef.current || mapRef.current) return;
       const L = (await import("leaflet")).default;
-      await import("leaflet/dist/leaflet.css");
       if (cancelled || !containerRef.current) return;
 
       const m = L.map(containerRef.current, { scrollWheelZoom: false }).setView(

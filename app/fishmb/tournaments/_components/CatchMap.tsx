@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import "leaflet/dist/leaflet.css";
 
 export interface CatchPin {
   id: string;
@@ -19,7 +20,6 @@ export function CatchMap({ pins }: { pins: CatchPin[] }) {
     let cancelled = false;
     (async () => {
       const L = (await import("leaflet")).default;
-      await import("leaflet/dist/leaflet.css");
       if (cancelled || !containerRef.current) return;
       const m = L.map(containerRef.current, { scrollWheelZoom: false }).setView(
         [53.5, -96.5],
