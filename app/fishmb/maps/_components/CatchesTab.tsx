@@ -290,7 +290,7 @@ export default function CatchesTab({
       }
       g.catches.push(c);
     }
-    return [...groupById.values()].sort((a, b) => a.title.localeCompare(b.title));
+    return Array.from(groupById.values()).sort((a, b) => a.title.localeCompare(b.title));
   };
 
   const renderGroups = (groups: { key: string; title: string; catches: MapCatch[] }[]) => (
