@@ -60,24 +60,25 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
   const [editingOverlay, setEditingOverlay] = useState<TextOverlay | null>(null);
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const [textSheetOpen, setTextSheetOpen] = useState(false);
-  // Keyboard height (px) so the text sheet can dock just above the keyboard.
-  const [kbOffset, setKbOffset] = useState(0);
+  // The visible viewport box (visualViewport). The text sheet lives inside a
+  // wrapper pinned to exactly this box, so when the iOS keyboard opens and
+  // the browser pans/shrinks the visible area, the sheet rides with it —
+  // no offset math that can overshoot and push the input off-screen.
+  const [vvBox, setVvBox] = useState<{ top: number; height: number } | null>(null);
   useEffect(() => {
     if (!textSheetOpen) {
-      setKbOffset(0);
+      setVvBox(null);
       return;
     }
     const vv = window.visualViewport;
     if (!vv) return;
-    const onResize = () => {
-      setKbOffset(Math.max(0, window.innerHeight - vv.height - vv.offsetTop));
-    };
-    vv.addEventListener("resize", onResize);
-    vv.addEventListener("scroll", onResize);
-    onResize();
+    const update = () => setVvBox({ top: vv.offsetTop, height: vv.height });
+    update();
+    vv.addEventListener("resize", update);
+    vv.addEventListener("scroll", update);
     return () => {
-      vv.removeEventListener("resize", onResize);
-      vv.removeEventListener("scroll", onResize);
+      vv.removeEventListener("resize", update);
+      vv.removeEventListener("scroll", update);
     };
   }, [textSheetOpen]);
   // Lock background scrolling while the text sheet is open — otherwise touch
@@ -101,7 +102,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
   const [clipZooms, setClipZooms] = useState<Record<string, number>>({});
   const [clipVolumes, setClipVolumes] = useState<Record<string, number>>({});
   const [expiresHours, setExpiresHours] = useState(24);
-  const [saveAsReel, setSaveAsReel] = useState(false);
+  // Reel posting is parked for now (Dave, 2026-10-12) — everything posts as a story.
   const previewRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -516,7 +517,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
             zoom: clipZooms[d.id] ?? 1,
             volume: d.media_type === "video" ? (clipVolumes[d.id] ?? 0.5) : null,
             expires_hours: expiresHours,
-            is_reel: saveAsReel,
+            is_reel: false,
           }),
         });
       }
@@ -691,7 +692,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                 ? "Select photos and videos"
                 : selected.size === 1
                   ? "Continue"
-                  : `Continue with ${selected.size} (reel)`}
+                  : `Continue with ${selected.size} clips`}
             </button>
           </div>
         </>
@@ -855,7 +856,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
             {clips.length > 1 && (
               <div className="px-4 pt-3">
                 <p className="text-xs font-bold uppercase tracking-wider text-pine/50 mb-2">
-                  Reel timeline — drag to reorder
+                  Timeline — drag to reorder
                 </p>
                 <div
                   ref={timelineRef}
@@ -977,11 +978,16 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
             )}
 
             {/* Text editor — bottom sheet rendered via portal so it escapes
-                the scroll container (fixed positioning breaks inside it on iOS). */}
+                the scroll container (fixed positioning breaks inside it on
+                iOS). The wrapper is pinned to the visual viewport so the
+                sheet docks exactly at the visible bottom, above the keyboard. */}
             {textSheetOpen && typeof document !== "undefined" && createPortal(
             <div
-              className="fixed z-[1500] left-0 right-0 bg-white rounded-t-3xl shadow-2xl border-t border-pine/10 p-4 space-y-3 max-h-[78dvh] min-h-[56dvh] overflow-y-auto overscroll-contain touch-auto"
-              style={{ bottom: kbOffset }}
+              className="fixed z-[1500] left-0 right-0 pointer-events-none"
+              style={{ top: vvBox?.top ?? 0, height: vvBox?.height ?? "100dvh" }}
+            >
+            <div
+              className="absolute left-0 right-0 bottom-0 pointer-events-auto bg-white rounded-t-3xl shadow-2xl border-t border-pine/10 p-4 space-y-3 max-h-[92%] min-h-[56%] overflow-y-auto overscroll-contain touch-auto"
               data-edit-controls
             >
               <div className="flex gap-2">
@@ -1068,6 +1074,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                 </div>
               </div>
               )}
+            </div>
             </div>, document.body)}
 
               {/* Current overlays — tap clips to choose when text shows */}
@@ -1128,8 +1135,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
 
           {/* Bottom bar */}
           <div className="px-4 pt-3 border-t border-pine/10">
-            {!saveAsReel && (
-              <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-3 mb-3">
                 <span className="text-xs font-bold uppercase tracking-wider text-pine/50 shrink-0">
                   Visible for
                 </span>
@@ -1150,30 +1156,6 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                   ))}
                 </div>
               </div>
-            )}
-            <label className="flex items-center gap-3 mb-3 cursor-pointer">
-              <button
-                type="button"
-                role="switch"
-                aria-checked={saveAsReel}
-                onClick={() => setSaveAsReel((v) => !v)}
-                className={`w-11 h-6 rounded-full transition-colors relative ${
-                  saveAsReel ? "bg-signal" : "bg-pine/20"
-                }`}
-              >
-                <span
-                  className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${
-                    saveAsReel ? "left-[22px]" : "left-0.5"
-                  }`}
-                />
-              </button>
-              <span className="text-sm font-bold text-pine">
-                Save as reel
-                <span className="block text-xs font-medium text-pine/50">
-                  Permanent — shows on your profile
-                </span>
-              </span>
-            </label>
             <div className="flex gap-2 pb-4">
               <button
                 onClick={() => setStep("pick")}
@@ -1186,7 +1168,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                 disabled={posting}
                 className="flex-1 py-4 rounded-full bg-signal text-white font-bold uppercase tracking-wider disabled:opacity-50"
               >
-                {posting ? "Posting…" : clips.length > 1 ? `Post ${clips.length}-clip reel` : "Post story"}
+                {posting ? "Posting…" : "Post story"}
               </button>
             </div>
           </div>
