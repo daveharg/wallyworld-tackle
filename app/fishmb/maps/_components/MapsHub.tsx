@@ -78,6 +78,7 @@ export default function MapsHub() {
   const [catchEditing, setCatchEditing] = useState(false);
   const [catchEditLoading, setCatchEditLoading] = useState(false);
   const [catchEditNote, setCatchEditNote] = useState("");
+  const [catchEditDepth, setCatchEditDepth] = useState("");
   const [catchEditPhotos, setCatchEditPhotos] = useState<string[]>([]);
   const [catchEditFiles, setCatchEditFiles] = useState<File[]>([]);
   const [catchEditPreviews, setCatchEditPreviews] = useState<string[]>([]);
@@ -86,6 +87,7 @@ export default function MapsHub() {
   const [spotEditName, setSpotEditName] = useState("");
   const [spotEditNotes, setSpotEditNotes] = useState("");
   const [spotEditIcon, setSpotEditIcon] = useState("pin");
+  const [spotEditDepth, setSpotEditDepth] = useState("");
   const [spotSaving, setSpotSaving] = useState(false);
   const [spotEditLakeId, setSpotEditLakeId] = useState<string | null>(null);
   const [spotLakeQuery, setSpotLakeQuery] = useState("");
@@ -342,6 +344,7 @@ export default function MapsHub() {
   const [quickName, setQuickName] = useState("");
   const [quickNotes, setQuickNotes] = useState("");
   const [quickIcon, setQuickIcon] = useState("pin");
+  const [quickDepth, setQuickDepth] = useState("");
   const [quickSaving, setQuickSaving] = useState(false);
   const [quickReady, setQuickReady] = useState(false);
   // Route recording.
@@ -416,6 +419,7 @@ export default function MapsHub() {
           notes: spotEditNotes.trim() || null,
           icon: spotEditIcon,
           lake_id: spotEditLakeId,
+          depth_ft: (() => { const d = parseFloat(spotEditDepth); return Number.isFinite(d) && d > 0 && d <= 1000 ? Math.round(d * 10) / 10 : null; })(),
         }),
       });
       await reloadSpots();
@@ -788,8 +792,10 @@ export default function MapsHub() {
         photos?: string[] | null;
         photo_hold_url?: string | null;
         photo_measure_url?: string | null;
+        depth_ft?: number | string | null;
       };
       setCatchEditNote(full.note ?? "");
+      setCatchEditDepth(full.depth_ft != null ? String(Number(full.depth_ft)) : "");
       const ph =
         Array.isArray(full.photos) && full.photos.length > 0
           ? full.photos
@@ -815,7 +821,7 @@ export default function MapsHub() {
       await fishFetch(`/api/fish/catches/${selectedCatch.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ note: catchEditNote.trim() || null, photos }),
+        body: JSON.stringify({ note: catchEditNote.trim() || null, photos, depth_ft: (() => { const d = parseFloat(catchEditDepth); return Number.isFinite(d) && d > 0 && d <= 1000 ? Math.round(d * 10) / 10 : null; })() }),
       });
       setSelectedCatch({ ...selectedCatch, photo_url: photos[0] ?? null });
       setCatchEditing(false);
@@ -858,6 +864,7 @@ export default function MapsHub() {
     setPicking(false);
     setQuickName("");
     setQuickNotes("");
+    setQuickDepth("");
     setQuickIcon("pin");
     setQuickMode("choose");
     setQuickAdd({ lat, lng });
@@ -876,6 +883,7 @@ export default function MapsHub() {
           notes: quickNotes.trim() || null,
           lat: quickAdd.lat,
           lng: quickAdd.lng,
+          depth_ft: (() => { const d = parseFloat(quickDepth); return Number.isFinite(d) && d > 0 && d <= 1000 ? Math.round(d * 10) / 10 : null; })(),
           icon: quickIcon,
         }),
       });
@@ -897,7 +905,7 @@ export default function MapsHub() {
 
   const editSpot = async (
     id: string,
-    patch: { name: string; notes: string | null; icon: string; lake_id: string | null }
+    patch: { name: string; notes: string | null; icon: string; lake_id: string | null; depth_ft: number | null }
   ) => {
     try {
       const d = await fishFetch(`/api/fishmb/spots/${id}`, {
@@ -939,6 +947,13 @@ export default function MapsHub() {
     setSpotEditNotes(s.notes || "");
     setSpotEditIcon(s.icon || "pin");
     const full = spots.find((sp) => sp.id === s.id);
+    setSpotEditDepth(
+      full?.depth_ft != null
+        ? String(Number(full.depth_ft))
+        : s.depth_ft != null
+          ? String(Number(s.depth_ft))
+          : ""
+    );
     setSpotEditLakeId(full?.lake_id ?? null);
     const lakeName = full?.lake_id
       ? allLakes.find((l) => l.id === full.lake_id)?.name ?? ""
@@ -960,6 +975,7 @@ export default function MapsHub() {
           lng: Number(spotPopup.lng),
           notes: spotPopup.notes ?? null,
           icon: spotPopup.icon || "pin",
+          depth_ft: spotPopup.depth_ft ?? null,
         }),
       });
       await reloadSpots();
@@ -1527,6 +1543,14 @@ export default function MapsHub() {
                   rows={3}
                   className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm mb-3 focus:outline-none focus:border-signal"
                 />
+                <input
+                  value={spotEditDepth}
+                  onChange={(e) => setSpotEditDepth(e.target.value.replace(/[^0-9.]/g, ""))}
+                  inputMode="decimal"
+                  placeholder="Water depth (ft)"
+                  aria-label="Water depth in feet"
+                  className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal mb-4"
+                />
                 <p className="text-xs font-bold uppercase tracking-wider text-pine/55 mb-2">
                   Lake
                 </p>
@@ -1640,6 +1664,9 @@ export default function MapsHub() {
                 </div>
                 {spotPopup.notes && (
                   <p className="text-pine/70 text-sm mb-3 whitespace-pre-line">{spotPopup.notes}</p>
+                )}
+                {spotPopup.depth_ft != null && (
+                  <p className="text-pine/70 text-sm mb-3">🌊 Water depth: {Number(spotPopup.depth_ft)} ft</p>
                 )}
                 {spotPopup.origin_name && (
                   <p className="text-pine/50 text-xs font-bold mb-3">
@@ -1789,6 +1816,11 @@ export default function MapsHub() {
                   ⚖️ {selectedCatch.weight_lb} lb
                 </span>
               ) : null}
+              {selectedCatch.depth_ft != null ? (
+                <span className="bg-pine/5 rounded-full px-3 py-1.5 text-sm font-bold text-pine">
+                  🌊 {selectedCatch.depth_ft} ft deep
+                </span>
+              ) : null}
             </div>
             {catchEditing ? (
               catchEditLoading ? (
@@ -1804,6 +1836,16 @@ export default function MapsHub() {
                     maxLength={500}
                     rows={3}
                     placeholder="Notes (optional)"
+                    className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm mb-4 focus:outline-none focus:border-signal"
+                  />
+                  <p className="text-xs font-bold uppercase tracking-wider text-pine/55 mb-2">
+                    Water depth (ft)
+                  </p>
+                  <input
+                    value={catchEditDepth}
+                    onChange={(e) => setCatchEditDepth(e.target.value.replace(/[^0-9.]/g, ""))}
+                    inputMode="decimal"
+                    placeholder="e.g. 18"
                     className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm mb-4 focus:outline-none focus:border-signal"
                   />
                   <p className="text-xs font-bold uppercase tracking-wider text-pine/55 mb-2">
@@ -2000,6 +2042,14 @@ export default function MapsHub() {
               onChange={(e) => setQuickNotes(e.target.value)}
               maxLength={500}
               placeholder="Notes (optional)"
+              className={`${inputCls} mt-2`}
+            />
+            <input
+              value={quickDepth}
+              onChange={(e) => setQuickDepth(e.target.value.replace(/[^0-9.]/g, ""))}
+              inputMode="decimal"
+              placeholder="Water depth (ft)"
+              aria-label="Water depth in feet"
               className={`${inputCls} mt-2`}
             />
             <div className="mt-3">

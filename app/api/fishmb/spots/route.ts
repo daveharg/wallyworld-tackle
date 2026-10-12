@@ -53,6 +53,12 @@ export async function POST(req: NextRequest) {
     notes,
     icon: isSpotIconId(body.icon) ? body.icon : "pin",
     lakeId: typeof body.lake_id === "string" && body.lake_id.trim() ? body.lake_id.trim() : null,
+    depthFt:
+      body.depth_ft === undefined || body.depth_ft === null
+        ? null
+        : Number.isFinite(Number(body.depth_ft)) && Number(body.depth_ft) > 0 && Number(body.depth_ft) <= 1000
+          ? Math.round(Number(body.depth_ft) * 10) / 10
+          : null,
     // Set when accepting a spot shared in Messages — permanent attribution.
     originUserId:
       typeof body.origin_user_id === "string" && body.origin_user_id.trim()

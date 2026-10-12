@@ -23,7 +23,7 @@ export async function PATCH(
   } catch {
     return badRequest("Invalid JSON body.");
   }
-  const patch: { name?: string; notes?: string | null; icon?: string; lakeId?: string | null } = {};
+  const patch: { name?: string; notes?: string | null; icon?: string; lakeId?: string | null; depthFt?: number | null } = {};
   if (body.name !== undefined) {
     if (typeof body.name !== "string") return badRequest("name must be a string.");
     patch.name = body.name.trim().slice(0, 80);
@@ -41,6 +41,16 @@ export async function PATCH(
     if (typeof body.lake_id !== "string" && body.lake_id !== null)
       return badRequest("lake_id must be a string or null.");
     patch.lakeId = body.lake_id;
+  }
+  if (body.depth_ft !== undefined) {
+    if (body.depth_ft !== null) {
+      const d = Number(body.depth_ft);
+      if (!Number.isFinite(d) || d <= 0 || d > 1000)
+        return badRequest("depth_ft must be a number of feet (up to 1000), or null.");
+      patch.depthFt = Math.round(d * 10) / 10;
+    } else {
+      patch.depthFt = null;
+    }
   }
   const spot = await updateSpot(me.id, params.id, patch);
   if (!spot) return notFound();

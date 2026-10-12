@@ -15,6 +15,7 @@ interface CatchDetail {
   species: string;
   length_in: string | null;
   weight_lb: string | null;
+  depth_ft: string | null;
   photo_hold_url: string | null;
   photo_measure_url: string | null;
   photos: string[] | null;
@@ -136,6 +137,7 @@ export default function CatchDetailPage({ params }: { params: { id: string } }) 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-6">
         {c.length_in && <Stat label="Length" value={`${c.length_in}″`} />}
         {c.weight_lb && <Stat label="Weight" value={`${c.weight_lb} lb`} />}
+        {c.depth_ft && <Stat label="Water depth" value={`${c.depth_ft} ft`} />}
         <Stat label="Visibility" value={c.visibility === "public" ? "Shared" : c.visibility === "friends" ? "Friends" : "Private"} />
         {c.personal_record && <Stat label="Personal best" value="Yes" />}
       </div>

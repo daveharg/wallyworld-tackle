@@ -26,6 +26,8 @@ export interface FishingSpot {
   origin_name: string | null;
   /** The recipient-side message row id this spot was accepted from. */
   share_msg_id: string | null;
+  /** Water depth at the spot, in feet (optional). */
+  depth_ft: number | null;
   created_at: string;
 }
 
@@ -58,6 +60,8 @@ export async function ensureSpotsTable(): Promise<void> {
   // message it was accepted from (so the chat card can show "Saved ✓").
   await query(`ALTER TABLE fm_fishing_spots ADD COLUMN IF NOT EXISTS origin_user_id uuid`);
   await query(`ALTER TABLE fm_fishing_spots ADD COLUMN IF NOT EXISTS origin_name text`);
+  // Water depth at the spot, in feet (optional). Added Oct 2026.
+  await query(`ALTER TABLE fm_fishing_spots ADD COLUMN IF NOT EXISTS depth_ft numeric(6,1)`);
   await query(`ALTER TABLE fm_fishing_spots ADD COLUMN IF NOT EXISTS share_msg_id text`);
   // Favorite lakes: the angler's saved lakes for quick map navigation on the
   // profile's fishing-spots section.
@@ -116,7 +120,7 @@ export function isValidLng(v: unknown): v is number {
 
 export async function listSpots(userId: string): Promise<FishingSpot[]> {
   const rows = await query<FishingSpot>(
-    `SELECT id, user_id, name, lat, lng, notes, catch_id, icon, lake_id, origin_user_id, origin_name, share_msg_id, created_at
+    `SELECT id, user_id, name, lat, lng, notes, catch_id, icon, lake_id, origin_user_id, origin_name, share_msg_id, depth_ft, created_at
        FROM fm_fishing_spots
       WHERE user_id = $1
       ORDER BY created_at DESC`,
@@ -151,12 +155,13 @@ export async function createSpot(
     originUserId?: string | null;
     originName?: string | null;
     shareMsgId?: string | null;
+    depthFt?: number | null;
   }
 ): Promise<FishingSpot> {
   const row = await queryOne<FishingSpot>(
-    `INSERT INTO fm_fishing_spots (user_id, name, lat, lng, notes, catch_id, icon, lake_id, origin_user_id, origin_name, share_msg_id)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-     RETURNING id, user_id, name, lat, lng, notes, catch_id, icon, lake_id, origin_user_id, origin_name, share_msg_id, created_at`,
+    `INSERT INTO fm_fishing_spots (user_id, name, lat, lng, notes, catch_id, icon, lake_id, origin_user_id, origin_name, share_msg_id, depth_ft)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+     RETURNING id, user_id, name, lat, lng, notes, catch_id, icon, lake_id, origin_user_id, origin_name, share_msg_id, depth_ft, created_at`,
     [
       userId,
       spot.name.trim().slice(0, 80) || "Fishing spot",
@@ -171,6 +176,7 @@ export async function createSpot(
       spot.originUserId ?? null,
       spot.originName?.trim().slice(0, 80) || null,
       spot.shareMsgId?.trim().slice(0, 64) || null,
+      spot.depthFt ?? null,
     ]
   );
   if (!row) throw new Error("Could not create spot.");
@@ -180,7 +186,7 @@ export async function createSpot(
 export async function updateSpot(
   userId: string,
   spotId: string,
-  patch: { name?: string; notes?: string | null; icon?: string; lakeId?: string | null }
+  patch: { name?: string; notes?: string | null; icon?: string; lakeId?: string | null; depthFt?: number | null }
 ): Promise<FishingSpot | null> {
   const sets: string[] = [];
   const vals: unknown[] = [];
@@ -199,6 +205,10 @@ export async function updateSpot(
   if (patch.lakeId !== undefined) {
     vals.push(patch.lakeId?.trim() || null);
     sets.push(`lake_id = $${vals.length}`);
+  }
+  if (patch.depthFt !== undefined) {
+    vals.push(patch.depthFt);
+    sets.push(`depth_ft = $${vals.length}`);
   }
   if (sets.length === 0) {
     return queryOne<FishingSpot>(

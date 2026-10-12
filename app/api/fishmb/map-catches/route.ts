@@ -16,6 +16,11 @@ export const dynamic = "force-dynamic";
 export async function GET(req: NextRequest) {
   const me = await fishUserFromRequest(req);
   if (!me) return unauthorized();
+  // The depth column is selected below — make sure it exists (self-applying
+  // migration, same pattern as the catches routes).
+  try {
+    await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS depth_ft numeric(6,1)`);
+  } catch {}
 
   const url = new URL(req.url);
   const lat = Number(url.searchParams.get("lat"));
@@ -76,6 +81,7 @@ export async function GET(req: NextRequest) {
     species: string;
     length_in: string;
     weight_lb: string | null;
+    depth_ft: string | null;
     photo_url: string | null;
     lat: number;
     lng: number;
@@ -83,7 +89,7 @@ export async function GET(req: NextRequest) {
     user_name: string;
     is_friend: boolean;
   }>(
-    `SELECT c.id, c.user_id, c.species, c.length_in, c.weight_lb,
+    `SELECT c.id, c.user_id, c.species, c.length_in, c.weight_lb, c.depth_ft,
             COALESCE(c.photo_hold_url, c.photo_measure_url) AS photo_url,
             c.lat, c.lng, c.caught_at, u.name AS user_name,
             u.avatar_url AS avatar_url,
@@ -120,6 +126,7 @@ export async function GET(req: NextRequest) {
       species: r.species,
       length_in: Number(r.length_in),
       weight_lb: r.weight_lb === null ? null : Number(r.weight_lb),
+      depth_ft: r.depth_ft === null || r.depth_ft === undefined ? null : Number(r.depth_ft),
       photo_url: r.photo_url,
       lat: r.lat,
       lng: r.lng,

@@ -6,6 +6,7 @@ export interface MapCatch {
   species: string;
   length_in: number | null;
   weight_lb: number | null;
+  depth_ft?: number | null;
   photo_url: string | null;
   lat: number;
   lng: number;

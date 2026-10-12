@@ -65,6 +65,9 @@ export async function PATCH(
     return badRequest("Invalid JSON body.");
   }
 
+  try {
+    await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS depth_ft numeric(6,1)`);
+  } catch {}
   const sets: string[] = [];
   const vals: unknown[] = [];
   let i = 1;
@@ -80,6 +83,19 @@ export async function PATCH(
   if (body.personal_record !== undefined) {
     sets.push(`personal_record = $${i++}`);
     vals.push(body.personal_record === true);
+  }
+  if (body.depth_ft !== undefined) {
+    if (body.depth_ft !== null) {
+      const d = Number(body.depth_ft);
+      if (!Number.isFinite(d) || d <= 0 || d > 1000) {
+        return badRequest("depth_ft must be a positive number of feet, or null.");
+      }
+      sets.push(`depth_ft = $${i++}`);
+      vals.push(Math.round(d * 10) / 10);
+    } else {
+      sets.push(`depth_ft = $${i++}`);
+      vals.push(null);
+    }
   }
   if (body.note !== undefined) {
     if (typeof body.note !== "string" && body.note !== null) {

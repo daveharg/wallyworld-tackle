@@ -12,7 +12,7 @@ interface SpotsTabProps {
   spots: Spot[];
   onSelect: (s: Spot) => void;
   onNavigate: (s: Spot) => void;
-  onEdit: (id: string, patch: { name: string; notes: string | null; icon: string; lake_id: string | null }) => Promise<void>;
+  onEdit: (id: string, patch: { name: string; notes: string | null; icon: string; lake_id: string | null; depth_ft: number | null }) => Promise<void>;
   onDelete: (id: string) => void;
   onShare: (id: string) => void;
   onSend: (s: Spot) => void;
@@ -55,6 +55,7 @@ export default function SpotsTab({
   const [editLakeId, setEditLakeId] = useState<string | null>(null);
   const [editLakeQuery, setEditLakeQuery] = useState("");
   const [editIcon, setEditIcon] = useState("pin");
+  const [editDepth, setEditDepth] = useState("");
   const [saving, setSaving] = useState(false);
   const [lakes, setLakes] = useState<LakeCoord[]>([]);
 
@@ -91,6 +92,7 @@ export default function SpotsTab({
     setEditLakeId(s.lake_id ?? null);
     setEditLakeQuery(lakes.find((l) => l.id === s.lake_id)?.name ?? "");
     setEditIcon(s.icon ?? "pin");
+    setEditDepth(s.depth_ft != null ? String(Number(s.depth_ft)) : "");
   };
 
   const saveEdit = async (id: string) => {
@@ -101,6 +103,7 @@ export default function SpotsTab({
         notes: editNotes.trim() || null,
         icon: editIcon,
         lake_id: editLakeId,
+        depth_ft: (() => { const d = parseFloat(editDepth); return Number.isFinite(d) && d > 0 && d <= 1000 ? Math.round(d * 10) / 10 : null; })(),
       });
       setEditingId(null);
     } catch {
@@ -201,6 +204,14 @@ export default function SpotsTab({
                         onChange={(e) => setEditNotes(e.target.value)}
                         maxLength={500}
                         placeholder="Notes (optional)"
+                        className={inputCls}
+                      />
+                      <input
+                        value={editDepth}
+                        onChange={(e) => setEditDepth(e.target.value.replace(/[^0-9.]/g, ""))}
+                        inputMode="decimal"
+                        placeholder="Water depth (ft)"
+                        aria-label="Water depth in feet"
                         className={inputCls}
                       />
                       <div>

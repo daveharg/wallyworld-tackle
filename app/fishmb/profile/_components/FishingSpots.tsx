@@ -155,6 +155,7 @@ export default function FishingSpots() {
   const [editName, setEditName] = useState("");
   const [editNotes, setEditNotes] = useState("");
   const [editIcon, setEditIcon] = useState("pin");
+  const [editDepth, setEditDepth] = useState("");
 
   // Icon choices for the quick-add and manual-add forms
   const [quickIcon, setQuickIcon] = useState("pin");
@@ -423,6 +424,7 @@ export default function FishingSpots() {
     setEditName(s.name);
     setEditNotes(s.notes ?? "");
     setEditIcon(s.icon ?? "pin");
+    setEditDepth(s.depth_ft != null ? String(Number(s.depth_ft)) : "");
   };
 
   const saveEdit = async (id: string) => {
@@ -430,7 +432,7 @@ export default function FishingSpots() {
       const d = await fishFetch(`/api/fishmb/spots/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: editName.trim(), notes: editNotes.trim() || null, icon: editIcon }),
+        body: JSON.stringify({ name: editName.trim(), notes: editNotes.trim() || null, icon: editIcon, depth_ft: (() => { const d = parseFloat(editDepth); return Number.isFinite(d) && d > 0 && d <= 1000 ? Math.round(d * 10) / 10 : null; })() }),
       });
       setSpots(spots.map((s) => (s.id === id ? (d.spot as Spot) : s)));
       setEditingId(null);
@@ -796,6 +798,14 @@ export default function FishingSpots() {
                   placeholder="Notes (optional)"
                   className={inputCls}
                 />
+                  <input
+                    value={editDepth}
+                    onChange={(e) => setEditDepth(e.target.value.replace(/[^0-9.]/g, ""))}
+                    inputMode="decimal"
+                    placeholder="Water depth (ft)"
+                    aria-label="Water depth in feet"
+                    className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal"
+                  />
                 <IconPicker value={editIcon} onChange={setEditIcon} />
                 <div className="flex gap-2">
                   <button

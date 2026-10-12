@@ -137,6 +137,11 @@ export async function POST(req: NextRequest) {
   if (weightLb !== null && (!Number.isFinite(weightLb) || weightLb <= 0 || weightLb > 999)) {
     return badRequest("weight_lb must be a positive number of pounds.");
   }
+  const depthFt =
+    body.depth_ft === undefined || body.depth_ft === null ? null : Number(body.depth_ft);
+  if (depthFt !== null && (!Number.isFinite(depthFt) || depthFt <= 0 || depthFt > 1000)) {
+    return badRequest("depth_ft must be a positive number of feet.");
+  }
   // Ensure video columns exist (safe for existing DBs).
   try {
     await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS video_playback_id text`);
@@ -251,13 +256,14 @@ export async function POST(req: NextRequest) {
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS weather jsonb`);
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS tournament_id uuid REFERENCES fm_tournaments(id) ON DELETE SET NULL`);
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS feed_caption text`);
+  await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS depth_ft numeric(6,1)`);
   const rows = await query<CatchRow>(
     `INSERT INTO fm_catches
-       (user_id, species, length_in, weight_lb, photo_measure_url, photo_hold_url, photos, visibility, note, feed_caption, caught_at, lat, lng, share_location, weather, personal_record, tournament_id, video_playback_id, video_url)
-     VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9,$10,COALESCE($11::timestamptz, now()),$12,$13,$14,$15::jsonb,$16,$17::uuid,$18,$19)
+       (user_id, species, length_in, weight_lb, photo_measure_url, photo_hold_url, photos, visibility, note, feed_caption, caught_at, lat, lng, share_location, weather, personal_record, tournament_id, video_playback_id, video_url, depth_ft)
+     VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9,$10,COALESCE($11::timestamptz, now()),$12,$13,$14,$15::jsonb,$16,$17::uuid,$18,$19,$20)
      RETURNING *, (SELECT name FROM fm_users WHERE id = $1) AS name,
                    (SELECT avatar_url FROM fm_users WHERE id = $1) AS avatar_url`,
-    [me.id, species, lengthIn, weightLb, photoMeasure, photoHold, JSON.stringify(photos), visibility, note, feedCaption, caughtAt, lat, lng, shareLocation, weather ? JSON.stringify(weather) : null, personalRecord, tournamentId, videoPlaybackId, videoUrl]
+    [me.id, species, lengthIn, weightLb, photoMeasure, photoHold, JSON.stringify(photos), visibility, note, feedCaption, caughtAt, lat, lng, shareLocation, weather ? JSON.stringify(weather) : null, personalRecord, tournamentId, videoPlaybackId, videoUrl, depthFt]
   );
   const newCatch = rows[0];
 
@@ -271,6 +277,7 @@ export async function POST(req: NextRequest) {
         lat,
         lng,
         catchId: newCatch.id,
+        depthFt,
       });
     } catch {
       // Spot creation is best-effort — the catch itself is already saved.

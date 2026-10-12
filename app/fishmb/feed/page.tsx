@@ -1288,6 +1288,7 @@ function FeedPageInner() {
   const postToFeed = catchShare !== "private";
   const [catchSpecies, setCatchSpecies] = useState("");
   const [catchLength, setCatchLength] = useState("");
+  const [catchDepth, setCatchDepth] = useState("");
   const [catchLat, setCatchLat] = useState<number | null>(null);
   const [catchLng, setCatchLng] = useState<number | null>(null);
   const [locating, setLocating] = useState(false);
@@ -1862,6 +1863,7 @@ function FeedPageInner() {
         body: JSON.stringify({
           species: catchSpecies.trim(),
           length_in: lengthIn,
+          depth_ft: (() => { const d = parseFloat(catchDepth); return Number.isFinite(d) && d > 0 && d <= 1000 ? Math.round(d * 10) / 10 : null; })(),
           photo_measure_url: photoUrl,
           photo_hold_url: photoUrl,
           photos: urls,
@@ -1899,6 +1901,7 @@ function FeedPageInner() {
       }
       setCatchSpecies("");
       setCatchLength("");
+      setCatchDepth("");
       setDraft("");
       setCatchPhotos([]);
       setTournamentId("");
@@ -2623,6 +2626,13 @@ function FeedPageInner() {
                     className="bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal"
                   />
                 </div>
+                <input
+                  value={catchDepth}
+                  onChange={(e) => setCatchDepth(e.target.value.replace(/[^0-9.]/g, ""))}
+                  inputMode="decimal"
+                  placeholder="Water depth (ft)"
+                  className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal"
+                />
                 <textarea
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}

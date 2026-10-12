@@ -19,6 +19,8 @@ export interface SpotPin {
   /** Set when this spot was received from another angler (permanent credit). */
   origin_user_id?: string | null;
   origin_name?: string | null;
+  /** Water depth at the spot, in feet (optional). */
+  depth_ft?: number | null;
 }
 
 export interface TrailPoint {
