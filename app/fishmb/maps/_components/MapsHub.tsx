@@ -2,7 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type {
   BasemapId,
@@ -603,19 +603,25 @@ export default function MapsHub() {
     nearbyTimer.current = setTimeout(() => loadNearbyCatches(center.lat, center.lng), 800);
   };
 
-  const catchPins: CatchPin[] = [
-    ...(showMyCatches ? myCatches : []),
-    ...(showPublicCatches ? nearbyCatches : []),
-  ].map((c) => ({
-    id: c.id,
-    lat: c.lat,
-    lng: c.lng,
-    species: c.species,
-    length_in: c.length_in,
-    mine: c.mine,
-    avatar_url: c.avatar_url ?? null,
-    user_name: c.user_name,
-  }));
+  // Memoized: a fresh array identity on every render makes SpotMap tear down
+  // and rebuild every pin, which flickers the avatar photos.
+  const catchPins: CatchPin[] = useMemo(
+    () =>
+      [
+        ...(showMyCatches ? myCatches : []),
+        ...(showPublicCatches ? nearbyCatches : []),
+      ].map((c) => ({
+        id: c.id,
+        lat: c.lat,
+        lng: c.lng,
+        species: c.species,
+        length_in: c.length_in,
+        mine: c.mine,
+        avatar_url: c.avatar_url ?? null,
+        user_name: c.user_name,
+      })),
+    [showMyCatches, showPublicCatches, myCatches, nearbyCatches]
+  );
 
   const flyTo = (lat: number, lng: number, key: string, zoom = 13) => {
     setFocus({ lat, lng, key: `${key}:${Date.now()}`, zoom });

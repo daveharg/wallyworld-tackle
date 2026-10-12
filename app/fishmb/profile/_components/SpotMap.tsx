@@ -132,6 +132,8 @@ export default function SpotMap({
   const containerRef = useRef<HTMLDivElement>(null);
   const onSpotClickRef = useRef(onSpotClick);
   onSpotClickRef.current = onSpotClick;
+  const onCatchClickRef = useRef(onCatchClick);
+  onCatchClickRef.current = onCatchClick;
   const [map, setMap] = useState<any>(null);
   const [expanded, setExpanded] = useState(false);
   // Circular fill indicator shown at the press point during a long-press.
@@ -396,12 +398,17 @@ export default function SpotMap({
   }, [basemap, map]);
 
   // GPS catch pins — your catches in signal orange, others' in pine.
+  // Rebuilt ONLY when the pin data actually changes: tearing the layer down
+  // on unrelated re-renders recreates every avatar <img> and flickers.
   const catchLayerRef = useRef<any>(null);
   useEffect(() => {
     if (!map) return;
+    let cancelled = false;
     (async () => {
       const L = (await import("leaflet")).default;
+      if (cancelled) return;
       catchLayerRef.current?.remove();
+      catchLayerRef.current = null;
       const pins = catchPins ?? [];
       if (pins.length === 0) return;
       const layer = L.layerGroup();
@@ -417,8 +424,8 @@ export default function SpotMap({
           iconAnchor: [16, 16],
         });
         const marker = L.marker([c.lat, c.lng], { icon });
-        if (onCatchClick) {
-          marker.on("click", () => onCatchClick(c));
+        if (onCatchClickRef.current) {
+          marker.on("click", () => onCatchClickRef.current?.(c));
         } else {
           marker.bindPopup(
             `<strong>${escapeHtml(c.species)}</strong>${
@@ -428,10 +435,14 @@ export default function SpotMap({
         }
         marker.addTo(layer);
       }
+      if (cancelled) return;
       layer.addTo(map);
       catchLayerRef.current = layer;
     })();
-  }, [catchPins, map, onCatchClick]);
+    return () => {
+      cancelled = true;
+    };
+  }, [catchPins, map]);
 
   // Live GPS person marker — follows you whenever we have a fix.
   // Single persistent marker (no duplicates): we reuse one Leaflet marker and
