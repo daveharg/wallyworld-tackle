@@ -51,7 +51,6 @@ const BACKGROUNDS = [
 
 export default function StoryCreator({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const [drafts, setDrafts] = useState<Draft[]>([]);
-  const [selected, setSelected] = useState<Set<string>>(new Set());
   const [uploading, setUploading] = useState(false);
   const [posting, setPosting] = useState(false);
   const [note, setNote] = useState<string | null>(null);
@@ -301,18 +300,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
     );
   };
 
-  const loadDrafts = async () => {
-    try {
-      const d = await fishFetch("/api/fishmb/story-drafts");
-      setDrafts(((d as { drafts?: Draft[] }).drafts ?? []) as Draft[]);
-    } catch {
-      // Drafts stay empty.
-    }
-  };
 
-  useEffect(() => {
-    loadDrafts();
-  }, []);
 
   const uploadDraft = async (file: File) => {
     setUploading(true);
@@ -393,17 +381,16 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
         if (!upRes.ok) throw new Error(up.error || "Upload failed.");
         mediaUrl = up.url;
       }
-      const created = (await fishFetch("/api/fishmb/story-drafts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          media_url: mediaUrl,
-          media_type: isVideo ? "video" : "photo",
-          duration: isVideo ? videoDuration : null,
-        }),
-      })) as { draft?: Draft };
-      await loadDrafts();
-      return created.draft?.id ?? null;
+      return {
+        id:
+          typeof crypto !== "undefined" && "randomUUID" in crypto
+            ? crypto.randomUUID()
+            : `clip-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        media_url: mediaUrl,
+        media_type: isVideo ? "video" : "photo",
+        duration: isVideo ? videoDuration : null,
+        created_at: new Date().toISOString(),
+      } as Draft;
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not upload.");
       return null;
@@ -412,58 +399,27 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
     }
   };
 
-  /** One pick, everything at once: upload each chosen file and select
-   *  them all for the story. */
+  /** One pick, straight to the editor: upload everything chosen and
+   *  make it the story being edited. Nothing is saved as a draft. */
   const addFiles = async (files: File[]) => {
-    const ids: string[] = [];
+    const picked: Draft[] = [];
     for (const f of files) {
-      const id = await uploadDraft(f);
-      if (id) ids.push(id);
+      const clip = await uploadDraft(f);
+      if (clip) picked.push(clip);
     }
-    if (ids.length) {
-      setSelected((prev) => {
-        const next = new Set(prev);
-        for (const id of ids) next.add(id);
-        return next;
-      });
-    }
-  };
-
-  const deleteDraft = async (id: string) => {
-    try {
-      await fishFetch(`/api/fishmb/story-drafts?id=${id}`, { method: "DELETE" });
-      setDrafts((list) => list.filter((d) => d.id !== id));
-      setSelected((s) => {
-        const next = new Set(s);
-        next.delete(id);
-        return next;
-      });
-    } catch {
-      // Best effort.
-    }
-  };
-
-  const toggleSelect = (id: string) => {
-    setSelected((s) => {
-      const next = new Set(s);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
-
-  const selectedDrafts = drafts.filter((d) => selected.has(d.id));
-
-  const startEdit = () => {
-    if (selectedDrafts.length === 0) {
-      setNote("Pick at least one photo or video first.");
-      return;
-    }
-    // Preserve selection order as the reel timeline.
-    setClipOrder(drafts.filter((d) => selected.has(d.id)).map((d) => d.id));
+    if (picked.length === 0) return;
+    setDrafts(picked);
+    setClipOrder(picked.map((d) => d.id));
     setActiveClip(0);
+    setOverlays([]);
+    setClipZooms({});
+    setClipVolumes({});
     setStep("edit");
   };
+
+
+
+
 
   const addOverlay = () => {
     if (!overlayText.trim() || !activeDraft) {
@@ -561,7 +517,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
       {step === "pick" ? (
         <>
           {/* One picker for everything — photos and videos, as many as you
-              want at once. New picks are selected for the story automatically. */}
+              want at once, then straight into the editor. Nothing is saved. */}
           <div className="px-4 py-3">
             <button
               onClick={() => fileRef.current?.click()}
@@ -583,7 +539,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
               }}
             />
             <p className="text-center text-pine/40 text-xs mt-2">
-              Pick as many as you want at once. Anything you added before is below — tap to add or remove it.
+              Pick as many as you want at once — you'll go straight into the editor. Nothing is saved here.
             </p>
           </div>
 
@@ -597,88 +553,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
             </div>
           )}
 
-          {/* Draft grid with plus boxes */}
-          <div className="flex-1 overflow-y-auto px-4 pb-4">
-            <div className="grid grid-cols-3 gap-1">
-              {/* Saved drafts */}
-              {drafts.map((d) => {
-                // Videos store a Mux HLS URL; use the Mux thumbnail image for the grid.
-                const videoThumb =
-                  d.media_type === "video"
-                    ? d.media_url.replace("stream.mux.com/", "image.mux.com/").replace(/\.m3u8.*$/, "/thumbnail.jpg")
-                    : null;
-                return (
-                <div key={d.id} className="relative aspect-square">
-                  <button
-                    onClick={() => toggleSelect(d.id)}
-                    className="absolute inset-0 rounded-xl overflow-hidden"
-                  >
-                    {d.media_type === "video" ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={videoThumb ?? ""} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={d.media_url} alt="" className="w-full h-full object-cover" />
-                    )}
-                    {/* Type icon top-right: camera for photos, film for videos */}
-                    <span className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/50 flex items-center justify-center">
-                      {d.media_type === "video" ? (
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                          <rect x="2" y="4" width="20" height="16" rx="2" />
-                          <path d="M7 4v16M17 4v16M2 9h5M2 15h5M17 9h5M17 15h5" />
-                        </svg>
-                      ) : (
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-                          <circle cx="12" cy="13" r="4" />
-                        </svg>
-                      )}
-                    </span>
-                    {/* Video duration bottom-left */}
-                    {d.media_type === "video" && d.duration != null && (
-                      <span className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/60 text-white text-[10px] font-bold">
-                        {Math.floor(d.duration / 60)}:{String(Math.floor(d.duration % 60)).padStart(2, "0")}
-                      </span>
-                    )}
-                    {selected.has(d.id) && (
-                      <span className="absolute inset-0 bg-signal/30 flex items-center justify-center">
-                        <span className="w-8 h-8 rounded-full bg-signal text-white flex items-center justify-center font-bold">✓</span>
-                      </span>
-                    )}
-                  </button>
-                  <button
-                    onClick={() => deleteDraft(d.id)}
-                    aria-label="Remove"
-                    className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/50 text-white text-xs"
-                  >
-                    ×
-                  </button>
-                </div>
-                );
-              })}
-            </div>
-            {drafts.length === 0 && !uploading && (
-              <p className="text-center text-pine/40 text-sm mt-6">
-                Nothing here yet — what you add stays saved here until you need it.
-              </p>
-            )}
-          </div>
-
-          {/* Bottom bar */}
-          <div className="p-4 border-t border-pine/10">
-            <button
-              onClick={startEdit}
-              disabled={selected.size === 0}
-              className="w-full py-4 rounded-full bg-signal text-white font-bold uppercase tracking-wider disabled:opacity-40"
-            >
-              {selected.size === 0
-                ? "Select photos and videos"
-                : selected.size === 1
-                  ? "Continue"
-                  : `Continue with ${selected.size} clips`}
-            </button>
-          </div>
-        </>
+          </>
       ) : (
         <>
           {/* Edit step — reel editor */}
