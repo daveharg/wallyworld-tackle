@@ -275,92 +275,8 @@ export default function LakesTab({
 
   return (
     <div className="pt-1 pb-2">
-      {/* Lake cards — full width, most-used on top */}
-      {cards.length === 0 ? (
-        <p className="text-center text-pine/50 text-sm py-8">
-          No saved lakes yet.
-        </p>
-      ) : (
-        <div className="-mx-4 space-y-2.5">
-          {cards.map((lake) => (
-            <button
-              key={lake.id}
-              type="button"
-              onClick={() => handleSelect(lake)}
-              className="w-full text-left bg-white border-y border-pine/10 px-5 py-3 active:bg-pine/5"
-            >
-              <div className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="font-extrabold text-pine text-[16px] leading-tight truncate">
-                    {lake.name}
-                    {lake.tempC !== null && (
-                      <span className="ml-2 font-bold text-pine/55">{lake.tempC}°</span>
-                    )}
-                  </p>
-                  <p className="text-[11px] text-pine/50 font-semibold mt-0.5">
-                    {lake.region}
-                    {lake.catchCount !== null && lake.catchCount > 0 &&
-                      ` · ${lake.catchCount} ${lake.catchCount === 1 ? "catch" : "catches"}`}
-                  </p>
-                </div>
-                <LakeStatBlock
-                  stocked20yr={lake.stocked20yr}
-                  masters={lake.masters2yr}
-                />
-              </div>
-              {lake.species.length > 0 && (
-                <p className="text-[11px] text-pine/55 font-semibold mt-1 truncate">
-                  {lake.species.slice(0, 4).join(" · ")}
-                  {lake.species.length > 4 ? ` · +${lake.species.length - 4}` : ""}
-                </p>
-              )}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Recommended lakes — top Master Angler producers */}
-      <div className="mt-6">
-        <div className="px-4 mb-2">
-          <h3 className="text-xs font-black uppercase tracking-wider text-pine/45">
-            Recommended lakes
-          </h3>
-          <p className="text-[11px] text-pine/50 mt-0.5">
-            Top Master Angler producers in Manitoba
-          </p>
-        </div>
-        <div className="-mx-4 space-y-2.5">
-          {RECOMMENDED.filter((r) => !cards.some((c) => c.id === r.id)).map((lake) => (
-            <button
-              key={lake.id}
-              type="button"
-              onClick={() => handleSelect({ id: lake.id, name: lake.name, region: lake.region, lat: null, lng: null })}
-              className="w-full text-left bg-white border-y border-pine/10 px-5 py-3 active:bg-pine/5"
-            >
-              <div className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="font-extrabold text-pine text-[16px] leading-tight truncate">
-                    {lake.name}
-                    {recWeather[lake.id] != null && (
-                      <span className="ml-2 font-bold text-pine/55">{recWeather[lake.id]}°</span>
-                    )}
-                  </p>
-                  <p className="text-[11px] text-pine/50 font-semibold mt-0.5">
-                    {lake.region}
-                  </p>
-                </div>
-                <LakeStatBlock
-                  stocked20yr={lakeStats[lake.id]?.stocked_20yr ?? 0}
-                  masters={lake.entries}
-                />
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Small add-lake button below the last lake */}
-      <div className="mt-3 px-4">
+      {/* Add lake — pinned to the top of the tab */}
+      <div className="mb-3 px-4">
         {adding ? (
           <div className="space-y-2">
             <input
@@ -448,6 +364,91 @@ export default function LakesTab({
           </button>
         )}
       </div>
+
+      {/* Lake cards — full width, most-used on top */}
+      {cards.length === 0 ? (
+        <p className="text-center text-pine/50 text-sm py-8">
+          No saved lakes yet.
+        </p>
+      ) : (
+        <div className="-mx-4 space-y-2.5">
+          {cards.map((lake) => (
+            <button
+              key={lake.id}
+              type="button"
+              onClick={() => handleSelect(lake)}
+              className="w-full text-left bg-white border-y border-pine/10 px-5 py-3 active:bg-pine/5"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-extrabold text-pine text-[16px] leading-tight truncate">
+                    {lake.name}
+                    {lake.tempC !== null && (
+                      <span className="ml-2 font-bold text-pine/55">{lake.tempC}°</span>
+                    )}
+                  </p>
+                  <p className="text-[11px] text-pine/50 font-semibold mt-0.5">
+                    {lake.region}
+                    {lake.catchCount !== null && lake.catchCount > 0 &&
+                      ` · ${lake.catchCount} ${lake.catchCount === 1 ? "catch" : "catches"}`}
+                  </p>
+                </div>
+                <LakeStatBlock
+                  stocked20yr={lake.stocked20yr}
+                  masters={lake.masters2yr}
+                />
+              </div>
+              {lake.species.length > 0 && (
+                <p className="text-[11px] text-pine/55 font-semibold mt-1 truncate">
+                  {lake.species.slice(0, 4).join(" · ")}
+                  {lake.species.length > 4 ? ` · +${lake.species.length - 4}` : ""}
+                </p>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Recommended lakes — top Master Angler producers */}
+      <div className="mt-6">
+        <div className="px-4 mb-2">
+          <h3 className="text-xs font-black uppercase tracking-wider text-pine/45">
+            Recommended lakes
+          </h3>
+          <p className="text-[11px] text-pine/50 mt-0.5">
+            Top Master Angler producers in Manitoba
+          </p>
+        </div>
+        <div className="-mx-4 space-y-2.5">
+          {RECOMMENDED.filter((r) => !cards.some((c) => c.id === r.id)).map((lake) => (
+            <button
+              key={lake.id}
+              type="button"
+              onClick={() => handleSelect({ id: lake.id, name: lake.name, region: lake.region, lat: null, lng: null })}
+              className="w-full text-left bg-white border-y border-pine/10 px-5 py-3 active:bg-pine/5"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-extrabold text-pine text-[16px] leading-tight truncate">
+                    {lake.name}
+                    {recWeather[lake.id] != null && (
+                      <span className="ml-2 font-bold text-pine/55">{recWeather[lake.id]}°</span>
+                    )}
+                  </p>
+                  <p className="text-[11px] text-pine/50 font-semibold mt-0.5">
+                    {lake.region}
+                  </p>
+                </div>
+                <LakeStatBlock
+                  stocked20yr={lakeStats[lake.id]?.stocked_20yr ?? 0}
+                  masters={lake.entries}
+                />
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
     </div>
   );
 }
