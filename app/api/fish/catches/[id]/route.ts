@@ -81,6 +81,32 @@ export async function PATCH(
     sets.push(`personal_record = $${i++}`);
     vals.push(body.personal_record === true);
   }
+  if (body.note !== undefined) {
+    if (typeof body.note !== "string" && body.note !== null) {
+      return badRequest("note must be a string or null.");
+    }
+    sets.push(`note = $${i++}`);
+    vals.push(body.note === null ? null : body.note.trim().slice(0, 500) || null);
+  }
+  if (body.photos !== undefined) {
+    if (!Array.isArray(body.photos)) {
+      return badRequest("photos must be an array of URLs.");
+    }
+    const photos = body.photos
+      .filter(
+        (u): u is string =>
+          typeof u === "string" && /^https?:\/\//.test(u) && u.length <= 2048
+      )
+      .slice(0, 4);
+    sets.push(`photos = $${i++}::jsonb`);
+    vals.push(JSON.stringify(photos));
+    // The legacy single-photo columns mirror the first photo — they carry
+    // the verified signal, so an emptied photo set un-verifies the catch.
+    sets.push(`photo_hold_url = $${i++}`);
+    vals.push(photos[0] ?? null);
+    sets.push(`photo_measure_url = $${i++}`);
+    vals.push(photos[0] ?? null);
+  }
   if (sets.length === 0) {
     return badRequest("Nothing to update.");
   }

@@ -16,6 +16,7 @@ interface CatchesTabProps {
   scope: CatchScope;
   onScopeChange: (s: CatchScope) => void;
   onSelect: (c: MapCatch) => void;
+  onGoTo: (c: MapCatch) => void;
   myLoc: { lat: number; lng: number } | null;
   showOnMap: boolean;
   onShowOnMapChange: (v: boolean) => void;
@@ -37,45 +38,56 @@ function CatchRow({
   c,
   myLoc,
   onSelect,
+  onGoTo,
 }: {
   c: MapCatch;
   myLoc: { lat: number; lng: number } | null;
   onSelect: () => void;
+  onGoTo: () => void;
 }) {
   const dist =
     myLoc != null
       ? formatDist(haversineM(myLoc.lat, myLoc.lng, c.lat, c.lng))
       : null;
   return (
-    <button
-      type="button"
-      onClick={onSelect}
-      className="w-full flex items-center gap-3 bg-white border border-pine/10 rounded-2xl p-3 text-left active:scale-[0.99] transition-transform"
-    >
-      {c.photo_url ? (
-        <img
-          src={c.photo_url}
-          alt={c.species}
-          className="w-14 h-14 rounded-xl object-cover shrink-0 bg-pine/5"
-          loading="lazy"
-        />
-      ) : (
-        <span className="w-14 h-14 rounded-xl bg-pine/5 flex items-center justify-center text-2xl shrink-0">
-          🐟
+    <div className="w-full flex items-center gap-3 bg-white border border-pine/10 rounded-2xl p-3">
+      <button
+        type="button"
+        onClick={onSelect}
+        className="flex items-center gap-3 flex-1 min-w-0 text-left active:scale-[0.99] transition-transform"
+      >
+        {c.photo_url ? (
+          <img
+            src={c.photo_url}
+            alt={c.species}
+            className="w-14 h-14 rounded-xl object-cover shrink-0 bg-pine/5"
+            loading="lazy"
+          />
+        ) : (
+          <span className="w-14 h-14 rounded-xl bg-pine/5 flex items-center justify-center text-2xl shrink-0">
+            🐟
+          </span>
+        )}
+        <span className="flex-1 min-w-0">
+          <span className="block font-bold text-pine truncate">
+            {c.species}
+            {c.length_in ? <span className="text-pine/50 font-medium"> · {c.length_in}&Prime;</span> : null}
+          </span>
+          <span className="block text-xs text-pine/50 mt-0.5 truncate">
+            {c.mine ? "You" : c.user_name} · {fmtDate(c.caught_at)}
+            {dist ? ` · ${dist} away` : ""}
+          </span>
         </span>
-      )}
-      <span className="flex-1 min-w-0">
-        <span className="block font-bold text-pine truncate">
-          {c.species}
-          {c.length_in ? <span className="text-pine/50 font-medium"> · {c.length_in}&Prime;</span> : null}
-        </span>
-        <span className="block text-xs text-pine/50 mt-0.5 truncate">
-          {c.mine ? "You" : c.user_name} · {fmtDate(c.caught_at)}
-          {dist ? ` · ${dist} away` : ""}
-        </span>
-      </span>
-      <span className="text-pine/30 text-lg shrink-0">›</span>
-    </button>
+      </button>
+      <button
+        type="button"
+        onClick={onGoTo}
+        aria-label={`Go to ${c.species} on the map`}
+        className="shrink-0 bg-signal/15 hover:bg-signal/25 text-signal-dark text-xs font-bold uppercase tracking-wider px-3 py-2.5 rounded-full transition-colors"
+      >
+        🧭 Go to
+      </button>
+    </div>
   );
 }
 
@@ -133,6 +145,7 @@ export default function CatchesTab({
   scope,
   onScopeChange,
   onSelect,
+  onGoTo,
   myLoc,
   showOnMap,
   onShowOnMapChange,
@@ -302,7 +315,7 @@ export default function CatchesTab({
           </h3>
           <div className="space-y-2">
             {g.catches.map((c) => (
-              <CatchRow key={c.id} c={c} myLoc={myLoc} onSelect={() => onSelect(c)} />
+              <CatchRow key={c.id} c={c} myLoc={myLoc} onSelect={() => onSelect(c)} onGoTo={() => onGoTo(c)} />
             ))}
           </div>
         </div>
@@ -325,7 +338,7 @@ export default function CatchesTab({
       return (
         <div className="space-y-2">
           {list.map((c) => (
-            <CatchRow key={c.id} c={c} myLoc={myLoc} onSelect={() => onSelect(c)} />
+            <CatchRow key={c.id} c={c} myLoc={myLoc} onSelect={() => onSelect(c)} onGoTo={() => onGoTo(c)} />
           ))}
         </div>
       );

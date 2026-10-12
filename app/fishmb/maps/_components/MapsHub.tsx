@@ -11,6 +11,8 @@ import type {
   TrailPoint,
 } from "../../profile/_components/SpotMap";
 import { fishFetch } from "../../_components/fishFetch";
+import { compressImage } from "../../_components/compressImage";
+import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 import { SPOT_ICON_CHOICES } from "../../profile/_components/spotIcons";
 import {
   haversineM,
@@ -73,6 +75,13 @@ export default function MapsHub() {
     (import("../../messages/_components/sendSpot").SpotShareData & { displayName: string }) | null
   >(null);
   const [selectedCatch, setSelectedCatch] = useState<MapCatch | null>(null);
+  const [catchEditing, setCatchEditing] = useState(false);
+  const [catchEditLoading, setCatchEditLoading] = useState(false);
+  const [catchEditNote, setCatchEditNote] = useState("");
+  const [catchEditPhotos, setCatchEditPhotos] = useState<string[]>([]);
+  const [catchEditFiles, setCatchEditFiles] = useState<File[]>([]);
+  const [catchEditPreviews, setCatchEditPreviews] = useState<string[]>([]);
+  const [catchSaving, setCatchSaving] = useState(false);
   const [spotEditing, setSpotEditing] = useState(false);
   const [spotEditName, setSpotEditName] = useState("");
   const [spotEditNotes, setSpotEditNotes] = useState("");
@@ -731,10 +740,17 @@ export default function MapsHub() {
     setSnap("collapsed");
   };
 
-  // Tapping a catch in a list flies to it — make sure its pin layer is ON,
-  // or the map zooms to an empty spot. The layer flips on automatically
-  // (and stays on until the angler turns it back off in the list/widget).
+  // Tapping a catch in a list opens its detail sheet (edit lives there for
+  // your own catches). Flying to it is the row's separate Go to button.
   const onCatchListSelect = (c: MapCatch) => {
+    setCatchEditing(false);
+    setSelectedCatch(c);
+  };
+
+  // Go to on map — make sure the catch's pin layer is ON, or the map zooms
+  // to an empty spot. The layer flips on automatically (and stays on until
+  // the angler turns it back off in the list/widget).
+  const onCatchGoTo = (c: MapCatch) => {
     if (c.mine) {
       if (!showMyCatches) changeShowMyCatches(true);
     } else if (c.friend) {
@@ -743,6 +759,98 @@ export default function MapsHub() {
       changeShowPublicCatches(true);
     }
     flyTo(c.lat, c.lng, `catch:${c.id}`, 14);
+  };
+
+  const uploadCatchPhoto = async (file: File): Promise<string> => {
+    const token = localStorage.getItem(FISHMB_TOKEN_KEY);
+    const form = new FormData();
+    form.append("file", await compressImage(file, true));
+    const upRes = await fetch("/api/fish/photos/upload", {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: form,
+    });
+    const up = await upRes.json().catch(() => ({}));
+    if (!upRes.ok) throw new Error(up.error || "Photo upload failed.");
+    return up.url as string;
+  };
+
+  const startCatchEdit = async () => {
+    if (!selectedCatch) return;
+    setCatchEditLoading(true);
+    setCatchEditing(true);
+    setCatchEditFiles([]);
+    setCatchEditPreviews([]);
+    try {
+      const d = await fishFetch(`/api/fish/catches/${selectedCatch.id}`);
+      const full = d.catch as {
+        note?: string | null;
+        photos?: string[] | null;
+        photo_hold_url?: string | null;
+        photo_measure_url?: string | null;
+      };
+      setCatchEditNote(full.note ?? "");
+      const ph =
+        Array.isArray(full.photos) && full.photos.length > 0
+          ? full.photos
+          : [full.photo_hold_url || full.photo_measure_url].filter(
+              (u): u is string => !!u
+            );
+      setCatchEditPhotos(ph);
+    } catch {
+      setCatchEditNote("");
+      setCatchEditPhotos(selectedCatch.photo_url ? [selectedCatch.photo_url] : []);
+    } finally {
+      setCatchEditLoading(false);
+    }
+  };
+
+  const saveCatchEdit = async () => {
+    if (!selectedCatch || catchSaving) return;
+    setCatchSaving(true);
+    try {
+      const uploaded: string[] = [];
+      for (const f of catchEditFiles) uploaded.push(await uploadCatchPhoto(f));
+      const photos = [...catchEditPhotos, ...uploaded].slice(0, 4);
+      await fishFetch(`/api/fish/catches/${selectedCatch.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ note: catchEditNote.trim() || null, photos }),
+      });
+      setSelectedCatch({ ...selectedCatch, photo_url: photos[0] ?? null });
+      setCatchEditing(false);
+      setCatchEditFiles([]);
+      setCatchEditPreviews([]);
+      void loadMyCatches(mapCenter.lat, mapCenter.lng);
+      void loadAllCatches();
+      setNote("Catch updated.");
+      setTimeout(() => setNote(null), 2500);
+    } catch {
+      setNote("Couldn't save — try again.");
+      setTimeout(() => setNote(null), 3000);
+    } finally {
+      setCatchSaving(false);
+    }
+  };
+
+  const deleteCatch = async () => {
+    if (!selectedCatch || catchSaving) return;
+    if (!window.confirm("Delete this catch? This can't be undone.")) return;
+    setCatchSaving(true);
+    try {
+      await fishFetch(`/api/fish/catches/${selectedCatch.id}`, { method: "DELETE" });
+      setSelectedCatch(null);
+      setCatchEditing(false);
+      void loadMyCatches(mapCenter.lat, mapCenter.lng);
+      void loadAllCatches();
+      setNote("Catch deleted.");
+      setTimeout(() => setNote(null), 2500);
+    } catch {
+      setNote("Couldn't delete — try again.");
+      setTimeout(() => setNote(null), 3000);
+    } finally {
+      setCatchSaving(false);
+    }
   };
 
   // ---- spot CRUD ----
@@ -977,7 +1085,7 @@ export default function MapsHub() {
                 allCatches.find((c) => c.id === pin.id) ??
                 nearbyCatches.find((c) => c.id === pin.id) ??
                 null;
-              if (full) setSelectedCatch(full);
+              if (full) { setCatchEditing(false); setSelectedCatch(full); }
             }}
             basemap={basemap}
             onMoveEnd={onMoveEnd}
@@ -1241,6 +1349,7 @@ export default function MapsHub() {
             scope={catchScope}
             onScopeChange={setCatchScope}
             onSelect={onCatchListSelect}
+            onGoTo={onCatchGoTo}
             myLoc={myLoc}
             showOnMap={
               catchScope === "mine"
@@ -1681,13 +1790,140 @@ export default function MapsHub() {
                 </span>
               ) : null}
             </div>
-            <button
-              type="button"
-              onClick={() => setSelectedCatch(null)}
-              className="w-full bg-pine/5 hover:bg-pine/10 text-pine font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
-            >
-              Close
-            </button>
+            {catchEditing ? (
+              catchEditLoading ? (
+                <p className="text-sm text-pine/50 font-semibold py-4 text-center">Loading…</p>
+              ) : (
+                <>
+                  <p className="text-xs font-bold uppercase tracking-wider text-pine/55 mb-2">
+                    Notes (only you see these)
+                  </p>
+                  <textarea
+                    value={catchEditNote}
+                    onChange={(e) => setCatchEditNote(e.target.value)}
+                    maxLength={500}
+                    rows={3}
+                    placeholder="Notes (optional)"
+                    className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm mb-4 focus:outline-none focus:border-signal"
+                  />
+                  <p className="text-xs font-bold uppercase tracking-wider text-pine/55 mb-2">
+                    Photos
+                  </p>
+                  <div className="flex gap-2 flex-wrap mb-4">
+                    {catchEditPhotos.map((u) => (
+                      <span key={u} className="relative inline-block">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={u} alt="" className="w-16 h-16 rounded-xl object-cover" />
+                        <button
+                          type="button"
+                          aria-label="Remove photo"
+                          onClick={() => setCatchEditPhotos(catchEditPhotos.filter((x) => x !== u))}
+                          className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-pine text-white text-[11px] leading-none flex items-center justify-center"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                    {catchEditPreviews.map((pv, i) => (
+                      <span key={pv} className="relative inline-block">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={pv} alt="" className="w-16 h-16 rounded-xl object-cover" />
+                        <button
+                          type="button"
+                          aria-label="Remove photo"
+                          onClick={() => {
+                            URL.revokeObjectURL(pv);
+                            setCatchEditPreviews(catchEditPreviews.filter((_, j) => j !== i));
+                            setCatchEditFiles(catchEditFiles.filter((_, j) => j !== i));
+                          }}
+                          className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-pine text-white text-[11px] leading-none flex items-center justify-center"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                    {catchEditPhotos.length + catchEditFiles.length < 4 && (
+                      <label className="w-16 h-16 rounded-xl border-2 border-dashed border-pine/25 text-pine/50 flex items-center justify-center text-2xl cursor-pointer">
+                        +
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          className="hidden"
+                          onChange={(e) => {
+                            const picked = Array.from(e.target.files ?? []).slice(
+                              0,
+                              4 - catchEditPhotos.length - catchEditFiles.length
+                            );
+                            if (picked.length) {
+                              setCatchEditFiles([...catchEditFiles, ...picked].slice(0, 4));
+                              setCatchEditPreviews(
+                                [...catchEditPreviews, ...picked.map((f) => URL.createObjectURL(f))].slice(0, 4)
+                              );
+                            }
+                            e.target.value = "";
+                          }}
+                        />
+                      </label>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={saveCatchEdit}
+                      disabled={catchSaving}
+                      className="flex-1 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full disabled:opacity-50 transition-colors"
+                    >
+                      {catchSaving ? "Saving…" : "Save"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCatchEditing(false)}
+                      className="px-6 py-3 text-pine/60 font-bold uppercase tracking-wider text-sm"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={deleteCatch}
+                    disabled={catchSaving}
+                    className="w-full mt-4 bg-red-50 hover:bg-red-100 text-red-600 font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors disabled:opacity-50"
+                  >
+                    🗑 Delete catch
+                  </button>
+                </>
+              )
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onCatchGoTo(selectedCatch);
+                    setSelectedCatch(null);
+                  }}
+                  className="w-full bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors mb-2"
+                >
+                  🧭 Go to on map
+                </button>
+                {selectedCatch.mine && (
+                  <button
+                    type="button"
+                    onClick={startCatchEdit}
+                    className="w-full bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors mb-2"
+                  >
+                    ✏️ Edit catch
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setSelectedCatch(null)}
+                  className="w-full bg-pine/5 hover:bg-pine/10 text-pine font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
+                >
+                  Close
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}
