@@ -529,50 +529,89 @@ function cardPhotos(item: FeedItem): string[] {
 
 function PhotoCarousel({ photos, bare }: { photos: string[]; bare?: boolean }) {
   const [idx, setIdx] = useState(0);
+  const scrollerRef = useRef<HTMLDivElement>(null);
   if (photos.length === 0) return null;
-  const go = (d: number) => setIdx((i) => (i + d + photos.length) % photos.length);
+  const wrapper = bare ? "relative bg-pine-deep/10" : "mt-3 rounded-2xl overflow-hidden bg-pine-deep/10 relative max-sm:-mx-5 max-sm:rounded-none";
+
+  // Single photo — plain display, as before.
+  if (photos.length === 1) {
+    return (
+      <div className={wrapper}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={photos[0]}
+          alt=""
+          className="w-full max-h-96 object-cover"
+          loading="lazy"
+        />
+      </div>
+    );
+  }
+
+  // Multiple photos — swipe/scroll through them right on the post
+  // (scroll-snap gallery; dots + counter track the scroll position).
+  const onScroll = () => {
+    const el = scrollerRef.current;
+    if (!el || el.clientWidth === 0) return;
+    const i = Math.round(el.scrollLeft / el.clientWidth);
+    const clamped = Math.max(0, Math.min(photos.length - 1, i));
+    if (clamped !== idx) setIdx(clamped);
+  };
+  const go = (e: React.MouseEvent, d: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const el = scrollerRef.current;
+    if (!el) return;
+    const next = (idx + d + photos.length) % photos.length;
+    el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
+  };
   return (
-    <div className={bare ? "relative bg-pine-deep/10" : "mt-3 rounded-2xl overflow-hidden bg-pine-deep/10 relative max-sm:-mx-5 max-sm:rounded-none"}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={photos[idx]}
-        alt=""
-        className="w-full max-h-96 object-cover"
-        loading="lazy"
-      />
-      {photos.length > 1 && (
-        <>
-          <button
-            onClick={() => go(-1)}
-            aria-label="Previous photo"
-            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 text-white text-sm font-bold"
-          >
-            ‹
-          </button>
-          <button
-            onClick={() => go(1)}
-            aria-label="Next photo"
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 text-white text-sm font-bold"
-          >
-            ›
-          </button>
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
-            {photos.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setIdx(i)}
-                aria-label={`Photo ${i + 1}`}
-                className={`w-2 h-2 rounded-full transition-colors ${
-                  i === idx ? "bg-white" : "bg-white/50"
-                }`}
-              />
-            ))}
+    <div className={wrapper}>
+      <div
+        ref={scrollerRef}
+        onScroll={onScroll}
+        className="flex overflow-x-auto snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {photos.map((src, i) => (
+          <div key={i} className="w-full shrink-0 snap-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={src}
+              alt=""
+              className="w-full max-h-96 object-cover"
+              loading="lazy"
+              draggable={false}
+            />
           </div>
-          <span className="absolute top-2 right-2 text-[11px] font-bold text-white bg-black/50 rounded-full px-2 py-0.5">
-            {idx + 1}/{photos.length}
-          </span>
-        </>
-      )}
+        ))}
+      </div>
+      <button
+        onClick={(e) => go(e, -1)}
+        aria-label="Previous photo"
+        className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 text-white text-sm font-bold"
+      >
+        ‹
+      </button>
+      <button
+        onClick={(e) => go(e, 1)}
+        aria-label="Next photo"
+        className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 text-white text-sm font-bold"
+      >
+        ›
+      </button>
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+        {photos.map((_, i) => (
+          <span
+            key={i}
+            className={`w-2 h-2 rounded-full transition-colors ${
+              i === idx ? "bg-white" : "bg-white/50"
+            }`}
+          />
+        ))}
+      </div>
+      <span className="absolute top-2 right-2 text-[11px] font-bold text-white bg-black/50 rounded-full px-2 py-0.5">
+        {idx + 1}/{photos.length}
+      </span>
     </div>
   );
 }
