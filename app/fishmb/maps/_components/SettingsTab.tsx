@@ -286,7 +286,7 @@ export default function SettingsTab({
           </span>
         </button>
         <p className="text-[11px] text-pine/45 mt-2">
-          The grid button at the top-left of the map that jumps straight here.
+          The Widget button at the top-left of the map that jumps straight here.
         </p>
         <button
           type="button"

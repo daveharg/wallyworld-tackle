@@ -1060,14 +1060,9 @@ export default function MapsHub() {
         onClick={openWidgetSettings}
         aria-label="Widget settings"
         title="Widget settings"
-        className="absolute top-14 left-3 z-20 w-11 h-11 rounded-full backdrop-blur border shadow-lg flex items-center justify-center active:scale-95 transition-transform bg-white/95 border-pine/15 text-pine"
+        className="absolute top-14 left-3 z-20 h-11 px-4 rounded-full backdrop-blur border shadow-lg flex items-center justify-center active:scale-95 transition-transform bg-white/95 border-pine/15 text-pine text-sm font-bold tracking-wide"
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-          <rect x="3" y="3" width="8" height="8" rx="2" />
-          <rect x="13" y="3" width="8" height="5" rx="2" />
-          <rect x="13" y="10" width="8" height="11" rx="2" />
-          <rect x="3" y="13" width="8" height="8" rx="2" />
-        </svg>
+        Widget
       </button>
       )}
 
