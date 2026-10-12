@@ -270,7 +270,7 @@ function Bar() {
   return (
     <nav
       aria-label="FishMB sections"
-      className={`sticky bottom-0 flex justify-center pointer-events-none ${
+      className={`fixed inset-x-0 bottom-0 flex justify-center pointer-events-none ${
         kbOpen ? "invisible" : "visible"
       } ${menuOpen ? "z-[1100]" : "z-40"}`}
     >

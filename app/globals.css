@@ -120,6 +120,12 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* FishMB app shell: stop the rubber-band bounce — it drags the fixed bottom
+   bar up with it on iOS. Scoped to FishMB pages only. */
+body:has(.fishmb-shell) {
+  overscroll-behavior: none;
+}
+
 .font-display {
   font-family: var(--font-display), "Arial Narrow", sans-serif;
   letter-spacing: 0.02em;
