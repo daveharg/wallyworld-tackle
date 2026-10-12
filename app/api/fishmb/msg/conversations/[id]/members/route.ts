@@ -1,6 +1,6 @@
 // /api/fishmb/msg/conversations/[id]/members — group membership.
 // GET: members with public keys. POST: { user_id } add a friend.
-// DELETE: leave the conversation.
+// DELETE: remove ?user_id= from the chat; no param = leave (remove yourself).
 import { NextRequest, NextResponse } from "next/server";
 import {
   fishUserFromRequest,
@@ -59,6 +59,11 @@ export async function DELETE(
   const { id } = await params;
   const g = await guard(req, id);
   if (g.err) return g.err;
-  await removeMember(id, g.me!.id);
+  // ?user_id= says WHO to remove — the × beside a member's name removes
+  // THAT member. Without it, the caller removes themselves (leave).
+  // (This used to ignore the parameter and always remove the caller, so
+  // tapping × beside someone else deleted YOU from the chat.)
+  const target = new URL(req.url).searchParams.get("user_id") || g.me!.id;
+  await removeMember(id, target);
   return NextResponse.json({ ok: true });
 }
