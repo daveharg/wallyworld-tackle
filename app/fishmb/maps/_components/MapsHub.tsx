@@ -1193,7 +1193,7 @@ export default function MapsHub() {
           }}
         >
           <div
-            className="bg-paper rounded-t-3xl p-6 pt-3 w-full sm:max-w-md shadow-2xl max-h-[85vh] overflow-y-auto"
+            className="bg-paper rounded-t-3xl p-6 pt-3 pb-32 w-full sm:max-w-md shadow-2xl max-h-[85vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Drag handle */}
@@ -1369,7 +1369,7 @@ export default function MapsHub() {
           onClick={() => setSelectedCatch(null)}
         >
           <div
-            className="bg-paper rounded-t-3xl p-6 pt-3 w-full sm:max-w-md shadow-2xl max-h-[85vh] overflow-y-auto"
+            className="bg-paper rounded-t-3xl p-6 pt-3 pb-32 w-full sm:max-w-md shadow-2xl max-h-[85vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="w-10 h-1.5 bg-pine/20 rounded-full mx-auto mb-4" />
