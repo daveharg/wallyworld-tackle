@@ -201,6 +201,9 @@ export default function SpotMap({
         ],
         { animate: false }
       );
+      // Then in 3 notches from that frame, same centre (Dave's ask) — the
+      // coasts crop out of the opening view; pan/zoom still reach anywhere.
+      m.zoomIn(3, { animate: false });
       const streets = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
