@@ -229,9 +229,9 @@ export default function StoriesRow() {
               {viewing.media_type === "video" ? (
                 <video
                   src={viewing.media_url}
-                  controls
                   autoPlay
                   playsInline
+                  muted={false}
                   className="w-full h-full object-cover"
                   onLoadedMetadata={(e) => {
                     if (viewing.volume != null) e.currentTarget.volume = viewing.volume;
