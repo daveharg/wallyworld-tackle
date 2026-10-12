@@ -33,7 +33,7 @@ export default function DashboardProfile() {
   return (
     <>
       <FriendRequests />
-      <ProfileView userId={user.id} />
+      <ProfileView userId={user.id} hqEmbed />
       <ProfileFriends />
       {isBusiness && (
         <div className="max-w-3xl mx-auto px-4 pb-10 mt-8">

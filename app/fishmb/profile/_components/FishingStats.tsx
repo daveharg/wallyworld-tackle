@@ -34,7 +34,16 @@ function memberSince(iso: string | null): string | null {
   return d.toLocaleDateString("en-CA", { year: "numeric", month: "long" });
 }
 
-export default function FishingStats({ userId, hideTitle }: { userId: string; hideTitle?: boolean }) {
+export default function FishingStats({
+  userId,
+  hideTitle,
+  hqContext,
+}: {
+  userId: string;
+  hideTitle?: boolean;
+  /** Set when rendered inside HQ — your own tiles deep-link to HQ sections. */
+  hqContext?: boolean;
+}) {
   const [stats, setStats] = useState<UserStats | null>(null);
   const [failed, setFailed] = useState(false);
 
@@ -82,6 +91,50 @@ export default function FishingStats({ userId, hideTitle }: { userId: string; hi
   const showBiggest = stats.is_self || !(stats.hidden_stats ?? []).includes("biggest");
   const since = memberSince(stats.member_since);
 
+  // Your own tiles (inside HQ) deep-link straight to the HQ section holding
+  // the detail — no separate pages. Anyone else's tiles are display-only.
+  const linkHQ = hqContext && stats.is_self;
+  const tileHref = (key: string): string | null => {
+    if (!linkHQ) return null;
+    switch (key) {
+      case "catches":
+        return "/fishmb/dashboard?tab=stats#catches";
+      case "tournament-catches":
+        return "/fishmb/dashboard?tab=stats&catchfilter=verified#catches";
+      case "catches-nonverified":
+        return "/fishmb/dashboard?tab=stats&catchfilter=notverified#catches";
+      case "species":
+        return "/fishmb/dashboard?tab=stats#species";
+      case "tournaments":
+      case "wins":
+        return "/fishmb/dashboard?tab=tournaments";
+      case "posts":
+        return "/fishmb/dashboard?tab=profile";
+      default:
+        return null;
+    }
+  };
+  const tileIcon = (key: string): string => {
+    switch (key) {
+      case "catches":
+        return "🎣";
+      case "tournament-catches":
+        return "✓";
+      case "catches-nonverified":
+        return "○";
+      case "species":
+        return "🐟";
+      case "tournaments":
+        return "🏆";
+      case "wins":
+        return "🥇";
+      case "posts":
+        return "💬";
+      default:
+        return "•";
+    }
+  };
+
   return (
     <section className="mb-8">
       {!hideTitle && (
@@ -90,18 +143,32 @@ export default function FishingStats({ userId, hideTitle }: { userId: string; hi
         </h2>
       )}
       <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5 mb-4">
-        {visibleTiles.map(([label, value, key]) => (
-          <Link
-            key={label}
-            href={`/fishmb/anglers/${userId}/stats/${key}`}
-            className="bg-white border border-pine/10 rounded-2xl p-3 text-center hover:border-signal/50 hover:shadow-sm active:scale-[0.98] transition-all"
-          >
-            <p className="font-display font-bold text-pine text-2xl leading-none">{value}</p>
-            <p className="text-[10px] font-bold uppercase tracking-wider text-pine/55 mt-1.5 leading-tight">
-              {label}
-            </p>
-          </Link>
-        ))}
+        {visibleTiles.map(([label, value, key]) => {
+          const href = tileHref(key);
+          const inner = (
+            <>
+              <span className="text-xl leading-none">{tileIcon(key)}</span>
+              <p className="font-display font-bold text-pine text-2xl leading-none mt-1 tabular-nums">
+                {value}
+              </p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-pine/55 mt-1.5 leading-tight">
+                {label}
+              </p>
+            </>
+          );
+          const cls =
+            "bg-white border border-pine/10 rounded-3xl px-2 py-4 flex flex-col items-center justify-center text-center transition-all " +
+            (href ? "hover:border-signal/50 hover:shadow-md active:scale-[0.97] cursor-pointer" : "");
+          return href ? (
+            <Link key={label} href={href} className={cls}>
+              {inner}
+            </Link>
+          ) : (
+            <div key={label} className={cls}>
+              {inner}
+            </div>
+          );
+        })}
       </div>
       {showBiggest && (
       <div className="bg-white border border-pine/10 rounded-3xl p-5">

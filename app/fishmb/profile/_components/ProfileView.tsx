@@ -6,6 +6,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { fishFetch } from "../../_components/fishFetch";
 import { useFishAuth } from "../../_components/FishAuth";
 import FishingStats from "./FishingStats";
@@ -65,11 +66,15 @@ function Avatar({ url, name, size }: { url: string | null; name: string; size: s
 export default function ProfileView({
   userId,
   editor,
+  hqEmbed,
 }: {
   userId: string;
   /** Extra node rendered under the header for the owner (edit form). */
   editor?: React.ReactNode;
+  /** Set when rendered inside the HQ profile tab — skips the self-redirect. */
+  hqEmbed?: boolean;
 }) {
+  const router = useRouter();
   const [data, setData] = useState<ProfileData | null>(null);
   const { user: me, logout } = useFishAuth();
   const [tab, setTab] = useState<"posts" | "photos" | "friends" | "reels">("posts");
@@ -96,6 +101,14 @@ export default function ProfileView({
       live = false;
     };
   }, [userId]);
+
+  // Your own profile lives only in HQ — viewing your own public angler URL
+  // redirects to the HQ profile tab so there is exactly one profile page.
+  useEffect(() => {
+    if (data?.is_self && !hqEmbed) {
+      router.replace("/fishmb/dashboard?tab=profile");
+    }
+  }, [data?.is_self, hqEmbed, router]);
 
   // When viewing your own profile, keep the header (avatar, name, bio) in sync
   // with the auth session — e.g. right after you change your profile picture
@@ -303,7 +316,7 @@ export default function ProfileView({
 
       {editor}
 
-      <FishingStats userId={userId} />
+      <FishingStats userId={userId} hqContext={hqEmbed} />
 
       {data.is_self && (
         <div className="mb-8 -mt-4">

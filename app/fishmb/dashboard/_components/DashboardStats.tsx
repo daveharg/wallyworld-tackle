@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useFishAuth } from "../../_components/FishAuth";
 import { fishFetch } from "../../_components/fishFetch";
@@ -34,7 +35,18 @@ interface Catch {
   lng: number | null;
 }
 
+interface SpeciesRow {
+  species: string;
+  count: number;
+  best_in: number | null;
+}
+
 type CatchSort = "size" | "species" | "newest" | "oldest";
+
+type CatchFilter = "all" | "shared" | "not-shared" | "personal" | "tournament" | "verified" | "not-verified";
+
+// Dave's rule: any catch with a photo is verified.
+const isVerified = (c: Catch) => !!(c.photo_hold_url || c.photo_measure_url);
 
 function sortCatches(list: Catch[], sort: CatchSort): Catch[] {
   const arr = [...list];
@@ -102,17 +114,37 @@ function LeaderboardList({ rows, unit }: { rows: LeaderRow[]; unit: string }) {
 /** Dashboard stats: your numbers plus any friend's, side by side. */
 export default function DashboardStats() {
   const { user } = useFishAuth();
+  const searchParams = useSearchParams();
   const [friends, setFriends] = useState<Friend[]>([]);
   const [selected, setSelected] = useState<Friend | null>(null);
   const [topAnglers, setTopAnglers] = useState<LeaderRow[]>([]);
   const [topFriends, setTopFriends] = useState<LeaderRow[]>([]);
   const [catches, setCatches] = useState<Catch[]>([]);
-  const [catchFilter, setCatchFilter] = useState<"all" | "shared" | "not-shared" | "personal" | "tournament">("all");
+  const [catchFilter, setCatchFilter] = useState<CatchFilter>("all");
   const [catchSort, setCatchSort] = useState<CatchSort>("size");
   const [catchesExpanded, setCatchesExpanded] = useState(false);
   const [sharingId, setSharingId] = useState<string | null>(null);
   const [catchesError, setCatchesError] = useState<string | null>(null);
   const [sharedOk, setSharedOk] = useState<string | null>(null);
+  const [speciesRows, setSpeciesRows] = useState<SpeciesRow[]>([]);
+
+  // Deep links from the stat tiles: ?catchfilter=verified|notverified#catches
+  // presets the catches filter, and #catches / #species scrolls to the section.
+  useEffect(() => {
+    const f = searchParams.get("catchfilter");
+    if (f === "verified") setCatchFilter("verified");
+    else if (f === "notverified") setCatchFilter("not-verified");
+  }, [searchParams]);
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash === "#catches" || hash === "#species") {
+      // Wait a tick for the sections to render, then smooth-scroll.
+      const t = setTimeout(() => {
+        document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 350);
+      return () => clearTimeout(t);
+    }
+  }, [searchParams]);
 
   const shareCatch = async (c: Catch) => {
     if (sharingId) return;
@@ -161,6 +193,14 @@ export default function DashboardStats() {
     return () => window.removeEventListener("focus", onFocus);
   }, []);
 
+  // Species breakdown for the #species section (same data the old stat page showed).
+  useEffect(() => {
+    if (!user) return;
+    fishFetch(`/api/fishmb/users/${user.id}/stat-items?stat=species`)
+      .then((d) => setSpeciesRows(((d as { items: SpeciesRow[] }).items ?? []) as SpeciesRow[]))
+      .catch(() => {});
+  }, [user]);
+
   // Top friends: rank the user's friends by fish logged.
   useEffect(() => {
     if (friends.length === 0) return;
@@ -178,7 +218,7 @@ export default function DashboardStats() {
   return (
     <div className="space-y-6">
       <div>
-        <FishingStats userId={user.id} hideTitle />
+        <FishingStats userId={user.id} hideTitle hqContext />
       </div>
 
       <div>
@@ -249,7 +289,7 @@ export default function DashboardStats() {
                     {selected.name}
                   </Link>
                 </p>
-                <FishingStats userId={selected.id} />
+                <FishingStats userId={selected.id} hqContext />
               </div>
             ) : (
               <p className="text-pine/50 text-sm">
@@ -276,7 +316,7 @@ export default function DashboardStats() {
         </div>
       )}
 
-      <div>
+      <div id="catches" className="scroll-mt-24">
         <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
           My catches
         </h2>
@@ -284,6 +324,8 @@ export default function DashboardStats() {
           {(
             [
               { id: "all", label: "All" },
+              { id: "verified", label: "✓ Verified" },
+              { id: "not-verified", label: "Non-verified" },
               { id: "shared", label: "Shared" },
               { id: "not-shared", label: "Not shared" },
               { id: "personal", label: "Personal" },
@@ -333,13 +375,17 @@ export default function DashboardStats() {
           const filtered = catches.filter((c) =>
             catchFilter === "all"
               ? true
-              : catchFilter === "tournament"
-                ? c.tournament_id != null
-                : catchFilter === "shared"
-                  ? isShared(c)
-                  : catchFilter === "personal"
-                    ? c.personal_record === true
-                    : !isShared(c) && c.tournament_id == null
+              : catchFilter === "verified"
+                ? isVerified(c)
+                : catchFilter === "not-verified"
+                  ? !isVerified(c)
+                  : catchFilter === "tournament"
+                    ? c.tournament_id != null
+                    : catchFilter === "shared"
+                      ? isShared(c)
+                      : catchFilter === "personal"
+                        ? c.personal_record === true
+                        : !isShared(c) && c.tournament_id == null
           );
           if (filtered.length === 0) {
             return catchesError ? (
@@ -423,6 +469,34 @@ export default function DashboardStats() {
             </>
           );
         })()}
+      </div>
+
+      <div id="species" className="scroll-mt-24">
+        <h2 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
+          Species
+        </h2>
+        {speciesRows.length === 0 ? (
+          <p className="text-pine/50 text-sm">
+            No species logged yet — log a catch to start your list.
+          </p>
+        ) : (
+          <div className="bg-white border border-pine/10 rounded-3xl overflow-hidden">
+            {speciesRows.map((s, i) => (
+              <div
+                key={s.species}
+                className={`flex items-center justify-between px-5 py-3.5 ${
+                  i > 0 ? "border-t border-pine/8" : ""
+                }`}
+              >
+                <span className="font-bold text-pine text-sm">{s.species}</span>
+                <span className="text-xs text-pine/60 font-bold tabular-nums">
+                  {s.count} caught
+                  {s.best_in != null && ` · best ${Number(s.best_in).toFixed(1)}″`}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
