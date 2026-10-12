@@ -51,8 +51,12 @@ function allowedAudiences(): string[] {
     process.env.FISHMB_GOOGLE_CLIENT_ID,
     process.env.GOOGLE_IOS_CLIENT_ID,
     process.env.GOOGLE_WEB_CLIENT_ID,
+    // The public FishMB web client ID is always trusted — it's the client
+    // the website itself uses (see lib/fishmb-constants.ts). Env vars can
+    // add more, but a deployment missing them must not reject its own site.
+    "544282207513-u3ncjmbht90lksed0m81hprf1d1at42t.apps.googleusercontent.com",
   ];
-  return ids.filter((v): v is string => !!v);
+  return [...new Set(ids.filter((v): v is string => !!v))];
 }
 
 export async function verifyGoogleIdToken(
