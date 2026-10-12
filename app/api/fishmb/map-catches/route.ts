@@ -111,6 +111,7 @@ export async function GET(req: NextRequest) {
       lng: r.lng,
       caught_at: r.caught_at,
       user_name: r.user_name,
+      avatar_url: (r as any).avatar_url ?? null,
       mine: r.user_id === me.id,
     }));
 
