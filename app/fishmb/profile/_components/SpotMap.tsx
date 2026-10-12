@@ -183,17 +183,14 @@ export default function SpotMap({
       const L = (await import("leaflet")).default;
       await import("leaflet/dist/leaflet.css");
       if (cancelled || !containerRef.current) return;
-      const m = L.map(containerRef.current, { scrollWheelZoom: false, zoomControl: false }).setView(
-        [48, -100],
-        4
-      );
-      // Force the North America view after the container settles — Leaflet can
-      // miscalculate the zoom if the container had no size at init.
-      setTimeout(() => {
-        if (cancelled) return;
-        m.invalidateSize();
-        m.setView([48, -100], 4, { animate: false });
-      }, 300);
+      // Open already zoomed out on Canada — no zoom animation, no
+      // corrective jump afterwards. Just open at that spot.
+      const m = L.map(containerRef.current, {
+        scrollWheelZoom: false,
+        zoomControl: false,
+        center: [48, -100],
+        zoom: 4,
+      });
       const streets = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
