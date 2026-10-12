@@ -91,6 +91,36 @@ interface LakeCoord {
   name: string;
   lat: number;
   lng: number;
+  /** How far from the lake's centre point a catch can be and still belong
+   *  to this lake — scaled by the lake's size (great lakes run huge). */
+  reach: number;
+}
+
+/** Per-lake reach (km) from its size text: big lakes get a long reach so
+ *  their far shores still group under them; small lakes stay at 15 km. */
+function lakeReachKm(sizeText: string | undefined): number {
+  if (!sizeText) return 15;
+  const area = sizeText.match(/([\d,]+(?:\.\d+)?)\s*km(?:2|²)/);
+  if (area) {
+    const km2 = parseFloat(area[1].replace(/,/g, ""));
+    if (Number.isFinite(km2) && km2 > 0) {
+      return Math.max(15, Math.min(230, Math.sqrt(km2) * 1.35));
+    }
+  }
+  const dim = sizeText.match(/([\d.]+)\s*km\s*(?:north-south|x|×|by)/i);
+  if (dim) {
+    const km = parseFloat(dim[1]);
+    if (Number.isFinite(km) && km > 0) {
+      return Math.max(15, Math.min(200, km * 0.65));
+    }
+  }
+  return 15;
+}
+
+/** Ponds and creeks are minor waters — they only claim catches that are
+ *  genuinely right at them, never a great lake's shoreline catch. */
+function isMinorWater(name: string): boolean {
+  return /\b(pond|creek)\b/i.test(name);
 }
 
 /** Catches tab — three top tabs: My catches, Friends, and All (every catch
@@ -117,8 +147,11 @@ export default function CatchesTab({
           fetch("/fish-manitoba/data.json"),
         ]);
         const coords = (await coordsRes.json()) as Record<string, { lat: number; lng: number }>;
-        const meta = (await metaRes.json()) as { lakes?: { id: string; name: string }[] };
+        const meta = (await metaRes.json()) as {
+          lakes?: { id: string; name: string; size_text?: string }[];
+        };
         const nameById = new Map((meta.lakes ?? []).map((l) => [l.id, l.name]));
+        const reachById = new Map((meta.lakes ?? []).map((l) => [l.id, lakeReachKm(l.size_text)]));
         setLakes(
           Object.entries(coords)
             .filter(([, c]) => Number.isFinite(c.lat) && Number.isFinite(c.lng))
@@ -127,6 +160,7 @@ export default function CatchesTab({
               name: nameById.get(id) ?? id,
               lat: c.lat,
               lng: c.lng,
+              reach: reachById.get(id) ?? 15,
             }))
         );
       } catch {
@@ -147,20 +181,58 @@ export default function CatchesTab({
   }
   const list = scope === "mine" ? mine : scope === "friends" ? friends : all;
 
-  // Group a list by nearest lake within 15 km, lakes sorted A–Z.
+  // Group a list by lake, lakes sorted A–Z. Assignment is tiered:
+  //  1. the nearest water within 15 km — unless it's a pond/creek and a
+  //     great lake's territory covers the point (a harbour catch on Lake
+  //     Winnipeg is not a "Gull Pond" catch);
+  //  2. a great lake (reach ≥ 40 km) whose territory covers the point;
+  //  3. the nearest proper lake within 25 km (river-chain lakes);
+  //  otherwise the catch stays in "Other waters".
   const groupByLake = (items: MapCatch[]) => {
-    const nearestLake = (c: MapCatch): LakeCoord | null => {
+    const lakeFor = (c: MapCatch): LakeCoord | null => {
       if (!Number.isFinite(c.lat) || !Number.isFinite(c.lng) || lakes.length === 0) return null;
-      let best: LakeCoord | null = null;
-      let bestD = 15;
-      for (const l of lakes) {
-        const d = kmBetween(c.lat, c.lng, l.lat, l.lng);
-        if (d < bestD) {
-          bestD = d;
-          best = l;
+      const dists = lakes.map((l) => ({ l, d: kmBetween(c.lat, c.lng, l.lat, l.lng) }));
+      // Great lakes (reach ≥ 40 km) whose territory covers the point; the
+      // nearest qualifying one wins.
+      const greatClaim = (): LakeCoord | null => {
+        let best: LakeCoord | null = null;
+        let bestD = Infinity;
+        for (const { l, d } of dists) {
+          if (l.reach < 40) continue;
+          if (d <= l.reach * 0.95 && d < bestD) {
+            bestD = d;
+            best = l;
+          }
+        }
+        return best;
+      };
+      let nearest: LakeCoord | null = null;
+      let nearestD = Infinity;
+      let nearestProper: LakeCoord | null = null;
+      let nearestProperD = Infinity;
+      for (const { l, d } of dists) {
+        if (d < nearestD) {
+          nearestD = d;
+          nearest = l;
+        }
+        if (!isMinorWater(l.name) && d < nearestProperD) {
+          nearestProperD = d;
+          nearestProper = l;
         }
       }
-      return best;
+      if (nearest && nearestD <= 15) {
+        if (isMinorWater(nearest.name)) {
+          // A pond/creek point beside real water: prefer a proper lake
+          // right there, else a great lake whose shore this is.
+          if (nearestProper && nearestProperD <= 15) return nearestProper;
+          const g = greatClaim();
+          if (g) return g;
+        }
+        return nearest;
+      }
+      const g = greatClaim();
+      if (g) return g;
+      return nearestProper && nearestProperD <= 25 ? nearestProper : null;
     };
     const groupById = new Map<string, { lake: LakeCoord | null; catches: MapCatch[] }>();
     const groups: { lake: LakeCoord | null; catches: MapCatch[] }[] = [];
@@ -168,7 +240,7 @@ export default function CatchesTab({
       (a, b) => new Date(b.caught_at).getTime() - new Date(a.caught_at).getTime()
     );
     for (const c of sorted) {
-      const lake = nearestLake(c);
+      const lake = lakeFor(c);
       const key = lake ? lake.id : "__other";
       let g = groupById.get(key);
       if (!g) {
@@ -187,8 +259,8 @@ export default function CatchesTab({
   };
 
   const renderList = () => {
-    // My catches and All are grouped by lake; Friends is a simple list.
-    if (scope === "friends" || lakes.length === 0) {
+    // All three scopes (Mine, Friends, All) are grouped by lake.
+    if (lakes.length === 0) {
       return (
         <div className="space-y-2">
           {list.map((c) => (
