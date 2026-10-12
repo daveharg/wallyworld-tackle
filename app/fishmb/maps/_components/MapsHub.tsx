@@ -22,6 +22,7 @@ import MapSheet, { type SheetTab, type SheetSnap } from "./MapSheet";
 import CatchesTab from "./CatchesTab";
 import SpotsTab, { type Spot } from "./SpotsTab";
 import SendSpotPicker from "../../_components/SendSpotPicker";
+import { useSheetDrag, SheetGrabber } from "../../_components/sheetDrag";
 import LakesTab from "./LakesTab";
 import LakeSheetDetail from "./LakeSheetDetail";
 import LakeSheetHeader from "./LakeSheetHeader";
@@ -80,6 +81,12 @@ export default function MapsHub() {
   const [spotLakeQuery, setSpotLakeQuery] = useState("");
   const [allLakes, setAllLakes] = useState<{ id: string; name: string; region?: string }[]>([]);
   const [note, setNote] = useState<string | null>(null);
+  // Bottom sheets: drag down / tap the grabber to close (shared behaviour).
+  const spotSheetDrag = useSheetDrag(() => {
+    setSpotPopup(null);
+    setSpotEditing(false);
+  });
+  const catchSheetDrag = useSheetDrag(() => setSelectedCatch(null));
   const [myLoc, setMyLoc] = useState<{ lat: number; lng: number; speed: number | null } | null>(null);
   const [mapCenter, setMapCenter] = useState(() => {
     try {
@@ -1275,9 +1282,17 @@ export default function MapsHub() {
           <div
             className="bg-paper rounded-t-3xl p-6 pt-3 pb-32 w-full sm:max-w-md shadow-2xl max-h-[85vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
+            style={spotSheetDrag.dragStyle}
           >
-            {/* Drag handle */}
-            <div className="w-10 h-1.5 bg-pine/20 rounded-full mx-auto mb-4" />
+            {/* Drag handle — drag down or tap to close */}
+            <div className="touch-none cursor-grab active:cursor-grabbing -mt-1 pb-2" {...spotSheetDrag.dragHandlers}>
+              <SheetGrabber
+                onClose={() => {
+                  setSpotPopup(null);
+                  setSpotEditing(false);
+                }}
+              />
+            </div>
             {spotEditing ? (
               <>
                 <button
@@ -1472,8 +1487,11 @@ export default function MapsHub() {
           <div
             className="bg-paper rounded-t-3xl p-6 pt-3 pb-32 w-full sm:max-w-md shadow-2xl max-h-[85vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
+            style={catchSheetDrag.dragStyle}
           >
-            <div className="w-10 h-1.5 bg-pine/20 rounded-full mx-auto mb-4" />
+            <div className="touch-none cursor-grab active:cursor-grabbing -mt-1 pb-2" {...catchSheetDrag.dragHandlers}>
+              <SheetGrabber onClose={() => setSelectedCatch(null)} />
+            </div>
             {/* Angler header — profile pic top-left, tap to view profile */}
             <Link
               href={selectedCatch.mine ? "/fishmb/dashboard?tab=profile" : `/fishmb/anglers/${selectedCatch.user_id}`}

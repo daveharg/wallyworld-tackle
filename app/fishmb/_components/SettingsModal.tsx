@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { fishFetch } from "./fishFetch";
 import { THEMES, getTheme, setTheme, type ThemeId } from "./theme";
+import { useSheetDrag, SheetGrabber } from "./sheetDrag";
 
 interface Prefs {
   friend_catch: boolean;
@@ -32,6 +33,7 @@ type PushState = "checking" | "unsupported" | "denied" | "prompt" | "enabled";
 
 /** Settings popup: color themes + push notification alert settings. */
 export default function SettingsModal({ onClose }: { onClose: () => void }) {
+  const { dragHandlers, dragStyle } = useSheetDrag(onClose);
   const [theme, setThemeState] = useState<ThemeId>("ocean");
   const [prefs, setPrefs] = useState<Prefs | null>(null);
   const [saving, setSaving] = useState<keyof Prefs | null>(null);
@@ -144,8 +146,12 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
         onClick={onClose}
         aria-hidden
       />
-      <div className="relative w-full sm:max-w-md bg-paper rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[88vh] overflow-y-auto">
-        <div className="sticky top-0 bg-paper/95 backdrop-blur px-5 pt-4 pb-3 border-b border-pine/10 flex items-center justify-between">
+      <div className="relative w-full sm:max-w-md bg-paper rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[88vh] overflow-y-auto" style={dragStyle}>
+        <div className="sticky top-0 bg-paper/95 backdrop-blur px-5 pt-2 pb-3 border-b border-pine/10 z-10">
+          <div className="touch-none cursor-grab active:cursor-grabbing" {...dragHandlers}>
+            <SheetGrabber onClose={onClose} />
+          </div>
+          <div className="flex items-center justify-between mt-1">
           <h2 className="font-display font-bold text-xl text-pine">Settings</h2>
           <button
             onClick={onClose}
@@ -154,6 +160,7 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
           >
             ×
           </button>
+          </div>
         </div>
 
         <div className="px-5 py-5">

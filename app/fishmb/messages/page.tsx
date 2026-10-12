@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
 import ThreadView, { type ThreadPeer } from "./_components/ThreadView";
+import { useSheetDrag, SheetGrabber } from "../_components/sheetDrag";
 import {
   getOrCreateKeypair,
   publicKeyB64,
@@ -156,6 +157,8 @@ function MessagesPageInner() {
   const [chatTab, setChatTab] = useState<"friends" | "other">("friends");
   const [note, setNote] = useState<string | null>(null);
   const [sheetConvo, setSheetConvo] = useState<Convo | null>(null);
+  const convoSheetDrag = useSheetDrag(() => setSheetConvo(null));
+  const newChatSheetDrag = useSheetDrag(() => closeNewChat());
   const [pushState, setPushState] = useState<"unknown" | "enabled" | "prompt" | "denied" | "unsupported">("unknown");
   const [enablingPush, setEnablingPush] = useState(false);
   const pressTimer = useRef<number | null>(null);
@@ -884,9 +887,13 @@ function MessagesPageInner() {
           <div
             className="absolute inset-x-0 bottom-0 top-16 bg-[#EFEFF4] rounded-t-[28px] flex flex-col overflow-hidden"
             onClick={(e) => e.stopPropagation()}
+            style={newChatSheetDrag.dragStyle}
           >
-            {/* Header */}
-            <div className="relative flex items-center justify-center pt-5 pb-3 shrink-0">
+            {/* Header — drag down or tap the grabber to close */}
+            <div className="touch-none cursor-grab active:cursor-grabbing pt-1.5" {...newChatSheetDrag.dragHandlers}>
+              <SheetGrabber onClose={closeNewChat} />
+            </div>
+            <div className="relative flex items-center justify-center pt-2 pb-3 shrink-0">
               <h3 className="text-[17px] font-semibold text-black">
                 {newChatMode === "username" ? "Find by Username" : newChatMode === "group" ? "New Group" : "New Message"}
               </h3>
@@ -1177,10 +1184,16 @@ function MessagesPageInner() {
       {sheetConvo && (
         <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true" aria-label="Conversation options">
           <div className="absolute inset-0 bg-black/40" onClick={() => setSheetConvo(null)} />
-          <div className="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-            <p className="text-center font-bold text-pine mb-3 truncate px-8">
-              {convoTitle(sheetConvo)}
-            </p>
+          <div
+            className="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
+            style={convoSheetDrag.dragStyle}
+          >
+            <div className="touch-none cursor-grab active:cursor-grabbing -mt-1" {...convoSheetDrag.dragHandlers}>
+              <SheetGrabber onClose={() => setSheetConvo(null)} />
+              <p className="text-center font-bold text-pine mt-1 mb-3 truncate px-8">
+                {convoTitle(sheetConvo)}
+              </p>
+            </div>
             <button
               type="button"
               onClick={() => togglePin(sheetConvo)}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSheetDrag, SheetGrabber } from "../../_components/sheetDrag";
 
 export type WxLoc = { name: string; lat: number; lon: number; kind?: "lake" | "town" };
 
@@ -29,6 +30,7 @@ export default function LocationPicker({
   onSelect: (loc: WxLoc) => void;
   onClose: () => void;
 }) {
+  const { dragHandlers, dragStyle } = useSheetDrag(onClose);
   const [saved, setSaved] = useState<WxLoc[]>([]);
   const [q, setQ] = useState("");
   const [lakes, setLakes] = useState<WxLoc[]>([]);
@@ -162,7 +164,10 @@ export default function LocationPicker({
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" role="dialog" aria-modal="true" aria-label="Choose weather location">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative w-full sm:max-w-md bg-white border border-pine/10 rounded-t-3xl sm:rounded-3xl p-5 max-h-[85vh] overflow-y-auto">
+      <div className="relative w-full sm:max-w-md bg-white border border-pine/10 rounded-t-3xl sm:rounded-3xl p-5 max-h-[85vh] overflow-y-auto" style={dragStyle}>
+        <div className="touch-none cursor-grab active:cursor-grabbing -mt-2 mb-1" {...dragHandlers}>
+          <SheetGrabber onClose={onClose} />
+        </div>
         <div className="flex items-start justify-between gap-3">
           <div>
             <h3 className="text-lg font-black">Weather location</h3>

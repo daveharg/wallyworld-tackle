@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { fishFetch } from "../../_components/fishFetch";
+import { useSheetDrag, SheetGrabber } from "../../_components/sheetDrag";
 import {
   decryptText,
   encryptText,
@@ -107,6 +108,9 @@ export default function ThreadView({
   const [showMembers, setShowMembers] = useState(false);
   const [editingGroup, setEditingGroup] = useState(false);
   const [themeOpen, setThemeOpen] = useState(false);
+  // Bottom sheets: drag down / tap the grabber to close (shared behaviour).
+  const groupSheetDrag = useSheetDrag(() => setEditingGroup(false));
+  const themeSheetDrag = useSheetDrag(() => setThemeOpen(false));
   const [themeName, setThemeName] = useState<string>("Default");
   const [resyncing, setResyncing] = useState(false);
   const autoResyncDone = useRef(false);
@@ -779,7 +783,10 @@ export default function ThreadView({
 
       {editingGroup && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 p-4" onClick={() => setEditingGroup(false)}>
-          <div className="bg-paper rounded-3xl w-full max-w-sm p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-paper rounded-3xl w-full max-w-sm p-6" onClick={(e) => e.stopPropagation()} style={groupSheetDrag.dragStyle}>
+            <div className="touch-none cursor-grab active:cursor-grabbing -mt-3 mb-1" {...groupSheetDrag.dragHandlers}>
+              <SheetGrabber onClose={() => setEditingGroup(false)} />
+            </div>
             <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-4">
               {peer.is_group ? "Edit group" : "Add to chat"}
             </h3>
@@ -1155,7 +1162,11 @@ export default function ThreadView({
           <div
             className="bg-white rounded-3xl w-full max-w-sm p-6 max-h-[80vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
+            style={themeSheetDrag.dragStyle}
           >
+            <div className="touch-none cursor-grab active:cursor-grabbing -mt-3 mb-1" {...themeSheetDrag.dragHandlers}>
+              <SheetGrabber onClose={() => setThemeOpen(false)} />
+            </div>
             <h3 className="font-bold text-pine text-lg mb-1">Chat theme</h3>
             <p className="text-xs text-pine/50 mb-4">Applies to this chat only.</p>
 

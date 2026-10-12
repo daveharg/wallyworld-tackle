@@ -2,6 +2,7 @@
 // from a catch (which carries its own coords) or added manually in the profile.
 
 import { query, queryOne } from "./db";
+import { nearestLake } from "./lakeCoords";
 
 /** Allowed spot icon ids (must match the client SPOT_ICON_CHOICES). */
 export const SPOT_ICON_IDS = ["pin", "dot-red", "dot-blue", "dot-green", "dot-yellow", "dot-purple", "fish", "rock", "weed", "boat"] as const;
@@ -121,6 +122,19 @@ export async function listSpots(userId: string): Promise<FishingSpot[]> {
       ORDER BY created_at DESC`,
     [userId]
   );
+  // Self-heal: spots saved before auto-detection (or with no lake chosen)
+  // get their lake from their coordinates, persisted so they know their
+  // lake everywhere from now on.
+  for (const r of rows) {
+    if (r.lake_id) continue;
+    const lake = nearestLake(Number(r.lat), Number(r.lng));
+    if (!lake) continue;
+    r.lake_id = lake.id;
+    query(`UPDATE fm_fishing_spots SET lake_id = $1 WHERE id = $2 AND lake_id IS NULL`, [
+      lake.id,
+      r.id,
+    ]).catch(() => {});
+  }
   return rows;
 }
 
@@ -151,7 +165,9 @@ export async function createSpot(
       spot.notes?.trim().slice(0, 500) || null,
       spot.catchId ?? null,
       isSpotIconId(spot.icon) ? spot.icon : "pin",
-      spot.lakeId?.trim() || null,
+      // A spot automatically knows its lake: when the caller didn't pick
+      // one, assign the nearest lake to the spot's coordinates.
+      spot.lakeId?.trim() || nearestLake(spot.lat, spot.lng)?.id || null,
       spot.originUserId ?? null,
       spot.originName?.trim().slice(0, 80) || null,
       spot.shareMsgId?.trim().slice(0, 64) || null,

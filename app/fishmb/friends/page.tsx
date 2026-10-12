@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
 import BackArrow from "../_components/BackArrow";
+import { useSheetDrag, SheetGrabber } from "../_components/sheetDrag";
 
 interface Person {
   id: string;
@@ -47,6 +48,7 @@ export default function FriendsPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
   const [actionFriend, setActionFriend] = useState<Person | null>(null);
+  const friendSheetDrag = useSheetDrag(() => setActionFriend(null));
 
   const tabParam = params.get("tab");
   const tab: Tab = tabParam === "requests" ? "requests" : tabParam === "add" ? "add" : "friends";
@@ -347,7 +349,11 @@ export default function FriendsPage() {
           <div
             className="bg-paper rounded-3xl w-full max-w-sm p-6 text-center shadow-2xl"
             onClick={(e) => e.stopPropagation()}
+            style={friendSheetDrag.dragStyle}
           >
+            <div className="touch-none cursor-grab active:cursor-grabbing -mt-3 mb-1" {...friendSheetDrag.dragHandlers}>
+              <SheetGrabber onClose={() => setActionFriend(null)} />
+            </div>
             <Avatar p={actionFriend} size={64} />
             <p className="font-bold text-pine text-lg mt-3 mb-5">{actionFriend.name}</p>
             <button

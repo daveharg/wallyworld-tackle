@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, Fragment, Suspense } from "re
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useFishAuth } from "../_components/FishAuth";
+import { SheetGrabber } from "../_components/sheetDrag";
 import { fishFetch } from "../_components/fishFetch";
 import { compressImage } from "../_components/compressImage";
 import { readGpsFromImage } from "../_components/exifGps";
@@ -82,9 +83,11 @@ function ComposerSheet({
           "sm:max-w-lg"
         }`}
       >
-        {/* Drag handle — swipe down here to dismiss */}
+        {/* Drag handle — swipe down here to dismiss, or tap the pill */}
         <div data-sheet-handle className="sticky top-0 bg-white pt-3 pb-1 px-5 cursor-grab touch-none">
-          <div className="w-10 h-1.5 bg-pine/20 rounded-full mx-auto mb-3" />
+          <div className="mb-1">
+            <SheetGrabber onClose={closeComposer} />
+          </div>
           <div className="flex gap-2">
             {(
               [
