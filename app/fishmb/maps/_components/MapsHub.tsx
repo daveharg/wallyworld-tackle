@@ -236,6 +236,9 @@ export default function MapsHub() {
   }, [windOn, speedOn, tempOn, biteOn]);
   const initPlaced = useRef(false);
   const urlPlaced = useRef(false);
+  // Pointer-down spot for the catch-toggle widget buttons, so a widget drag
+  // doesn't also flip a switch on release.
+  const catchToggleDown = useRef<{ x: number; y: number } | null>(null);
 
   // (0,0) is "Null Island" — never a real spot or GPS fix. Treat as invalid
   // so the map can't get stuck in the ocean.
@@ -904,36 +907,47 @@ export default function MapsHub() {
         }}
       />
 
-      {/* Catch pin toggles — top left, auto-on. Same state as Settings. */}
-      <div className="absolute top-3 left-3 z-20 bg-white/95 backdrop-blur border border-pine/15 rounded-2xl shadow-lg px-3 py-2 space-y-1.5">
-        {(
-          [
-            { label: "My catches", on: showMyCatches, set: changeShowMyCatches },
-            { label: "Others' catches", on: showPublicCatches, set: changeShowPublicCatches },
-          ] as const
-        ).map((t) => (
-          <button
-            key={t.label}
-            type="button"
-            onClick={() => t.set(!t.on)}
-            className="flex items-center gap-2 w-full"
-            aria-pressed={t.on}
-          >
-            <span
-              className={`w-9 h-5 rounded-full p-0.5 transition-colors shrink-0 ${
-                t.on ? "bg-signal" : "bg-pine/15"
-              }`}
+      {/* Catch pin toggles — draggable widget, auto-starts below the search
+          bar. Same state as the Settings tab toggles. */}
+      <DraggableWidget id="catches" defaultPos={{ x: 12, y: 70 }}>
+        <div className="bg-white/95 backdrop-blur border border-pine/15 rounded-2xl shadow-lg px-3 py-2 space-y-1.5">
+          {(
+            [
+              { label: "My catches", on: showMyCatches, set: changeShowMyCatches },
+              { label: "Others' catches", on: showPublicCatches, set: changeShowPublicCatches },
+            ] as const
+          ).map((t) => (
+            <button
+              key={t.label}
+              type="button"
+              onPointerDown={(e) => {
+                catchToggleDown.current = { x: e.clientX, y: e.clientY };
+              }}
+              onClick={(e) => {
+                // Ignore the click if this was a widget drag, not a tap.
+                const d = catchToggleDown.current;
+                if (d && Math.hypot(e.clientX - d.x, e.clientY - d.y) > 8) return;
+                t.set(!t.on);
+              }}
+              className="flex items-center gap-2 w-full"
+              aria-pressed={t.on}
             >
               <span
-                className={`block w-4 h-4 rounded-full bg-white shadow transition-transform ${
-                  t.on ? "translate-x-4" : ""
+                className={`w-9 h-5 rounded-full p-0.5 transition-colors shrink-0 ${
+                  t.on ? "bg-signal" : "bg-pine/15"
                 }`}
-              />
-            </span>
-            <span className="text-[11px] font-bold text-pine whitespace-nowrap">{t.label}</span>
-          </button>
-        ))}
-      </div>
+              >
+                <span
+                  className={`block w-4 h-4 rounded-full bg-white shadow transition-transform ${
+                    t.on ? "translate-x-4" : ""
+                  }`}
+                />
+              </span>
+              <span className="text-[11px] font-bold text-pine whitespace-nowrap">{t.label}</span>
+            </button>
+          ))}
+        </div>
+      </DraggableWidget>
 
       {/* Follow-me button — tap to follow your GPS, tap again to stop */}
       <button
