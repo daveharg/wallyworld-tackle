@@ -138,6 +138,22 @@ export default function CatchesTab({
   onShowOnMapChange,
 }: CatchesTabProps) {
   const [lakes, setLakes] = useState<LakeCoord[]>([]);
+  // How the catches lists are grouped: by lake or by fish type.
+  const [groupMode, setGroupMode] = useState<"lake" | "species">(() => {
+    try {
+      return localStorage.getItem("fishmb-catches-group") === "species" ? "species" : "lake";
+    } catch {
+      return "lake";
+    }
+  });
+  const changeGroupMode = (m: "lake" | "species") => {
+    setGroupMode(m);
+    try {
+      localStorage.setItem("fishmb-catches-group", m);
+    } catch {
+      // Best effort.
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -258,8 +274,53 @@ export default function CatchesTab({
     return groups;
   };
 
+  // Group by fish type (species A–Z), newest first within each group.
+  const groupBySpecies = (items: MapCatch[]) => {
+    const groupById = new Map<string, { title: string; catches: MapCatch[] }>();
+    const sorted = [...items].sort(
+      (a, b) => new Date(b.caught_at).getTime() - new Date(a.caught_at).getTime()
+    );
+    for (const c of sorted) {
+      const title = (c.species || "Fish").trim() || "Fish";
+      const key = title.toLowerCase();
+      let g = groupById.get(key);
+      if (!g) {
+        g = { title, catches: [] };
+        groupById.set(key, g);
+      }
+      g.catches.push(c);
+    }
+    return [...groupById.values()].sort((a, b) => a.title.localeCompare(b.title));
+  };
+
+  const renderGroups = (groups: { key: string; title: string; catches: MapCatch[] }[]) => (
+    <div className="space-y-5">
+      {groups.map((g) => (
+        <div key={g.key}>
+          <h3 className="text-xs font-black uppercase tracking-wider text-pine/45 mb-2 px-1">
+            {g.title} <span className="text-pine/30">({g.catches.length})</span>
+          </h3>
+          <div className="space-y-2">
+            {g.catches.map((c) => (
+              <CatchRow key={c.id} c={c} myLoc={myLoc} onSelect={() => onSelect(c)} />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
   const renderList = () => {
-    // All three scopes (Mine, Friends, All) are grouped by lake.
+    if (groupMode === "species") {
+      return renderGroups(
+        groupBySpecies(list).map((g) => ({
+          key: `sp:${g.title.toLowerCase()}`,
+          title: g.title,
+          catches: g.catches,
+        }))
+      );
+    }
+    // Lake mode — flat list only until the lake data loads.
     if (lakes.length === 0) {
       return (
         <div className="space-y-2">
@@ -269,22 +330,12 @@ export default function CatchesTab({
         </div>
       );
     }
-    const groups = groupByLake(list);
-    return (
-      <div className="space-y-5">
-        {groups.map((g) => (
-          <div key={g.lake ? g.lake.id : "__other"}>
-            <h3 className="text-xs font-black uppercase tracking-wider text-pine/45 mb-2 px-1">
-              {g.lake ? g.lake.name : "Other waters"}
-            </h3>
-            <div className="space-y-2">
-              {g.catches.map((c) => (
-                <CatchRow key={c.id} c={c} myLoc={myLoc} onSelect={() => onSelect(c)} />
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
+    return renderGroups(
+      groupByLake(list).map((g) => ({
+        key: g.lake ? g.lake.id : "__other",
+        title: g.lake ? g.lake.name : "Other waters",
+        catches: g.catches,
+      }))
     );
   };
 
@@ -322,6 +373,31 @@ export default function CatchesTab({
             {s.label}
           </button>
         ))}
+      </div>
+      {/* Grouping: by lake or by fish type */}
+      <div className="flex items-center gap-2 mb-3 px-1">
+        <span className="text-xs font-black uppercase tracking-wider text-pine/45">
+          Group by
+        </span>
+        <div className="flex bg-pine/5 rounded-full p-0.5">
+          {(
+            [
+              { id: "lake", label: "🏞 Lake" },
+              { id: "species", label: "🐟 Fish type" },
+            ] as const
+          ).map((m) => (
+            <button
+              key={m.id}
+              type="button"
+              onClick={() => changeGroupMode(m.id)}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-colors ${
+                groupMode === m.id ? "bg-white text-pine shadow" : "text-pine/50"
+              }`}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
       </div>
       <button
         type="button"
