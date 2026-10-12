@@ -57,8 +57,19 @@ export default function MapSheet({
   const startY = useRef<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
+  const grabberRef = useRef<HTMLDivElement>(null);
   const dragTarget = useRef<SheetSnap | null>(null);
   const fromHeader = useRef(false);
+  const tapOnGrabber = useRef(false);
+
+  /** Tap the grabber to toggle expand/collapse — no drag needed. */
+  const toggleSnap = () => {
+    if (snap === "mini" || snap === "collapsed") {
+      onSnapChange(detailMode ? "half" : "full");
+    } else {
+      onSnapChange("collapsed");
+    }
+  };
 
   const onTouchStart = (e: TouchEvent) => {
     startY.current = e.touches[0].clientY;
@@ -70,12 +81,15 @@ export default function MapSheet({
       (headerRef.current && headerRef.current.contains(target)) ||
       target.closest("[data-sheet-drag]")
     );
+    tapOnGrabber.current = !!(grabberRef.current && grabberRef.current.contains(target));
     setDragging(true);
   };
 
   const onTouchMove = (e: TouchEvent) => {
     if (startY.current === null) return;
     const dy = e.touches[0].clientY - startY.current;
+    // Moved more than a tap — this is a drag, not a grabber tap.
+    if (Math.abs(dy) > 10) tapOnGrabber.current = false;
     const scroller = scrollRef.current;
     const atTop = fromHeader.current || !scroller || scroller.scrollTop <= 0;
 
@@ -127,12 +141,16 @@ export default function MapSheet({
     const target = dragTarget.current;
     if (target && Math.abs(dragDy) > 60) {
       onSnapChange(target);
+    } else if (tapOnGrabber.current) {
+      // Tap (not drag) on the grabber — toggle expand/collapse.
+      toggleSnap();
     }
     setDragDy(0);
     setDragging(false);
     startY.current = null;
     dragTarget.current = null;
     fromHeader.current = false;
+    tapOnGrabber.current = false;
   };
 
   // When the sheet settles back to collapsed, scroll content to the top
@@ -164,8 +182,12 @@ export default function MapSheet({
     >
       {/* Grabber + header zone — always drags the sheet */}
       <div ref={headerRef} style={{ touchAction: "pan-x" }}>
-      <div className="shrink-0 pt-2.5 pb-1 flex justify-center">
-        <div className="w-10 h-1.5 rounded-full bg-pine/20" />
+      <div ref={grabberRef} className="shrink-0 pt-2.5 pb-1 flex justify-center cursor-pointer">
+        <div
+          className="w-10 h-1.5 rounded-full bg-pine/20"
+          role="button"
+          aria-label={snap === "mini" || snap === "collapsed" ? "Expand sheet" : "Collapse sheet"}
+        />
       </div>
 
       {!detailMode && (
