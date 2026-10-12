@@ -121,9 +121,23 @@ export default function FishMBComingSoon() {
           Garmin Navionics contours, encrypted messaging and an Fish-activity forecast.
           Built by anglers, for anglers.
         </p>
+        <div className="flex flex-col sm:flex-row gap-3 justify-center mb-4">
+          <Link
+            href="/fishmb/feed"
+            className="inline-block bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-10 py-4 rounded-full transition-colors"
+          >
+            📱 Get the web app
+          </Link>
+          <Link
+            href="/fishmb/home"
+            className="inline-block bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold uppercase tracking-wider text-sm px-10 py-4 rounded-full transition-colors"
+          >
+            🌐 Website
+          </Link>
+        </div>
         <Link
           href="/fishmb/lakes"
-          className="inline-block bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-10 py-4 rounded-full transition-colors mb-4"
+          className="inline-block text-white/60 hover:text-white text-sm font-bold underline mb-4"
         >
           🎣 Try the live demo
         </Link>

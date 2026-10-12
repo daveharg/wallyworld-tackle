@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { FishLoginButton, useFishAuth } from "./FishAuth";
 
 const NAV = [
-  { href: "/fishmb", label: "Home" },
+  { href: "/fishmb/home", label: "Home" },
   { href: "/fishmb/lakes", label: "Lakes" },
   { href: "/fishmb/lodges", label: "Lodges & Guides" },
   { href: "/fishmb/regulations", label: "Regulations" },
@@ -67,7 +67,7 @@ export default function FishHeader() {
     >
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link href="/fishmb" aria-label="FishMB home">
+          <Link href="/" aria-label="FishMB home">
             <Wordmark />
           </Link>
           <nav className="hidden md:flex items-center gap-7">
