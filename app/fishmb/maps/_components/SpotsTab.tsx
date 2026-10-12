@@ -242,7 +242,7 @@ export default function SpotsTab({
                           ))}
                         </div>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 items-center">
                         <button
                           type="button"
                           onClick={() => saveEdit(s.id)}
@@ -257,6 +257,13 @@ export default function SpotsTab({
                           className="text-pine/60 text-xs font-bold uppercase tracking-wider px-4 py-2.5"
                         >
                           Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onDelete(s.id)}
+                          className="ml-auto bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-full"
+                        >
+                          🗑 Delete
                         </button>
                       </div>
                     </div>

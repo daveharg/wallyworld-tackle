@@ -789,14 +789,16 @@ export default function MapsHub() {
     }
   };
 
-  const removeSpot = async (id: string) => {
-    if (!window.confirm("Delete this spot?")) return;
+  const removeSpot = async (id: string): Promise<boolean> => {
+    if (!window.confirm("Delete this spot?")) return false;
     try {
       await fishFetch(`/api/fishmb/spots/${id}`, { method: "DELETE" });
       setSpots(spots.filter((s) => s.id !== id));
       if (goTo?.id === id) setGoTo(null);
+      return true;
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not delete the spot.");
+      return false;
     }
   };
 
@@ -1461,6 +1463,19 @@ export default function MapsHub() {
                     Cancel
                   </button>
                 </div>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const gone = await removeSpot(spotPopup.id);
+                    if (gone) {
+                      setSpotPopup(null);
+                      setSpotEditing(false);
+                    }
+                  }}
+                  className="w-full mt-4 bg-red-50 hover:bg-red-100 text-red-600 font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
+                >
+                  🗑 Delete spot
+                </button>
               </>
             ) : (
               <>
