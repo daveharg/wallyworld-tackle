@@ -671,8 +671,8 @@ export default function MapsHub() {
     () =>
       [
         ...(showMyCatches ? myCatches : []),
-        ...(showFriendCatches ? nearbyCatches.filter((c) => c.friend) : []),
-        ...(showPublicCatches ? nearbyCatches.filter((c) => !c.friend) : []),
+        ...(showFriendCatches ? allCatches.filter((c) => c.friend && !c.mine) : []),
+        ...(showPublicCatches ? allCatches.filter((c) => !c.friend && !c.mine) : []),
       ].map((c) => ({
         id: c.id,
         lat: c.lat,
@@ -683,7 +683,7 @@ export default function MapsHub() {
         avatar_url: c.avatar_url ?? null,
         user_name: c.user_name,
       })),
-    [showMyCatches, showFriendCatches, showPublicCatches, myCatches, nearbyCatches]
+    [showMyCatches, showFriendCatches, showPublicCatches, myCatches, allCatches]
   );
 
   const flyTo = (lat: number, lng: number, key: string, zoom = 13) => {
@@ -874,6 +874,7 @@ export default function MapsHub() {
             onCatchClick={(pin) => {
               const full =
                 myCatches.find((c) => c.id === pin.id) ??
+                allCatches.find((c) => c.id === pin.id) ??
                 nearbyCatches.find((c) => c.id === pin.id) ??
                 null;
               if (full) setSelectedCatch(full);
