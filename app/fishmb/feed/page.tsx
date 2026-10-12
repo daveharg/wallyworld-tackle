@@ -1151,6 +1151,8 @@ function FeedPageInner() {
   const [draft, setDraft] = useState("");
   const [feedCaption, setFeedCaption] = useState("");
   const [catchPhotos, setCatchPhotos] = useState<File[]>([]);
+  const [catchVideo, setCatchVideo] = useState<File | null>(null);
+  const [catchVideoPlayback, setCatchVideoPlayback] = useState<{ playback_id: string; duration: number | null } | null>(null);
   const [postPhotos, setPostPhotos] = useState<File[]>([]);
   // Optional one video per post (60s max) — uploads straight to Mux.
   const [postVideo, setPostVideo] = useState<File | null>(null);
@@ -1741,6 +1743,8 @@ function FeedPageInner() {
           photo_measure_url: photoUrl,
           photo_hold_url: photoUrl,
           photos: urls,
+          video_playback_id: catchVideoPlayback?.playback_id ?? null,
+          video_url: catchVideoPlayback ? `https://stream.mux.com/${catchVideoPlayback.playback_id}.m3u8` : null,
           visibility: postToFeed ? visibility : "private",
           share_location: shareLocation,
           personal_record: !postToFeed,
@@ -2554,6 +2558,42 @@ function FeedPageInner() {
                       }}
                     />
                   </label>
+                  {!catchVideo ? (
+                    <label className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-white bg-pine hover:bg-pine-deep px-3.5 py-2 rounded-full cursor-pointer transition-colors">
+                      Add video
+                      <input
+                        type="file"
+                        accept="video/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          e.target.value = "";
+                          if (f) {
+                            setCatchVideo(f);
+                            uploadVideoFile(f).then(() => {
+                              // Store playback for catch submission
+                              setCatchVideoPlayback(videoPlayback);
+                            });
+                          }
+                        }}
+                      />
+                    </label>
+                  ) : (
+                    <span className="relative text-xs font-bold text-pine/70 bg-pine/5 rounded-full pl-3 pr-2 py-1.5">
+                      {catchVideo.name.slice(0, 18)}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setCatchVideo(null);
+                          setCatchVideoPlayback(null);
+                        }}
+                        className="ml-1 text-pine/40 hover:text-signal font-bold"
+                        aria-label="Remove video"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  )}
                   <label className="flex items-center gap-2">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-pine/50 whitespace-nowrap">
                       Visible to

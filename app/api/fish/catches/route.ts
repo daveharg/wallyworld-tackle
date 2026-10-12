@@ -137,6 +137,11 @@ export async function POST(req: NextRequest) {
   if (weightLb !== null && (!Number.isFinite(weightLb) || weightLb <= 0 || weightLb > 999)) {
     return badRequest("weight_lb must be a positive number of pounds.");
   }
+  // Ensure video columns exist (safe for existing DBs).
+  try {
+    await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS video_playback_id text`);
+    await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS video_url text`);
+  } catch {}
   const visibility = body.visibility ?? "public";
   if (!VISIBILITIES.includes(visibility as (typeof VISIBILITIES)[number])) {
     return badRequest("visibility must be public, friends or private.");
@@ -156,6 +161,8 @@ export async function POST(req: NextRequest) {
       .slice(0, 4);
   }
   if (photos.length === 0) photos = [photoMeasure];
+  const videoPlaybackId = typeof body.video_playback_id === "string" && body.video_playback_id.length <= 128 ? body.video_playback_id : null;
+  const videoUrl = typeof body.video_url === "string" && /^https?:\/\//.test(body.video_url) && body.video_url.length <= 2048 ? body.video_url : null;
   const note = typeof body.note === "string" ? body.note.trim().slice(0, 500) || null : null;
   // Public caption shown with the catch on the feed (separate from private notes).
   const feedCaption =
@@ -242,11 +249,11 @@ export async function POST(req: NextRequest) {
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS feed_caption text`);
   const rows = await query<CatchRow>(
     `INSERT INTO fm_catches
-       (user_id, species, length_in, weight_lb, photo_measure_url, photo_hold_url, photos, visibility, note, feed_caption, caught_at, lat, lng, share_location, weather, personal_record, tournament_id)
-     VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9,$10,COALESCE($11::timestamptz, now()),$12,$13,$14,$15::jsonb,$16,$17::uuid)
+       (user_id, species, length_in, weight_lb, photo_measure_url, photo_hold_url, photos, visibility, note, feed_caption, caught_at, lat, lng, share_location, weather, personal_record, tournament_id, video_playback_id, video_url)
+     VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9,$10,COALESCE($11::timestamptz, now()),$12,$13,$14,$15::jsonb,$16,$17::uuid,$18,$19)
      RETURNING *, (SELECT name FROM fm_users WHERE id = $1) AS name,
                    (SELECT avatar_url FROM fm_users WHERE id = $1) AS avatar_url`,
-    [me.id, species, lengthIn, weightLb, photoMeasure, photoHold, JSON.stringify(photos), visibility, note, feedCaption, caughtAt, lat, lng, shareLocation, weather ? JSON.stringify(weather) : null, personalRecord, tournamentId]
+    [me.id, species, lengthIn, weightLb, photoMeasure, photoHold, JSON.stringify(photos), visibility, note, feedCaption, caughtAt, lat, lng, shareLocation, weather ? JSON.stringify(weather) : null, personalRecord, tournamentId, videoPlaybackId, videoUrl]
   );
   const newCatch = rows[0];
 
