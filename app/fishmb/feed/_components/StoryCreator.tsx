@@ -393,7 +393,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
         if (!upRes.ok) throw new Error(up.error || "Upload failed.");
         mediaUrl = up.url;
       }
-      await fishFetch("/api/fishmb/story-drafts", {
+      const created = (await fishFetch("/api/fishmb/story-drafts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -401,12 +401,31 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
           media_type: isVideo ? "video" : "photo",
           duration: isVideo ? videoDuration : null,
         }),
-      });
+      })) as { draft?: Draft };
       await loadDrafts();
+      return created.draft?.id ?? null;
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not upload.");
+      return null;
     } finally {
       setUploading(false);
+    }
+  };
+
+  /** One pick, everything at once: upload each chosen file and select
+   *  them all for the story. */
+  const addFiles = async (files: File[]) => {
+    const ids: string[] = [];
+    for (const f of files) {
+      const id = await uploadDraft(f);
+      if (id) ids.push(id);
+    }
+    if (ids.length) {
+      setSelected((prev) => {
+        const next = new Set(prev);
+        for (const id of ids) next.add(id);
+        return next;
+      });
     }
   };
 
@@ -537,50 +556,35 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
       <div className="flex items-center justify-between px-4 py-3 border-b border-pine/10">
         <button onClick={onClose} aria-label="Close" className="text-3xl text-pine leading-none">×</button>
         <h2 className="font-bold text-pine text-lg">Create story</h2>
-        <div className="flex gap-3">
-          <button
-            onClick={() => fileRef.current?.click()}
-            aria-label="Take photo"
-            className="text-pine/70 text-2xl"
-          >
-            
-          </button>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/*,video/*"
-            capture="environment"
-            className="hidden"
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) void uploadDraft(f);
-              e.target.value = "";
-            }}
-          />
-        </div>
-      </div>
+              </div>
 
       {step === "pick" ? (
         <>
-          {/* Camera roll bar */}
-          <div className="flex items-center justify-between px-4 py-3">
-            <span className="font-bold text-pine/60">Camera roll ▾</span>
+          {/* One picker for everything — photos and videos, as many as you
+              want at once. New picks are selected for the story automatically. */}
+          <div className="px-4 py-3">
             <button
-              onClick={() => {
-                const input = document.createElement("input");
-                input.type = "file";
-                input.accept = "image/*,video/*";
-                input.onchange = () => {
-                  const f = input.files?.[0];
-                  if (f) void uploadDraft(f);
-                };
-                input.click();
-              }}
+              onClick={() => fileRef.current?.click()}
               disabled={uploading}
-              className="px-4 py-2 rounded-full text-sm font-bold bg-pine/10 text-pine disabled:opacity-50"
+              className="w-full py-3.5 rounded-full bg-signal text-white text-sm font-bold uppercase tracking-wider disabled:opacity-50"
             >
-              ＋ Add
+              {uploading ? "Adding…" : "＋ Add photos & videos"}
             </button>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*,video/*"
+              multiple
+              className="hidden"
+              onChange={(e) => {
+                const files = Array.from(e.target.files ?? []);
+                if (files.length) void addFiles(files);
+                e.target.value = "";
+              }}
+            />
+            <p className="text-center text-pine/40 text-xs mt-2">
+              Pick as many as you want at once. Anything you added before is below — tap to add or remove it.
+            </p>
           </div>
 
           {note && <p className="px-4 py-2 text-sm text-amber-700 bg-amber-50">{note}</p>}
@@ -589,34 +593,13 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
           {uploading && (
             <div className="mx-4 mb-3 bg-pine/5 border border-pine/10 rounded-2xl px-4 py-3 flex items-center gap-3">
               <div className="w-5 h-5 border-2 border-pine/20 border-t-signal rounded-full animate-spin shrink-0" />
-              <p className="text-sm font-bold text-pine/70">Loading your video… this can take a moment</p>
+              <p className="text-sm font-bold text-pine/70">Adding your photos & videos… this can take a moment</p>
             </div>
           )}
 
           {/* Draft grid with plus boxes */}
           <div className="flex-1 overflow-y-auto px-4 pb-4">
             <div className="grid grid-cols-3 gap-1">
-              {/* Plus boxes — upload slots */}
-              {[0, 1, 2].map((i) => (
-                <button
-                  key={`plus-${i}`}
-                  onClick={() => {
-                    const input = document.createElement("input");
-                    input.type = "file";
-                    input.accept = "image/*,video/*";
-                    input.onchange = () => {
-                      const f = input.files?.[0];
-                      if (f) void uploadDraft(f);
-                    };
-                    input.click();
-                  }}
-                  disabled={uploading}
-                  className="aspect-square bg-pine/5 rounded-xl flex items-center justify-center text-4xl text-pine/30 hover:text-pine/50 disabled:opacity-50"
-                  aria-label="Add photo or video"
-                >
-                  {uploading ? "…" : "+"}
-                </button>
-              ))}
               {/* Saved drafts */}
               {drafts.map((d) => {
                 // Videos store a Mux HLS URL; use the Mux thumbnail image for the grid.
@@ -676,7 +659,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
             </div>
             {drafts.length === 0 && !uploading && (
               <p className="text-center text-pine/40 text-sm mt-6">
-                Hit + to add photos or videos — they stay saved here until you need them.
+                Nothing here yet — what you add stays saved here until you need it.
               </p>
             )}
           </div>
