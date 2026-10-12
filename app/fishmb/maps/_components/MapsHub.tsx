@@ -698,6 +698,20 @@ export default function MapsHub() {
     setSnap("collapsed");
   };
 
+  // Tapping a catch in a list flies to it — make sure its pin layer is ON,
+  // or the map zooms to an empty spot. The layer flips on automatically
+  // (and stays on until the angler turns it back off in the list/widget).
+  const onCatchListSelect = (c: MapCatch) => {
+    if (c.mine) {
+      if (!showMyCatches) changeShowMyCatches(true);
+    } else if (c.friend) {
+      if (!showFriendCatches) changeShowFriendCatches(true);
+    } else if (!showPublicCatches) {
+      changeShowPublicCatches(true);
+    }
+    flyTo(c.lat, c.lng, `catch:${c.id}`, 14);
+  };
+
   // ---- spot CRUD ----
   const onMapLongPress = (lat: number, lng: number) => {
     setPicking(false);
@@ -1144,7 +1158,7 @@ export default function MapsHub() {
             loading={catchesLoading}
             scope={catchScope}
             onScopeChange={setCatchScope}
-            onSelect={(c) => flyTo(c.lat, c.lng, `catch:${c.id}`, 14)}
+            onSelect={onCatchListSelect}
             myLoc={myLoc}
             showOnMap={
               catchScope === "mine"
