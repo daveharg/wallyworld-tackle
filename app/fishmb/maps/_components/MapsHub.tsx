@@ -123,17 +123,31 @@ export default function MapsHub() {
     offsetY?: number;
   } | null>(() => {
     // Deep link from a catch page (?lat=&lng=&zoom=) — focus on load.
+    // The params must actually be present: Number(null) is 0, which used
+    // to fabricate a focus on (0, 0) at zoom 0 — flying the map to the
+    // whole world on every plain open.
     try {
-      const qLat = Number(searchParams.get("lat"));
-      const qLng = Number(searchParams.get("lng"));
-      const qZoom = Number(searchParams.get("zoom"));
-      if (Number.isFinite(qLat) && Number.isFinite(qLng)) {
-        return {
-          lat: qLat,
-          lng: qLng,
-          key: `deeplink:${qLat},${qLng}`,
-          zoom: Number.isFinite(qZoom) ? qZoom : 13,
-        };
+      const rawLat = searchParams.get("lat");
+      const rawLng = searchParams.get("lng");
+      if (rawLat && rawLng) {
+        const qLat = Number(rawLat);
+        const qLng = Number(rawLng);
+        if (
+          Number.isFinite(qLat) &&
+          Number.isFinite(qLng) &&
+          (qLat !== 0 || qLng !== 0)
+        ) {
+          const rawZoom = Number(searchParams.get("zoom"));
+          return {
+            lat: qLat,
+            lng: qLng,
+            key: `deeplink:${qLat},${qLng}`,
+            zoom:
+              Number.isFinite(rawZoom) && rawZoom >= 3 && rawZoom <= 18
+                ? rawZoom
+                : 13,
+          };
+        }
       }
     } catch {
       // No deep link.
