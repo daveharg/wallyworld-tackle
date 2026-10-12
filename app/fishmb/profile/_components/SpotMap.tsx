@@ -203,13 +203,14 @@ export default function SpotMap({
         { animate: false }
       );
       // Tall screens overshoot the top of the tile world, leaving a blank
-      // band up top. If the fitted view runs past ~84.5°N, pan it down so
-      // the imagery starts right at the top of the world.
+      // band up top. If the fitted view runs past ~82°N, pan it down so
+      // the imagery starts right at the top of the world. (82, not 84.5:
+      // the first pass still left a sliver on the tallest phones.)
       const view = m.getBounds();
-      if (view.getNorth() > 84.5) {
+      if (view.getNorth() > 82) {
         const zoom = m.getZoom();
         const overPx =
-          m.project(L.latLng(84.5, view.getEast()), zoom).y -
+          m.project(L.latLng(82, view.getEast()), zoom).y -
           m.project(view.getNorthEast(), zoom).y;
         if (overPx > 0) m.panBy([0, overPx], { animate: false });
       }
