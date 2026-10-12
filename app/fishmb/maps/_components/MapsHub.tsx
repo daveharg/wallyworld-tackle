@@ -175,11 +175,12 @@ export default function MapsHub() {
       return false;
     }
   });
+  // Catch pins default ON — Dave wants them auto-loaded on the map.
   const [showPublicCatches, setShowPublicCatches] = useState(() => {
     try {
-      return localStorage.getItem("fishmb-show-public-catches") === "1";
+      return localStorage.getItem("fishmb-show-public-catches") !== "0";
     } catch {
-      return false;
+      return true;
     }
   });
 
@@ -193,9 +194,9 @@ export default function MapsHub() {
   };
   const [showMyCatches, setShowMyCatches] = useState(() => {
     try {
-      return localStorage.getItem("fishmb-show-my-catches") === "1";
+      return localStorage.getItem("fishmb-show-my-catches") !== "0";
     } catch {
-      return false;
+      return true;
     }
   });
 
@@ -902,6 +903,37 @@ export default function MapsHub() {
           setTimeout(() => setNote(null), 2500);
         }}
       />
+
+      {/* Catch pin toggles — top left, auto-on. Same state as Settings. */}
+      <div className="absolute top-3 left-3 z-20 bg-white/95 backdrop-blur border border-pine/15 rounded-2xl shadow-lg px-3 py-2 space-y-1.5">
+        {(
+          [
+            { label: "My catches", on: showMyCatches, set: changeShowMyCatches },
+            { label: "Others' catches", on: showPublicCatches, set: changeShowPublicCatches },
+          ] as const
+        ).map((t) => (
+          <button
+            key={t.label}
+            type="button"
+            onClick={() => t.set(!t.on)}
+            className="flex items-center gap-2 w-full"
+            aria-pressed={t.on}
+          >
+            <span
+              className={`w-9 h-5 rounded-full p-0.5 transition-colors shrink-0 ${
+                t.on ? "bg-signal" : "bg-pine/15"
+              }`}
+            >
+              <span
+                className={`block w-4 h-4 rounded-full bg-white shadow transition-transform ${
+                  t.on ? "translate-x-4" : ""
+                }`}
+              />
+            </span>
+            <span className="text-[11px] font-bold text-pine whitespace-nowrap">{t.label}</span>
+          </button>
+        ))}
+      </div>
 
       {/* Follow-me button — tap to follow your GPS, tap again to stop */}
       <button
