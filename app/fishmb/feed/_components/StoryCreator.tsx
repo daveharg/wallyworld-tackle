@@ -55,6 +55,16 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
   const [posting, setPosting] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [step, setStep] = useState<"pick" | "edit">("pick");
+
+  // The moment this opens, your phone's photos open with it — picking is
+  // the whole point of the screen. Cancel and the Add button is here.
+  const autoOpenedRef = useRef(false);
+  useEffect(() => {
+    if (autoOpenedRef.current) return;
+    autoOpenedRef.current = true;
+    const t = setTimeout(() => fileRef.current?.click(), 80);
+    return () => clearTimeout(t);
+  }, []);
   const [overlays, setOverlays] = useState<TextOverlay[]>([]);
   const [editingOverlay, setEditingOverlay] = useState<TextOverlay | null>(null);
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
