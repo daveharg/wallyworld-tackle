@@ -61,6 +61,10 @@ export default function MapSheet({
   const dragTarget = useRef<SheetSnap | null>(null);
   const fromHeader = useRef(false);
   const tapOnGrabber = useRef(false);
+  /** Timestamp of the last touch end — used to ignore the synthesized
+   *  click a browser fires right after a touch tap, so touch users don't
+   *  double-toggle. Real mouse clicks (desktop) have no recent touch. */
+  const lastTouchEndAt = useRef(0);
 
   /** Tap the grabber to toggle expand/collapse — no drag needed. */
   const toggleSnap = () => {
@@ -138,6 +142,7 @@ export default function MapSheet({
   };
 
   const onTouchEnd = () => {
+    lastTouchEndAt.current = Date.now();
     const target = dragTarget.current;
     if (target && Math.abs(dragDy) > 60) {
       onSnapChange(target);
@@ -182,7 +187,17 @@ export default function MapSheet({
     >
       {/* Grabber + header zone — always drags the sheet */}
       <div ref={headerRef} style={{ touchAction: "pan-x" }}>
-      <div ref={grabberRef} className="shrink-0 pt-2.5 pb-1 flex justify-center cursor-pointer">
+      <div
+        ref={grabberRef}
+        className="shrink-0 pt-2.5 pb-1 flex justify-center cursor-pointer"
+        onClick={() => {
+          // Mouse click (desktop): toggle. Touch taps are handled in
+          // onTouchEnd; the browser fires a follow-up click after them,
+          // which the timestamp guard swallows.
+          if (Date.now() - lastTouchEndAt.current < 700) return;
+          toggleSnap();
+        }}
+      >
         <div
           className="w-10 h-1.5 rounded-full bg-pine/20"
           role="button"
