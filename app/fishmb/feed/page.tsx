@@ -59,19 +59,95 @@ function ComposerSheet({
   };
 
   // Lock the background page while the composer is open — sliding on the
-  // sheet must not scroll the feed behind it.
+  // sheet must not scroll the feed behind it. iOS ignores body
+  // overflow:hidden for touch scrolling, so pin the body with
+  // position:fixed and restore the scroll position on close.
   useEffect(() => {
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const y = window.scrollY;
+    const b = document.body.style;
+    const prev = {
+      position: b.position,
+      top: b.top,
+      left: b.left,
+      right: b.right,
+      width: b.width,
+      overflow: b.overflow,
+    };
+    b.position = "fixed";
+    b.top = `-${y}px`;
+    b.left = "0";
+    b.right = "0";
+    b.width = "100%";
+    b.overflow = "hidden";
     return () => {
-      document.body.style.overflow = prev;
+      b.position = prev.position;
+      b.top = prev.top;
+      b.left = prev.left;
+      b.right = prev.right;
+      b.width = prev.width;
+      b.overflow = prev.overflow;
+      window.scrollTo(0, y);
     };
   }, []);
+
+  // Pull down anywhere in the sheet while it's scrolled to the top and the
+  // whole sheet follows the finger; let go past 70px and it closes — the
+  // standard sheet gesture. (The handle has its own drag above; touches
+  // starting there are skipped here.) Native listeners because the
+  // touchmove must be non-passive to stop the scroll taking over.
+  const panelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = panelRef.current;
+    if (!el) return;
+    let start: number | null = null;
+    let dy = 0;
+    const ts = (e: TouchEvent) => {
+      if ((e.target as HTMLElement).closest("[data-sheet-handle]")) {
+        start = null;
+        return;
+      }
+      start = e.touches[0].clientY;
+      dy = 0;
+    };
+    const tm = (e: TouchEvent) => {
+      if (start === null) return;
+      if (el.scrollTop > 0) {
+        start = null;
+        setDragY(0);
+        setDragging(false);
+        return;
+      }
+      dy = e.touches[0].clientY - start;
+      if (dy > 0) {
+        e.preventDefault();
+        setDragging(true);
+        setDragY(dy);
+      }
+    };
+    const te = () => {
+      if (start !== null && dy > 70) closeComposer();
+      start = null;
+      dy = 0;
+      setDragging(false);
+      setDragY(0);
+    };
+    el.addEventListener("touchstart", ts, { passive: true });
+    el.addEventListener("touchmove", tm, { passive: false });
+    el.addEventListener("touchend", te);
+    el.addEventListener("touchcancel", te);
+    return () => {
+      el.removeEventListener("touchstart", ts);
+      el.removeEventListener("touchmove", tm);
+      el.removeEventListener("touchend", te);
+      el.removeEventListener("touchcancel", te);
+    };
+  }, [closeComposer]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       <div className="absolute inset-0 bg-pine-deep/60" onClick={closeComposer} />
       <div
+        ref={panelRef}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
@@ -1716,8 +1792,10 @@ function FeedPageInner() {
         // If we can't check, let the server validate on submit.
       }
     }
-    if (catchPhotos.length === 0) {
-      setCatchNote("Add a photo of your catch.");
+    // Photos are optional for a regular catch (it just stays unverified).
+    // Tournament entries still need one — entries are photo-verified.
+    if (catchPhotos.length === 0 && tournamentId) {
+      setCatchNote("Tournament entries need a photo of your catch.");
       return;
     }
     setPosting(true);
@@ -1727,7 +1805,7 @@ function FeedPageInner() {
       for (const f of catchPhotos.slice(0, 4)) {
         urls.push(await uploadPhoto(f));
       }
-      const photoUrl = urls[0];
+      const photoUrl = urls[0] ?? null;
       // Snapshot the weather at the catch location (when we have GPS).
       let weather: Record<string, number | string> | null = null;
       if (catchLat !== null && catchLng !== null) {
@@ -2574,8 +2652,8 @@ function FeedPageInner() {
                 <div className="flex items-center justify-between mt-3 gap-2 flex-wrap">
                   <label className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-white bg-pine hover:bg-pine-deep px-3.5 py-2 rounded-full cursor-pointer transition-colors">
                     {catchPhotos.length > 0
-                    ? `${catchPhotos.length}/4 photos *`
-                    : "Add photos *"}
+                    ? `${catchPhotos.length}/4 photos`
+                    : "Add photos"}
                     <input
                       type="file"
                       accept="image/*"

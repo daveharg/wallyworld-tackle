@@ -2,7 +2,7 @@
 // GET  → newest-first feed. Public catches always; with auth also friends'
 //        catches and your own. ?limit (1-50, default 20) & ?offset.
 // POST → log a catch (auth required). Validates species, length, visibility
-//        and requires BOTH photo URLs (measure + holding).
+//        and any photo URLs supplied (photos are optional — no photo = unverified).
 
 import { NextRequest, NextResponse } from "next/server";
 import { query, queryOne } from "@/lib/fish/db";
@@ -20,8 +20,8 @@ export interface CatchRow {
   species: string;
   length_in: string;
   weight_lb: string | null;
-  photo_measure_url: string;
-  photo_hold_url: string;
+  photo_measure_url: string | null;
+  photo_hold_url: string | null;
   photos: string[] | null;
   visibility: "public" | "friends" | "private";
   note: string | null;
@@ -146,11 +146,15 @@ export async function POST(req: NextRequest) {
   if (!VISIBILITIES.includes(visibility as (typeof VISIBILITIES)[number])) {
     return badRequest("visibility must be public, friends or private.");
   }
-  const photoMeasure = typeof body.photo_measure_url === "string" ? body.photo_measure_url : "";
-  const photoHold = typeof body.photo_hold_url === "string" ? body.photo_hold_url : "";
+  // Photos are OPTIONAL: no photo = an unverified catch. A photo that IS
+  // supplied must still be a valid http(s) URL.
+  const photoMeasure =
+    typeof body.photo_measure_url === "string" && body.photo_measure_url ? body.photo_measure_url : null;
+  const photoHold =
+    typeof body.photo_hold_url === "string" && body.photo_hold_url ? body.photo_hold_url : null;
   for (const [label, v] of [["photo_measure_url", photoMeasure], ["photo_hold_url", photoHold]] as const) {
-    if (!v || !/^https?:\/\//.test(v) || v.length > 2048) {
-      return badRequest(`${label} is required and must be an http(s) URL.`);
+    if (v !== null && (!/^https?:\/\//.test(v) || v.length > 2048)) {
+      return badRequest(`${label} must be an http(s) URL.`);
     }
   }
   // Optional multi-photo array (up to 4). First photo stays primary via photo_measure_url/photo_hold_url.
@@ -160,7 +164,7 @@ export async function POST(req: NextRequest) {
       .filter((u): u is string => typeof u === "string" && /^https?:\/\//.test(u) && u.length <= 2048)
       .slice(0, 4);
   }
-  if (photos.length === 0) photos = [photoMeasure];
+  if (photos.length === 0 && photoMeasure) photos = [photoMeasure];
   const videoPlaybackId = typeof body.video_playback_id === "string" && body.video_playback_id.length <= 128 ? body.video_playback_id : null;
   const videoUrl = typeof body.video_url === "string" && /^https?:\/\//.test(body.video_url) && body.video_url.length <= 2048 ? body.video_url : null;
   const note = typeof body.note === "string" ? body.note.trim().slice(0, 500) || null : null;

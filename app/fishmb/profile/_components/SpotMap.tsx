@@ -189,7 +189,7 @@ export default function SpotMap({
         scrollWheelZoom: false,
         zoomControl: false,
         center: [52, -97],
-        zoom: 7,
+        zoom: 5,
       });
       const streets = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
