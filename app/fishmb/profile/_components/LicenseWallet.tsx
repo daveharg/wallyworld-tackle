@@ -60,8 +60,7 @@ function statusOf(expiry: string | null): {
 /**
  * Fishing-licence wallet on the profile. The angler uploads their own
  * government-issued digital licence (JPEG/PNG/PDF from manitobaelicensing.ca);
- * FishMB just holds it and shows it on demand. The file is cached on-device
- * so "Show licence" works with no signal.
+ * FishMB just holds it and shows it on demand.
  */
 export default function LicenseWallet({ embedded = false }: { embedded?: boolean }) {
   const [lic, setLic] = useState<License | null>(null);
@@ -84,7 +83,7 @@ export default function LicenseWallet({ embedded = false }: { embedded?: boolean
       .finally(() => setLoading(false));
   }, []);
 
-  // Cache the licence file on-device for offline display.
+  // Cache the licence file on-device so the viewer can reuse it.
   const cacheFile = async (url: string) => {
     try {
       if (!("caches" in window)) return;
@@ -111,7 +110,7 @@ export default function LicenseWallet({ embedded = false }: { embedded?: boolean
       setLic(l);
       setFile(null);
       cacheFile(l.file_url);
-      setNote("Licence saved — it's now one tap away, even with no signal.");
+      setNote("Licence saved — it's now one tap away.");
     } catch (e) {
       setNote(e instanceof Error ? e.message : "Could not save the licence.");
     } finally {
@@ -165,7 +164,7 @@ export default function LicenseWallet({ embedded = false }: { embedded?: boolean
  Fishing licence
       </h2>
       <p className="text-pine/60 text-sm mb-4">
-        Your digital licence, one tap away — works even with no signal.
+        Your digital licence, one tap away.
       </p>
       {note && (
         <p className="text-sm text-pine bg-pine/5 border border-pine/15 rounded-2xl px-4 py-3 mb-4">
@@ -250,8 +249,7 @@ export default function LicenseWallet({ embedded = false }: { embedded?: boolean
             Download your licence from your{" "}
             <span className="font-bold">manitobaelicensing.ca</span> account
             (JPEG, PNG or PDF — the formats conservation officers accept), then
-            save it here. It stays on your phone so you can pull it up even with
-            no bars.
+            save it here so it's always one tap away.
           </p>
           <div className="space-y-3">
             <label className="block">
