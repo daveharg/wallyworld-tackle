@@ -53,6 +53,7 @@ export default function SpotsTab({
   const [editName, setEditName] = useState("");
   const [editNotes, setEditNotes] = useState("");
   const [editLakeId, setEditLakeId] = useState<string | null>(null);
+  const [editLakeQuery, setEditLakeQuery] = useState("");
   const [editIcon, setEditIcon] = useState("pin");
   const [saving, setSaving] = useState(false);
   const [lakes, setLakes] = useState<LakeCoord[]>([]);
@@ -88,6 +89,7 @@ export default function SpotsTab({
     setEditName(s.name);
     setEditNotes(s.notes ?? "");
     setEditLakeId(s.lake_id ?? null);
+    setEditLakeQuery(lakes.find((l) => l.id === s.lake_id)?.name ?? "");
     setEditIcon(s.icon ?? "pin");
   };
 
@@ -205,20 +207,69 @@ export default function SpotsTab({
                         <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-1.5">
                           Lake
                         </label>
-                        <select
-                          value={editLakeId ?? ""}
-                          onChange={(e) => setEditLakeId(e.target.value || null)}
-                          className={inputCls}
-                        >
-                          <option value="">Auto (nearest lake)</option>
-                          {[...lakes]
-                            .sort((a, b) => a.name.localeCompare(b.name))
-                            .map((l) => (
-                              <option key={l.id} value={l.id}>
-                                {l.name}
-                              </option>
-                            ))}
-                        </select>
+                        {editLakeId ? (
+                          <div className="flex items-center justify-between gap-2 bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3">
+                            <span className="text-sm font-bold text-pine truncate">
+                              {lakes.find((l) => l.id === editLakeId)?.name ?? "Selected lake"}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditLakeId(null);
+                                setEditLakeQuery("");
+                              }}
+                              className="text-xs font-bold uppercase tracking-wider text-signal-dark shrink-0"
+                            >
+                              Change
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            <input
+                              value={editLakeQuery}
+                              onChange={(e) => setEditLakeQuery(e.target.value)}
+                              placeholder="Search lakes…"
+                              aria-label="Search for a lake"
+                              className={inputCls}
+                            />
+                            {editLakeQuery.trim().length > 0 ? (
+                              <div className="max-h-40 overflow-y-auto bg-white border border-pine/15 rounded-2xl divide-y divide-pine/5 mt-1">
+                                {(() => {
+                                  const matches = lakes
+                                    .filter((l) =>
+                                      l.name.toLowerCase().includes(editLakeQuery.trim().toLowerCase())
+                                    )
+                                    .sort((a, b) => a.name.localeCompare(b.name))
+                                    .slice(0, 15);
+                                  if (matches.length === 0) {
+                                    return (
+                                      <p className="px-4 py-3 text-sm text-pine/50">
+                                        No lakes found for “{editLakeQuery.trim()}”.
+                                      </p>
+                                    );
+                                  }
+                                  return matches.map((l) => (
+                                    <button
+                                      key={l.id}
+                                      type="button"
+                                      onClick={() => {
+                                        setEditLakeId(l.id);
+                                        setEditLakeQuery(l.name);
+                                      }}
+                                      className="w-full text-left px-4 py-2.5 text-sm font-bold text-pine hover:bg-pine/5"
+                                    >
+                                      {l.name}
+                                    </button>
+                                  ));
+                                })()}
+                              </div>
+                            ) : (
+                              <p className="text-[11px] text-pine/50 font-semibold mt-1.5">
+                                No lake picked = Auto (nearest lake)
+                              </p>
+                            )}
+                          </>
+                        )}
                       </div>
                       <div>
                         <label className="block text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-1.5">
