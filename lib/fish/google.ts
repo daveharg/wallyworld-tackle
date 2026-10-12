@@ -56,7 +56,8 @@ function allowedAudiences(): string[] {
     // add more, but a deployment missing them must not reject its own site.
     "544282207513-u3ncjmbht90lksed0m81hprf1d1at42t.apps.googleusercontent.com",
   ];
-  return [...new Set(ids.filter((v): v is string => !!v))];
+  const filtered = ids.filter((v): v is string => !!v);
+  return filtered.filter((v, i) => filtered.indexOf(v) === i);
 }
 
 export async function verifyGoogleIdToken(
