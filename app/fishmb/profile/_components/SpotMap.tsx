@@ -183,14 +183,19 @@ export default function SpotMap({
     (async () => {
       const L = (await import("leaflet")).default;
       if (cancelled || !containerRef.current) return;
-      // Open halfway zoomed in: Manitoba province view — not all the way
-      // out on Canada, not street level. No zoom animation, just open there.
+      // Open framed on all of Canada, fitted to the screen — no zoom
+      // animation, it just opens there.
       const m = L.map(containerRef.current, {
         scrollWheelZoom: false,
         zoomControl: false,
-        center: [52, -97],
-        zoom: 5,
       });
+      m.fitBounds(
+        [
+          [42, -142],
+          [83, -52],
+        ],
+        { animate: false }
+      );
       const streets = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
