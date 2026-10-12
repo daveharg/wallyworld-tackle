@@ -13,7 +13,6 @@ import YouTubeEmbed, { extractYouTubeId } from "../_components/YouTubeEmbed";
 import { TournamentBuilder } from "../tournaments/_components/TournamentBuilder";
 import { JoinByCode } from "../tournaments/_components/JoinByCode";
 import CommentsSheet from "./_components/CommentsSheet";
-import FishMeasurer from "../_components/FishMeasurer";
 import StoriesRow from "./_components/StoriesRow";
 import SettingsModal from "../_components/SettingsModal";
 import dynamic from "next/dynamic";
@@ -1210,7 +1209,6 @@ function FeedPageInner() {
   const postToFeed = catchShare !== "private";
   const [catchSpecies, setCatchSpecies] = useState("");
   const [catchLength, setCatchLength] = useState("");
-  const [measurerUrl, setMeasurerUrl] = useState<string | null>(null);
   const [catchLat, setCatchLat] = useState<number | null>(null);
   const [catchLng, setCatchLng] = useState<number | null>(null);
   const [locating, setLocating] = useState(false);
@@ -2544,30 +2542,6 @@ function FeedPageInner() {
                     className="bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm placeholder:text-pine/40 focus:outline-none focus:border-signal"
                   />
                 </div>
-                {catchPhotos.length > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => setMeasurerUrl(URL.createObjectURL(catchPhotos[0]))}
-                    className="mt-3 w-full border-2 border-dashed border-pine/25 text-pine font-bold uppercase tracking-wider text-xs px-4 py-3 rounded-2xl"
-                  >
-                    📏 Measure the fish from your photo
-                  </button>
-                )}
-                {measurerUrl && (
-                  <FishMeasurer
-                    imageUrl={measurerUrl}
-                    onDone={(inches) => {
-                      setCatchLength(String(inches));
-                      URL.revokeObjectURL(measurerUrl);
-                      setMeasurerUrl(null);
-                      setCatchNote("Length measured from your photo — check it looks right.");
-                    }}
-                    onClose={() => {
-                      URL.revokeObjectURL(measurerUrl);
-                      setMeasurerUrl(null);
-                    }}
-                  />
-                )}
                 <textarea
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
