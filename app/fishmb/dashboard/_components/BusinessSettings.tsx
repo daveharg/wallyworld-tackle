@@ -1,4 +1,4 @@
-// Business settings section — listings, business page, tournaments, bookings, ads.
+// Business settings section — listings, tournaments, bookings, ads.
 // Embeddable: assumes a logged-in business user; the parent handles auth.
 
 "use client";
@@ -11,7 +11,7 @@ import { compressImage } from "../../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 import MyListings from "../../profile/_components/MyListings";
 
-type Tab = "listings" | "business" | "tournaments" | "bookings" | "advertise";
+type Tab = "listings" | "tournaments" | "bookings" | "advertise";
 
 interface DashboardData {
   business: {
@@ -73,7 +73,6 @@ interface AdRow {
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "listings", label: " Listings" },
-  { id: "business", label: " Business page" },
   { id: "tournaments", label: " Tournaments" },
   { id: "bookings", label: " Bookings" },
   { id: "advertise", label: " Advertise" },
@@ -170,62 +169,6 @@ export default function BusinessSettings() {
           >
             + List something
           </Link>
-        </section>
-      )}
-
-      {data && tab === "business" && (
-        <section>
-          {data.business ? (
-            <div className="bg-white border border-pine/10 rounded-3xl p-6">
-              <div className="flex items-start justify-between gap-4 flex-wrap">
-                <div>
-                  <h2 className="font-display font-bold uppercase text-pine text-2xl tracking-wide">
-                    {data.business.name}
-                  </h2>
-                  {data.business.location && (
-                    <p className="text-sm text-pine/55 mt-1">{data.business.location}</p>
-                  )}
-                </div>
-                <Link
-                  href={`/fishmb/business/${data.business.id}`}
-                  className="bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-xs px-5 py-2.5 rounded-full transition-colors"
-                >
-                  View / edit page →
-                </Link>
-              </div>
-              {data.business.description && (
-                <p className="text-pine/70 text-sm mt-4 leading-relaxed">{data.business.description}</p>
-              )}
-              {data.business.contact && (
-                <p className="text-sm text-pine/60 mt-3">{data.business.contact}</p>
-              )}
-              {data.business.website && (
-                <a
-                  href={data.business.website}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-signal-dark font-bold text-sm mt-2 inline-block"
-                >
-                  {data.business.website} ↗
-                </a>
-              )}
-            </div>
-          ) : (
-            <div className="bg-white border border-pine/10 rounded-3xl p-6 text-center">
-              <h2 className="font-bold text-pine text-lg mb-2">No business page yet</h2>
-              <p className="text-sm text-pine/60 mb-6">
-                Create a page for your lodge, guide service, or shop — or claim it if it&apos;s already listed.
-              </p>
-              <div className="flex gap-3 justify-center flex-wrap">
-                <Link
-                  href="/fishmb/business"
-                  className="bg-paper-deep border border-pine/15 text-pine font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full"
-                >
-                  Claim a listing
-                </Link>
-              </div>
-            </div>
-          )}
         </section>
       )}
 

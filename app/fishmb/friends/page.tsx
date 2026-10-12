@@ -42,6 +42,7 @@ export default function FriendsPage() {
   const params = useSearchParams();
   const [bundle, setBundle] = useState<FriendsBundle | null>(null);
   const [query, setQuery] = useState("");
+  const [friendFilter, setFriendFilter] = useState("");
   const [results, setResults] = useState<Person[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
@@ -200,28 +201,47 @@ export default function FriendsPage() {
                 </button>
               </div>
             ) : (
-              <ul className="divide-y divide-pine/10">
-                {bundle!.friends.map((p) => (
-                  <li key={p.id} className="flex items-center gap-4 py-3">
-                    <Link href={`/fishmb/anglers/${p.id}`}>
-                      <Avatar p={p} size={64} />
-                    </Link>
-                    <button
-                      onClick={() => setActionFriend(p)}
-                      className="flex-1 min-w-0 text-left"
-                    >
-                      <span className="block font-bold text-pine text-lg truncate">{p.name}</span>
-                    </button>
-                    <button
-                      onClick={() => remove(p.id)}
-                      disabled={busy === p.id}
-                      className="text-xs font-bold text-pine/45 uppercase tracking-wider px-3 py-2 disabled:opacity-50"
-                    >
-                      Remove
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              <>
+                <input
+                  value={friendFilter}
+                  onChange={(e) => setFriendFilter(e.target.value)}
+                  placeholder="Search your friends…"
+                  className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-3.5 text-pine placeholder:text-pine/35 focus:outline-none focus:border-signal mb-2"
+                />
+                {(() => {
+                  const q = friendFilter.trim().toLowerCase();
+                  const shown = q
+                    ? bundle!.friends.filter((p) => p.name.toLowerCase().includes(q))
+                    : bundle!.friends;
+                  if (shown.length === 0) {
+                    return <p className="text-pine/55 text-center py-10">No friends match “{friendFilter.trim()}”.</p>;
+                  }
+                  return (
+                    <ul className="divide-y divide-pine/10">
+                      {shown.map((p) => (
+                        <li key={p.id} className="flex items-center gap-4 py-3">
+                          <Link href={`/fishmb/anglers/${p.id}`}>
+                            <Avatar p={p} size={64} />
+                          </Link>
+                          <button
+                            onClick={() => setActionFriend(p)}
+                            className="flex-1 min-w-0 text-left"
+                          >
+                            <span className="block font-bold text-pine text-lg truncate">{p.name}</span>
+                          </button>
+                          <button
+                            onClick={() => remove(p.id)}
+                            disabled={busy === p.id}
+                            className="text-xs font-bold text-pine/45 uppercase tracking-wider px-3 py-2 disabled:opacity-50"
+                          >
+                            Remove
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  );
+                })()}
+              </>
             )}
           </div>
         )}

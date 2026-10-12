@@ -211,7 +211,7 @@ export default function ProfileView({
   ];
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10 md:py-14">
+    <div className={`max-w-3xl mx-auto px-4 ${hqEmbed ? "pt-0 pb-10" : "py-10 md:py-14"}`}>
       <BackArrow />
       {/* Header */}
       <div className="flex items-start gap-6 md:gap-10 mb-8">

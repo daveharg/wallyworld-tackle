@@ -47,7 +47,7 @@ export default function DashboardProfile() {
  Business profile options
               </p>
               <p className="text-white/70 text-sm mt-1">
-                Classified listings, booking requests, tournaments, business page & ads —
+                Classified listings, booking requests, tournaments & ads —
                 all in one place.
               </p>
             </div>
