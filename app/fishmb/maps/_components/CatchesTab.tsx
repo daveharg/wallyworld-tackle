@@ -4,12 +4,14 @@ import { useEffect, useState } from "react";
 import { haversineM, formatDist } from "../../profile/_components/geo";
 import type { MapCatch } from "./types";
 
+export type CatchScope = "mine" | "friends" | "all";
+
 interface CatchesTabProps {
   mine: MapCatch[];
   nearby: MapCatch[];
   loading: boolean;
-  scope: "mine" | "nearby";
-  onScopeChange: (s: "mine" | "nearby") => void;
+  scope: CatchScope;
+  onScopeChange: (s: CatchScope) => void;
   onSelect: (c: MapCatch) => void;
   myLoc: { lat: number; lng: number } | null;
   showOnMap: boolean;
@@ -56,7 +58,7 @@ function CatchRow({
         />
       ) : (
         <span className="w-14 h-14 rounded-xl bg-pine/5 flex items-center justify-center text-2xl shrink-0">
- 
+          🐟
         </span>
       )}
       <span className="flex-1 min-w-0">
@@ -88,7 +90,8 @@ interface LakeCoord {
   lng: number;
 }
 
-/** Catches tab — your GPS catches grouped by lake, plus public catches near the map. */
+/** Catches tab — three top tabs: My catches, Friends, and All (every catch
+ *  shared with you, grouped by lake with lake headers). */
 export default function CatchesTab({
   mine,
   nearby,
@@ -128,28 +131,36 @@ export default function CatchesTab({
     })();
   }, []);
 
-  // Group "my catches" by nearest lake within 15 km.
-  const nearestLake = (c: MapCatch): LakeCoord | null => {
-    if (!Number.isFinite(c.lat) || !Number.isFinite(c.lng) || lakes.length === 0) return null;
-    let best: LakeCoord | null = null;
-    let bestD = 15;
-    for (const l of lakes) {
-      const d = kmBetween(c.lat, c.lng, l.lat, l.lng);
-      if (d < bestD) {
-        bestD = d;
-        best = l;
-      }
+  const friends = nearby.filter((c) => c.friend);
+  const all: MapCatch[] = [];
+  {
+    const seen = new Set<string>();
+    for (const c of [...mine, ...nearby]) {
+      if (seen.has(c.id)) continue;
+      seen.add(c.id);
+      all.push(c);
     }
-    return best;
-  };
+  }
+  const list = scope === "mine" ? mine : scope === "friends" ? friends : all;
 
-  const list = scope === "mine" ? mine : nearby;
-
-  // Build lake groups for "my catches".
-  const groups: { lake: LakeCoord | null; catches: MapCatch[] }[] = [];
-  if (scope === "mine" && lakes.length > 0) {
+  // Group a list by nearest lake within 15 km, lakes sorted A–Z.
+  const groupByLake = (items: MapCatch[]) => {
+    const nearestLake = (c: MapCatch): LakeCoord | null => {
+      if (!Number.isFinite(c.lat) || !Number.isFinite(c.lng) || lakes.length === 0) return null;
+      let best: LakeCoord | null = null;
+      let bestD = 15;
+      for (const l of lakes) {
+        const d = kmBetween(c.lat, c.lng, l.lat, l.lng);
+        if (d < bestD) {
+          bestD = d;
+          best = l;
+        }
+      }
+      return best;
+    };
     const groupById = new Map<string, { lake: LakeCoord | null; catches: MapCatch[] }>();
-    const sorted = [...mine].sort(
+    const groups: { lake: LakeCoord | null; catches: MapCatch[] }[] = [];
+    const sorted = [...items].sort(
       (a, b) => new Date(b.caught_at).getTime() - new Date(a.caught_at).getTime()
     );
     for (const c of sorted) {
@@ -168,10 +179,12 @@ export default function CatchesTab({
       if (!b.lake) return -1;
       return a.lake.name.localeCompare(b.lake.name);
     });
-  }
+    return groups;
+  };
 
   const renderList = () => {
-    if (scope === "nearby" || groups.length === 0) {
+    // My catches and All are grouped by lake; Friends is a simple list.
+    if (scope === "friends" || lakes.length === 0) {
       return (
         <div className="space-y-2">
           {list.map((c) => (
@@ -180,6 +193,7 @@ export default function CatchesTab({
         </div>
       );
     }
+    const groups = groupByLake(list);
     return (
       <div className="space-y-5">
         {groups.map((g) => (
@@ -197,13 +211,28 @@ export default function CatchesTab({
       </div>
     );
   };
+
+  const emptyTitle =
+    scope === "mine"
+      ? "No GPS catches yet"
+      : scope === "friends"
+        ? "No friends' catches near here yet"
+        : "No catches shared with you here yet";
+  const emptyBody =
+    scope === "mine"
+      ? "Log a catch with your location saved and it'll show up on your map."
+      : scope === "friends"
+        ? "When your friends share a catch with friends, it shows up here."
+        : "Pan the map — catches shared by you, your friends and other anglers appear here, grouped by lake.";
+
   return (
     <div className="pt-1">
       <div className="flex bg-pine/5 rounded-full p-1 mb-3">
         {(
           [
- { id: "mine", label: ` My catches (${mine.length})` },
- { id: "nearby", label: ` On this lake (${nearby.length})` },
+            { id: "mine", label: `My catches (${mine.length})` },
+            { id: "friends", label: `Friends (${friends.length})` },
+            { id: "all", label: `All (${all.length})` },
           ] as const
         ).map((s) => (
           <button
@@ -244,21 +273,17 @@ export default function CatchesTab({
         </div>
       ) : list.length === 0 ? (
         <div className="text-center py-10">
-          <p className="font-bold text-pine">
-            {scope === "mine" ? "No GPS catches yet" : "No public catches here yet"}
-          </p>
-          <p className="text-pine/55 text-sm mt-1 max-w-xs mx-auto">
-            {scope === "mine"
-              ? "Log a catch with your location saved and it'll show up on your map."
-              : "Pan the map to a lake — public catches from other anglers appear here."}
-          </p>
+          <p className="font-bold text-pine">{emptyTitle}</p>
+          <p className="text-pine/55 text-sm mt-1 max-w-xs mx-auto">{emptyBody}</p>
         </div>
       ) : (
         renderList()
       )}
-      {scope === "nearby" && list.length > 0 && (
+      {scope !== "mine" && list.length > 0 && (
         <p className="text-center text-pine/40 text-[11px] mt-3">
-          Only catches anglers chose to share publicly.
+          {scope === "friends"
+            ? "Catches your friends shared with friends or everyone."
+            : "Every catch shared with you — yours, your friends' and public catches."}
         </p>
       )}
     </div>

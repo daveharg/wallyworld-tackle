@@ -208,6 +208,41 @@ export default function MapsHub() {
       // Best effort.
     }
   };
+  // Friends' catches on the map — default ON, same as the other catch pins.
+  const [showFriendCatches, setShowFriendCatches] = useState(() => {
+    try {
+      return localStorage.getItem("fishmb-show-friend-catches") !== "0";
+    } catch {
+      return true;
+    }
+  });
+
+  const changeShowFriendCatches = (v: boolean) => {
+    setShowFriendCatches(v);
+    try {
+      localStorage.setItem("fishmb-show-friend-catches", v ? "1" : "0");
+    } catch {
+      // Best effort.
+    }
+  };
+  // The catch-toggles widget itself — closing it (×) turns this off; it can
+  // be brought back from the Settings tab. Default ON.
+  const [catchesWidgetOn, setCatchesWidgetOn] = useState(() => {
+    try {
+      return localStorage.getItem("fishmb-widget-catches") !== "0";
+    } catch {
+      return true;
+    }
+  });
+
+  const changeCatchesWidget = (v: boolean) => {
+    setCatchesWidgetOn(v);
+    try {
+      localStorage.setItem("fishmb-widget-catches", v ? "1" : "0");
+    } catch {
+      // Best effort.
+    }
+  };
   const [followDot, setFollowDot] = useState<string>(() => {
     try {
       return localStorage.getItem("fishmb-follow-dot") || "dot-blue";
@@ -282,7 +317,7 @@ export default function MapsHub() {
   const [goTo, setGoTo] = useState<Spot | null>(null);
 
   // Catches
-  const [catchScope, setCatchScope] = useState<"mine" | "nearby">("mine");
+  const [catchScope, setCatchScope] = useState<"mine" | "friends" | "all">("mine");
   const [myCatches, setMyCatches] = useState<MapCatch[]>([]);
   const [nearbyCatches, setNearbyCatches] = useState<MapCatch[]>([]);
   const [catchesLoading, setCatchesLoading] = useState(true);
@@ -609,7 +644,8 @@ export default function MapsHub() {
     () =>
       [
         ...(showMyCatches ? myCatches : []),
-        ...(showPublicCatches ? nearbyCatches : []),
+        ...(showFriendCatches ? nearbyCatches.filter((c) => c.friend) : []),
+        ...(showPublicCatches ? nearbyCatches.filter((c) => !c.friend) : []),
       ].map((c) => ({
         id: c.id,
         lat: c.lat,
@@ -620,7 +656,7 @@ export default function MapsHub() {
         avatar_url: c.avatar_url ?? null,
         user_name: c.user_name,
       })),
-    [showMyCatches, showPublicCatches, myCatches, nearbyCatches]
+    [showMyCatches, showFriendCatches, showPublicCatches, myCatches, nearbyCatches]
   );
 
   const flyTo = (lat: number, lng: number, key: string, zoom = 13) => {
@@ -869,14 +905,14 @@ export default function MapsHub() {
 
       {/* Wind overlay — draggable widget */}
       {windOn && (
-        <DraggableWidget id="wind" defaultPos={{ x: 12, y: 180 }}>
+        <DraggableWidget id="wind" defaultPos={{ x: 12, y: 180 }} onClose={() => setWindOn(false)}>
           <WindWidget lat={mapCenter.lat} lng={mapCenter.lng} />
         </DraggableWidget>
       )}
 
       {/* Speed widget — draggable, shows GPS speed */}
       {speedOn && (
-        <DraggableWidget id="speed" defaultPos={{ x: 12, y: 240 }}>
+        <DraggableWidget id="speed" defaultPos={{ x: 12, y: 240 }} onClose={() => setSpeedOn(false)}>
           <div className="flex items-center gap-2 bg-white/95 backdrop-blur border border-pine/15 rounded-full px-4 py-2 shadow-lg">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1d4d2b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 14l4-4" />
@@ -891,14 +927,14 @@ export default function MapsHub() {
 
       {/* Temp widget — draggable, shows current temp at your location */}
       {tempOn && myLoc && (
-        <DraggableWidget id="temp" defaultPos={{ x: 12, y: 300 }}>
+        <DraggableWidget id="temp" defaultPos={{ x: 12, y: 300 }} onClose={() => setTempOn(false)}>
           <TempWidget lat={myLoc.lat} lng={myLoc.lng} />
         </DraggableWidget>
       )}
 
       {/* Bite prediction widget — draggable */}
       {biteOn && myLoc && (
-        <DraggableWidget id="bite" defaultPos={{ x: 12, y: 360 }}>
+        <DraggableWidget id="bite" defaultPos={{ x: 12, y: 360 }} onClose={() => setBiteOn(false)}>
           <BiteWidget lat={myLoc.lat} lng={myLoc.lng} />
         </DraggableWidget>
       )}
@@ -915,11 +951,13 @@ export default function MapsHub() {
 
       {/* Catch pin toggles — draggable widget, auto-starts below the search
           bar. Same state as the Settings tab toggles. */}
-      <DraggableWidget id="catches" defaultPos={{ x: 12, y: 70 }}>
+      {catchesWidgetOn && (
+      <DraggableWidget id="catches" defaultPos={{ x: 12, y: 70 }} onClose={() => changeCatchesWidget(false)}>
         <div className="bg-white/95 backdrop-blur border border-pine/15 rounded-2xl shadow-lg px-3 py-2 space-y-1.5">
           {(
             [
               { label: "My catches", on: showMyCatches, set: changeShowMyCatches },
+              { label: "Friends' catches", on: showFriendCatches, set: changeShowFriendCatches },
               { label: "Others' catches", on: showPublicCatches, set: changeShowPublicCatches },
             ] as const
           ).map((t) => (
@@ -954,6 +992,7 @@ export default function MapsHub() {
           ))}
         </div>
       </DraggableWidget>
+      )}
 
       {/* Follow-me button — tap to follow your GPS, tap again to stop */}
       <button
@@ -1094,10 +1133,22 @@ export default function MapsHub() {
             onScopeChange={setCatchScope}
             onSelect={(c) => flyTo(c.lat, c.lng, `catch:${c.id}`, 14)}
             myLoc={myLoc}
-            showOnMap={catchScope === "mine" ? showMyCatches : showPublicCatches}
-            onShowOnMapChange={(v) =>
-              catchScope === "mine" ? setShowMyCatches(v) : setShowPublicCatches(v)
+            showOnMap={
+              catchScope === "mine"
+                ? showMyCatches
+                : catchScope === "friends"
+                  ? showFriendCatches
+                  : showMyCatches && showFriendCatches && showPublicCatches
             }
+            onShowOnMapChange={(v) => {
+              if (catchScope === "mine") changeShowMyCatches(v);
+              else if (catchScope === "friends") changeShowFriendCatches(v);
+              else {
+                changeShowMyCatches(v);
+                changeShowFriendCatches(v);
+                changeShowPublicCatches(v);
+              }
+            }}
           />
         )}
         {tab === "spots" && (
@@ -1137,6 +1188,10 @@ export default function MapsHub() {
             onShowPublicCatchesChange={changeShowPublicCatches}
             showMyCatches={showMyCatches}
             onShowMyCatchesChange={changeShowMyCatches}
+            showFriendCatches={showFriendCatches}
+            onShowFriendCatchesChange={changeShowFriendCatches}
+            catchesWidgetOn={catchesWidgetOn}
+            onCatchesWidgetChange={changeCatchesWidget}
             followDot={followDot}
             onFollowDotChange={setFollowDot}
             trails={trails}

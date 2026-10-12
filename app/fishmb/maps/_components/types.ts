@@ -13,6 +13,8 @@ export interface MapCatch {
   user_name: string;
   avatar_url: string | null;
   mine: boolean;
+  /** The author is an accepted friend of the viewer (map-catches API). */
+  friend?: boolean;
 }
 
 export interface SavedLake {

@@ -30,6 +30,10 @@ interface SettingsTabProps {
   onShowPublicCatchesChange: (v: boolean) => void;
   showMyCatches: boolean;
   onShowMyCatchesChange: (v: boolean) => void;
+  showFriendCatches: boolean;
+  onShowFriendCatchesChange: (v: boolean) => void;
+  catchesWidgetOn: boolean;
+  onCatchesWidgetChange: (v: boolean) => void;
   followDot: string;
   onFollowDotChange: (id: string) => void;
   trails: Trail[];
@@ -78,6 +82,10 @@ export default function SettingsTab({
   onShowPublicCatchesChange,
   showMyCatches,
   onShowMyCatchesChange,
+  showFriendCatches,
+  onShowFriendCatchesChange,
+  catchesWidgetOn,
+  onCatchesWidgetChange,
   followDot,
   onFollowDotChange,
   trails,
@@ -214,6 +222,24 @@ export default function SettingsTab({
         </button>
         <button
           type="button"
+          onClick={() => onShowFriendCatchesChange(!showFriendCatches)}
+          className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3 mt-2"
+        >
+          <span className="text-sm font-bold text-pine">Show friends' catches</span>
+          <span
+            className={`w-12 h-7 rounded-full p-1 transition-colors ${
+              showFriendCatches ? "bg-signal" : "bg-pine/15"
+            }`}
+          >
+            <span
+              className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                showFriendCatches ? "translate-x-5" : ""
+              }`}
+            />
+          </span>
+        </button>
+        <button
+          type="button"
           onClick={() => onShowPublicCatchesChange(!showPublicCatches)}
           className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3 mt-2"
         >
@@ -234,7 +260,28 @@ export default function SettingsTab({
           Pins catches on the map so you can see where fish are being landed.
         </p>
       </Section>
-      <Section icon="" title="Widgets" sub="Floating boxes you can drag anywhere on the map.">
+      <Section icon="" title="Widgets" sub="Floating boxes you can drag anywhere on the map. Tap the × on a widget to hide it.">
+        <button
+          type="button"
+          onClick={() => onCatchesWidgetChange(!catchesWidgetOn)}
+          className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3 mt-3"
+        >
+          <span className="text-sm font-bold text-pine">Catches widget</span>
+          <span
+            className={`w-12 h-7 rounded-full p-1 transition-colors ${
+              catchesWidgetOn ? "bg-signal" : "bg-pine/15"
+            }`}
+          >
+            <span
+              className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                catchesWidgetOn ? "translate-x-5" : ""
+              }`}
+            />
+          </span>
+        </button>
+        <p className="text-[11px] text-pine/45 mt-2">
+          Quick switches for my / friends' / others' catches — drag it anywhere on the map.
+        </p>
         <button
           type="button"
           onClick={() => onWindChange(!windOn)}

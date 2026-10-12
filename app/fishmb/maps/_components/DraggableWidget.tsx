@@ -12,7 +12,7 @@ interface Pos {
 
 function loadPos(id: string, fallback: Pos): Pos {
   try {
-    const raw = localStorage.getItem(`fishmb-widget-${id}`);
+    const raw = localStorage.getItem(`fishmb-widget-pos-${id}`);
     if (raw) {
       const p = JSON.parse(raw) as Pos;
       if (typeof p.x === "number" && typeof p.y === "number") return p;
@@ -28,18 +28,22 @@ export default function DraggableWidget({
   defaultPos,
   children,
   className = "",
+  onClose,
 }: {
   id: string;
   defaultPos: Pos;
   children: ReactNode;
   className?: string;
+  /** When set, a small × button sits on the widget's corner; tapping it
+   *  turns the widget off (the parent owns the setting + persistence). */
+  onClose?: () => void;
 }) {
   const [pos, setPos] = useState<Pos>(() => loadPos(id, defaultPos));
   const drag = useRef<{ dx: number; dy: number; moved: boolean } | null>(null);
 
   useEffect(() => {
     try {
-      localStorage.setItem(`fishmb-widget-${id}`, JSON.stringify(pos));
+      localStorage.setItem(`fishmb-widget-pos-${id}`, JSON.stringify(pos));
     } catch {
       // Best effort.
     }
@@ -89,6 +93,16 @@ export default function DraggableWidget({
       >
         {children}
       </div>
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Hide widget"
+          className="absolute -top-2 -right-2 z-30 w-6 h-6 rounded-full bg-pine-deep text-white text-xs font-black shadow-lg border-2 border-white flex items-center justify-center active:scale-90 transition-transform"
+        >
+          ×
+        </button>
+      )}
     </div>
   );
 }

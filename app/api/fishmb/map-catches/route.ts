@@ -74,11 +74,18 @@ export async function GET(req: NextRequest) {
     lng: number;
     caught_at: string;
     user_name: string;
+    is_friend: boolean;
   }>(
     `SELECT c.id, c.user_id, c.species, c.length_in, c.weight_lb,
             COALESCE(c.photo_hold_url, c.photo_measure_url) AS photo_url,
             c.lat, c.lng, c.caught_at, u.name AS user_name,
-            u.avatar_url AS avatar_url
+            u.avatar_url AS avatar_url,
+            EXISTS (
+              SELECT 1 FROM fm_friendships f
+               WHERE f.status = 'accepted'
+                 AND ((f.requester_id = $1 AND f.addressee_id = c.user_id)
+                   OR (f.addressee_id = $1 AND f.requester_id = c.user_id))
+            ) AS is_friend
        FROM fm_catches c
        JOIN fm_users u ON u.id = c.user_id
       WHERE ${visibilityWhere}
@@ -113,6 +120,7 @@ export async function GET(req: NextRequest) {
       user_name: r.user_name,
       avatar_url: (r as any).avatar_url ?? null,
       mine: r.user_id === me.id,
+      friend: r.user_id !== me.id && !!r.is_friend,
     }));
 
   return NextResponse.json({ catches });
