@@ -179,7 +179,7 @@ export default function SpotMap({
       if (cancelled || !containerRef.current) return;
       const m = L.map(containerRef.current, { scrollWheelZoom: false, zoomControl: false }).setView(
         [48, -100],
-        3
+        4
       );
       const streets = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
