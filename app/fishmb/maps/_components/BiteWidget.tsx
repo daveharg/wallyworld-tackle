@@ -4,6 +4,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { nearestLake } from "@/lib/fish/lakeCoords";
 
 function hourScore(pressure: number, trend3h: number): number {
   let s = 50;
@@ -25,12 +26,15 @@ function scoreLabel(s: number): { label: string; color: string } {
 
 export default function BiteWidget({ lat, lng }: { lat: number; lng: number }) {
   const [bite, setBite] = useState<{ score: number; label: string; color: string } | null>(null);
+  /** Name of the town/lake the weather data comes from. */
+  const [place, setPlace] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     // Use the weather section's location so the prediction matches it exactly.
     let wLat = lat;
     let wLng = lng;
+    let wLabel: string | null = null;
     try {
       const raw = localStorage.getItem("fishmb-wx-current");
       if (raw) {
@@ -39,10 +43,15 @@ export default function BiteWidget({ lat, lng }: { lat: number; lng: number }) {
           wLat = c.lat;
           wLng = c.lon;
         }
+        if (typeof c.label === "string" && c.label.trim()) wLabel = c.label.trim();
+        else if (typeof c.name === "string" && c.name.trim()) wLabel = c.name.trim();
       }
     } catch {
       // Fall back to GPS.
     }
+    // No saved weather place — name the nearest lake to the map centre.
+    if (!wLabel) wLabel = nearestLake(wLat, wLng, 30)?.name ?? null;
+    setPlace(wLabel);
     const t = setTimeout(async () => {
       try {
         const r = await fetch(
@@ -103,6 +112,9 @@ export default function BiteWidget({ lat, lng }: { lat: number; lng: number }) {
       <span className="text-xs font-black tabular-nums whitespace-nowrap" style={{ color: bite.color }}>
         Bite: {bite.label}
       </span>
+      {place && (
+        <span className="text-xs font-bold text-pine/55 whitespace-nowrap">· {place}</span>
+      )}
     </div>
   );
 }
