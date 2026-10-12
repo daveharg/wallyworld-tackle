@@ -88,6 +88,35 @@ export function FishAuthProvider({ children }: { children: React.ReactNode }) {
     refresh();
   }, [refresh]);
 
+  // Messaging keys set themselves up automatically: the moment you're
+  // signed in anywhere in FishMB, your public key is registered with the
+  // server — friends can message you and send you spots without you ever
+  // opening the Messages section first. (The private key never leaves
+  // this device; only the public key is uploaded.)
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      try {
+        const { getOrCreateKeypair, publicKeyB64 } = await import(
+          "../messages/_components/msgCrypto"
+        );
+        const pub = publicKeyB64(getOrCreateKeypair(user.id));
+        const d = (await fishFetch("/api/fishmb/msg/keys")) as {
+          public_key: string | null;
+        };
+        if (d.public_key !== pub) {
+          await fishFetch("/api/fishmb/msg/keys", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ public_key: pub }),
+          });
+        }
+      } catch {
+        // Non-fatal — Messages still self-heals its keys when opened.
+      }
+    })();
+  }, [user]);
+
   const logout = useCallback(() => {
     localStorage.removeItem(FISHMB_TOKEN_KEY);
     setUser(null);

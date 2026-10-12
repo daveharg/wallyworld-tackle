@@ -73,7 +73,7 @@ export async function sendSpotToFriend(
   const friend = members.find((m) => m.user_id === friendId);
   if (!friend?.public_key) {
     throw new Error(
-      "That friend hasn't opened Messages yet, so they can't receive spots. Ask them to open Messages once first."
+      "That friend hasn't opened FishMB yet, so there's no way to deliver the spot. Once they've opened the app, you can send it."
     );
   }
 
