@@ -178,15 +178,15 @@ export default function SpotMap({
       await import("leaflet/dist/leaflet.css");
       if (cancelled || !containerRef.current) return;
       const m = L.map(containerRef.current, { scrollWheelZoom: false, zoomControl: false }).setView(
-        [56, -106],
-        5
+        [48, -100],
+        4
       );
-      // Force the Canada view after the container settles — Leaflet can
+      // Force the North America view after the container settles — Leaflet can
       // miscalculate the zoom if the container had no size at init.
       setTimeout(() => {
         if (cancelled) return;
         m.invalidateSize();
-        m.setView([56, -106], 5, { animate: false });
+        m.setView([48, -100], 4, { animate: false });
       }, 300);
       const streets = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
