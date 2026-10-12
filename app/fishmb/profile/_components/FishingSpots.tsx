@@ -7,6 +7,7 @@ import { fishFetch } from "../../_components/fishFetch";
 import { GpxImport } from "./GpxImport";
 import type { SpotPin, TrailPoint } from "./SpotMap";
 import SendSpotPicker from "../../_components/SendSpotPicker";
+import ShareSpotSheet from "../../_components/ShareSpotSheet";
 import { SPOT_ICON_CHOICES } from "./spotIcons";
 import { haversineM, bearingDeg, compassLabel, formatDist } from "./geo";
 
@@ -452,18 +453,10 @@ export default function FishingSpots() {
     }
   };
 
-  const [sharingSpot, setSharingSpot] = useState<string | null>(null);
-  const shareSpot = async (id: string) => {
-    if (!window.confirm("Share this spot with your friends on the feed? They\u2019ll see its location.")) return;
-    setSharingSpot(id);
-    try {
-      await fishFetch(`/api/fishmb/spots/${id}/share`, { method: "POST" });
- setNote("Spot shared to the feed! ");
-    } catch (e) {
-      setNote(e instanceof Error ? e.message : "Could not share the spot.");
-    } finally {
-      setSharingSpot(null);
-    }
+  const [shareTarget, setShareTarget] = useState<{ id: string; name: string } | null>(null);
+  const shareSpot = (id: string) => {
+    const s = spots.find((sp) => sp.id === id);
+    setShareTarget({ id, name: s?.name || "Fishing spot" });
   };
 
   const inputCls =
@@ -495,6 +488,14 @@ export default function FishingSpots() {
         <p className="text-sm text-signal-dark bg-signal/10 border border-signal/30 rounded-2xl px-4 py-3 mb-4">
           {note}
         </p>
+      )}
+
+      {shareTarget && (
+        <ShareSpotSheet
+          spot={shareTarget}
+          onClose={() => setShareTarget(null)}
+          onShared={() => setNote("Spot shared to the feed! 🎣")}
+        />
       )}
 
       {loading ? (
@@ -851,10 +852,10 @@ export default function FishingSpots() {
                   <button
                     type="button"
                     onClick={() => shareSpot(selectedSpot.id)}
-                    disabled={sharingSpot === selectedSpot.id}
+                    disabled={shareTarget?.id === selectedSpot.id}
                     className="flex-1 bg-white border border-pine/15 text-pine text-xs font-bold uppercase tracking-wider px-3 py-2.5 rounded-2xl disabled:opacity-40"
                   >
- {sharingSpot === selectedSpot.id ? "…" : " Share"}
+ " Share"
                   </button>
                   <button
                     type="button"

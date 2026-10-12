@@ -22,6 +22,7 @@ import MapSheet, { type SheetTab, type SheetSnap } from "./MapSheet";
 import CatchesTab from "./CatchesTab";
 import SpotsTab, { type Spot } from "./SpotsTab";
 import SendSpotPicker from "../../_components/SendSpotPicker";
+import ShareSpotSheet from "../../_components/ShareSpotSheet";
 import { useSheetDrag, SheetGrabber } from "../../_components/sheetDrag";
 import LakesTab from "./LakesTab";
 import LakeSheetDetail from "./LakeSheetDetail";
@@ -367,7 +368,7 @@ export default function MapsHub() {
   const [catchesLoading, setCatchesLoading] = useState(true);
 
   // Spot sharing
-  const [sharingId, setSharingId] = useState<string | null>(null);
+  const [shareTarget, setShareTarget] = useState<{ id: string; name: string } | null>(null);
 
   // ---- data loading ----
   const reloadSpots = async () => {
@@ -816,21 +817,52 @@ export default function MapsHub() {
     }
   };
 
-  const shareSpot = async (id: string) => {
-    if (
-      !window.confirm(
-        "Share this spot with your friends on the feed? They\u2019ll see its location."
-      )
-    )
-      return;
-    setSharingId(id);
+  const shareSpot = (id: string) => {
+    const s = spots.find((sp) => sp.id === id);
+    setShareTarget({ id, name: s?.name || "Fishing spot" });
+  };
+
+  /** Open the spot detail popup with its editor primed (used by map pins
+   *  and by taps in the Saved spots list). */
+  const openSpotPopup = (s: SpotPin) => {
+    setSpotPopup(s);
+    setSpotEditing(false);
+    setSpotEditName(s.name || "");
+    setSpotEditNotes(s.notes || "");
+    setSpotEditIcon(s.icon || "pin");
+    const full = spots.find((sp) => sp.id === s.id);
+    setSpotEditLakeId(full?.lake_id ?? null);
+    const lakeName = full?.lake_id
+      ? allLakes.find((l) => l.id === full.lake_id)?.name ?? ""
+      : "";
+    setSpotLakeQuery(lakeName);
+  };
+
+  /** Save a shared (not-yet-owned) spot pin to the user's own spots. */
+  const saveSharedSpot = async () => {
+    if (!spotPopup || spotSaving) return;
+    setSpotSaving(true);
     try {
-      await fishFetch(`/api/fishmb/spots/${id}/share`, { method: "POST" });
- setNote("Spot shared to the feed! ");
-    } catch (e) {
-      setNote(e instanceof Error ? e.message : "Could not share the spot.");
+      await fishFetch("/api/fishmb/spots", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: spotPopup.name || "Fishing spot",
+          lat: Number(spotPopup.lat),
+          lng: Number(spotPopup.lng),
+          notes: spotPopup.notes ?? null,
+          icon: spotPopup.icon || "pin",
+        }),
+      });
+      await reloadSpots();
+      setSpotPopup(null);
+      setNote("Spot saved to your spots!");
+      setTimeout(() => setNote(null), 2500);
+    } catch {
+      setNote("Couldn't save that spot — try again.");
+      setTimeout(() => setNote(null), 3000);
     } finally {
-      setSharingId(null);
+      setSpotSaving(false);
     }
   };
 
@@ -951,19 +983,7 @@ export default function MapsHub() {
             onMoveEnd={onMoveEnd}
             panTo={followPan}
             followDot={followDot}
-            onSpotClick={(s) => {
-              setSpotPopup(s);
-              setSpotEditing(false);
-              setSpotEditName(s.name || "");
-              setSpotEditNotes(s.notes || "");
-              setSpotEditIcon(s.icon || "pin");
-              const full = spots.find((sp) => sp.id === s.id);
-              setSpotEditLakeId(full?.lake_id ?? null);
-              const lakeName = full?.lake_id
-                ? allLakes.find((l) => l.id === full.lake_id)?.name ?? ""
-                : "";
-              setSpotLakeQuery(lakeName);
-            }}
+            onSpotClick={(s) => openSpotPopup(s)}
           />
         </Suspense>
         {loading && (
@@ -1243,7 +1263,7 @@ export default function MapsHub() {
         {tab === "spots" && (
           <SpotsTab
             spots={spots}
-            onSelect={(s) => flyTo(Number(s.lat), Number(s.lng), `spot:${s.id}`, 15)}
+            onSelect={(s) => openSpotPopup(s)}
             onNavigate={(s) => {
               setGoTo(s);
               flyTo(Number(s.lat), Number(s.lng), `spot:${s.id}`, 15);
@@ -1264,7 +1284,7 @@ export default function MapsHub() {
                 displayName: s.name || "Fishing spot",
               })
             }
-            sharingId={sharingId}
+            sharingId={shareTarget?.id ?? null}
             onAddSpot={() => {
               setSnap("collapsed");
               setPicking(true);
@@ -1521,13 +1541,24 @@ export default function MapsHub() {
                   {Number(spotPopup.lat).toFixed(5)}, {Number(spotPopup.lng).toFixed(5)}
                 </p>
                 <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setSpotEditing(true)}
-                    className="flex-1 bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
-                  >
-                    ✏️ Edit
-                  </button>
+                  {spots.some((sp) => sp.id === spotPopup.id) ? (
+                    <button
+                      type="button"
+                      onClick={() => setSpotEditing(true)}
+                      className="flex-1 bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
+                    >
+                      ✏️ Edit
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={saveSharedSpot}
+                      disabled={spotSaving}
+                      className="flex-1 bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors disabled:opacity-50"
+                    >
+                      {spotSaving ? "Saving…" : "💾 Save spot"}
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => {
@@ -1567,6 +1598,17 @@ export default function MapsHub() {
 
       {sendSpotTarget && (
         <SendSpotPicker spot={sendSpotTarget} onClose={() => setSendSpotTarget(null)} />
+      )}
+
+      {shareTarget && (
+        <ShareSpotSheet
+          spot={shareTarget}
+          onClose={() => setShareTarget(null)}
+          onShared={() => {
+            setNote("Spot shared to the feed! 🎣");
+            setTimeout(() => setNote(null), 2500);
+          }}
+        />
       )}
 
       {/* Catch detail sheet — tap a catch pin on the map */}
