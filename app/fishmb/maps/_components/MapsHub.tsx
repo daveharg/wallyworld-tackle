@@ -1062,9 +1062,9 @@ export default function MapsHub() {
         onClick={openWidgetSettings}
         aria-label="Widget settings"
         title="Widget settings"
-        className="absolute top-14 left-3 z-20 h-11 px-4 rounded-full backdrop-blur border shadow-lg flex items-center justify-center active:scale-95 transition-transform bg-white/95 border-pine/15 text-pine text-sm font-bold tracking-wide"
+        className="absolute top-[4.5rem] left-3 z-20 h-11 px-4 rounded-full backdrop-blur border shadow-lg flex items-center justify-center active:scale-95 transition-transform bg-white/95 border-pine/15 text-pine text-sm font-bold tracking-wide"
       >
-        Widget
+        Widgets
       </button>
       )}
 
