@@ -145,18 +145,17 @@ export async function POST(req: NextRequest) {
       [profile.sub]
     );
     if (existing) {
-      // Refresh profile details on each sign-in, but never steal another
-      // angler's display name — keep the current one if Google's is taken.
+      // Never overwrite the angler's chosen display name with Google's on
+      // sign-in — once set (by them or at creation), it stays.
       // Never overwrite a custom avatar with Google's picture.
-      const safeName = await uniqueDisplayName(profile.name, client, existing.id);
       const updated = await txQueryOne<FishUser>(
         client,
         `UPDATE fm_users
-            SET name = $2, email = COALESCE($3, email), avatar_url = COALESCE(avatar_url, $4),
-                age_confirmed = age_confirmed OR $5,
-                terms_accepted = terms_accepted OR $6
+            SET email = COALESCE($2, email), avatar_url = COALESCE(avatar_url, $3),
+                age_confirmed = age_confirmed OR $4,
+                terms_accepted = terms_accepted OR $5
           WHERE id = $1 RETURNING *`,
-        [existing.id, safeName, profile.email, profile.picture, ageConfirmed, termsAccepted]
+        [existing.id, profile.email, profile.picture, ageConfirmed, termsAccepted]
       );
       return { user: updated!, isNew: false };
     }
