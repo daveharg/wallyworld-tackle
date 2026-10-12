@@ -34,6 +34,8 @@ interface SettingsTabProps {
   onShowFriendCatchesChange: (v: boolean) => void;
   catchesWidgetOn: boolean;
   onCatchesWidgetChange: (v: boolean) => void;
+  widgetBtnOn: boolean;
+  onWidgetBtnChange: (v: boolean) => void;
   followDot: string;
   onFollowDotChange: (id: string) => void;
   trails: Trail[];
@@ -48,15 +50,17 @@ function Section({
   icon,
   title,
   sub,
+  id,
   children,
 }: {
   icon: string;
   title: string;
   sub?: string;
+  id?: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="bg-white border border-pine/10 rounded-3xl p-5">
+    <section id={id} className="bg-white border border-pine/10 rounded-3xl p-5 scroll-mt-4">
       <h3 className="font-display font-bold uppercase text-pine text-base tracking-wide mb-1">
         {icon} {title}
       </h3>
@@ -86,6 +90,8 @@ export default function SettingsTab({
   onShowFriendCatchesChange,
   catchesWidgetOn,
   onCatchesWidgetChange,
+  widgetBtnOn,
+  onWidgetBtnChange,
   followDot,
   onFollowDotChange,
   trails,
@@ -260,7 +266,28 @@ export default function SettingsTab({
           Pins catches on the map so you can see where fish are being landed.
         </p>
       </Section>
-      <Section icon="" title="Widgets" sub="Floating boxes you can drag anywhere on the map. Tap the × on a widget to hide it.">
+      <Section id="fishmb-widgets-section" icon="" title="Widgets" sub="Floating boxes you can drag anywhere on the map. Tap the × on a widget to hide it.">
+        <button
+          type="button"
+          onClick={() => onWidgetBtnChange(!widgetBtnOn)}
+          className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3 mt-3"
+        >
+          <span className="text-sm font-bold text-pine">Widget settings button</span>
+          <span
+            className={`w-12 h-7 rounded-full p-1 transition-colors ${
+              widgetBtnOn ? "bg-signal" : "bg-pine/15"
+            }`}
+          >
+            <span
+              className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                widgetBtnOn ? "translate-x-5" : ""
+              }`}
+            />
+          </span>
+        </button>
+        <p className="text-[11px] text-pine/45 mt-2">
+          The grid button at the top-left of the map that jumps straight here.
+        </p>
         <button
           type="button"
           onClick={() => onCatchesWidgetChange(!catchesWidgetOn)}

@@ -254,6 +254,24 @@ export default function MapsHub() {
       // Best effort.
     }
   };
+  // The widget-settings shortcut button (top-left of the map) is itself a
+  // widget: ON for everyone until turned off in Settings → Widgets.
+  const [widgetBtnOn, setWidgetBtnOn] = useState(() => {
+    try {
+      return localStorage.getItem("fishmb-widget-settings-btn") !== "0";
+    } catch {
+      return true;
+    }
+  });
+
+  const changeWidgetBtn = (v: boolean) => {
+    setWidgetBtnOn(v);
+    try {
+      localStorage.setItem("fishmb-widget-settings-btn", v ? "1" : "0");
+    } catch {
+      // Best effort.
+    }
+  };
   const [followDot, setFollowDot] = useState<string>(() => {
     try {
       return localStorage.getItem("fishmb-follow-dot") || "dot-blue";
@@ -866,6 +884,19 @@ export default function MapsHub() {
     }
   };
 
+  // Widget shortcut (top-left on the map): open Settings in the sheet,
+  // scrolled straight to the Widgets section.
+  const openWidgetSettings = () => {
+    setSelectedLake(null);
+    setTab("settings");
+    setSnap("full");
+    setTimeout(() => {
+      document
+        .getElementById("fishmb-widgets-section")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 400);
+  };
+
   return (
     <div className="fixed inset-0 top-0 md:top-16 bottom-0 overflow-hidden bg-paper">
       <div className="absolute inset-0">
@@ -1018,6 +1049,26 @@ export default function MapsHub() {
           ))}
         </div>
       </DraggableWidget>
+      )}
+
+      {/* Widgets shortcut — top-left under the search bar: opens Settings
+          in the sheet, scrolled to the Widgets section. It is itself a
+          widget (Settings → Widgets turns it off); on until then. */}
+      {widgetBtnOn && (
+      <button
+        type="button"
+        onClick={openWidgetSettings}
+        aria-label="Widget settings"
+        title="Widget settings"
+        className="absolute top-14 left-3 z-20 w-11 h-11 rounded-full backdrop-blur border shadow-lg flex items-center justify-center active:scale-95 transition-transform bg-white/95 border-pine/15 text-pine"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+          <rect x="3" y="3" width="8" height="8" rx="2" />
+          <rect x="13" y="3" width="8" height="5" rx="2" />
+          <rect x="13" y="10" width="8" height="11" rx="2" />
+          <rect x="3" y="13" width="8" height="8" rx="2" />
+        </svg>
+      </button>
       )}
 
       {/* Follow-me button — tap to follow your GPS, tap again to stop */}
@@ -1232,6 +1283,8 @@ export default function MapsHub() {
             onShowFriendCatchesChange={changeShowFriendCatches}
             catchesWidgetOn={catchesWidgetOn}
             onCatchesWidgetChange={changeCatchesWidget}
+            widgetBtnOn={widgetBtnOn}
+            onWidgetBtnChange={changeWidgetBtn}
             followDot={followDot}
             onFollowDotChange={setFollowDot}
             trails={trails}
