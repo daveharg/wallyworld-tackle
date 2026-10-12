@@ -126,7 +126,7 @@ export default function FishMBComingSoon() {
             href="/fishmb/feed"
             className="inline-block bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-10 py-4 rounded-full transition-colors"
           >
-            📱 Get the web app
+            📱 Go to the app
           </Link>
           <Link
             href="/fishmb/home"
@@ -134,6 +134,14 @@ export default function FishMBComingSoon() {
           >
             🌐 Website
           </Link>
+        </div>
+        <div className="max-w-md mx-auto bg-white/5 border border-white/10 rounded-2xl p-4 mb-8 text-left">
+          <p className="text-white font-bold text-sm mb-2">📲 Make it a web app on your phone</p>
+          <ol className="text-white/70 text-sm space-y-1 list-decimal list-inside">
+            <li>Tap "Go to the app" above</li>
+            <li>iPhone: tap Share → Add to Home Screen. Android: tap ⋮ → Add to Home Screen</li>
+            <li>FishMB now opens like a real app — full screen, no browser bars</li>
+          </ol>
         </div>
         <Link
           href="/fishmb/lakes"
