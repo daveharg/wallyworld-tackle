@@ -53,6 +53,19 @@ export async function POST(req: NextRequest) {
     notes,
     icon: isSpotIconId(body.icon) ? body.icon : "pin",
     lakeId: typeof body.lake_id === "string" && body.lake_id.trim() ? body.lake_id.trim() : null,
+    // Set when accepting a spot shared in Messages — permanent attribution.
+    originUserId:
+      typeof body.origin_user_id === "string" && body.origin_user_id.trim()
+        ? body.origin_user_id.trim()
+        : null,
+    originName:
+      typeof body.origin_name === "string" && body.origin_name.trim()
+        ? body.origin_name.trim().slice(0, 80)
+        : null,
+    shareMsgId:
+      typeof body.share_msg_id === "string" && body.share_msg_id.trim()
+        ? body.share_msg_id.trim().slice(0, 64)
+        : null,
   });
   return NextResponse.json({ spot }, { status: 201 });
 }

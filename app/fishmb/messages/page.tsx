@@ -117,6 +117,10 @@ function LastMessagePreview({
           setPreview(`${convo.last_sender_id === myId ? "You" : sender.name ?? "Someone"} sent a photo`);
           return;
         }
+        if (parsed && parsed.t === "spot") {
+          setPreview(`${convo.last_sender_id === myId ? "You" : sender.name ?? "Someone"} sent a fishing spot 📍`);
+          return;
+        }
       } catch {
         // Not JSON — plain text.
       }

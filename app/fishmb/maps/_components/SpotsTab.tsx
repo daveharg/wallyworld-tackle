@@ -15,6 +15,7 @@ interface SpotsTabProps {
   onEdit: (id: string, patch: { name: string; notes: string | null; icon: string; lake_id: string | null }) => Promise<void>;
   onDelete: (id: string) => void;
   onShare: (id: string) => void;
+  onSend: (s: Spot) => void;
   sharingId: string | null;
   onAddSpot: () => void;
 }
@@ -44,6 +45,7 @@ export default function SpotsTab({
   onEdit,
   onDelete,
   onShare,
+  onSend,
   sharingId,
   onAddSpot,
 }: SpotsTabProps) {
@@ -271,6 +273,11 @@ export default function SpotsTab({
                         <span className="font-bold text-pine text-sm truncate block">
                           {s.name || "Fishing spot"}
                         </span>
+                        {s.origin_name && (
+                          <span className="block text-[11px] text-pine/45 truncate">
+                            🎣 Spot shared by {s.origin_name}
+                          </span>
+                        )}
                       </button>
                       <button
                         type="button"
@@ -278,6 +285,15 @@ export default function SpotsTab({
                         className="shrink-0 bg-pine text-white text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full"
                       >
                         Go
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onSend(s)}
+                        aria-label="Send spot to a friend"
+                        title="Send to a friend"
+                        className="shrink-0 w-8 h-8 rounded-full bg-pine/5 text-pine flex items-center justify-center"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
                       </button>
                       <button
                         type="button"

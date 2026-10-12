@@ -21,6 +21,7 @@ import {
 import MapSheet, { type SheetTab, type SheetSnap } from "./MapSheet";
 import CatchesTab from "./CatchesTab";
 import SpotsTab, { type Spot } from "./SpotsTab";
+import SendSpotPicker from "../../_components/SendSpotPicker";
 import LakesTab from "./LakesTab";
 import LakeSheetDetail from "./LakeSheetDetail";
 import LakeSheetHeader from "./LakeSheetHeader";
@@ -66,6 +67,9 @@ export default function MapsHub() {
   const [loading, setLoading] = useState(true);
   const [spotsReady, setSpotsReady] = useState(false);
   const [spotPopup, setSpotPopup] = useState<SpotPin | null>(null);
+  const [sendSpotTarget, setSendSpotTarget] = useState<
+    (import("../../messages/_components/sendSpot").SpotShareData & { displayName: string }) | null
+  >(null);
   const [selectedCatch, setSelectedCatch] = useState<MapCatch | null>(null);
   const [spotEditing, setSpotEditing] = useState(false);
   const [spotEditName, setSpotEditName] = useState("");
@@ -746,29 +750,6 @@ export default function MapsHub() {
     }
   };
 
-  const shareSpotToFriend = async (spot: SpotPin) => {
-    const url = `https://www.fishmb.ca/fishmb/maps?spot=${spot.lat},${spot.lng}&name=${encodeURIComponent(
-      spot.name || "Fishing spot"
-    )}`;
-    const text = `📍 ${spot.name || "Fishing spot"} — check out this fishing spot on FishMB!`;
-    if (typeof navigator !== "undefined" && navigator.share) {
-      try {
-        await navigator.share({ title: text, text, url });
-      } catch {
-        // User cancelled the share sheet.
-      }
-    } else {
-      try {
-        await navigator.clipboard.writeText(`${text}\n${url}`);
-        setNote("Spot link copied — paste it to your friend!");
-        setTimeout(() => setNote(null), 3500);
-      } catch {
-        setNote("Copy this link to share: " + url);
-        setTimeout(() => setNote(null), 5000);
-      }
-    }
-  };
-
   const shareSpot = async (id: string) => {
     if (
       !window.confirm(
@@ -1175,6 +1156,19 @@ export default function MapsHub() {
             onEdit={editSpot}
             onDelete={removeSpot}
             onShare={shareSpot}
+            onSend={(s) =>
+              setSendSpotTarget({
+                name: s.name || "Fishing spot",
+                lat: Number(s.lat),
+                lng: Number(s.lng),
+                notes: s.notes ?? null,
+                icon: s.icon || "pin",
+                lake_id: s.lake_id ?? null,
+                origin_user_id: s.origin_user_id ?? null,
+                origin_name: s.origin_name ?? null,
+                displayName: s.name || "Fishing spot",
+              })
+            }
             sharingId={sharingId}
             onAddSpot={() => {
               setSnap("collapsed");
@@ -1400,6 +1394,11 @@ export default function MapsHub() {
                 {spotPopup.notes && (
                   <p className="text-pine/70 text-sm mb-3 whitespace-pre-line">{spotPopup.notes}</p>
                 )}
+                {spotPopup.origin_name && (
+                  <p className="text-pine/50 text-xs font-bold mb-3">
+                    🎣 Spot shared by {spotPopup.origin_name}
+                  </p>
+                )}
                 <p className="text-pine/40 text-xs tabular-nums mb-4">
                   {Number(spotPopup.lat).toFixed(5)}, {Number(spotPopup.lng).toFixed(5)}
                 </p>
@@ -1425,15 +1424,31 @@ export default function MapsHub() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => shareSpotToFriend(spotPopup)}
+                  onClick={() =>
+                    setSendSpotTarget({
+                      name: spotPopup.name || "Fishing spot",
+                      lat: Number(spotPopup.lat),
+                      lng: Number(spotPopup.lng),
+                      notes: spotPopup.notes ?? null,
+                      icon: spotPopup.icon || "pin",
+                      lake_id: spotPopup.lake_id ?? null,
+                      origin_user_id: spotPopup.origin_user_id ?? null,
+                      origin_name: spotPopup.origin_name ?? null,
+                      displayName: spotPopup.name || "Fishing spot",
+                    })
+                  }
                   className="w-full mt-2 bg-white border border-pine/20 hover:border-pine/40 text-pine font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
                 >
-                  📤 Share to a friend
+                  📤 Send to a friend
                 </button>
               </>
             )}
           </div>
         </div>
+      )}
+
+      {sendSpotTarget && (
+        <SendSpotPicker spot={sendSpotTarget} onClose={() => setSendSpotTarget(null)} />
       )}
 
       {/* Catch detail sheet — tap a catch pin on the map */}

@@ -20,6 +20,11 @@ export interface FishingSpot {
   catch_id: string | null;
   icon: string;
   lake_id: string | null;
+  /** Permanent attribution for spots received from another angler. */
+  origin_user_id: string | null;
+  origin_name: string | null;
+  /** The recipient-side message row id this spot was accepted from. */
+  share_msg_id: string | null;
   created_at: string;
 }
 
@@ -47,6 +52,12 @@ export async function ensureSpotsTable(): Promise<void> {
   // groups under the right lake even when a neighbouring lake's pin is closer.
   // Added Oct 2026.
   await query(`ALTER TABLE fm_fishing_spots ADD COLUMN IF NOT EXISTS lake_id text`);
+  // Spot sharing attribution: a spot accepted from a friend's message keeps
+  // who originally shared it, forever. share_msg_id marks which incoming
+  // message it was accepted from (so the chat card can show "Saved ✓").
+  await query(`ALTER TABLE fm_fishing_spots ADD COLUMN IF NOT EXISTS origin_user_id uuid`);
+  await query(`ALTER TABLE fm_fishing_spots ADD COLUMN IF NOT EXISTS origin_name text`);
+  await query(`ALTER TABLE fm_fishing_spots ADD COLUMN IF NOT EXISTS share_msg_id text`);
   // Favorite lakes: the angler's saved lakes for quick map navigation on the
   // profile's fishing-spots section.
   await ensureFavoriteLakesTable();
@@ -104,7 +115,7 @@ export function isValidLng(v: unknown): v is number {
 
 export async function listSpots(userId: string): Promise<FishingSpot[]> {
   const rows = await query<FishingSpot>(
-    `SELECT id, user_id, name, lat, lng, notes, catch_id, icon, lake_id, created_at
+    `SELECT id, user_id, name, lat, lng, notes, catch_id, icon, lake_id, origin_user_id, origin_name, share_msg_id, created_at
        FROM fm_fishing_spots
       WHERE user_id = $1
       ORDER BY created_at DESC`,
@@ -115,12 +126,23 @@ export async function listSpots(userId: string): Promise<FishingSpot[]> {
 
 export async function createSpot(
   userId: string,
-  spot: { name: string; lat: number; lng: number; notes?: string | null; catchId?: string | null; icon?: string; lakeId?: string | null }
+  spot: {
+    name: string;
+    lat: number;
+    lng: number;
+    notes?: string | null;
+    catchId?: string | null;
+    icon?: string;
+    lakeId?: string | null;
+    originUserId?: string | null;
+    originName?: string | null;
+    shareMsgId?: string | null;
+  }
 ): Promise<FishingSpot> {
   const row = await queryOne<FishingSpot>(
-    `INSERT INTO fm_fishing_spots (user_id, name, lat, lng, notes, catch_id, icon, lake_id)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-     RETURNING id, user_id, name, lat, lng, notes, catch_id, icon, lake_id, created_at`,
+    `INSERT INTO fm_fishing_spots (user_id, name, lat, lng, notes, catch_id, icon, lake_id, origin_user_id, origin_name, share_msg_id)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+     RETURNING id, user_id, name, lat, lng, notes, catch_id, icon, lake_id, origin_user_id, origin_name, share_msg_id, created_at`,
     [
       userId,
       spot.name.trim().slice(0, 80) || "Fishing spot",
@@ -130,6 +152,9 @@ export async function createSpot(
       spot.catchId ?? null,
       isSpotIconId(spot.icon) ? spot.icon : "pin",
       spot.lakeId?.trim() || null,
+      spot.originUserId ?? null,
+      spot.originName?.trim().slice(0, 80) || null,
+      spot.shareMsgId?.trim().slice(0, 64) || null,
     ]
   );
   if (!row) throw new Error("Could not create spot.");

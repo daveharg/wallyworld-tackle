@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { fishFetch } from "../../_components/fishFetch";
 import { GpxImport } from "./GpxImport";
 import type { SpotPin, TrailPoint } from "./SpotMap";
+import SendSpotPicker from "../../_components/SendSpotPicker";
 import { SPOT_ICON_CHOICES } from "./spotIcons";
 import { haversineM, bearingDeg, compassLabel, formatDist } from "./geo";
 
@@ -176,6 +177,7 @@ export default function FishingSpots() {
   const autoLoadedFav = useRef(false);
   // Saved-spots dropdown selection (mirrors the saved-lakes dropdown).
   const [selectedSpotId, setSelectedSpotId] = useState("");
+  const [sendSpotOpen, setSendSpotOpen] = useState(false);
   const selectedSpot = spots.find((s) => s.id === selectedSpotId) ?? null;
 
   const load = async () => {
@@ -776,6 +778,11 @@ export default function FishingSpots() {
                 {selectedSpot.notes && (
                   <p className="text-sm text-pine/70 mt-1">{selectedSpot.notes}</p>
                 )}
+                {selectedSpot.origin_name && (
+                  <p className="text-xs font-bold text-pine/50 mt-1">
+                    🎣 Spot shared by {selectedSpot.origin_name}
+                  </p>
+                )}
                 <div className="flex gap-2 mt-3">
                   <button
                     type="button"
@@ -804,6 +811,13 @@ export default function FishingSpots() {
                   </button>
                   <button
                     type="button"
+                    onClick={() => setSendSpotOpen(true)}
+                    className="flex-1 bg-white border border-pine/15 text-pine text-xs font-bold uppercase tracking-wider px-3 py-2.5 rounded-2xl"
+                  >
+                    📤 Send
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => removeSpot(selectedSpot.id)}
                     className="flex-1 bg-white border border-pine/15 text-signal-dark text-xs font-bold uppercase tracking-wider px-3 py-2.5 rounded-2xl"
                   >
@@ -815,6 +829,23 @@ export default function FishingSpots() {
           </div>
         )}
       </div>
+
+      {sendSpotOpen && selectedSpot && (
+        <SendSpotPicker
+          spot={{
+            name: selectedSpot.name || "Fishing spot",
+            lat: Number(selectedSpot.lat),
+            lng: Number(selectedSpot.lng),
+            notes: selectedSpot.notes ?? null,
+            icon: selectedSpot.icon || "pin",
+            lake_id: (selectedSpot as { lake_id?: string | null }).lake_id ?? null,
+            origin_user_id: selectedSpot.origin_user_id ?? null,
+            origin_name: selectedSpot.origin_name ?? null,
+            displayName: selectedSpot.name || "Fishing spot",
+          }}
+          onClose={() => setSendSpotOpen(false)}
+        />
+      )}
 
       {/* Recorded boat trails — overlay one to retrace your route */}
       <div className="bg-white border border-pine/10 rounded-3xl p-6 mt-4">

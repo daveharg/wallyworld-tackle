@@ -14,6 +14,10 @@ export interface SpotPin {
   notes: string | null;
   icon: string;
   created_at: string;
+  lake_id?: string | null;
+  /** Set when this spot was received from another angler (permanent credit). */
+  origin_user_id?: string | null;
+  origin_name?: string | null;
 }
 
 export interface TrailPoint {

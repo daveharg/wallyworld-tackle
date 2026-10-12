@@ -49,6 +49,40 @@ function photoUrl(text: string | null): string | null {
   }
 }
 
+export interface SpotPayload {
+  spot: {
+    name: string;
+    lat: number;
+    lng: number;
+    notes: string | null;
+    icon: string;
+    lake_id: string | null;
+  };
+  origin: { id: string; name: string };
+}
+
+/** Spot-share payloads are JSON { t: "spot", spot, origin } (see sendSpot.ts). */
+function spotPayload(text: string | null): SpotPayload | null {
+  if (!text || !text.startsWith("{")) return null;
+  try {
+    const o = JSON.parse(text);
+    if (
+      o &&
+      o.t === "spot" &&
+      o.spot &&
+      typeof o.spot.lat === "number" &&
+      typeof o.spot.lng === "number" &&
+      o.origin &&
+      typeof o.origin.name === "string"
+    ) {
+      return o as SpotPayload;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export default function ThreadView({
   peer,
   myId,
@@ -76,6 +110,68 @@ export default function ThreadView({
   const [themeName, setThemeName] = useState<string>("Default");
   const [resyncing, setResyncing] = useState(false);
   const autoResyncDone = useRef(false);
+  // Spot shares: message ids I've already saved a spot from, and ones I
+  // declined (declines are local-only — the sender isn't notified).
+  const [acceptedSpotMsgs, setAcceptedSpotMsgs] = useState<Set<string>>(new Set());
+  const [declinedSpotMsgs, setDeclinedSpotMsgs] = useState<Set<string>>(() => {
+    try {
+      const raw = localStorage.getItem("fishmb-declined-spot-msgs");
+      return new Set(raw ? (JSON.parse(raw) as string[]) : []);
+    } catch {
+      return new Set();
+    }
+  });
+  const [acceptingSpotId, setAcceptingSpotId] = useState<string | null>(null);
+
+  useEffect(() => {
+    fishFetch("/api/fishmb/spots")
+      .then((d) => {
+        const rows = (d as { spots?: { share_msg_id: string | null }[] }).spots ?? [];
+        setAcceptedSpotMsgs(
+          new Set(rows.map((s) => s.share_msg_id).filter((x): x is string => !!x))
+        );
+      })
+      .catch(() => {});
+  }, []);
+
+  const acceptSpot = async (msgId: string, p: SpotPayload) => {
+    if (acceptingSpotId) return;
+    setAcceptingSpotId(msgId);
+    setNote(null);
+    try {
+      await fishFetch("/api/fishmb/spots", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: p.spot.name,
+          lat: p.spot.lat,
+          lng: p.spot.lng,
+          notes: p.spot.notes,
+          icon: p.spot.icon,
+          lake_id: p.spot.lake_id,
+          origin_user_id: p.origin.id,
+          origin_name: p.origin.name,
+          share_msg_id: msgId,
+        }),
+      });
+      setAcceptedSpotMsgs((prev) => new Set(prev).add(msgId));
+      setNote("Spot saved — it's in your Saved spots on the map 🎣");
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Could not save the spot.");
+    } finally {
+      setAcceptingSpotId(null);
+    }
+  };
+
+  const declineSpot = (msgId: string) => {
+    setDeclinedSpotMsgs((prev) => {
+      const next = new Set(prev).add(msgId);
+      try {
+        localStorage.setItem("fishmb-declined-spot-msgs", JSON.stringify(Array.from(next)));
+      } catch {}
+      return next;
+    });
+  };
 
   /** Force re-upload our public key and refetch all member keys. Fixes "couldn't decrypt" when keys are stale. */
   const resyncKeys = async (silent: boolean = false) => {
@@ -920,6 +1016,7 @@ export default function ThreadView({
             ? null
             : (peer.members.find((x) => x.user_id === m.sender_id)?.name ?? null);
           const photo = photoUrl(m.text);
+          const spot = spotPayload(m.text);
           // iOS touches: name above the first bubble of a sender run (groups),
           // avatar only on the last bubble of a sender run.
           const showName = !m.mine && peer.is_group && senderName && prev?.sender_id !== m.sender_id;
@@ -946,7 +1043,47 @@ export default function ThreadView({
                 {showName && (
                   <p className="text-[11px] font-semibold text-pine/50 mb-0.5">{senderName}</p>
                 )}
-                {photo ? (
+                {spot ? (
+                  <div className="bg-white rounded-2xl p-3.5 w-60 text-pine shadow-sm">
+                    <p className="font-bold text-[15px] leading-snug">
+                      📍 {spot.spot.name || "Fishing spot"}
+                    </p>
+                    <p className="text-[11px] text-pine/45 tabular-nums mt-0.5">
+                      {spot.spot.lat.toFixed(5)}, {spot.spot.lng.toFixed(5)}
+                    </p>
+                    {spot.spot.notes && (
+                      <p className="text-[13px] text-pine/70 mt-1.5 leading-snug">{spot.spot.notes}</p>
+                    )}
+                    <p className="text-[11px] font-bold text-pine/50 mt-2">
+                      🎣 Spot shared by {spot.origin.name}
+                    </p>
+                    {m.mine ? (
+                      <p className="text-[11px] text-pine/40 mt-2">You shared this spot</p>
+                    ) : acceptedSpotMsgs.has(m.id) ? (
+                      <p className="text-[12px] font-bold text-pine mt-2.5">✓ Saved to your spots</p>
+                    ) : declinedSpotMsgs.has(m.id) ? (
+                      <p className="text-[11px] text-pine/40 mt-2">Declined</p>
+                    ) : (
+                      <div className="flex gap-2 mt-3">
+                        <button
+                          type="button"
+                          disabled={acceptingSpotId === m.id}
+                          onClick={() => acceptSpot(m.id, spot)}
+                          className="flex-1 bg-signal hover:bg-signal-dark text-white text-xs font-bold uppercase tracking-wider px-3 py-2.5 rounded-full disabled:opacity-50 transition-colors"
+                        >
+                          {acceptingSpotId === m.id ? "Saving…" : "✓ Accept spot"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => declineSpot(m.id)}
+                          className="px-3 py-2.5 text-xs font-bold uppercase tracking-wider text-pine/50"
+                        >
+                          Decline
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : photo ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={photo} alt="Shared photo" className="rounded-2xl max-h-64 object-cover" loading="lazy" />
                 ) : (
