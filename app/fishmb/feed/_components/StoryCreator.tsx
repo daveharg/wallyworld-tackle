@@ -412,7 +412,13 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
   };
 
   const addOverlay = () => {
-    if (!overlayText.trim() || !activeDraft) return;
+    if (!overlayText.trim() || !activeDraft) {
+      setTextSheetOpen(false);
+      setEditingIdx(null);
+      setEditingOverlay(null);
+      setOverlayText("");
+      return;
+    }
     if (editingIdx !== null) {
       // Update the existing overlay being edited.
       const idx = editingIdx;
