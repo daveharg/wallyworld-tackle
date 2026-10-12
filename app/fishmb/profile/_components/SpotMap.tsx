@@ -202,6 +202,17 @@ export default function SpotMap({
         ],
         { animate: false }
       );
+      // Tall screens overshoot the top of the tile world, leaving a blank
+      // band up top. If the fitted view runs past ~84.5°N, pan it down so
+      // the imagery starts right at the top of the world.
+      const view = m.getBounds();
+      if (view.getNorth() > 84.5) {
+        const zoom = m.getZoom();
+        const overPx =
+          m.project(L.latLng(84.5, view.getEast()), zoom).y -
+          m.project(view.getNorthEast(), zoom).y;
+        if (overPx > 0) m.panBy([0, overPx], { animate: false });
+      }
       const streets = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
