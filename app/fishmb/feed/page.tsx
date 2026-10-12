@@ -12,6 +12,7 @@ import MuxPlayer from "@mux/mux-player-react";
 import YouTubeEmbed, { extractYouTubeId } from "../_components/YouTubeEmbed";
 import { TournamentBuilder } from "../tournaments/_components/TournamentBuilder";
 import { JoinByCode } from "../tournaments/_components/JoinByCode";
+import CommentsSheet from "./_components/CommentsSheet";
 import StoriesRow from "./_components/StoriesRow";
 import SettingsModal from "../_components/SettingsModal";
 import dynamic from "next/dynamic";
@@ -1174,7 +1175,7 @@ function FeedPageInner() {
   const [tournamentId, setTournamentId] = useState("");
   const [tournamentHelpOpen, setTournamentHelpOpen] = useState(false);
   const [catchNote, setCatchNote] = useState<string | null>(null);
-  const [openComments, setOpenComments] = useState<Set<string>>(new Set());
+  const [commentsPost, setCommentsPost] = useState<FeedItem | null>(null);
 
   const PAGE_SIZE = 20;
   // Refs mirror state so the IntersectionObserver callback never goes stale.
@@ -1790,14 +1791,6 @@ function FeedPageInner() {
     }
   };
 
-  const toggleComments = (id: string) => {
-    const next = new Set(openComments);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    setOpenComments(next);
-  };
-
-
   // Members-only feed: signed-out visitors (and guests) get the pitch, not the posts.
   // NOTE: all hooks must stay above this early return (Rules of Hooks).
   // Pull down past the top to load new posts.
@@ -2300,7 +2293,7 @@ function FeedPageInner() {
                 <div className="mt-3 flex items-center justify-between">
                   <Reactions item={item} onReacted={handleReacted} onShare={handleShare} />
                   <button
-                    onClick={() => toggleComments(item.id)}
+                    onClick={() => setCommentsPost(item)}
                     aria-label="Comments"
                     className="flex items-center gap-1.5 text-sm font-bold text-pine/45 hover:text-pine"
                   >
@@ -2311,11 +2304,6 @@ function FeedPageInner() {
                   </button>
                 </div>
               </div>
-              {openComments.has(item.id) && (
-                <div className="px-5 pb-4">
-                  <Comments postId={item.id} uploadPhoto={uploadPhoto} />
-                </div>
-              )}
             </article>
             {/* Interleave a sponsored ad after every 8th post */}
             {feedAds.length > 0 && (idx + 1) % 8 === 0 && (
@@ -2857,6 +2845,23 @@ function FeedPageInner() {
       )}
 
 
+      {/* Full-screen Facebook-style comments */}
+      {commentsPost && (
+        <CommentsSheet
+          post={{
+            id: commentsPost.id,
+            user_id: commentsPost.user_id,
+            user_name: commentsPost.user_name,
+            avatar_url: commentsPost.avatar_url,
+            body: commentsPost.body,
+            photo_url: commentsPost.photo_url,
+            created_at: commentsPost.created_at,
+            like_count: commentsPost.like_count,
+            comment_count: commentsPost.comment_count,
+          }}
+          onClose={() => setCommentsPost(null)}
+        />
+      )}
     </div>
   );
 }
