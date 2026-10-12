@@ -7,6 +7,8 @@ export const dynamic = "force-dynamic";
 // GET /api/fishmb/map-catches?lat=&lng=&radius_km=&mine=1
 // GPS catches for the maps page:
 //   - mine=1 → the signed-in user's own catches that have GPS (any visibility).
+//   - all=1 → every catch the viewer may see (own + public + friends'),
+//     province-wide, no radius — feeds the Catches tab's All/Friends lists.
 //   - otherwise → public catches (plus friends' + own, same rules as the feed)
 //     with GPS inside radius_km of the given point.
 // Exact coordinates are only returned for catches the viewer may already see
@@ -23,8 +25,11 @@ export async function GET(req: NextRequest) {
     500
   );
   const mineOnly = url.searchParams.get("mine") === "1";
+  // all=1 → every catch the viewer may see, province-wide (no radius).
+  // Used by the Catches tab's "All" list; map pins keep the radius query.
+  const allMode = url.searchParams.get("all") === "1" && !mineOnly;
 
-  if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+  if (!allMode && (!Number.isFinite(lat) || !Number.isFinite(lng))) {
     return NextResponse.json(
       { error: "lat and lng query params are required." },
       { status: 400 }
@@ -41,7 +46,9 @@ export async function GET(req: NextRequest) {
   await query(`ALTER TABLE fm_catches ADD COLUMN IF NOT EXISTS share_location boolean DEFAULT true`);
 
   let visibilityWhere: string;
-  const params: unknown[] = [me.id, lat - dLat, lat + dLat, lng - dLng, lng + dLng];
+  const params: unknown[] = allMode
+    ? [me.id]
+    : [me.id, lat - dLat, lat + dLat, lng - dLng, lng + dLng];
   if (mineOnly) {
     visibilityWhere = `c.user_id = $1`;
   } else {
@@ -90,9 +97,9 @@ export async function GET(req: NextRequest) {
        JOIN fm_users u ON u.id = c.user_id
       WHERE ${visibilityWhere}
         AND c.lat IS NOT NULL AND c.lng IS NOT NULL
-        AND c.lat BETWEEN $2 AND $3 AND c.lng BETWEEN $4 AND $5
+        ${allMode ? "" : "AND c.lat BETWEEN $2 AND $3 AND c.lng BETWEEN $4 AND $5"}
       ORDER BY c.caught_at DESC
-      LIMIT 200`,
+      LIMIT ${allMode ? 1000 : 200}`,
     params
   );
 
@@ -107,7 +114,7 @@ export async function GET(req: NextRequest) {
   };
 
   const catches = rows
-    .filter((r) => distKm(r.lat, r.lng) <= radiusKm)
+    .filter((r) => allMode || distKm(r.lat, r.lng) <= radiusKm)
     .map((r) => ({
       id: r.id,
       species: r.species,

@@ -320,6 +320,7 @@ export default function MapsHub() {
   const [catchScope, setCatchScope] = useState<"mine" | "friends" | "all">("mine");
   const [myCatches, setMyCatches] = useState<MapCatch[]>([]);
   const [nearbyCatches, setNearbyCatches] = useState<MapCatch[]>([]);
+  const [allCatches, setAllCatches] = useState<MapCatch[]>([]);
   const [catchesLoading, setCatchesLoading] = useState(true);
 
   // Spot sharing
@@ -595,6 +596,17 @@ export default function MapsHub() {
     }
   };
 
+  // Every visible catch province-wide — feeds the Catches tab's All and
+  // Friends lists (the radius query above only covers the map pins).
+  const loadAllCatches = async () => {
+    try {
+      const d = await fishFetch(`/api/fishmb/map-catches?all=1`);
+      setAllCatches((d.catches ?? []) as MapCatch[]);
+    } catch {
+      // Lists stay on the radius-based data.
+    }
+  };
+
   // Initial catch load once we have a location (GPS or default).
   const catchesInit = useRef(false);
   useEffect(() => {
@@ -602,7 +614,7 @@ export default function MapsHub() {
     catchesInit.current = true;
     (async () => {
       const c = mapCenter;
-      await Promise.all([loadMyCatches(c.lat, c.lng), loadNearbyCatches(c.lat, c.lng)]);
+      await Promise.all([loadMyCatches(c.lat, c.lng), loadNearbyCatches(c.lat, c.lng), loadAllCatches()]);
       setCatchesLoading(false);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1128,6 +1140,7 @@ export default function MapsHub() {
           <CatchesTab
             mine={myCatches}
             nearby={nearbyCatches}
+            allCatches={allCatches}
             loading={catchesLoading}
             scope={catchScope}
             onScopeChange={setCatchScope}

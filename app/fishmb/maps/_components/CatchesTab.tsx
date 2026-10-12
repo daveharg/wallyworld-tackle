@@ -9,6 +9,9 @@ export type CatchScope = "mine" | "friends" | "all";
 interface CatchesTabProps {
   mine: MapCatch[];
   nearby: MapCatch[];
+  // Every visible catch province-wide (own + public + friends') — the All
+  // and Friends lists come from here, not the radius-limited nearby set.
+  allCatches: MapCatch[];
   loading: boolean;
   scope: CatchScope;
   onScopeChange: (s: CatchScope) => void;
@@ -95,6 +98,7 @@ interface LakeCoord {
 export default function CatchesTab({
   mine,
   nearby,
+  allCatches,
   loading,
   scope,
   onScopeChange,
@@ -131,11 +135,11 @@ export default function CatchesTab({
     })();
   }, []);
 
-  const friends = nearby.filter((c) => c.friend);
+  const friends = allCatches.filter((c) => c.friend);
   const all: MapCatch[] = [];
   {
     const seen = new Set<string>();
-    for (const c of [...mine, ...nearby]) {
+    for (const c of [...mine, ...allCatches]) {
       if (seen.has(c.id)) continue;
       seen.add(c.id);
       all.push(c);
