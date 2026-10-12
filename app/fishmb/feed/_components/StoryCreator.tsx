@@ -772,6 +772,36 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                       ×
                     </button>
                   )}
+                  {isEditing && (
+                    <div
+                      aria-label="Resize text"
+                      onPointerDown={(e) => {
+                        e.stopPropagation();
+                        const startX = e.clientX;
+                        const startY = e.clientY;
+                        const startSize = editingOverlay?.size ?? o.size ?? 28;
+                        const onMove = (ev: PointerEvent) => {
+                          const dx = ev.clientX - startX;
+                          const dy = ev.clientY - startY;
+                          const delta = Math.max(dx, dy);
+                          const newSize = Math.min(96, Math.max(12, Math.round(startSize + delta * 0.3)));
+                          setEditingOverlay((prev) => ({ ...(prev ?? { text: "", x: 50, y: 50, font: "bold", color: "#ffffff", bg: "transparent", clipIds: [] }), size: newSize }));
+                        };
+                        const onUp = () => {
+                          window.removeEventListener("pointermove", onMove);
+                          window.removeEventListener("pointerup", onUp);
+                        };
+                        window.addEventListener("pointermove", onMove);
+                        window.addEventListener("pointerup", onUp);
+                      }}
+                      className="absolute -bottom-2 -right-2 w-6 h-6 rounded-full bg-[#e8622c] text-white flex items-center justify-center shadow-lg cursor-nwse-resize active:scale-90 transition-transform"
+                      style={{ transform: "translate(50%, 50%)", touchAction: "none" }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M9 3L3 9M9 9H3V3" />
+                      </svg>
+                    </div>
+                  )}
                 </div>
                 );
                 })}
@@ -858,24 +888,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
             </div>
             )}
 
-            {/* Text size — with the other sliders */}
-            {(editingIdx !== null || overlayText.trim()) && (
-              <div className="px-4 pt-1 pb-2 flex items-center gap-3">
-                <span className="text-pine/60 text-sm font-bold shrink-0 w-8">Aa</span>
-                <input
-                  type="range"
-                  min={16}
-                  max={64}
-                  value={editingOverlay?.size ?? 28}
-                  onChange={(e) => setEditingOverlay((o) => ({ ...(o ?? { text: "", x: 50, y: 50, font: "bold", color: "#ffffff", bg: "transparent", clipIds: [] }), size: Number(e.target.value) }))}
-                  className="flex-1 accent-[#e8622c]"
-                  aria-label="Text size"
-                />
-                <span className="text-xs font-bold text-pine/50 w-10 text-right">
-                  {editingOverlay?.size ?? 28}px
-                </span>
-              </div>
-            )}
+            {/* Text size hint — drag the orange corner handle to resize */}
 
             {/* Volume control — videos only, hidden when editing text */}
             {activeDraft?.media_type === "video" && editingIdx === null && (
