@@ -464,7 +464,7 @@ function FeedSignupWall({ onJoin }: { onJoin: () => void }) {
     {
  icon: "",
       title: "Posts, photos & video",
-      text: "Share up to 4 photos per post or a 60-second video, get reactions and comments from Manitoba anglers.",
+      text: "Share photos per post or a 60-second video, get reactions and comments from Manitoba anglers.",
     },
     {
  icon: "",

@@ -36,7 +36,7 @@ const SECTIONS = [
   {
     icon: "📰",
     title: "The Feed",
-    text: "A social-media-style feed for Manitoba anglers. Share catches with up to 4 photos and videos, post lake reports and fishing tips, and follow the anglers you fish with. Watch top Manitoba YouTube channels, see which lakes are hottest right now, and join community fishing challenges with real-time leaderboards and anti-cheat verification.",
+    text: "A social-media-style feed for Manitoba anglers. Share catches with photos and videos, post lake reports and fishing tips, and follow the anglers you fish with. Watch top Manitoba YouTube channels, see which lakes are hottest right now, and join community fishing challenges with real-time leaderboards and anti-cheat verification.",
     href: "/fishmb/feed",
     cta: "Open the feed",
   },
