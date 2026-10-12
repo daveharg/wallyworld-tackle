@@ -121,6 +121,29 @@ export default function LakesTab({
   // Shared by recommended rows: aggregates + weather keyed by lake id.
   const [lakeStats, setLakeStats] = useState<Record<string, { masters_2yr: number; stocked_20yr: number }>>({});
   const [recWeather, setRecWeather] = useState<Record<string, number | null>>({});
+  // Real coordinates for the recommended lakes (from the bundled coords
+  // file) — without them the tap dead-ended on "No map coordinates".
+  const [recCoords, setRecCoords] = useState<Record<string, { lat: number; lng: number }>>({});
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await fetch("/fishmb/lake-coords.json");
+        const d = (await r.json()) as Record<string, { lat: number; lng: number }>;
+        const picked: Record<string, { lat: number; lng: number }> = {};
+        for (const rec of RECOMMENDED) {
+          const c = d[rec.id];
+          if (c && Number.isFinite(c.lat) && Number.isFinite(c.lng)) {
+            picked[rec.id] = { lat: c.lat, lng: c.lng };
+          }
+        }
+        setRecCoords(picked);
+      } catch {
+        // Recommended rows fall back to the no-coordinates note.
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -424,7 +447,7 @@ export default function LakesTab({
             <button
               key={lake.id}
               type="button"
-              onClick={() => handleSelect({ id: lake.id, name: lake.name, region: lake.region, lat: null, lng: null })}
+              onClick={() => handleSelect({ id: lake.id, name: lake.name, region: lake.region, lat: recCoords[lake.id]?.lat ?? null, lng: recCoords[lake.id]?.lng ?? null })}
               className="w-full text-left bg-white border-y border-pine/10 px-5 py-3 active:bg-pine/5"
             >
               <div className="flex items-center justify-between gap-3">

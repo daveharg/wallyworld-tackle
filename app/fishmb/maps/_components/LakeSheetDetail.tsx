@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { fishFetch } from "../../_components/fishFetch";
+import AddToMyLakesButton from "../../_components/AddToMyLakesButton";
 import type { SavedLake } from "./types";
 
 interface LakeMeta {
@@ -202,6 +203,11 @@ export default function LakeSheetDetail({ lake, spots, onBack, onSelectSpot }: P
 
   return (
     <div className="pb-6 pt-1">
+      {/* Save this lake to the angler's My Lakes list */}
+      <div className="mb-5">
+        <AddToMyLakesButton lakeId={lake.id} className="w-full" />
+      </div>
+
       {/* Species */}
       {species.length > 0 && (
         <div className="mb-5">

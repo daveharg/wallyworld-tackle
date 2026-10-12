@@ -5,6 +5,7 @@ import { getLake, getLakes, getZone, getGuideUrl, getStockingHistory, getTrophyC
 import { slugifySpecies, getSpeciesAdvice } from "@/lib/fishmb-species";
 import { lakePhotoUrl, hasRealLakePhoto, lakePhotoCredit } from "@/lib/fishmb-constants";
 import { LakeMap } from "../_components/LakeMap";
+import AddToMyLakesButton from "../../_components/AddToMyLakesButton";
 import { LakeSpotsSection } from "../_components/LakeSpotsSection";
 import { TrophyCatchesList } from "./TrophyCatchesList";
 import { SharedCatchesList } from "./SharedCatchesList";
@@ -202,6 +203,9 @@ export default function LakeDetailPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
+      <div className="mb-6 max-w-sm">
+        <AddToMyLakesButton lakeId={lake.id} className="w-full" />
+      </div>
       <Link
         href="/fishmb/lakes"
         className="text-sm font-bold text-signal uppercase tracking-wider"
