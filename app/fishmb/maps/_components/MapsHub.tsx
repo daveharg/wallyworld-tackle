@@ -441,8 +441,19 @@ export default function MapsHub() {
 
   // Follow-me: keep the map centered on the GPS dot as it moves.
   const [followPan, setFollowPan] = useState<{ lat: number; lng: number; key: string } | null>(null);
+  const followWasOn = useRef(false);
   useEffect(() => {
-    if (!followMe || !myLoc) return;
+    if (!followMe || !myLoc) {
+      followWasOn.current = followMe;
+      return;
+    }
+    // Just switched on: the activation flyTo (with zoom) handles this move.
+    // Panning here too would cancel the flyTo's zoom — the "centers but
+    // never zooms in" bug.
+    if (!followWasOn.current) {
+      followWasOn.current = true;
+      return;
+    }
     programmaticMove.current = true;
     setFollowPan({ lat: myLoc.lat, lng: myLoc.lng, key: `follow:${Date.now()}` });
   }, [followMe, myLoc]);
@@ -469,7 +480,7 @@ export default function MapsHub() {
         setMyLoc((prev) => ({ ...loc, speed: prev?.speed ?? null }));
         setMapCenter(loc);
         programmaticMove.current = true;
-        setFocus({ lat: loc.lat, lng: loc.lng, key: `gps:follow:${Date.now()}`, zoom: 15 });
+        setFocus({ lat: loc.lat, lng: loc.lng, key: `gps:follow:${Date.now()}`, zoom: 16 });
         setFollowMe(true);
         setLocating(false);
       },
@@ -1018,7 +1029,7 @@ export default function MapsHub() {
         title={recording ? "Stop recording route" : "Record a route"}
         className={`absolute top-[7.5rem] right-3 z-20 w-11 h-11 rounded-full backdrop-blur border shadow-lg flex items-center justify-center active:scale-95 transition-transform ${
           recording
-            ? "bg-signal text-white border-signal animate-pulse"
+            ? "bg-red-600 text-white border-red-700 animate-pulse"
             : "bg-white/95 border-pine/15 text-pine"
         }`}
       >
