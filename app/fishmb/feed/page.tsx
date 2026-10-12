@@ -63,6 +63,17 @@ function ComposerSheet({
   // overflow:hidden for touch scrolling, so pin the body with
   // position:fixed and restore the scroll position on close.
   useEffect(() => {
+    // App-shell lock: freeze the shell's <main> scroller while the sheet
+    // is open (the document itself never scrolls any more). Falls back
+    // to the old body pin if the shell isn't mounted.
+    const scroller = document.querySelector<HTMLElement>("[data-fishmb-scroll]");
+    if (scroller) {
+      const prevOverflow = scroller.style.overflowY;
+      scroller.style.overflowY = "hidden";
+      return () => {
+        scroller.style.overflowY = prevOverflow;
+      };
+    }
     const y = window.scrollY;
     const b = document.body.style;
     const prev = {
@@ -1468,7 +1479,7 @@ function FeedPageInner() {
     tabRef.current = v;
     setFriendsOnly(false);
     friendsOnlyRef.current = false;
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    document.querySelector<HTMLElement>("[data-fishmb-scroll]")?.scrollTo({ top: 0, behavior: "smooth" });
     load(activeQRef.current || undefined, v, false);
   };
 
@@ -1477,7 +1488,7 @@ function FeedPageInner() {
     tabRef.current = "all";
     setFriendsOnly(true);
     friendsOnlyRef.current = true;
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    document.querySelector<HTMLElement>("[data-fishmb-scroll]")?.scrollTo({ top: 0, behavior: "smooth" });
     load(activeQRef.current || undefined, "all", true);
   };
 

@@ -37,15 +37,18 @@ export default function FishHeader() {
   openRef.current = open;
 
   // Hide the header when scrolling down, show it immediately on scroll up.
+  // The app shell scrolls <main>, not the window — listen to it.
   useEffect(() => {
     setHidden(false);
-    let lastY = window.scrollY;
+    const scroller = document.querySelector<HTMLElement>("[data-fishmb-scroll]");
+    const getY = () => (scroller ? scroller.scrollTop : window.scrollY);
+    let lastY = getY();
     let ticking = false;
     const onScroll = () => {
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
-        const y = window.scrollY;
+        const y = getY();
         const scrollingDown = y > lastY;
         if (!openRef.current) {
           if (scrollingDown && y > 120) setHidden(true);
@@ -55,8 +58,9 @@ export default function FishHeader() {
         ticking = false;
       });
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const target: HTMLElement | Window = scroller ?? window;
+    target.addEventListener("scroll", onScroll, { passive: true });
+    return () => target.removeEventListener("scroll", onScroll);
   }, [pathname]);
 
   return (

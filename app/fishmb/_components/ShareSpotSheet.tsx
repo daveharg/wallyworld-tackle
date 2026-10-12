@@ -41,6 +41,17 @@ export default function ShareSpotSheet({
 
   // iOS-proof background lock while the composer is open.
   useEffect(() => {
+    // App-shell lock: freeze the shell's <main> scroller while the sheet
+    // is open (the document itself never scrolls any more). Falls back
+    // to the old body pin if the shell isn't mounted.
+    const scroller = document.querySelector<HTMLElement>("[data-fishmb-scroll]");
+    if (scroller) {
+      const prevOverflow = scroller.style.overflowY;
+      scroller.style.overflowY = "hidden";
+      return () => {
+        scroller.style.overflowY = prevOverflow;
+      };
+    }
     const y = window.scrollY;
     const b = document.body.style;
     const prev = {
