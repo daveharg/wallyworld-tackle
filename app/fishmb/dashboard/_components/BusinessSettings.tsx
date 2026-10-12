@@ -218,12 +218,6 @@ export default function BusinessSettings() {
               </p>
               <div className="flex gap-3 justify-center flex-wrap">
                 <Link
-                  href="/fishmb/business/new"
-                  className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
-                >
-                  Create business page
-                </Link>
-                <Link
                   href="/fishmb/business"
                   className="bg-paper-deep border border-pine/15 text-pine font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full"
                 >
