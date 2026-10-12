@@ -1204,7 +1204,9 @@ function FeedPageInner() {
   const [visibility, setVisibility] = useState<"public" | "friends" | "followers" | "private">("public");
   const [shareLocation, setShareLocation] = useState(true);
   const [saveLocation, setSaveLocation] = useState(true);
-  const [postToFeed, setPostToFeed] = useState(true);
+  // Catch sharing — one choice: everyone, friends only, or not shared.
+  const [catchShare, setCatchShare] = useState<"public" | "friends" | "private">("public");
+  const postToFeed = catchShare !== "private";
   const [catchSpecies, setCatchSpecies] = useState("");
   const [catchLength, setCatchLength] = useState("");
   const [catchLat, setCatchLat] = useState<number | null>(null);
@@ -1784,7 +1786,7 @@ function FeedPageInner() {
           photos: urls,
           video_playback_id: catchVideoPlayback?.playback_id ?? null,
           video_url: catchVideoPlayback ? `https://stream.mux.com/${catchVideoPlayback.playback_id}.m3u8` : null,
-          visibility: postToFeed ? visibility : "private",
+          visibility: catchShare,
           share_location: shareLocation,
           personal_record: !postToFeed,
           tournament_id: tournamentId || null,
@@ -1823,7 +1825,7 @@ function FeedPageInner() {
       setCatchLng(null);
       setShareLocation(true);
       setSaveLocation(true);
-      setPostToFeed(true);
+      setCatchShare("public");
       setFeedCaption("");
       closeComposer();
       load();
@@ -2633,50 +2635,41 @@ function FeedPageInner() {
                       </button>
                     </span>
                   )}
-                  <label className="flex items-center gap-2">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-pine/50 whitespace-nowrap">
-                      Visible to
-                    </span>
-                    <select
-                      value={visibility}
-                      onChange={(e) => setVisibility(e.target.value as "public" | "friends" | "followers" | "private")}
-                      className="bg-paper-deep border border-pine/15 rounded-full px-3 py-2 text-xs font-bold text-pine focus:outline-none"
-                      aria-label="Who can see this catch"
-                    >
-                      <option value="public">Everyone</option>
-                      <option value="friends">Friends only</option>
-                      <option value="followers">Followers only</option>
-                      <option value="private">Only me</option>
-                    </select>
-                  </label>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setPostToFeed(!postToFeed)}
-                  className="w-full flex items-center justify-between mt-2 bg-pine/5 border border-pine/10 rounded-2xl px-4 py-3 text-left"
-                >
-                  <span>
-                    <span className="block text-sm font-bold text-pine">
-                      {postToFeed ? "Post to feed" : "Personal log"}
-                    </span>
-                    <span className="block text-xs text-pine/55 mt-0.5">
-                      {postToFeed
-                        ? "This catch will appear in the feed."
-                        : "Only you can see this catch. No verification required. You can share it later from HQ → Stats."}
-                    </span>
-                  </span>
-                  <span
-                    className={`shrink-0 w-12 h-7 rounded-full p-1 transition-colors ${
-                      postToFeed ? "bg-signal" : "bg-pine/15"
-                    }`}
-                  >
-                    <span
-                      className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
-                        postToFeed ? "translate-x-5" : ""
-                      }`}
-                    />
-                  </span>
-                </button>
+                {/* Share with — one choice for this catch */}
+                <div className="mt-2">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-pine/50 mb-1.5">
+                    Share with
+                  </p>
+                  <div className="flex bg-pine/5 border border-pine/10 rounded-full p-1">
+                    {(
+                      [
+                        { id: "public", label: "Everyone" },
+                        { id: "friends", label: "Friends only" },
+                        { id: "private", label: "Not shared" },
+                      ] as const
+                    ).map((o) => (
+                      <button
+                        key={o.id}
+                        type="button"
+                        onClick={() => setCatchShare(o.id)}
+                        aria-pressed={catchShare === o.id}
+                        className={`flex-1 py-2 rounded-full text-xs font-bold transition-colors ${
+                          catchShare === o.id ? "bg-white text-pine shadow" : "text-pine/50"
+                        }`}
+                      >
+                        {o.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-pine/55 mt-1.5 px-1">
+                    {catchShare === "public"
+                      ? "Everyone can see this catch in the feed and on the map."
+                      : catchShare === "friends"
+                        ? "Only your friends can see this catch in the feed and on the map."
+                        : "Only you can see this catch. You can share it later from HQ → Stats."}
+                  </p>
+                </div>
                 {postToFeed && (
                   <textarea
                     value={feedCaption}

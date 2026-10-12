@@ -146,7 +146,9 @@ export default function DashboardStats() {
     }
   }, [searchParams]);
 
-  const shareCatch = async (c: Catch) => {
+  // Change who a catch is shared with: everyone, friends only, or not
+  // shared (private personal record). Owner-only PATCH on the server.
+  const setCatchSharing = async (c: Catch, level: "public" | "friends" | "private") => {
     if (sharingId) return;
     setSharingId(c.id);
     setSharedOk(null);
@@ -154,19 +156,28 @@ export default function DashboardStats() {
       await fishFetch(`/api/fish/catches/${c.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ personal_record: false, visibility: "public" }),
+        body: JSON.stringify({ personal_record: level === "private", visibility: level }),
       });
       setCatches((prev) =>
-        prev.map((x) => (x.id === c.id ? { ...x, personal_record: false, visibility: "public" } : x))
+        prev.map((x) =>
+          x.id === c.id ? { ...x, personal_record: level === "private", visibility: level } : x
+        )
       );
       setSharedOk(c.id);
       setTimeout(() => setSharedOk(null), 3000);
     } catch (e) {
-      setCatchesError(e instanceof Error ? e.message : "Couldn't share that catch.");
+      setCatchesError(e instanceof Error ? e.message : "Couldn't change sharing for that catch.");
     } finally {
       setSharingId(null);
     }
   };
+
+  const sharingOf = (c: Catch): "public" | "friends" | "private" =>
+    c.personal_record === true || c.visibility === "private"
+      ? "private"
+      : c.visibility === "friends"
+        ? "friends"
+        : "public";
 
   const isShared = (c: Catch) =>
     c.tournament_id == null && c.personal_record !== true && c.visibility !== "private";
@@ -436,21 +447,35 @@ export default function DashboardStats() {
                           year: "numeric",
                         })}
                         {c.tournament_name ? ` · 🏆 ${c.tournament_name}` : ""}
-                        {c.personal_record === true ? " · 🔒 Personal" : ""}
                       </span>
-                      {c.tournament_id == null && !isShared(c) && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            shareCatch(c);
-                          }}
-                          disabled={sharingId === c.id}
-                          className="mt-1 text-[11px] font-bold text-signal-dark disabled:opacity-40"
-                        >
-                          {sharingId === c.id ? "Sharing…" : sharedOk === c.id ? "✓ Shared!" : "📤 Share to feed"}
-                        </button>
+                      {c.tournament_id == null && (
+                        <span className="mt-1 flex items-center gap-1.5">
+                          <span className="text-[11px] font-bold text-pine/45">Sharing:</span>
+                          <select
+                            value={sharingOf(c)}
+                            disabled={sharingId === c.id}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                            }}
+                            onChange={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setCatchSharing(c, e.target.value as "public" | "friends" | "private");
+                            }}
+                            aria-label="Who can see this catch"
+                            className="text-[11px] font-bold text-signal-dark bg-transparent focus:outline-none disabled:opacity-40"
+                          >
+                            <option value="public">Everyone</option>
+                            <option value="friends">Friends only</option>
+                            <option value="private">Not shared</option>
+                          </select>
+                          {sharingId === c.id ? (
+                            <span className="text-[11px] font-bold text-pine/40">Saving…</span>
+                          ) : sharedOk === c.id ? (
+                            <span className="text-[11px] font-bold text-green-700">✓ Saved</span>
+                          ) : null}
+                        </span>
                       )}
                     </span>
                     <span className="text-pine/30 text-lg shrink-0">›</span>
