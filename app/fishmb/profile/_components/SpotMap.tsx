@@ -185,25 +185,23 @@ export default function SpotMap({
     (async () => {
       const L = (await import("leaflet")).default;
       if (cancelled || !containerRef.current) return;
-      // Open framed on Canada, fitted to the screen — no zoom animation,
-      // it just opens there. Bounds stop at 72°N (mainland + near Arctic):
-      // including the far Arctic islands left a big empty band up top and
-      // pushed the land down; this centres the frame lower, toward the
-      // border, so Canada fills the screen.
+      // Open framed on North America, centred over the USA (Dave's
+      // screenshot, 2026-10-12): the whole continent fills the screen —
+      // Alaska to Greenland across, Arctic at the top with NO blank band
+      // (a Canada-centred fit runs off the top of the tile world on tall
+      // phones), South America just entering at the bottom. The bounds'
+      // Mercator centre lands at ~40°N, -96°.
       const m = L.map(containerRef.current, {
         scrollWheelZoom: false,
         zoomControl: false,
       });
       m.fitBounds(
         [
-          [42, -142],
-          [72, -52],
+          [-18, -168],
+          [72, -24],
         ],
         { animate: false }
       );
-      // Then in 3 notches from that frame, same centre (Dave's ask) — the
-      // coasts crop out of the opening view; pan/zoom still reach anywhere.
-      m.zoomIn(3, { animate: false });
       const streets = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
