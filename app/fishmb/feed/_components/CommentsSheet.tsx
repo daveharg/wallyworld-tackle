@@ -260,16 +260,6 @@ export default function CommentsSheet({
           </span>
         </div>
 
-        {/* Sort */}
-        <div className="px-4 py-2.5">
-          <button type="button" className="font-bold text-pine text-[16px] flex items-center gap-1">
-            Most relevant
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path d="M3 5l4 4 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          </button>
-        </div>
-
         {/* Comments */}
         <div className="pb-4 divide-y divide-pine/5">
           {comments.map((c) => (
