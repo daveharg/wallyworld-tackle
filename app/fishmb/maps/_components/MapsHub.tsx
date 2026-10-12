@@ -186,30 +186,30 @@ export default function MapsHub() {
   };
   const [windOn, setWindOn] = useState(() => {
     try {
-      return localStorage.getItem("fishmb-widget-wind") === "1";
+      return localStorage.getItem("fishmb-widget-wind") !== "0";
     } catch {
-      return false;
+      return true;
     }
   });
   const [speedOn, setSpeedOn] = useState(() => {
     try {
-      return localStorage.getItem("fishmb-widget-speed") === "1";
+      return localStorage.getItem("fishmb-widget-speed") !== "0";
     } catch {
-      return false;
+      return true;
     }
   });
   const [tempOn, setTempOn] = useState(() => {
     try {
-      return localStorage.getItem("fishmb-widget-temp") === "1";
+      return localStorage.getItem("fishmb-widget-temp") !== "0";
     } catch {
-      return false;
+      return true;
     }
   });
   const [biteOn, setBiteOn] = useState(() => {
     try {
-      return localStorage.getItem("fishmb-widget-bite") === "1";
+      return localStorage.getItem("fishmb-widget-bite") !== "0";
     } catch {
-      return false;
+      return true;
     }
   });
   // Catch pins default ON — Dave wants them auto-loaded on the map.
@@ -1128,14 +1128,14 @@ export default function MapsHub() {
 
       {/* Wind overlay — draggable widget */}
       {windOn && (
-        <DraggableWidget id="wind" defaultPos={{ x: 12, y: 180 }} onClose={() => setWindOn(false)}>
+        <DraggableWidget id="wind" defaultPos={{ x: 12, y: 362 }} onClose={() => setWindOn(false)}>
           <WindWidget lat={mapCenter.lat} lng={mapCenter.lng} />
         </DraggableWidget>
       )}
 
       {/* Speed widget — draggable, shows GPS speed */}
       {speedOn && (
-        <DraggableWidget id="speed" defaultPos={{ x: 12, y: 240 }} onClose={() => setSpeedOn(false)}>
+        <DraggableWidget id="speed" defaultPos={{ x: 12, y: 406 }} onClose={() => setSpeedOn(false)}>
           <div className="flex items-center gap-2 bg-white/95 backdrop-blur border border-pine/15 rounded-full px-4 py-2 shadow-lg">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1d4d2b" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 14l4-4" />
@@ -1150,14 +1150,14 @@ export default function MapsHub() {
 
       {/* Temp widget — draggable, shows current temp at your location */}
       {tempOn && myLoc && (
-        <DraggableWidget id="temp" defaultPos={{ x: 12, y: 300 }} onClose={() => setTempOn(false)}>
+        <DraggableWidget id="temp" defaultPos={{ x: 12, y: 450 }} onClose={() => setTempOn(false)}>
           <TempWidget lat={myLoc.lat} lng={myLoc.lng} />
         </DraggableWidget>
       )}
 
       {/* Bite prediction widget — draggable */}
       {biteOn && myLoc && (
-        <DraggableWidget id="bite" defaultPos={{ x: 12, y: 360 }} onClose={() => setBiteOn(false)}>
+        <DraggableWidget id="bite" defaultPos={{ x: 12, y: 208 }} onClose={() => setBiteOn(false)}>
           <BiteWidget lat={myLoc.lat} lng={myLoc.lng} />
         </DraggableWidget>
       )}
@@ -1175,7 +1175,7 @@ export default function MapsHub() {
       {/* Catch pin toggles — draggable widget, auto-starts below the search
           bar. Same state as the Settings tab toggles. */}
       {catchesWidgetOn && (
-      <DraggableWidget id="catches" defaultPos={{ x: 12, y: 70 }} onClose={() => changeCatchesWidget(false)}>
+      <DraggableWidget id="catches" defaultPos={{ x: 12, y: 262 }} onClose={() => changeCatchesWidget(false)}>
         <div className="bg-white/95 backdrop-blur border border-pine/15 rounded-2xl shadow-lg px-3 py-2 space-y-1.5">
           {(
             [
