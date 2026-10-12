@@ -967,7 +967,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                 the scroll container (fixed positioning breaks inside it on iOS). */}
             {textSheetOpen && typeof document !== "undefined" && createPortal(
             <div
-              className="fixed z-[1500] left-0 right-0 bg-white rounded-t-3xl shadow-2xl border-t border-pine/10 p-4 space-y-3 max-h-[70dvh] overflow-y-auto"
+              className="fixed z-[1500] left-0 right-0 bg-white rounded-t-3xl shadow-2xl border-t border-pine/10 p-4 space-y-3 max-h-[78dvh] min-h-[56dvh] overflow-y-auto"
               style={{ bottom: kbOffset }}
               data-edit-controls
             >
