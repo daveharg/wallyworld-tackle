@@ -5,6 +5,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { fishFetch } from "../../_components/fishFetch";
 import { compressImage } from "../../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
@@ -59,6 +60,26 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
   const [editingOverlay, setEditingOverlay] = useState<TextOverlay | null>(null);
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
   const [textSheetOpen, setTextSheetOpen] = useState(false);
+  // Keyboard height (px) so the text sheet can dock just above the keyboard.
+  const [kbOffset, setKbOffset] = useState(0);
+  useEffect(() => {
+    if (!textSheetOpen) {
+      setKbOffset(0);
+      return;
+    }
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const onResize = () => {
+      setKbOffset(Math.max(0, window.innerHeight - vv.height - vv.offsetTop));
+    };
+    vv.addEventListener("resize", onResize);
+    vv.addEventListener("scroll", onResize);
+    onResize();
+    return () => {
+      vv.removeEventListener("resize", onResize);
+      vv.removeEventListener("scroll", onResize);
+    };
+  }, [textSheetOpen]);
   const [overlayText, setOverlayText] = useState("");
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   // Reel state — ordered clips, active clip for preview, per-clip zoom/volume.
@@ -942,11 +963,12 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
               </div>
             )}
 
-            {/* Text input — bottom sheet when open */}
-            <div 
-              className={textSheetOpen 
-                ? "fixed z-[1400] left-0 right-0 bottom-0 bg-white rounded-t-3xl shadow-2xl border-t border-pine/10 p-4 space-y-3 max-h-[70vh] overflow-y-auto" 
-                : "p-4 space-y-3 hidden"}
+            {/* Text editor — bottom sheet rendered via portal so it escapes
+                the scroll container (fixed positioning breaks inside it on iOS). */}
+            {textSheetOpen && typeof document !== "undefined" && createPortal(
+            <div
+              className="fixed z-[1500] left-0 right-0 bg-white rounded-t-3xl shadow-2xl border-t border-pine/10 p-4 space-y-3 max-h-[70dvh] overflow-y-auto"
+              style={{ bottom: kbOffset }}
               data-edit-controls
             >
               <div className="flex gap-2">
@@ -975,8 +997,8 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                 )}
               </div>
 
-              {/* Font styles — only when editing text */}
-              {(editingIdx !== null || overlayText.trim()) && (
+              {/* Font styles */}
+              {true && (
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-pine/50 mb-2">Style</p>
                 <div className="flex gap-2 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
@@ -996,8 +1018,8 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
               </div>
               )}
 
-              {/* Colors — only when editing text */}
-              {(editingIdx !== null || overlayText.trim()) && (
+              {/* Colors */}
+              {true && (
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-pine/50 mb-2">Color</p>
                 <div className="flex gap-2 flex-wrap">
@@ -1014,8 +1036,8 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
               </div>
               )}
 
-              {/* Backgrounds — only when editing text */}
-              {(editingIdx !== null || overlayText.trim()) && (
+              {/* Backgrounds */}
+              {true && (
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-pine/50 mb-2">Background</p>
                 <div className="flex gap-2 flex-wrap">
@@ -1033,10 +1055,11 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                 </div>
               </div>
               )}
+            </div>, document.body)}
 
               {/* Current overlays — tap clips to choose when text shows */}
               {overlays.length > 0 && (
-                <div>
+                <div className="px-4 pb-2">
                   <p className="text-xs font-bold uppercase tracking-wider text-pine/50 mb-2">
                     Text ({overlays.length}) — tap clips to set when it shows
                   </p>
@@ -1088,7 +1111,6 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
                   </div>
                 </div>
               )}
-            </div>
           </div>
 
           {/* Bottom bar */}
