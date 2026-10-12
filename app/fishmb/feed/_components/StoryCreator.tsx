@@ -58,6 +58,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
   const [overlays, setOverlays] = useState<TextOverlay[]>([]);
   const [editingOverlay, setEditingOverlay] = useState<TextOverlay | null>(null);
   const [editingIdx, setEditingIdx] = useState<number | null>(null);
+  const [textSheetOpen, setTextSheetOpen] = useState(false);
   const [overlayText, setOverlayText] = useState("");
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   // Reel state — ordered clips, active clip for preview, per-clip zoom/volume.
@@ -174,6 +175,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
         setOverlayText(o.text);
         setEditingOverlay(o);
         setEditingIdx(tap.idx);
+        setTextSheetOpen(true);
         // Focus the text input so the keyboard opens.
         setTimeout(() => textInputRef.current?.focus(), 100);
       }
@@ -446,12 +448,14 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
     }
     setOverlayText("");
     setEditingOverlay(null);
+    setTextSheetOpen(false);
   };
 
   const cancelOverlayEdit = () => {
     setEditingIdx(null);
     setEditingOverlay(null);
     setOverlayText("");
+    setTextSheetOpen(false);
   };
 
   const postStories = async () => {
@@ -658,7 +662,7 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
             className="flex-1 overflow-y-auto"
             onClick={(e) => {
               // Tap anywhere outside text editing controls — save and exit editing.
-              if (editingIdx !== null) {
+              if (editingIdx !== null || textSheetOpen) {
                 const t = e.target as HTMLElement;
                 const inEditControls = t.closest("[data-edit-controls]");
                 const inTextOverlay = t.closest("[data-text-overlay]");
@@ -856,6 +860,25 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
               </div>
             )}
 
+            {/* Add text button */}
+            {!textSheetOpen && editingIdx === null && (
+              <div className="px-4 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOverlayText("");
+                    setEditingOverlay(null);
+                    setEditingIdx(null);
+                    setTextSheetOpen(true);
+                    setTimeout(() => textInputRef.current?.focus(), 100);
+                  }}
+                  className="w-full py-3 rounded-full bg-pine text-white font-bold text-sm"
+                >
+                  + Add text
+                </button>
+              </div>
+            )}
+
             {/* Zoom control — hidden when editing text */}
             {editingIdx === null && (
             <div className="px-4 pt-2 pb-2 flex items-center gap-3">
@@ -913,8 +936,13 @@ export default function StoryCreator({ onClose, onCreated }: { onClose: () => vo
               </div>
             )}
 
-            {/* Text input */}
-            <div className="p-4 space-y-3" data-edit-controls>
+            {/* Text input — bottom sheet when open */}
+            <div 
+              className={textSheetOpen 
+                ? "fixed z-[1400] left-0 right-0 bottom-0 bg-white rounded-t-3xl shadow-2xl border-t border-pine/10 p-4 space-y-3 max-h-[70vh] overflow-y-auto" 
+                : "p-4 space-y-3 hidden"}
+              data-edit-controls
+            >
               <div className="flex gap-2">
                 <input
                   ref={textInputRef}
