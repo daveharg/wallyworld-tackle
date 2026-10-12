@@ -157,7 +157,7 @@ export async function getUserStats(
     [userId]
   );
   const tEntries = await queryOne<{ c: string }>(
-    `SELECT COUNT(*)::text AS c FROM fm_tournament_entries WHERE user_id = $1 AND status = 'approved'`,
+    `SELECT COUNT(*)::text AS c FROM fm_catches WHERE user_id = $1 ${vis} AND (photo_measure_url IS NOT NULL OR photo_hold_url IS NOT NULL)`,
     [userId]
   );
   const joined = await queryOne<{ c: string }>(
@@ -165,9 +165,13 @@ export async function getUserStats(
     [userId]
   );
   const posts = await queryOne<{ p: string; t: string }>(
-    `SELECT COUNT(*) FILTER (WHERE kind = 'post')::text AS p,
-            COUNT(*) FILTER (WHERE kind = 'tip')::text AS t
+    `SELECT (COUNT(*) FILTER (WHERE kind = 'post'))::text AS p,
+            (COUNT(*) FILTER (WHERE kind = 'tip'))::text AS t
      FROM fm_discussions WHERE user_id = $1`,
+    [userId]
+  );
+  const catchPosts = await queryOne<{ c: string }>(
+    `SELECT COUNT(*)::text AS c FROM fm_catches WHERE user_id = $1 ${vis}`,
     [userId]
   );
 
@@ -193,7 +197,7 @@ export async function getUserStats(
     biggest: hide("biggest") ? [] : await biggestFor(userId, publicOnly),
     tournaments_joined: hide("tournaments") ? 0 : Number(joined?.c ?? 0),
     tournament_wins: hide("wins") ? 0 : wins,
-    posts_count: hide("posts") ? 0 : Number(posts?.p ?? 0),
+    posts_count: hide("posts") ? 0 : Number(posts?.p ?? 0) + Number(catchPosts?.c ?? 0),
     tips_count: Number(posts?.t ?? 0),
     member_since: user.created_at,
     hidden_stats: hidden,

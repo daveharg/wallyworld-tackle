@@ -1042,6 +1042,10 @@ export default function MapsHub() {
             onScopeChange={setCatchScope}
             onSelect={(c) => flyTo(c.lat, c.lng, `catch:${c.id}`, 14)}
             myLoc={myLoc}
+            showOnMap={catchScope === "mine" ? showMyCatches : showPublicCatches}
+            onShowOnMapChange={(v) =>
+              catchScope === "mine" ? setShowMyCatches(v) : setShowPublicCatches(v)
+            }
           />
         )}
         {tab === "spots" && (

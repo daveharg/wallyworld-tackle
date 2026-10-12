@@ -12,6 +12,8 @@ interface CatchesTabProps {
   onScopeChange: (s: "mine" | "nearby") => void;
   onSelect: (c: MapCatch) => void;
   myLoc: { lat: number; lng: number } | null;
+  showOnMap: boolean;
+  onShowOnMapChange: (v: boolean) => void;
 }
 
 function fmtDate(iso: string): string {
@@ -95,6 +97,8 @@ export default function CatchesTab({
   onScopeChange,
   onSelect,
   myLoc,
+  showOnMap,
+  onShowOnMapChange,
 }: CatchesTabProps) {
   const [lakes, setLakes] = useState<LakeCoord[]>([]);
 
@@ -214,6 +218,24 @@ export default function CatchesTab({
           </button>
         ))}
       </div>
+      <button
+        type="button"
+        onClick={() => onShowOnMapChange(!showOnMap)}
+        className="w-full flex items-center justify-between py-2 px-1 mb-2"
+      >
+        <span className="text-sm font-bold text-pine">Show on map</span>
+        <span
+          className={`w-11 h-6 rounded-full p-1 transition-colors ${
+            showOnMap ? "bg-signal" : "bg-pine/15"
+          }`}
+        >
+          <span
+            className={`block w-4 h-4 rounded-full bg-white shadow transition-transform ${
+              showOnMap ? "translate-x-5" : ""
+            }`}
+          />
+        </span>
+      </button>
       {loading ? (
         <div className="space-y-2">
           {[0, 1, 2].map((i) => (
