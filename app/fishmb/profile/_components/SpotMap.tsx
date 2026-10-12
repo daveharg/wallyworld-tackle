@@ -183,8 +183,11 @@ export default function SpotMap({
     (async () => {
       const L = (await import("leaflet")).default;
       if (cancelled || !containerRef.current) return;
-      // Open framed on all of Canada, fitted to the screen — no zoom
-      // animation, it just opens there.
+      // Open framed on Canada, fitted to the screen — no zoom animation,
+      // it just opens there. Bounds stop at 72°N (mainland + near Arctic):
+      // including the far Arctic islands left a big empty band up top and
+      // pushed the land down; this centres the frame lower, toward the
+      // border, so Canada fills the screen.
       const m = L.map(containerRef.current, {
         scrollWheelZoom: false,
         zoomControl: false,
@@ -192,7 +195,7 @@ export default function SpotMap({
       m.fitBounds(
         [
           [42, -142],
-          [83, -52],
+          [72, -52],
         ],
         { animate: false }
       );
