@@ -4,7 +4,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useFishAuth } from "./FishAuth";
@@ -28,6 +28,26 @@ export default function SendSpotPicker({ spot, onClose }: Props) {
   const [sendingId, setSendingId] = useState<string | null>(null);
   const [sentTo, setSentTo] = useState<{ friend: Friend; convoId: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Drag-down-to-dismiss on the sheet header (grabber + title zone).
+  const [dragY, setDragY] = useState(0);
+  const dragStart = useRef<number | null>(null);
+
+  const onDragStart = (e: React.PointerEvent) => {
+    dragStart.current = e.clientY;
+    (e.target as Element).setPointerCapture?.(e.pointerId);
+  };
+  const onDragMove = (e: React.PointerEvent) => {
+    if (dragStart.current === null) return;
+    setDragY(Math.max(0, e.clientY - dragStart.current));
+  };
+  const onDragEnd = () => {
+    if (dragStart.current !== null && dragY > 70) {
+      onClose();
+      return;
+    }
+    dragStart.current = null;
+    setDragY(0);
+  };
 
   useEffect(() => {
     fishFetch("/api/fish/friends")
@@ -68,15 +88,35 @@ export default function SendSpotPicker({ spot, onClose }: Props) {
       <div
         className="bg-paper rounded-t-3xl sm:rounded-3xl w-full max-w-md p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-2xl max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
+        style={{
+          transform: dragY ? `translateY(${dragY}px)` : undefined,
+          transition: dragStart.current === null ? "transform 0.18s ease" : undefined,
+        }}
       >
-        <div className="w-10 h-1.5 bg-pine/20 rounded-full mx-auto mb-4 sm:hidden" />
-        <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-1">
-          Send spot to a friend
-        </h3>
-        <p className="text-sm text-pine/60 mb-4">
-          📍 {spot.displayName} — it lands in your Messages with them. If they
-          accept, it becomes their own spot to edit.
-        </p>
+        {/* Header — drag down or tap the grabber to close */}
+        <div
+          className="touch-none -mt-2 -mx-2 px-2 pt-2 cursor-grab active:cursor-grabbing"
+          onPointerDown={onDragStart}
+          onPointerMove={onDragMove}
+          onPointerUp={onDragEnd}
+          onPointerCancel={onDragEnd}
+        >
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="block mx-auto w-16 h-6 sm:hidden"
+          >
+            <span className="block w-10 h-1.5 bg-pine/20 rounded-full mx-auto" />
+          </button>
+          <h3 className="font-display font-bold uppercase text-pine text-xl tracking-wide mb-1 mt-1">
+            Send spot to a friend
+          </h3>
+          <p className="text-sm text-pine/60 mb-4">
+            📍 {spot.displayName} — it lands in your Messages with them. If they
+            accept, it becomes their own spot to edit.
+          </p>
+        </div>
 
         {error && (
           <p className="text-sm text-signal-dark bg-signal/10 border border-signal/25 rounded-2xl px-4 py-3 mb-4">
