@@ -977,12 +977,14 @@ export default function MapsHub() {
     setSpotLakeQuery(lakeName);
   };
 
-  /** Save a shared (not-yet-owned) spot pin to the user's own spots. */
+  /** Save a shared (not-yet-owned) spot pin to the user's own spots, then
+   *  open it straight into the editor — Dave's flow: save it, edit it,
+   *  then save it again as your own. */
   const saveSharedSpot = async () => {
     if (!spotPopup || spotSaving) return;
     setSpotSaving(true);
     try {
-      await fishFetch("/api/fishmb/spots", {
+      const d = await fishFetch("/api/fishmb/spots", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -994,9 +996,34 @@ export default function MapsHub() {
           depth_ft: spotPopup.depth_ft ?? null,
         }),
       });
+      const created = (d as { spot?: Spot }).spot;
       await reloadSpots();
-      setSpotPopup(null);
-      setNote("Spot saved to your spots!");
+      if (created) {
+        openSpotPopup({
+          id: created.id,
+          name: created.name,
+          lat: Number(created.lat),
+          lng: Number(created.lng),
+          notes: created.notes ?? null,
+          icon: created.icon || "pin",
+          created_at: created.created_at ?? new Date().toISOString(),
+          lake_id: created.lake_id ?? null,
+          depth_ft: created.depth_ft ?? null,
+        });
+        // Prime the editor's lake from the created row itself (the spots
+        // list in this closure may not include the new spot yet).
+        setSpotEditLakeId(created.lake_id ?? null);
+        setSpotLakeQuery(
+          created.lake_id
+            ? allLakes.find((l) => l.id === created.lake_id)?.name ?? ""
+            : ""
+        );
+        setSpotEditing(true);
+        setNote("Saved — make it yours, then tap Save.");
+      } else {
+        setSpotPopup(null);
+        setNote("Spot saved to your spots!");
+      }
       setTimeout(() => setNote(null), 2500);
     } catch {
       setNote("Couldn't save that spot — try again.");
