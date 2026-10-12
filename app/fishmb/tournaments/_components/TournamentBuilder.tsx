@@ -41,13 +41,13 @@ export function DateTimeField({ label, value, onChange }: { label: string; value
     onChange(`${nd}T${nt || "08:00"}`);
   };
   const smallInput =
-    "w-full min-w-0 bg-white border border-pine/20 rounded-xl px-3 py-2 text-sm text-pine focus:outline-none focus:border-signal";
+    "w-full min-w-0 bg-white border border-pine/20 rounded-xl px-2 py-2 text-sm text-pine focus:outline-none focus:border-signal";
   const miniLabel = "block text-[10px] font-bold uppercase tracking-wider text-pine/50 mb-1";
   return (
     <div className="min-w-0">
       {label && <label className={labelCls}>{label}</label>}
-      <div className="flex gap-2">
-        <div className="flex-1 min-w-0">
+      <div className="flex gap-1.5">
+        <div className="flex-[1.4] min-w-0">
           <span className={miniLabel}>Date</span>
           <input
             type="date"
@@ -57,7 +57,7 @@ export function DateTimeField({ label, value, onChange }: { label: string; value
             aria-label="Date"
           />
         </div>
-        <div className="w-32 shrink-0">
+        <div className="flex-1 min-w-0">
           <span className={miniLabel}>Time</span>
           <input
             type="time"
