@@ -744,11 +744,16 @@ export default function MapsHub() {
     setSnap("collapsed");
   };
 
-  // Tapping a catch in a list opens its detail sheet (edit lives there for
-  // your own catches). Flying to it is the row's separate Go to button.
+  // Tapping a catch in the menu: your own catch opens straight into its
+  // edit page; someone else's opens its detail view. Flying to the spot
+  // is the row's Go to button (and a button on the edit page itself).
   const onCatchListSelect = (c: MapCatch) => {
-    setCatchEditing(false);
     setSelectedCatch(c);
+    if (c.mine) {
+      void startCatchEdit(c);
+    } else {
+      setCatchEditing(false);
+    }
   };
 
   // Go to on map — make sure the catch's pin layer is ON, or the map zooms
@@ -779,14 +784,15 @@ export default function MapsHub() {
     return up.url as string;
   };
 
-  const startCatchEdit = async () => {
-    if (!selectedCatch) return;
+  const startCatchEdit = async (target?: MapCatch) => {
+    const c = target ?? selectedCatch;
+    if (!c) return;
     setCatchEditLoading(true);
     setCatchEditing(true);
     setCatchEditFiles([]);
     setCatchEditPreviews([]);
     try {
-      const d = await fishFetch(`/api/fish/catches/${selectedCatch.id}`);
+      const d = await fishFetch(`/api/fish/catches/${c.id}`);
       const full = d.catch as {
         note?: string | null;
         photos?: string[] | null;
@@ -805,7 +811,7 @@ export default function MapsHub() {
       setCatchEditPhotos(ph);
     } catch {
       setCatchEditNote("");
-      setCatchEditPhotos(selectedCatch.photo_url ? [selectedCatch.photo_url] : []);
+      setCatchEditPhotos(c.photo_url ? [c.photo_url] : []);
     } finally {
       setCatchEditLoading(false);
     }
@@ -1928,6 +1934,17 @@ export default function MapsHub() {
                   </div>
                   <button
                     type="button"
+                    onClick={() => {
+                      onCatchGoTo(selectedCatch);
+                      setSelectedCatch(null);
+                      setCatchEditing(false);
+                    }}
+                    className="w-full mt-4 bg-pine/5 hover:bg-pine/10 text-pine font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors"
+                  >
+                    🧭 Take me to the spot
+                  </button>
+                  <button
+                    type="button"
                     onClick={deleteCatch}
                     disabled={catchSaving}
                     className="w-full mt-4 bg-red-50 hover:bg-red-100 text-red-600 font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors disabled:opacity-50"
@@ -1951,7 +1968,7 @@ export default function MapsHub() {
                 {selectedCatch.mine && (
                   <button
                     type="button"
-                    onClick={startCatchEdit}
+                    onClick={() => startCatchEdit()}
                     className="w-full bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-full transition-colors mb-2"
                   >
                     ✏️ Edit catch
