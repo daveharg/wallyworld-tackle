@@ -946,13 +946,14 @@ function OwnPostMenu({
 }: {
   item: FeedItem;
   dark?: boolean;
-  onEdited: (id: string, body: string) => void;
+  onEdited: (id: string, body: string, visibility: string) => void;
   onDeleted: (id: string) => void;
 }) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [draft, setDraft] = useState(item.body ?? "");
+  const [vis, setVis] = useState(item.visibility ?? "public");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -965,9 +966,9 @@ function OwnPostMenu({
       await fishFetch(`/api/fishmb/feed/${item.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ body: text }),
+        body: JSON.stringify({ body: text, visibility: vis }),
       });
-      onEdited(item.id, text);
+      onEdited(item.id, text, vis);
       setEditing(false);
       setSheetOpen(false);
     } catch (e) {
@@ -1018,6 +1019,7 @@ function OwnPostMenu({
               type="button"
               onClick={() => {
                 setDraft(item.body ?? "");
+                setVis(item.visibility ?? "public");
                 setError(null);
                 setEditing(true);
               }}
@@ -1059,6 +1061,22 @@ function OwnPostMenu({
               autoFocus
               className="w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine text-sm focus:outline-none focus:border-signal resize-y"
             />
+            <div className="flex items-center gap-2 mt-3">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-pine/50 whitespace-nowrap">
+                Visible to
+              </span>
+              <select
+                value={vis}
+                onChange={(e) => setVis(e.target.value)}
+                className="bg-paper-deep border border-pine/15 rounded-full px-3 py-2 text-xs font-bold text-pine focus:outline-none"
+                aria-label="Who can see this post"
+              >
+                <option value="public">Everyone</option>
+                <option value="friends">Friends only</option>
+                <option value="followers">Followers only</option>
+                {item.kind === "catch" && <option value="private">Only me</option>}
+              </select>
+            </div>
             {error && <p className="text-signal-dark text-sm mt-2">{error}</p>}
             <div className="flex gap-2 mt-4">
               <button
@@ -1393,8 +1411,8 @@ function FeedPageInner() {
   const router = useRouter();
   const { user, loading: authLoading, openLogin, logout } = useFishAuth();
   const [items, setItems] = useState<FeedItem[]>([]);
-  const handlePostEdited = useCallback((id: string, body: string) => {
-    setItems((prev) => prev.map((it) => (it.id === id ? { ...it, body } : it)));
+  const handlePostEdited = useCallback((id: string, body: string, visibility: string) => {
+    setItems((prev) => prev.map((it) => (it.id === id ? { ...it, body, visibility } : it)));
   }, []);
   const handlePostDeleted = useCallback((id: string) => {
     setItems((prev) => prev.filter((it) => it.id !== id));

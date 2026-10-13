@@ -1,5 +1,6 @@
 // /api/fishmb/feed/[id] — edit or delete your own feed post.
-// PUT { body } — updates the post text (discussions.body, or catches.feed_caption).
+// PUT { body?, visibility? } — updates the post text (discussions.body,
+// or catches.feed_caption) and/or who it's shared with. Owner-only both.
 // DELETE — removes the post plus its reactions/comments. Owner-only both.
 
 import { NextRequest, NextResponse } from "next/server";
@@ -28,9 +29,30 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     return badRequest("Invalid JSON body.");
   }
   const text = typeof body.body === "string" ? body.body.trim().slice(0, 2000) : "";
-  if (!text) return badRequest("Post text is required.");
+  // Sharing can be changed on edit too: everyone / friends / followers,
+  // plus "private" (only me) for catches — a private discussion makes no
+  // sense, so posts can't be set private here.
+  const VISIBILITIES =
+    table === "fm_catches"
+      ? ["public", "friends", "followers", "private"]
+      : ["public", "friends", "followers"];
+  const visibility =
+    typeof body.visibility === "string" && VISIBILITIES.includes(body.visibility)
+      ? body.visibility
+      : null;
+  if (!text && !visibility) return badRequest("Nothing to update.");
   const column = table === "fm_discussions" ? "body" : "feed_caption";
-  await query(`UPDATE ${table} SET ${column} = $1 WHERE id = $2`, [text, params.id]);
+  if (text && visibility) {
+    await query(`UPDATE ${table} SET ${column} = $1, visibility = $2 WHERE id = $3`, [
+      text,
+      visibility,
+      params.id,
+    ]);
+  } else if (text) {
+    await query(`UPDATE ${table} SET ${column} = $1 WHERE id = $2`, [text, params.id]);
+  } else {
+    await query(`UPDATE ${table} SET visibility = $1 WHERE id = $2`, [visibility, params.id]);
+  }
   return NextResponse.json({ ok: true });
 }
 
