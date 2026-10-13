@@ -1275,6 +1275,44 @@ export default function ThreadView({
           <p className="text-[11px] text-pine/45 mt-0.5">
             {peer.is_group ? `${peer.members.length} members` : "Direct message"}
           </p>
+          {peer.is_group && peer.members.length > 0 && (
+            <button
+              type="button"
+              onClick={() => openGroupEditor()}
+              className="flex items-center justify-center mt-1.5 px-1"
+              aria-label="Group members"
+            >
+              <span className="flex -space-x-2">
+                {peer.members.slice(0, 10).map((m) => (
+                  <span
+                    key={m.user_id}
+                    className="ring-2 ring-white rounded-full shrink-0"
+                    title={m.name}
+                  >
+                    {m.avatar_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={m.avatar_url}
+                        alt=""
+                        className="w-7 h-7 rounded-full object-cover block"
+                      />
+                    ) : (
+                      <span
+                        className={`w-7 h-7 rounded-full ${avatarBg(m.name)} text-white flex items-center justify-center font-bold text-[10px]`}
+                      >
+                        {m.name.charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                  </span>
+                ))}
+                {peer.members.length > 10 && (
+                  <span className="ring-2 ring-white rounded-full shrink-0 w-7 h-7 bg-pine/15 text-pine flex items-center justify-center font-bold text-[10px]">
+                    +{peer.members.length - 10}
+                  </span>
+                )}
+              </span>
+            </button>
+          )}
         </div>
         <button
           type="button"
