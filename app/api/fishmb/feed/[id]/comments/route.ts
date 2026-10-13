@@ -31,6 +31,11 @@ export async function POST(
   const photoUrl = typeof body.photo_url === "string" && /^https?:\/\//.test(body.photo_url) ? body.photo_url.slice(0, 2048) : null;
   if (!text && !photoUrl) return badRequest("Write something or add a photo first.");
   const parentId = typeof body.parent_id === "string" && body.parent_id.trim() ? body.parent_id.trim() : null;
-  const comment = await addComment(params.id, me.id, text, parentId, photoUrl);
+  let comment;
+  try {
+    comment = await addComment(params.id, me.id, text, parentId, photoUrl);
+  } catch (e) {
+    return badRequest(e instanceof Error ? e.message : "Could not comment.");
+  }
   return NextResponse.json({ comment }, { status: 201 });
 }

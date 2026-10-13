@@ -12,6 +12,7 @@ import {
   ensureProfileColumns,
   type FishUser,
 } from "@/lib/fish/auth";
+import { findObjectionable, OBJECTIONABLE_ERROR } from "@/lib/fish/moderation";
 
 export async function GET(req: NextRequest) {
   const me = await fishUserFromRequest(req);
@@ -37,6 +38,7 @@ export async function PATCH(req: NextRequest) {
   if (typeof body.name === "string") {
     const name = body.name.trim().slice(0, 80);
     if (name.length === 0) return badRequest("name cannot be empty.");
+    if (findObjectionable(name)) return badRequest(OBJECTIONABLE_ERROR);
     // Display names are unique (case-insensitive) — no two anglers share one.
     const taken = await query(
       `SELECT id FROM fm_users WHERE LOWER(name) = LOWER($1) AND id != $2 LIMIT 1`,
@@ -66,6 +68,7 @@ export async function PATCH(req: NextRequest) {
     updates.push(`allow_follow = $${params.length}`);
   }
   if (typeof body.bio === "string") {
+    if (findObjectionable(body.bio)) return badRequest(OBJECTIONABLE_ERROR);
     params.push(body.bio.trim().slice(0, 500));
     updates.push(`bio = $${params.length}`);
   }

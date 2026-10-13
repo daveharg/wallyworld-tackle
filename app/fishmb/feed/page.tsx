@@ -797,6 +797,144 @@ function Reactions({
   );
 }
 
+/** ⋯ menu on someone else's post: Report it, or Block the author
+ *  (blocking hides everything they post, everywhere, and stops messages). */
+function OtherPostMenu({
+  item,
+  dark,
+  onBlocked,
+}: {
+  item: FeedItem;
+  dark?: boolean;
+  onBlocked: (userId: string) => void;
+}) {
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [confirming, setConfirming] = useState<null | "report" | "block">(null);
+  const [done, setDone] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const close = () => {
+    setSheetOpen(false);
+    setConfirming(null);
+    setDone(null);
+  };
+
+  const doReport = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await fishFetch("/api/fishmb/reports", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          target_type: item.kind === "catch" ? "catch" : "post",
+          target_id: item.id,
+          reason: "",
+        }),
+      });
+      setDone("Reported — thanks. We review every report within 24 hours.");
+    } catch {
+      setDone("Couldn't send the report — try again.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const doBlock = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await fishFetch("/api/fishmb/blocks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: item.user_id }),
+      });
+      onBlocked(item.user_id);
+      close();
+    } catch {
+      setBusy(false);
+    }
+  };
+
+  const rowBtn =
+    "w-full text-left px-4 py-3.5 rounded-2xl font-bold text-pine hover:bg-pine/5";
+
+  return (
+    <>
+      <button
+        type="button"
+        aria-label="Post options"
+        onClick={(e) => {
+          e.stopPropagation();
+          setSheetOpen(true);
+        }}
+        className={`w-8 h-8 rounded-full flex items-center justify-center text-lg leading-none transition-colors ${
+          dark ? "bg-black/45 text-white" : "text-pine/45 hover:bg-pine/10"
+        }`}
+      >
+        ⋯
+      </button>
+
+      {sheetOpen && (
+        <div className="fixed inset-0 z-[3000] flex items-end justify-center" onClick={close}>
+          <div className="absolute inset-0 bg-pine-deep/60" />
+          <div
+            className="relative w-full max-w-md bg-white rounded-t-3xl p-4 pb-8 space-y-1"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-10 h-1 rounded-full bg-pine/20 mx-auto mb-3" />
+            {done ? (
+              <>
+                <p className="px-4 py-3 text-sm font-bold text-pine">{done}</p>
+                <button type="button" onClick={close} className="w-full text-center px-4 py-3.5 rounded-2xl font-bold text-pine/50">
+                  Close
+                </button>
+              </>
+            ) : confirming === "report" ? (
+              <>
+                <p className="px-4 py-2 text-sm text-pine/70">
+                  Report this {item.kind === "catch" ? "catch" : "post"} to the FishMB team?
+                </p>
+                <button type="button" onClick={doReport} disabled={busy} className="w-full text-left px-4 py-3.5 rounded-2xl font-bold text-signal-dark hover:bg-signal/10 disabled:opacity-50">
+                  🚩 Yes, report it
+                </button>
+                <button type="button" onClick={() => setConfirming(null)} className="w-full text-center px-4 py-3.5 rounded-2xl font-bold text-pine/50">
+                  Back
+                </button>
+              </>
+            ) : confirming === "block" ? (
+              <>
+                <p className="px-4 py-2 text-sm text-pine/70">
+                  Block {item.user_name}? You&apos;ll stop seeing their posts and comments,
+                  and neither of you will be able to message the other. You can undo this in Settings.
+                </p>
+                <button type="button" onClick={doBlock} disabled={busy} className="w-full text-left px-4 py-3.5 rounded-2xl font-bold text-signal-dark hover:bg-signal/10 disabled:opacity-50">
+                  🚫 Yes, block {item.user_name}
+                </button>
+                <button type="button" onClick={() => setConfirming(null)} className="w-full text-center px-4 py-3.5 rounded-2xl font-bold text-pine/50">
+                  Back
+                </button>
+              </>
+            ) : (
+              <>
+                <button type="button" onClick={() => setConfirming("report")} className={rowBtn}>
+                  🚩 Report {item.kind === "catch" ? "catch" : "post"}
+                </button>
+                <button type="button" onClick={() => setConfirming("block")} className={rowBtn}>
+                  🚫 Block {item.user_name}
+                </button>
+                <button type="button" onClick={close} className="w-full text-center px-4 py-3.5 rounded-2xl font-bold text-pine/50">
+                  Cancel
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 /** ⋯ menu on your own posts: Edit / Delete via a bottom action sheet.
  *  For catches, "delete" only removes the post from the feed — the catch
  *  itself stays on your catch list. */
@@ -1260,6 +1398,9 @@ function FeedPageInner() {
   }, []);
   const handlePostDeleted = useCallback((id: string) => {
     setItems((prev) => prev.filter((it) => it.id !== id));
+  }, []);
+  const handleAuthorBlocked = useCallback((userId: string) => {
+    setItems((prev) => prev.filter((it) => it.user_id !== userId));
   }, []);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -2319,6 +2460,9 @@ function FeedPageInner() {
                       onDeleted={handlePostDeleted}
                     />
                   )}
+                  {user && user.id !== item.user_id && (
+                    <OtherPostMenu item={item} dark onBlocked={handleAuthorBlocked} />
+                  )}
                   {item.kind === "catch" && (
                     <span className="text-[10px] font-bold uppercase tracking-wider bg-black/55 text-white px-3 py-1 rounded-full">
                       Catch
@@ -2375,6 +2519,11 @@ function FeedPageInner() {
                         onEdited={handlePostEdited}
                         onDeleted={handlePostDeleted}
                       />
+                    </span>
+                  )}
+                  {user && user.id !== item.user_id && (
+                    <span className="ml-auto">
+                      <OtherPostMenu item={item} onBlocked={handleAuthorBlocked} />
                     </span>
                   )}
                 </div>

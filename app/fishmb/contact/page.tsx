@@ -60,7 +60,12 @@ export default function ContactPage() {
         Contact us
       </h1>
       <p className="text-pine/65 mb-8">
-        Found a bug, a wrong regulation, or just want to say hi? Send it our way.
+        Found a bug, a wrong regulation, or just want to say hi? Send it our way —
+        or email us any time at{" "}
+        <a href="mailto:support@fishmb.ca" className="font-bold text-pine underline">
+          support@fishmb.ca
+        </a>
+        .
       </p>
 
       {sent ? (

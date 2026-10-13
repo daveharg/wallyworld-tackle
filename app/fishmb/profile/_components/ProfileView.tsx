@@ -63,6 +63,80 @@ function Avatar({ url, name, size }: { url: string | null; name: string; size: s
   );
 }
 
+/** Report / Block row shown on someone else's profile. */
+function ReportBlockRow({ userId, name }: { userId: string; name: string }) {
+  const router = useRouter();
+  const [armBlock, setArmBlock] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const report = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await fishFetch("/api/fishmb/reports", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ target_type: "user", target_id: userId, reason: "" }),
+      });
+      setMsg("Reported — thanks. We review every report within 24 hours.");
+    } catch {
+      setMsg("Couldn't send the report — try again.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const block = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await fishFetch("/api/fishmb/blocks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: userId }),
+      });
+      router.push("/fishmb/feed");
+    } catch {
+      setBusy(false);
+      setMsg("Couldn't block — try again.");
+    }
+  };
+
+  if (msg) return <p className="text-xs text-pine/60 mt-2">{msg}</p>;
+  return (
+    <div className="flex items-center gap-4 mt-2">
+      <button
+        type="button"
+        onClick={report}
+        disabled={busy}
+        className="text-xs font-bold text-pine/45 underline underline-offset-2 disabled:opacity-50"
+      >
+        🚩 Report
+      </button>
+      {armBlock ? (
+        <button
+          type="button"
+          onClick={block}
+          disabled={busy}
+          className="text-xs font-bold text-signal-dark underline underline-offset-2 disabled:opacity-50"
+        >
+          🚫 Tap again to block {name}
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setArmBlock(true)}
+          disabled={busy}
+          className="text-xs font-bold text-pine/45 underline underline-offset-2 disabled:opacity-50"
+        >
+          🚫 Block
+        </button>
+      )}
+    </div>
+  );
+}
+
 export default function ProfileView({
   userId,
   editor,
@@ -298,6 +372,7 @@ export default function ProfileView({
             </div>
             )}
           </div>
+          {!data.is_self && me && <ReportBlockRow userId={userId} name={user.name} />}
           <div className="flex gap-6 mb-3">
             {stats.map((s) => (
               <div key={s.label} className="text-center">

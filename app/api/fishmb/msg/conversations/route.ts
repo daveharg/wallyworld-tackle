@@ -16,6 +16,7 @@ import {
   getPublicKey,
 } from "@/lib/fish/messages";
 import { query } from "@/lib/fish/db";
+import { blockedEitherWay } from "@/lib/fish/moderation";
 
 export async function GET(req: NextRequest) {
   const me = await fishUserFromRequest(req);
@@ -79,6 +80,8 @@ export async function POST(req: NextRequest) {
   if (!otherId || otherId === me.id) return badRequest("Invalid user.");
   const rows = await query<{ id: string }>(`SELECT id FROM fm_users WHERE id = $1`, [otherId]);
   if (rows.length === 0) return notFound("User not found.");
+  if (await blockedEitherWay(me.id, otherId))
+    return badRequest("You're unable to message this angler.");
   // Anyone can be messaged — a user without keys yet just can't read
   // messages until they enable encrypted messaging.
   if (!(await myKeyReady(me.id))) return badRequest("Set up your messaging keys first.");

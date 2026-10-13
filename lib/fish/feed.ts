@@ -4,6 +4,11 @@
 // items are shown to the author and their accepted friends).
 
 import { query, queryOne } from "./db";
+import {
+  findObjectionable,
+  OBJECTIONABLE_ERROR,
+  hiddenAuthorIds,
+} from "./moderation";
 
 export interface FeedItem {
   id: string;
@@ -183,6 +188,13 @@ export async function getFeed(opts: GetFeedOptions = {}): Promise<FeedPage> {
     const clause = `(feed.created_at < ${t}::timestamptz OR (feed.created_at = ${t}::timestamptz AND feed.id < ${i}))`;
     where = where ? `${where} AND ${clause}` : `WHERE ${clause}`;
   }
+  // Blocks: authors the viewer blocked (or who blocked the viewer) vanish.
+  const hidden = await hiddenAuthorIds(viewerId);
+  if (hidden.length > 0) {
+    params.push(hidden);
+    const clause = `feed.user_id <> ALL($${params.length}::uuid[])`;
+    where = where ? `${where} AND ${clause}` : `WHERE ${clause}`;
+  }
   // Kind filter applies inside each UNION branch so cursor pages stay stable.
   const catchWhere = kind === "post" ? "AND FALSE" : "";
   const postWhere = kind === "catch" ? "AND FALSE" : "";
@@ -242,6 +254,7 @@ export async function createPost(
   video: { playback_id: string; duration: number | null } | null = null
 ): Promise<FeedItem> {
   await ensureFeedColumns();
+  if (findObjectionable(body)) throw new Error(OBJECTIONABLE_ERROR);
   const finalPhotos = photos.length > 0 ? photos : photoUrl ? [photoUrl] : [];
   const finalPhotoUrl = finalPhotos[0] ?? null;
   const rows = await query<FeedItem>(
@@ -337,6 +350,7 @@ export async function getSpeciesTips(species: string, limit = 20): Promise<FeedI
 
 export async function getComments(postId: string, viewerId?: string): Promise<FeedComment[]> {
   await ensureFeedColumns();
+  const hidden = await hiddenAuthorIds(viewerId ?? null);
   const rows = await query<FeedComment>(
     `SELECT cm.id, cm.user_id::text AS user_id, u.name AS user_name, u.avatar_url, cm.body,
             cm.photo_url,
@@ -347,9 +361,9 @@ export async function getComments(postId: string, viewerId?: string): Promise<Fe
             cm.created_at
      FROM fm_comments cm
      JOIN fm_users u ON u.id = cm.user_id
-     WHERE cm.post_id = $1
+     WHERE cm.post_id = $1 AND cm.user_id <> ALL($3::uuid[])
      ORDER BY cm.created_at ASC`,
-    [postId, viewerId ?? null]
+    [postId, viewerId ?? null, hidden]
   );
   return rows.map((c) => ({
     ...c,
@@ -365,6 +379,7 @@ export async function addComment(
   photoUrl?: string | null
 ): Promise<FeedComment> {
   await ensureFeedColumns();
+  if (findObjectionable(body)) throw new Error(OBJECTIONABLE_ERROR);
   // A reply must belong to a comment on the same post.
   let parent: string | null = null;
   if (parentId) {

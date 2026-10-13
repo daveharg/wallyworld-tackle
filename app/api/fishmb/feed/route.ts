@@ -84,6 +84,11 @@ export async function POST(req: NextRequest) {
     const dur = typeof bv.duration === "number" && bv.duration > 0 ? Math.min(bv.duration, 3600) : null;
     video = { playback_id: bv.playback_id, duration: dur };
   }
-  const item = await createPost(me.id, text, photoUrl, visibility, speciesTag, photos, video);
+  let item;
+  try {
+    item = await createPost(me.id, text, photoUrl, visibility, speciesTag, photos, video);
+  } catch (e) {
+    return badRequest(e instanceof Error ? e.message : "Could not post.");
+  }
   return NextResponse.json({ item }, { status: 201 });
 }

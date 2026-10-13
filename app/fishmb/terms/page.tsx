@@ -12,7 +12,7 @@ export default function TermsPage() {
       <BackArrow />
       <LegalDoc
       title="Terms of Service"
-      updated="October 8, 2026"
+      updated="October 12, 2026"
       intro="Welcome to FishMB — Manitoba's fishing community. These terms are the rules of the dock: by creating an account or using the app, you agree to them. If you don't agree, don't use FishMB."
       sections={[
         {
@@ -83,6 +83,14 @@ export default function TermsPage() {
               <p>
                 Breaking these rules can get your content removed or your account
                 suspended, with or without warning depending on severity.
+              </p>
+              <p>
+                <strong>Zero tolerance:</strong> FishMB has zero tolerance for
+                objectionable content and abusive behaviour. Content that breaks
+                these rules is removed, and anglers who post it are suspended or
+                permanently banned. You can report any post, comment, profile, or
+                message and block any angler — every report is reviewed within
+                24 hours.
               </p>
             </>
           ),

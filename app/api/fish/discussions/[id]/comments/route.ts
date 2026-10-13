@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { query, queryOne } from "@/lib/fish/db";
+import { findObjectionable, OBJECTIONABLE_ERROR } from "@/lib/fish/moderation";
 import {
   fishUserFromRequest,
   unauthorized,
@@ -91,6 +92,7 @@ export async function POST(
   if (text.length > 500) {
     return badRequest("body must be 500 characters or fewer.");
   }
+  if (findObjectionable(text)) return badRequest(OBJECTIONABLE_ERROR);
 
   const recent = await queryOne<{ n: string }>(
     `SELECT COUNT(*) AS n FROM fm_comments

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { fishFetch } from "./fishFetch";
+import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 import { THEMES, getTheme, setTheme, type ThemeId } from "./theme";
 import { useSheetDrag, SheetGrabber } from "./sheetDrag";
 
@@ -39,6 +40,11 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
   const [saving, setSaving] = useState<keyof Prefs | null>(null);
   const [pushState, setPushState] = useState<PushState>("checking");
   const [enabling, setEnabling] = useState(false);
+  const [blocked, setBlocked] = useState<{ id: string; name: string; avatar_url: string | null }[] | null>(null);
+  const [unblocking, setUnblocking] = useState<string | null>(null);
+  const [armDelete, setArmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // Lock background scroll while the sheet is open.
   useEffect(() => {
@@ -57,6 +63,16 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
         setPrefs(p as Prefs);
       } catch {
         setPrefs({ friend_catch: true, friend_post: true, new_message: true });
+      }
+    })();
+    (async () => {
+      try {
+        const b = (await fishFetch("/api/fishmb/blocks")) as {
+          blocked: { id: string; name: string; avatar_url: string | null }[];
+        };
+        setBlocked(b.blocked ?? []);
+      } catch {
+        setBlocked([]);
       }
     })();
     (async () => {
@@ -85,6 +101,35 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
   const pickTheme = (id: ThemeId) => {
     setTheme(id);
     setThemeState(id);
+  };
+
+  const unblock = async (userId: string) => {
+    if (unblocking) return;
+    setUnblocking(userId);
+    try {
+      await fishFetch(`/api/fishmb/blocks?user_id=${encodeURIComponent(userId)}`, {
+        method: "DELETE",
+      });
+      setBlocked((prev) => (prev ?? []).filter((b) => b.id !== userId));
+    } catch {
+      // Leave the row in place on failure.
+    } finally {
+      setUnblocking(null);
+    }
+  };
+
+  const deleteAccount = async () => {
+    if (deleting) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await fishFetch("/api/fishmb/users/me", { method: "DELETE" });
+      localStorage.removeItem(FISHMB_TOKEN_KEY);
+      window.location.href = "/fishmb";
+    } catch {
+      setDeleting(false);
+      setDeleteError("Couldn't delete your account — try again, or contact support@fishmb.ca.");
+    }
   };
 
   const toggle = async (key: keyof Prefs) => {
@@ -261,6 +306,82 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
             Alerts only arrive on devices where push notifications are turned
             on.
           </p>
+
+          {/* Blocked anglers */}
+          <h3 className="text-xs font-black uppercase tracking-[0.14em] text-pine/45 mt-7 mb-3">
+            Blocked anglers
+          </h3>
+          {blocked === null ? (
+            <p className="text-xs text-pine/50 mb-2">Loading…</p>
+          ) : blocked.length === 0 ? (
+            <p className="text-xs text-pine/50 mb-2 leading-relaxed">
+              You haven&apos;t blocked anyone. Blocking hides an angler&apos;s posts
+              and comments from you, and stops messages both ways.
+            </p>
+          ) : (
+            <div className="bg-white border border-pine/10 rounded-2xl divide-y divide-pine/8 overflow-hidden mb-2">
+              {blocked.map((b) => (
+                <div key={b.id} className="flex items-center gap-3 px-4 py-3">
+                  <span className="min-w-0 flex-1 truncate text-sm font-bold text-pine">
+                    {b.name}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => unblock(b.id)}
+                    disabled={unblocking !== null}
+                    className="shrink-0 text-xs font-bold uppercase tracking-wider text-signal-dark disabled:opacity-50"
+                  >
+                    {unblocking === b.id ? "…" : "Unblock"}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Delete account */}
+          <h3 className="text-xs font-black uppercase tracking-[0.14em] text-pine/45 mt-7 mb-3">
+            Danger zone
+          </h3>
+          {!armDelete ? (
+            <button
+              type="button"
+              onClick={() => setArmDelete(true)}
+              className="w-full border border-red-200 text-red-700 font-bold text-sm rounded-full px-5 py-3"
+            >
+              Delete my account
+            </button>
+          ) : (
+            <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-4">
+              <p className="text-sm font-bold text-red-800 mb-1">
+                Permanently delete your account?
+              </p>
+              <p className="text-xs text-red-700/80 leading-relaxed mb-3">
+                This removes your profile and takes your posts, comments, catches
+                and spots down for good. It can&apos;t be undone.
+              </p>
+              {deleteError && (
+                <p className="text-xs font-bold text-red-700 mb-3">{deleteError}</p>
+              )}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={deleteAccount}
+                  disabled={deleting}
+                  className="flex-1 bg-red-600 text-white font-bold text-sm rounded-full px-4 py-2.5 disabled:opacity-50"
+                >
+                  {deleting ? "Deleting…" : "Yes, delete it"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setArmDelete(false)}
+                  disabled={deleting}
+                  className="flex-1 bg-white border border-pine/15 text-pine font-bold text-sm rounded-full px-4 py-2.5 disabled:opacity-50"
+                >
+                  Keep my account
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

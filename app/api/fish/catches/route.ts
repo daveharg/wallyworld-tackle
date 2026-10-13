@@ -13,6 +13,7 @@ import {
   publicUser,
   type FishUser,
 } from "@/lib/fish/auth";
+import { findObjectionable, OBJECTIONABLE_ERROR } from "@/lib/fish/moderation";
 
 export interface CatchRow {
   id: string;
@@ -176,6 +177,7 @@ export async function POST(req: NextRequest) {
   // Public caption shown with the catch on the feed (separate from private notes).
   const feedCaption =
     typeof body.feed_caption === "string" ? body.feed_caption.trim().slice(0, 500) || null : null;
+  if (findObjectionable(feedCaption)) return badRequest(OBJECTIONABLE_ERROR);
   let caughtAt: string | null = null;
   if (body.caught_at !== undefined && body.caught_at !== null) {
     const d = new Date(String(body.caught_at));

@@ -116,6 +116,91 @@ interface GrowthDay {
   catches: number;
 }
 
+interface ModerationReport {
+  id: string;
+  reporter_name: string | null;
+  target_type: string;
+  target_id: string;
+  target_user_id: string | null;
+  target_author_name: string | null;
+  reason: string;
+  status: string;
+  created_at: string;
+  content_preview: string | null;
+}
+
+/** Moderation queue: user reports with one-tap actions. Every report
+ *  should be actioned within 24 hours (App Store Guideline 1.2). */
+function ReportsQueue({
+  reports,
+  acting,
+  onAct,
+}: {
+  reports: ModerationReport[];
+  acting: string | null;
+  onAct: (report: ModerationReport, action: "remove_content" | "suspend_author" | "dismiss") => void;
+}) {
+  if (reports.length === 0)
+    return (
+      <p className="text-pine/60 text-sm bg-white border border-pine/10 rounded-2xl px-5 py-6">
+        No open reports. 🎉
+      </p>
+    );
+  return (
+    <div className="space-y-3">
+      {reports.map((r) => (
+        <div key={r.id} className="bg-white border border-pine/10 rounded-2xl px-5 py-4">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-1.5">
+            <span className="text-xs font-black uppercase tracking-wider text-signal-dark">
+              🚩 {r.target_type}
+            </span>
+            <span className="text-sm font-bold text-pine">
+              {r.target_author_name ?? "Unknown angler"}
+            </span>
+            <span className="text-xs text-pine/45">
+              reported by {r.reporter_name ?? "an angler"} · {timeAgo(r.created_at)}
+            </span>
+          </div>
+          {r.content_preview && (
+            <p className="text-sm text-pine/75 bg-pine/5 rounded-xl px-3.5 py-2.5 mb-2 whitespace-pre-wrap">
+              “{r.content_preview}”
+            </p>
+          )}
+          {r.reason && <p className="text-xs text-pine/55 mb-2">Reason: {r.reason}</p>}
+          <div className="flex flex-wrap gap-2 mt-2">
+            {r.target_type !== "user" && (
+              <button
+                type="button"
+                disabled={acting === r.id}
+                onClick={() => onAct(r, "remove_content")}
+                className="text-xs font-bold uppercase tracking-wider bg-red-600 text-white rounded-full px-4 py-2 disabled:opacity-50"
+              >
+                Remove content
+              </button>
+            )}
+            <button
+              type="button"
+              disabled={acting === r.id || !r.target_user_id}
+              onClick={() => onAct(r, "suspend_author")}
+              className="text-xs font-bold uppercase tracking-wider bg-pine text-white rounded-full px-4 py-2 disabled:opacity-50"
+            >
+              Suspend author
+            </button>
+            <button
+              type="button"
+              disabled={acting === r.id}
+              onClick={() => onAct(r, "dismiss")}
+              className="text-xs font-bold uppercase tracking-wider bg-white border border-pine/20 text-pine/60 rounded-full px-4 py-2 disabled:opacity-50"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 interface GrowthData {
   days: GrowthDay[];
   totals: { users: number; posts: number; catches: number; tournaments: number };
@@ -395,10 +480,11 @@ export default function AdminPage() {
   const [anglerStats, setAnglerStats] = useState<AnglerStatsRow[]>([]);
   const [anglerSearch, setAnglerSearch] = useState("");
   const [allUsers, setAllUsers] = useState<ManagedUser[]>([]);
+  const [reports, setReports] = useState<ModerationReport[]>([]);
   const [userSearch, setUserSearch] = useState("");
   const [growth, setGrowth] = useState<GrowthData | null>(null);
   const [userMap, setUserMap] = useState<UserMapData | null>(null);
-  const [tab, setTab] = useState<"claims" | "ads" | "tournaments" | "messages" | "anglers" | "users" | "growth" | "map">("claims");
+  const [tab, setTab] = useState<"claims" | "ads" | "tournaments" | "messages" | "anglers" | "users" | "growth" | "map" | "reports">("claims");
   const [denied, setDenied] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [acting, setActing] = useState<string | null>(null);
@@ -431,6 +517,9 @@ export default function AdminPage() {
     fishFetch("/api/fishmb/admin/user-map")
       .then((d) => setUserMap(d as UserMapData))
       .catch(() => {});
+    fishFetch("/api/fishmb/admin/reports?status=open")
+      .then((d) => setReports(d.reports ?? []))
+      .catch(() => {});
   };
 
   useEffect(() => {
@@ -448,6 +537,33 @@ export default function AdminPage() {
         body: JSON.stringify({ id, status }),
       });
  setNote(kind === "ads" && status === "active" ? "Ad approved — running for 7 days. " : "Done.");
+      load();
+    } catch {
+      setNote("Action failed.");
+    } finally {
+      setActing(null);
+    }
+  };
+
+  const actOnReport = async (
+    report: ModerationReport,
+    action: "remove_content" | "suspend_author" | "dismiss"
+  ) => {
+    setActing(report.id);
+    setNote(null);
+    try {
+      await fishFetch("/api/fishmb/admin/reports", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ report_id: report.id, action }),
+      });
+      setNote(
+        action === "remove_content"
+          ? "Content removed."
+          : action === "suspend_author"
+            ? "Author suspended."
+            : "Report dismissed."
+      );
       load();
     } catch {
       setNote("Action failed.");
@@ -554,6 +670,7 @@ export default function AdminPage() {
       <div className="flex flex-wrap gap-2 mb-6">
         {(
           [
+ ["reports", `🚩 Reports (${reports.length})`],
  ["claims", ` Business claims (${claims.length})`],
  ["ads", ` Ad submissions (${ads.length})`],
  ["tournaments", ` Tournament suggestions (${suggestions.length})`],
@@ -576,7 +693,9 @@ export default function AdminPage() {
         ))}
       </div>
 
-      {tab === "claims" ? (
+      {tab === "reports" ? (
+        <ReportsQueue reports={reports} acting={acting} onAct={actOnReport} />
+      ) : tab === "claims" ? (
         claims.length === 0 ? (
           <div className="bg-white border border-pine/10 rounded-3xl p-10 text-center">
             <p className="text-pine/60">No pending claims. All caught up.</p>

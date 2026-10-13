@@ -9,6 +9,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query, queryOne } from "@/lib/fish/db";
 import {
+  findObjectionable,
+  OBJECTIONABLE_ERROR,
+  hiddenAuthorIds,
+} from "@/lib/fish/moderation";
+import {
   fishUserFromRequest,
   unauthorized,
   badRequest,
@@ -77,14 +82,18 @@ export async function GET(req: NextRequest) {
   await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS species_tag text`);
   await query(`ALTER TABLE fm_discussions ADD COLUMN IF NOT EXISTS in_feed boolean NOT NULL DEFAULT true`);
 
+  // Blocks: hide authors the viewer blocked (or who blocked the viewer).
+  const hidden = await hiddenAuthorIds(viewerId);
+  const hiddenRows = hidden.length > 0 ? ` AND d.user_id <> ALL($${speciesTag ? 5 : 4}::uuid[])` : "";
+  const hiddenTotal = hidden.length > 0 ? ` AND d.user_id <> ALL($2::uuid[])` : "";
   const rows = await query<DiscussionRow>(
-    `${SELECT} WHERE ${VISIBLE_SQL}${speciesTag ? ` AND d.visibility = 'public' AND LOWER(d.species_tag) = LOWER($4)` : ""}
+    `${SELECT} WHERE ${VISIBLE_SQL}${speciesTag ? ` AND d.visibility = 'public' AND LOWER(d.species_tag) = LOWER($4)` : ""}${hiddenRows}
      ORDER BY d.created_at DESC LIMIT $2 OFFSET $3`,
-    speciesTag ? [viewerId, limit, offset, speciesTag] : [viewerId, limit, offset]
+    speciesTag ? [viewerId, limit, offset, speciesTag, hidden] : [viewerId, limit, offset, hidden]
   );
   const total = await queryOne<{ n: string }>(
-    `SELECT COUNT(*) AS n FROM fm_discussions d WHERE ${VISIBLE_SQL}`,
-    [viewerId]
+    `SELECT COUNT(*) AS n FROM fm_discussions d WHERE ${VISIBLE_SQL}${hiddenTotal}`,
+    hidden.length > 0 ? [viewerId, hidden] : [viewerId]
   );
   return NextResponse.json({
     discussions: rows.map(toItem),
@@ -116,6 +125,7 @@ export async function POST(req: NextRequest) {
   if (text.length > 500) {
     return badRequest("body must be 500 characters or fewer.");
   }
+  if (findObjectionable(text)) return badRequest(OBJECTIONABLE_ERROR);
 
   const kind = body.kind === "ad" ? "ad" : body.kind === "tip" ? "tip" : "post";
   const visibility = body.visibility === "friends" ? "friends" : "public";

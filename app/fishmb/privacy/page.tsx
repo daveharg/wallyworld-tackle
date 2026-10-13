@@ -12,7 +12,7 @@ export default function PrivacyPage() {
       <BackArrow />
       <LegalDoc
       title="Privacy Policy"
-      updated="October 8, 2026"
+      updated="October 12, 2026"
       intro="FishMB is a community, not a data business. We collect the minimum needed to run the app, we don't sell your personal information, and your private spots stay private. Here's exactly what happens with your data."
       sections={[
         {
@@ -117,8 +117,13 @@ export default function PrivacyPage() {
                 <li>Delete your account from your profile settings. That removes your profile and takes your posts out of public view.</li>
               </ul>
               <p>
-                To request a copy of your data or ask us to delete it, contact
-                us — we'll sort it out.
+                To request a copy of your data, correct something in it, or ask
+                us to delete it, email us at{" "}
+                <a href="mailto:support@fishmb.ca" className="underline font-bold">
+                  support@fishmb.ca
+                </a>{" "}
+                — that's also the address for any privacy question, and we'll
+                sort it out.
               </p>
             </>
           ),

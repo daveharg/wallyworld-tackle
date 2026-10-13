@@ -8,6 +8,7 @@ import {
   forbidden,
 } from "@/lib/fish/auth";
 import { isMember, listMessages, storeMessage, getReactions } from "@/lib/fish/messages";
+import { blockedEitherWay } from "@/lib/fish/moderation";
 
 const B64 = /^[A-Za-z0-9+/=]+$/;
 
@@ -66,6 +67,12 @@ export async function POST(
       return badRequest("Invalid ciphertext.");
     seen.add(recipient_id);
     clean.push({ recipient_id, nonce, ciphertext });
+  }
+  // Blocks: never deliver to a recipient who has blocked the sender.
+  for (const part of clean) {
+    if (part.recipient_id !== g.me!.id && (await blockedEitherWay(part.recipient_id, g.me!.id))) {
+      return badRequest("You're unable to message this angler.");
+    }
   }
   try {
     const stored = await storeMessage(id, g.me!.id, clean);
