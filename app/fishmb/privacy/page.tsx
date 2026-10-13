@@ -46,6 +46,13 @@ export default function PrivacyPage() {
                 app needs: login sessions, error logs, and aggregate usage so we
                 can keep the lights on and fix bugs.
               </p>
+              <p>
+                <strong>Visit statistics</strong> — we count page views and how
+                long visits last with our own counters built into the app (no
+                third-party trackers). Visits are anonymous unless you're signed
+                in, and we only use the numbers to see which parts of FishMB get
+                used — never to advertise, and never sold.
+              </p>
             </>
           ),
         },

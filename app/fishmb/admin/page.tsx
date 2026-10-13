@@ -116,6 +116,113 @@ interface GrowthDay {
   catches: number;
 }
 
+interface VisitWindowStats {
+  sessions: number;
+  page_views: number;
+  signed_in_visitors: number;
+  avg_duration_s: number;
+  median_duration_s: number;
+}
+
+interface VisitStatsData {
+  last_24h: VisitWindowStats;
+  last_7d: VisitWindowStats;
+  last_30d: VisitWindowStats;
+  daily: { day: string; sessions: number; page_views: number }[];
+  top_pages_7d: { path: string; views: number }[];
+}
+
+function fmtDuration(totalSeconds: number): string {
+  const s = Math.max(0, Math.round(totalSeconds));
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60);
+  const rest = s % 60;
+  if (m < 60) return rest ? `${m}m ${rest}s` : `${m}m`;
+  const h = Math.floor(m / 60);
+  return `${h}h ${m % 60}m`;
+}
+
+/** Visits tab: first-party page-view + duration stats (no third-party
+ *  trackers). Durations run from first page load to the last heartbeat;
+ *  averages skip sub-5-second bounces. */
+function VisitsPanel({ stats }: { stats: VisitStatsData | null }) {
+  if (!stats)
+    return (
+      <p className="text-pine/60 text-sm bg-white border border-pine/10 rounded-2xl px-5 py-6">
+        No visit data yet — visits are counted from when this shipped.
+      </p>
+    );
+  const windows: [string, VisitWindowStats][] = [
+    ["Last 24 hours", stats.last_24h],
+    ["Last 7 days", stats.last_7d],
+    ["Last 30 days", stats.last_30d],
+  ];
+  const maxDaily = Math.max(1, ...stats.daily.map((d) => d.sessions));
+  return (
+    <div className="space-y-6">
+      <div className="grid md:grid-cols-3 gap-3">
+        {windows.map(([label, w]) => (
+          <div key={label} className="bg-white border border-pine/10 rounded-2xl px-5 py-4">
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-pine/45 mb-2">{label}</p>
+            <p className="font-display font-bold text-pine text-3xl leading-none">
+              {w.sessions.toLocaleString()}
+              <span className="text-sm font-bold text-pine/50 ml-2">visits</span>
+            </p>
+            <div className="text-sm text-pine/70 mt-3 space-y-1">
+              <p>{w.page_views.toLocaleString()} page views</p>
+              <p>
+                Avg stay <strong className="text-pine">{fmtDuration(w.avg_duration_s)}</strong>
+                {" · "}median {fmtDuration(w.median_duration_s)}
+              </p>
+              <p>{w.signed_in_visitors.toLocaleString()} signed-in anglers</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="bg-white border border-pine/10 rounded-2xl px-5 py-4">
+        <p className="text-xs font-black uppercase tracking-[0.14em] text-pine/45 mb-3">
+          Visits per day (14 days)
+        </p>
+        <div className="space-y-1.5">
+          {stats.daily.map((d) => (
+            <div key={d.day} className="flex items-center gap-3 text-sm">
+              <span className="w-24 shrink-0 text-pine/55 tabular-nums">{d.day.slice(5)}</span>
+              <span className="flex-1 h-4 bg-pine/5 rounded-full overflow-hidden">
+                <span
+                  className="block h-full bg-signal rounded-full"
+                  style={{ width: `${Math.round((d.sessions / maxDaily) * 100)}%` }}
+                />
+              </span>
+              <span className="w-28 shrink-0 text-right tabular-nums text-pine/70">
+                {d.sessions} visits · {d.page_views} views
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-white border border-pine/10 rounded-2xl px-5 py-4">
+        <p className="text-xs font-black uppercase tracking-[0.14em] text-pine/45 mb-3">
+          Top pages (7 days)
+        </p>
+        {stats.top_pages_7d.length === 0 ? (
+          <p className="text-sm text-pine/60">No page views recorded yet.</p>
+        ) : (
+          <div className="divide-y divide-pine/8">
+            {stats.top_pages_7d.map((p) => (
+              <div key={p.path} className="flex items-center gap-3 py-2 text-sm">
+                <span className="flex-1 truncate text-pine/80">{p.path}</span>
+                <span className="tabular-nums font-bold text-pine">{p.views.toLocaleString()}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 interface ModerationReport {
   id: string;
   reporter_name: string | null;
@@ -481,10 +588,11 @@ export default function AdminPage() {
   const [anglerSearch, setAnglerSearch] = useState("");
   const [allUsers, setAllUsers] = useState<ManagedUser[]>([]);
   const [reports, setReports] = useState<ModerationReport[]>([]);
+  const [visitStats, setVisitStats] = useState<VisitStatsData | null>(null);
   const [userSearch, setUserSearch] = useState("");
   const [growth, setGrowth] = useState<GrowthData | null>(null);
   const [userMap, setUserMap] = useState<UserMapData | null>(null);
-  const [tab, setTab] = useState<"claims" | "ads" | "tournaments" | "messages" | "anglers" | "users" | "growth" | "map" | "reports">("claims");
+  const [tab, setTab] = useState<"claims" | "ads" | "tournaments" | "messages" | "anglers" | "users" | "growth" | "map" | "reports" | "visits">("claims");
   const [denied, setDenied] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [acting, setActing] = useState<string | null>(null);
@@ -519,6 +627,9 @@ export default function AdminPage() {
       .catch(() => {});
     fishFetch("/api/fishmb/admin/reports?status=open")
       .then((d) => setReports(d.reports ?? []))
+      .catch(() => {});
+    fishFetch("/api/fishmb/admin/visits")
+      .then((d) => setVisitStats((d.stats ?? null) as VisitStatsData | null))
       .catch(() => {});
   };
 
@@ -671,6 +782,7 @@ export default function AdminPage() {
         {(
           [
  ["reports", `🚩 Reports (${reports.length})`],
+ ["visits", `📈 Visits`],
  ["claims", ` Business claims (${claims.length})`],
  ["ads", ` Ad submissions (${ads.length})`],
  ["tournaments", ` Tournament suggestions (${suggestions.length})`],
@@ -693,7 +805,9 @@ export default function AdminPage() {
         ))}
       </div>
 
-      {tab === "reports" ? (
+      {tab === "visits" ? (
+        <VisitsPanel stats={visitStats} />
+      ) : tab === "reports" ? (
         <ReportsQueue reports={reports} acting={acting} onAct={actOnReport} />
       ) : tab === "claims" ? (
         claims.length === 0 ? (

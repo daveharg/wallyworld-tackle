@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { FishAuthProvider } from "./_components/FishAuth";
 import { FishChrome } from "./_components/FishChrome";
 import SWRegister from "./_components/SWRegister";
+import VisitTracker from "./_components/VisitTracker";
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -69,6 +70,7 @@ export default function FishMBLayout({ children }: { children: React.ReactNode }
   return (
     <FishAuthProvider>
       <SWRegister />
+      <VisitTracker />
       <FishChrome>{children}</FishChrome>
     </FishAuthProvider>
   );
