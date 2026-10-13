@@ -356,29 +356,28 @@ export default async function FishMBHome() {
               </a>
             </div>
           </div>
-          <div className="relative overflow-hidden rounded-3xl min-h-[280px]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={FISHMB_CTA_PHOTO}
-              alt="Fishing rods silhouetted over the water at sunset"
-              className="absolute inset-0 w-full h-full object-cover"
-              loading="lazy"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-pine-deep/70 to-transparent" />
-            <div className="absolute bottom-0 p-6">
-              <p className="text-white/90 text-sm">
-                Keep your licence on you while fishing, and check the{" "}
-                <a
-                  href={GUIDE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline font-bold"
-                >
-                  2026 Manitoba Anglers&apos; Guide
-                </a>{" "}
-                for the rules on the water you&apos;re fishing.
-              </p>
+          <div>
+            <div className="relative overflow-hidden rounded-3xl h-[280px]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={FISHMB_CTA_PHOTO}
+                alt="Fishing rods silhouetted over the water at sunset"
+                className="absolute inset-0 w-full h-full object-cover"
+                loading="lazy"
+              />
             </div>
+            <p className="text-white/90 text-sm mt-4">
+              Keep your licence on you while fishing, and check the{" "}
+              <a
+                href={GUIDE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline font-bold"
+              >
+                2026 Manitoba Anglers&apos; Guide
+              </a>{" "}
+              for the rules on the water you&apos;re fishing.
+            </p>
           </div>
         </div>
       </section>
