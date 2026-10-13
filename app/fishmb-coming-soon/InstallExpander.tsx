@@ -32,11 +32,18 @@ export default function InstallExpander() {
 
       {open && (
         <div className="w-full max-w-md mx-auto bg-white/5 border border-white/10 rounded-2xl p-4 mt-4 text-left">
+          <p className="text-gold font-bold text-sm mb-2">
+            🚧 The real FishMB app is coming soon to the App Store.
+          </p>
+          <p className="text-white/70 text-sm mb-4">
+            Until it lands, this web app is the full FishMB — put it on your
+            home screen and it opens just like an app:
+          </p>
           <p className="text-white font-bold text-sm mb-2">📲 Make it a web app on your phone</p>
           <ol className="text-white/70 text-sm space-y-1 list-decimal list-inside mb-4">
             <li>Tap the app link below to open FishMB</li>
             <li>iPhone: tap Share → Add to Home Screen. Android: tap ⋮ → Add to Home Screen</li>
-            <li>FishMB now opens like a real app — full screen, no browser bars</li>
+            <li>FishMB now opens full screen — no browser bars</li>
           </ol>
           <Link
             href="/fishmb/feed"
