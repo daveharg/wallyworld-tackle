@@ -712,24 +712,10 @@ function MessagesPageInner() {
     }
   };
 
-  // App icon badge: show total unread count on the home-screen icon.
-  // Must be before any early returns.
-  const totalUnread = convos.reduce((sum, c) => sum + (c.unread ?? 0), 0);
-  useEffect(() => {
-    try {
-      const nav = navigator as Navigator & {
-        setAppBadge?: (n: number) => Promise<void>;
-        clearAppBadge?: () => Promise<void>;
-      };
-      if (typeof nav.setAppBadge === "function") {
-        if (totalUnread > 0) {
-          nav.setAppBadge(totalUnread).catch(() => {});
-        } else if (typeof nav.clearAppBadge === "function") {
-          nav.clearAppBadge().catch(() => {});
-        }
-      }
-    } catch {}
-  }, [totalUnread]);
+  // The home-screen app icon badge is owned by the app shell
+  // (FishBottomBar syncs it from the server unread total on every
+  // poll / unread-changed event) — deliberately no badge writer
+  // here, so a stale page-level sum can never fight the shell.
 
   // Pastel avatar colors, deterministic per name (Telegram-style).
   const AVATAR_COLORS = [

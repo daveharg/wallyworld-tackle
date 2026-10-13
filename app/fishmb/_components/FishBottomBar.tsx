@@ -131,6 +131,33 @@ const RIGHT: Item[] = [
   },
 ];
 
+/**
+ * Keep the home-screen app icon badge in step with the server unread
+ * total. The bottom bar's check() polls the unread endpoint on an
+ * interval and on the "fishmb-unread-changed" event, so this is the
+ * ONE writer of the icon badge app-wide: it self-corrects within one
+ * poll cycle no matter where messages were read — including push
+ * deep links that open a thread directly and never mount the
+ * conversation list page.
+ */
+function syncAppBadge(total: number) {
+  try {
+    const nav = navigator as Navigator & {
+      setAppBadge?: (n: number) => Promise<void>;
+      clearAppBadge?: () => Promise<void>;
+    };
+    if (total > 0) {
+      if (typeof nav.setAppBadge === "function") {
+        nav.setAppBadge(total).catch(() => {});
+      }
+    } else if (typeof nav.clearAppBadge === "function") {
+      nav.clearAppBadge().catch(() => {});
+    }
+  } catch {
+    // Badging API unsupported — nothing to sync.
+  }
+}
+
 /** Center + button: dark circle like the reference design (X while the menu is open). */
 function PlusButton({ onClick, label, open }: { onClick: () => void; label: string; open: boolean }) {
   return (
@@ -179,7 +206,11 @@ function Bar() {
       try {
         if (!user || stop) return;
         const d = await fishFetch("/api/fishmb/msg/unread");
-        if (!stop) setUnread((d as { unread?: number }).unread ?? 0);
+        const total = (d as { unread?: number }).unread ?? 0;
+        if (!stop) {
+          setUnread(total);
+          syncAppBadge(total);
+        }
         const f = await fishFetch("/api/fish/friends");
         if (!stop) setFriendRequests(((f as { pending_incoming?: unknown[] }).pending_incoming ?? []).length);
       } catch {
