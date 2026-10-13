@@ -415,10 +415,9 @@ export default function DashboardStats() {
             <>
               <div className="flex flex-col gap-2">
                 {visible.map((c) => (
-                  <Link
+                  <div
                     key={`${c.tournament_id ?? "r"}:${c.id}`}
-                    href={c.tournament_id ? `/fishmb/tournaments/${c.tournament_id}` : `/fishmb/catches/${c.id}`}
-                    className="w-full flex items-center gap-3 bg-white border border-pine/10 rounded-2xl p-3 text-left active:scale-[0.99] transition-transform"
+                    className="w-full flex items-center gap-3 bg-white border border-pine/10 rounded-2xl p-3 text-left"
                   >
                     {/* Thumbnail */}
                     {c.photo_hold_url || c.photo_measure_url ? (
@@ -434,7 +433,12 @@ export default function DashboardStats() {
                         🐟
                       </span>
                     )}
-                    {/* Species + size + meta */}
+                    {/* Species + size + meta — the text is the link to the
+                        catch page; the thumbnail deliberately doesn't navigate. */}
+                    <Link
+                      href={c.tournament_id ? `/fishmb/tournaments/${c.tournament_id}` : `/fishmb/catches/${c.id}`}
+                      className="flex flex-1 min-w-0 items-center gap-3 active:scale-[0.99] transition-transform"
+                    >
                     <span className="flex-1 min-w-0">
                       <span className="block font-bold text-pine truncate">
                         {c.species}
@@ -479,7 +483,8 @@ export default function DashboardStats() {
                       )}
                     </span>
                     <span className="text-pine/30 text-lg shrink-0">›</span>
-                  </Link>
+                    </Link>
+                  </div>
                 ))}
               </div>
               {sorted.length > 3 && (

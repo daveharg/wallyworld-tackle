@@ -2482,9 +2482,13 @@ function FeedPageInner() {
                     <OtherPostMenu item={item} dark onBlocked={handleAuthorBlocked} />
                   )}
                   {item.kind === "catch" && (
-                    <span className="text-[10px] font-bold uppercase tracking-wider bg-black/55 text-white px-3 py-1 rounded-full">
+                    <Link
+                      href={`/fishmb/catches/${item.id}`}
+                      aria-label="View catch details"
+                      className="text-[10px] font-bold uppercase tracking-wider bg-black/55 text-white px-3 py-1 rounded-full"
+                    >
                       Catch
-                    </span>
+                    </Link>
                   )}
                 </div>
               </>
@@ -2503,13 +2507,7 @@ function FeedPageInner() {
                 </div>
               ) : photos.length > 0 ? (
                 <div className="relative">
-                  {item.kind === "catch" ? (
-                    <Link href={`/fishmb/catches/${item.id}`} aria-label="View catch details">
-                      <PhotoCarousel photos={photos} bare />
-                    </Link>
-                  ) : (
-                    <PhotoCarousel photos={photos} bare />
-                  )}
+                  <PhotoCarousel photos={photos} bare />
                   {authorOverlay}
                 </div>
               ) : (
@@ -2526,9 +2524,13 @@ function FeedPageInner() {
                     </p>
                   </div>
                   {item.kind === "catch" && (
-                    <span className="ml-auto text-[10px] font-bold uppercase tracking-wider bg-accentTeal/15 text-accentTeal px-3 py-1 rounded-full">
+                    <Link
+                      href={`/fishmb/catches/${item.id}`}
+                      aria-label="View catch details"
+                      className="ml-auto text-[10px] font-bold uppercase tracking-wider bg-accentTeal/15 text-accentTeal px-3 py-1 rounded-full"
+                    >
                       Catch
-                    </span>
+                    </Link>
                   )}
                   {user?.id === item.user_id && (
                     <span className={item.kind === "catch" ? "" : "ml-auto"}>
