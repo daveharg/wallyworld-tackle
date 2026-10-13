@@ -131,17 +131,8 @@ export default function FishMBComingSoon() {
           anglers.
         </p>
         <InstallExpander />
-        <Link
-          href="/fishmb/lakes"
-          className="inline-block text-white/60 hover:text-white text-sm font-bold underline mb-4"
-        >
-          🎣 Try the live demo
-        </Link>
-        <p className="text-white/40 text-xs mb-16">
-          The full app, running right now — no signup needed to look around.
-        </p>
 
-        <h2 className="font-display font-bold uppercase tracking-wide text-2xl md:text-3xl mb-4 text-left">
+        <h2 className="font-display font-bold uppercase tracking-wide text-2xl md:text-3xl mb-4 mt-16 text-left">
           What&apos;s inside
         </h2>
         <p className="text-white/50 text-sm text-left mb-8">
