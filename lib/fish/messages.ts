@@ -326,11 +326,29 @@ export async function listConversations(userId: string): Promise<ConversationPre
             m.nonce AS last_nonce, m.ciphertext AS last_ciphertext,
             m.recipient_key AS last_recipient_key,
             m.proto AS last_proto,
-            (SELECT COUNT(*)::int FROM fm_messages mm
-              WHERE mm.conversation_id = c.id
-                AND mm.recipient_id = $1
-                AND mm.created_at > mine.last_read_at
-                AND mm.sender_id <> $1) AS unread,
+            -- Unread counts LOGICAL messages, not copies: one send is
+            -- fanned out to one row per (recipient, key/device), so the
+            -- copies are clustered by sender + created_at (a copy starts
+            -- a new logical message when the previous copy from the same
+            -- sender is absent or >2s earlier) and only cluster starts
+            -- count. The window sees ALL my copies (not just unread
+            -- ones) so a send straddling last_read_at clusters right.
+            (SELECT COUNT(*)::int
+               FROM (
+                 SELECT mm.sender_id, mm.created_at,
+                        LAG(mm.created_at) OVER (
+                          PARTITION BY mm.sender_id
+                          ORDER BY mm.created_at
+                        ) AS prev_at
+                   FROM fm_messages mm
+                  WHERE mm.conversation_id = c.id
+                    AND mm.recipient_id = $1
+               ) lg
+              WHERE lg.sender_id <> $1
+                AND lg.created_at > mine.last_read_at
+                AND (lg.prev_at IS NULL
+                     OR lg.created_at - lg.prev_at > interval '2 seconds')
+            ) AS unread,
             mine.pinned_at AS pinned_at
        FROM mine
        JOIN fm_conversations c ON c.id = mine.conversation_id
@@ -624,16 +642,13 @@ export async function storeMessage(
     await Promise.allSettled(
       recipients.map(async (rid) => {
         if (!(await wantsAlert(rid, "new_message"))) return;
-        // Count total unread for the app icon badge.
+        // Count total unread for the app icon badge — logical
+        // messages, via the shared counter (the old inline query
+        // counted raw per-key/device copies and joined member rows
+        // without pinning the recipient, inflating group badges).
         let unread = 0;
         try {
-          const r = await queryOne<{ n: string }>(
-            `SELECT COUNT(*) AS n FROM fm_messages m
-             JOIN fm_conversation_members cm ON cm.conversation_id = m.conversation_id
-             WHERE m.recipient_id = $1 AND m.created_at > COALESCE(cm.last_read_at, '1970-01-01')`,
-            [rid]
-          );
-          unread = parseInt(r?.n ?? "0", 10) || 0;
+          unread = await totalUnread(rid);
         } catch {}
         return sendPushToUser(rid, {
           title: senderName,
@@ -659,17 +674,45 @@ export async function markRead(conversationId: string, userId: string): Promise<
   );
 }
 
+/**
+ * Total unread LOGICAL messages across all my conversations. Messages
+ * are stored as one row per (recipient, key/device) copy, so raw row
+ * counts multiply every send by the recipient's key/device count. The
+ * copies of one send share (conversation_id, sender_id) and a
+ * created_at within ~2s of each other, so they are clustered with
+ * LAG(): a copy starts a logical message when the previous copy from
+ * the same sender in the same conversation is absent or >2s earlier.
+ * Only cluster starts addressed to me, not sent by me, and newer than
+ * my last_read_at count — and in conversations I hid ("deleted"), only
+ * messages newer than hidden_at count, matching the list's rule that
+ * new activity resurrects the chat.
+ */
 export async function totalUnread(userId: string): Promise<number> {
   await ensureMsgTables();
   const row = await queryOne<{ n: string }>(
-    `SELECT COALESCE(SUM(
-       (SELECT COUNT(*) FROM fm_messages mm
-         WHERE mm.conversation_id = m.conversation_id
-           AND mm.recipient_id = $1
-           AND mm.created_at > m.last_read_at
-           AND mm.sender_id <> $1)
-     ), 0)::int AS n
-     FROM fm_conversation_members m WHERE m.user_id = $1`,
+    `WITH mine AS (
+       SELECT conversation_id, last_read_at, hidden_at
+         FROM fm_conversation_members
+        WHERE user_id = $1
+     ),
+     copies AS (
+       SELECT m.conversation_id, m.sender_id, m.created_at,
+              LAG(m.created_at) OVER (
+                PARTITION BY m.conversation_id, m.sender_id
+                ORDER BY m.created_at
+              ) AS prev_at
+         FROM fm_messages m
+         JOIN mine ON mine.conversation_id = m.conversation_id
+        WHERE m.recipient_id = $1
+     )
+     SELECT COUNT(*)::int AS n
+       FROM copies cp
+       JOIN mine ON mine.conversation_id = cp.conversation_id
+      WHERE cp.sender_id <> $1
+        AND cp.created_at > mine.last_read_at
+        AND (cp.prev_at IS NULL
+             OR cp.created_at - cp.prev_at > interval '2 seconds')
+        AND (mine.hidden_at IS NULL OR cp.created_at > mine.hidden_at)`,
     [userId]
   );
   return Number(row?.n ?? 0);
