@@ -163,9 +163,11 @@ export interface TrophyCatch {
 let trophyCache: Record<string, TrophyCatch[]> | null = null;
 
 /**
- * Biggest documented catches per lake, scraped from the Manitoba Master
- * Angler record book (anglers.travelmanitoba.com). Top entries per species.
- * Empty array when the lake has no recorded trophy catches.
+ * Master Angler records for one lake from the last 5 years, scraped
+ * from the Manitoba Master Angler record book
+ * (anglers.travelmanitoba.com). The app carries only the last 5 years
+ * of records plus each lake's all-time total (getTrophyTotal). Empty
+ * array when the lake has no records in that window.
  */
 export function getTrophyCatches(lakeId: string): TrophyCatch[] {
   if (!trophyCache) {
@@ -177,6 +179,25 @@ export function getTrophyCatches(lakeId: string): TrophyCatch[] {
     }
   }
   return trophyCache[lakeId] ?? [];
+}
+
+let trophyTotalsCache: Record<string, number> | null = null;
+
+/** All-time Master Angler record count for one lake (the full record
+ *  book, all years). 0 when the lake has no records on file. */
+export function getTrophyTotal(lakeId: string): number {
+  if (!trophyTotalsCache) {
+    const p = path.join(process.cwd(), "public", "fishmb", "trophy-totals.json");
+    try {
+      trophyTotalsCache = JSON.parse(fs.readFileSync(p, "utf8")) as Record<
+        string,
+        number
+      >;
+    } catch {
+      trophyTotalsCache = {};
+    }
+  }
+  return trophyTotalsCache[lakeId] ?? 0;
 }
 
 export function getLakes(): Lake[] {

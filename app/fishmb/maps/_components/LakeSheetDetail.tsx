@@ -116,6 +116,7 @@ export default function LakeSheetDetail({ lake, spots, onBack, onSelectSpot }: P
   const [zone, setZone] = useState<RegZone | null>(null);
   const [stocking, setStocking] = useState<StockingEvent[]>([]);
   const [trophies, setTrophies] = useState<TrophyCatch[]>([]);
+  const [trophyTotal, setTrophyTotal] = useState<number | null>(null);
   const [stockingOpen, setStockingOpen] = useState(false);
   const [tempC, setTempC] = useState<number | null>(null);
   const [weatherCode, setWeatherCode] = useState<number | null>(null);
@@ -150,6 +151,13 @@ export default function LakeSheetDetail({ lake, spots, onBack, onSelectSpot }: P
         if (!cancelled) setTrophies((d[lake.id] ?? []) as TrophyCatch[]);
       } catch {
         // Trophies stay empty.
+      }
+      try {
+        const r = await fetch("/fishmb/trophy-totals.json");
+        const d = await r.json();
+        if (!cancelled) setTrophyTotal((d[lake.id] ?? null) as number | null);
+      } catch {
+        // Total stays unknown.
       }
       if (lake.lat !== null && lake.lng !== null) {
         try {
@@ -299,10 +307,21 @@ export default function LakeSheetDetail({ lake, spots, onBack, onSelectSpot }: P
         </div>
       )}
 
-      {/* Trophy catches — newest first */}
-      {sortedTrophies.length > 0 && (
+      {/* Trophy catches — last 5 years, newest first */}
+      {(sortedTrophies.length > 0 || (trophyTotal ?? 0) > 0) && (
         <div className="mb-5">
           <SectionTitle>Trophy catches</SectionTitle>
+          {trophyTotal !== null && (
+            <p className="text-xs text-pine/50 mb-2">
+              {trophyTotal} Master Angler records on file · showing the last
+              5 years
+            </p>
+          )}
+          {sortedTrophies.length === 0 ? (
+            <p className="text-xs text-pine/50">
+              No records in the last 5 years.
+            </p>
+          ) : (
           <div className="rounded-2xl border border-pine/10 bg-white divide-y divide-pine/8 overflow-hidden">
             {sortedTrophies.map((t, i) => (
               <div key={i} className="px-4 py-3">
@@ -317,6 +336,7 @@ export default function LakeSheetDetail({ lake, spots, onBack, onSelectSpot }: P
               </div>
             ))}
           </div>
+          )}
         </div>
       )}
 

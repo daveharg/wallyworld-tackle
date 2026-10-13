@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getLake, getLakes, getZone, getGuideUrl, getStockingHistory, getTrophyCatches, type StockingEvent, type TrophyCatch } from "@/lib/fishmb";
+import { getLake, getLakes, getZone, getGuideUrl, getStockingHistory, getTrophyCatches, getTrophyTotal, type StockingEvent, type TrophyCatch } from "@/lib/fishmb";
 import { slugifySpecies, getSpeciesAdvice } from "@/lib/fishmb-species";
 import { lakePhotoUrl, hasRealLakePhoto, lakePhotoCredit } from "@/lib/fishmb-constants";
 import { LakeMap } from "../_components/LakeMap";
@@ -111,12 +111,13 @@ function formatStockWhen(e: StockingEvent): string {
   return e.year != null ? String(e.year) : "—";
 }
 
-/** Biggest documented catches for one lake, from the Master Angler record book.
- *  Scrollable with sort by date, species, or size. */
+/** Master Angler records for one lake: the last 5 years listed, with
+ *  the all-time record-book total as the count. */
 function TrophyCatches({ lakeId }: { lakeId: string }) {
   const catches: TrophyCatch[] = getTrophyCatches(lakeId);
-  if (catches.length === 0) return null;
-  return <TrophyCatchesList catches={catches} />;
+  const total = getTrophyTotal(lakeId);
+  if (catches.length === 0 && total === 0) return null;
+  return <TrophyCatchesList catches={catches} total={total} />;
 }
 
 /** Provincial stocking records table for one lake (exact dates + quantities). */

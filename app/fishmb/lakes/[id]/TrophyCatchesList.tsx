@@ -3,11 +3,35 @@
 import { useState } from "react";
 import type { TrophyCatch } from "@/lib/fishmb";
 
-/** Trophy catches — shows the most recent by default, with a button to view all. */
-export function TrophyCatchesList({ catches }: { catches: TrophyCatch[] }) {
+/** Trophy catches — the last 5 years of Master Angler records, most
+ *  recent by default, with a button to view all of them. The heading
+ *  count is the lake's all-time record-book total. */
+export function TrophyCatchesList({
+  catches,
+  total,
+}: {
+  catches: TrophyCatch[];
+  total: number;
+}) {
   const [search, setSearch] = useState("");
   const [showAll, setShowAll] = useState(false);
-  if (catches.length === 0) return null;
+  if (catches.length === 0 && total === 0) return null;
+  if (catches.length === 0) {
+    return (
+      <section>
+        <h2 className="font-display font-bold uppercase text-2xl text-pine tracking-wide mb-1">
+          Trophy catches <span className="text-pine/40 text-lg">({total})</span>
+        </h2>
+        <p className="text-sm text-pine/55">
+          {total} Master Angler records on file for this lake — none in the
+          last 5 years.
+        </p>
+        <p className="text-xs text-pine/40 mt-3">
+          Source: Manitoba Master Angler record book (anglers.travelmanitoba.com)
+        </p>
+      </section>
+    );
+  }
 
   const q = search.trim().toLowerCase();
   const filtered = q
@@ -29,12 +53,12 @@ export function TrophyCatchesList({ catches }: { catches: TrophyCatch[] }) {
     <section>
       <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
         <h2 className="font-display font-bold uppercase text-2xl text-pine tracking-wide">
- Trophy catches <span className="text-pine/40 text-lg">({sorted.length})</span>
+ Trophy catches <span className="text-pine/40 text-lg">({total})</span>
         </h2>
       </div>
       <p className="text-sm text-pine/55 mb-3">
-        Every documented trophy catch here, from the Manitoba Master
-        Angler record book.
+        {total} Master Angler records on file for this lake — showing the
+        last 5 years ({catches.length}), newest first.
       </p>
       {showAll && (
         <input
@@ -72,7 +96,7 @@ export function TrophyCatchesList({ catches }: { catches: TrophyCatch[] }) {
           onClick={() => setShowAll((s) => !s)}
           className="mt-3 w-full py-3 rounded-full bg-pine/5 hover:bg-pine/10 text-pine font-bold text-sm uppercase tracking-wider transition-colors"
         >
-          {showAll ? "Show less" : `View all ${sorted.length} trophy catches`}
+          {showAll ? "Show less" : `View all ${sorted.length} from the last 5 years`}
         </button>
       )}
       <p className="text-xs text-pine/40 mt-3">
