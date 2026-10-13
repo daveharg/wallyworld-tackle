@@ -35,6 +35,13 @@ export const metadata: Metadata = {
 
 const SECTIONS = [
   {
+    icon: "📏",
+    title: "Auto-Measure Catches",
+    text: "Take a picture of your fish and the app measures it for you — then logs the catch with the size already filled in. No bump board, no tape measure, no typing with wet hands. Check the numbers, tweak them if you like, and you're done: photo, measurement and catch record, all from one shot.",
+    href: "/fishmb/app",
+    cta: "Get the app",
+  },
+  {
     icon: "📰",
     title: "The Feed",
     text: "A social-media-style feed built for Manitoba anglers. Post catches with photos and video, share lake reports and tips, and post stories that stick around for a week. React, comment, and choose who sees each post — everyone, friends only, or followers only. The feed also carries a daily morning weather report, a Manitoba fishing video of the day, lake, lodge and hotspot spotlights, and Manitoba's own fishing YouTube channels.",
