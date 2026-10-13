@@ -6,9 +6,11 @@ import { fishFetch } from "../../_components/fishFetch";
 import { useSheetDrag, SheetGrabber } from "../../_components/sheetDrag";
 import {
   decryptText,
-  encryptText,
+  decryptV2Copy,
+  encryptForPublicKey,
   publicKeyB64,
   sharedSecret,
+  V2_NONCE,
   type MsgKeypair,
 } from "./msgCrypto";
 
@@ -16,9 +18,46 @@ interface StoredMessage {
   id: string;
   sender_id: string;
   recipient_id?: string;
+  recipient_key?: string | null;
   nonce: string;
   ciphertext: string;
   created_at: string;
+}
+
+/** A conversation member plus every public key they have registered. */
+interface MemberKeys {
+  user_id: string;
+  name: string;
+  public_key: string | null;
+  public_keys: string[];
+}
+
+/** All keys for a member payload — falls back to the single newest key
+ *  if an older server response has no public_keys array yet. */
+function keysOf(m: {
+  public_key?: string | null;
+  public_keys?: string[];
+}): string[] {
+  if (m.public_keys && m.public_keys.length > 0) return m.public_keys;
+  return m.public_key ? [m.public_key] : [];
+}
+
+function normalizeMembers(raw: unknown): MemberKeys[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.map((m) => {
+    const r = m as {
+      user_id: string;
+      name?: string;
+      public_key?: string | null;
+      public_keys?: string[];
+    };
+    return {
+      user_id: r.user_id,
+      name: r.name ?? "",
+      public_key: r.public_key ?? null,
+      public_keys: keysOf(r),
+    };
+  });
 }
 
 interface Decrypted {
@@ -99,7 +138,7 @@ export default function ThreadView({
   onSent: () => void;
   onRead: () => void;
 }) {
-  const [secrets, setSecrets] = useState<{ user_id: string; shared: Uint8Array }[] | null>(null);
+  const [memberKeys, setMemberKeys] = useState<MemberKeys[] | null>(null);
   const [missingNames, setMissingNames] = useState<string[]>([]);
   const [msgs, setMsgs] = useState<Decrypted[]>([]);
   const [draft, setDraft] = useState("");
@@ -177,7 +216,9 @@ export default function ThreadView({
     });
   };
 
-  /** Force re-upload our public key and refetch all member keys. Fixes "couldn't decrypt" when keys are stale. */
+  /** Re-upload our public key and refetch all member keys. Registration is
+   *  add-only on the server, so this can never replace a key another
+   *  device is relying on. */
   const resyncKeys = async (silent: boolean = false) => {
     if (!silent) setResyncing(true);
     try {
@@ -188,14 +229,9 @@ export default function ThreadView({
         body: JSON.stringify({ public_key: localPub }),
       });
       const d = await fishFetch(`/api/fishmb/msg/conversations/${peer.id}/members`);
-      const members = (d.members ?? []) as { user_id: string; public_key: string | null }[];
-      const keyed = members.filter((m) => m.public_key);
-      const s = keyed.map((m) => ({
-        user_id: m.user_id,
-        shared: sharedSecret(m.public_key as string, keypair.secretKey),
-      }));
-      secretsRef.current = s;
-      setSecrets(s);
+      const members = normalizeMembers(d.members ?? []);
+      memberKeysRef.current = members;
+      setMemberKeys(members);
       if (!silent) {
         setNote("Keys re-synced. New messages should decrypt. Old messages encrypted with a lost key can't be recovered.");
       }
@@ -210,14 +246,14 @@ export default function ThreadView({
 
   // Auto re-sync once when messages fail to decrypt (keys likely stale).
   useEffect(() => {
-    if (autoResyncDone.current || !secrets || msgs.length === 0) return;
+    if (autoResyncDone.current || !memberKeys || msgs.length === 0) return;
     const failed = msgs.some((m) => !m.text && !m.noKey && !m.mine);
     if (failed) {
       autoResyncDone.current = true;
       resyncKeys(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [msgs, secrets]);
+  }, [msgs, memberKeys]);
 
   // Curated themes — every combination is designed to be readable.
   const THEMES: {
@@ -261,6 +297,10 @@ export default function ThreadView({
   const [editName, setEditName] = useState("");
   const [editAvatar, setEditAvatar] = useState<string | null>(null);
   const [savingGroup, setSavingGroup] = useState(false);
+  // Member removal safety: removing someone — or leaving yourself — is
+  // a two-tap inline confirm, never a silent one-tap action.
+  const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
+  const [confirmLeave, setConfirmLeave] = useState(false);
   const [addSearch, setAddSearch] = useState("");
   const [addScope, setAddScope] = useState<"friends" | "all">("friends");
   const [friendOptions, setFriendOptions] = useState<{ id: string; name: string; avatar_url: string | null }[]>([]);
@@ -268,47 +308,43 @@ export default function ThreadView({
   const [allUserSearching, setAllUserSearching] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const lastAtRef = useRef<string | null>(null);
-  const secretsRef = useRef<{ user_id: string; shared: Uint8Array }[] | null>(null);
+  const memberKeysRef = useRef<MemberKeys[] | null>(null);
   // Synchronous send guard — `sending` state updates async, so rapid taps
   // (double-tap, tap + Enter) would all slip past it and send duplicates.
   const sendingRef = useRef(false);
   const uploadingRef = useRef(false);
 
-  // Every member's public key -> per-member shared secret. Each message is
-  // encrypted separately for each member that HAS a key (including yourself).
-  // Members without keys yet can't read anything until they enable encrypted
-  // messaging — the thread still works for everyone else.
+  // Load every member's registered public keys. Sends encrypt one
+  // self-contained copy per (member, key) — including yourself, so each
+  // of your devices can read the history. Members without any keys yet
+  // can't read anything until they enable encrypted messaging — the
+  // thread still works for everyone else.
   useEffect(() => {
     let live = true;
     fishFetch(`/api/fishmb/msg/conversations/${peer.id}/members`)
       .then((d) => {
         if (!live) return;
-        const members = (d.members ?? []) as {
-          user_id: string;
-          name: string;
-          public_key: string | null;
-        }[];
+        const members = normalizeMembers(d.members ?? []);
         setMissingNames(
-          members.filter((m) => !m.public_key && m.user_id !== myId).map((m) => m.name || "Someone")
+          members.filter((m) => m.public_keys.length === 0 && m.user_id !== myId).map((m) => m.name || "Someone")
         );
-        // Ensure our own server key matches our local keypair — if not,
-        // upload it now so others encrypt with the right key.
+        // Ensure our own key is registered — if not, upload it now so
+        // others encrypt copies for it. Registration is add-only, so
+        // this never replaces a key another device is using.
         const me = members.find((m) => m.user_id === myId);
         const localPub = publicKeyB64(keypair);
-        if (me && me.public_key !== localPub) {
+        if (me && !me.public_keys.includes(localPub)) {
           fishFetch("/api/fishmb/msg/keys", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ public_key: localPub }),
           }).catch(() => {});
+          // Use it immediately for this session's sends.
+          me.public_keys = [localPub, ...me.public_keys];
+          if (!me.public_key) me.public_key = localPub;
         }
-        const keyed = members.filter((m) => m.public_key);
-        const s = keyed.map((m) => ({
-          user_id: m.user_id,
-          shared: sharedSecret(m.public_key as string, keypair.secretKey),
-        }));
-        secretsRef.current = s;
-        setSecrets(s);
+        memberKeysRef.current = members;
+        setMemberKeys(members);
       })
       .catch(() => {
         if (live) setNote("Could not load encryption keys.");
@@ -319,27 +355,81 @@ export default function ThreadView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [peer.id, keypair]);
 
-  // Each message copy was encrypted by its sender for us, so it must be
-  // decrypted with the shared secret for THAT sender (their public key x
-  // our secret key) — not our own.
-  const decryptAll = (rows: StoredMessage[]): Decrypted[] =>
-    rows.map((m) => {
-      const sec =
-        secretsRef.current?.find((x) => x.user_id === m.sender_id)?.shared ?? null;
-      const text = sec ? decryptText(m.nonce, m.ciphertext, sec) : null;
+  // Decrypt ONE of my copies.
+  // - v2 copies are self-contained: they open with only my secret key,
+  //   whichever of my keys they were wrapped to (copies wrapped to a key
+  //   whose secret is lost simply fail and a sibling copy is tried).
+  // - Legacy copies were encrypted by their sender for us, so they open
+  //   with the pairwise shared secret for THAT sender. Any of the
+  //   sender's registered keys may have been current when the message
+  //   was sent (e.g. before they got a new phone), so try each,
+  //   newest first.
+  const decryptRow = (m: StoredMessage): { text: string | null; noKey: boolean } => {
+    if (m.nonce === V2_NONCE) {
       return {
-        id: m.id,
-        mine: m.sender_id === myId,
-        sender_id: m.sender_id,
-        text,
-        noKey: !sec,
-        created_at: m.created_at,
+        text: decryptV2Copy(m.nonce, m.ciphertext, keypair.secretKey),
+        noKey: false,
       };
-    });
+    }
+    const senderKeys =
+      memberKeysRef.current?.find((x) => x.user_id === m.sender_id)?.public_keys ?? [];
+    if (senderKeys.length === 0) return { text: null, noKey: true };
+    for (const pk of senderKeys) {
+      const text = decryptText(m.nonce, m.ciphertext, sharedSecret(pk, keypair.secretKey));
+      if (text !== null) return { text, noKey: false };
+    }
+    return { text: null, noKey: false };
+  };
 
-  // Initial load + polling. My rows only — each member reads their own copy.
+  // Rows arrive as one copy per (recipient, key). Copies of one logical
+  // message share sender_id + created_at (the server stamps all copies
+  // of a send with a single timestamp), so fold them into one bubble:
+  // the first copy that decrypts becomes the bubble; sibling copies are
+  // dropped, and a failed placeholder upgrades if a later copy opens.
+  const decryptAll = (rows: StoredMessage[]): Decrypted[] => {
+    const out: Decrypted[] = [];
+    const byBase = new Map<string, number>();
+    const seenGood = new Set<string>();
+    for (const m of rows) {
+      const { text, noKey } = decryptRow(m);
+      const base = `${m.sender_id}|${m.created_at}`;
+      if (text !== null) {
+        const goodKey = `${base}|${text}`;
+        if (seenGood.has(goodKey)) continue;
+        seenGood.add(goodKey);
+        const idx = byBase.get(base);
+        if (idx !== undefined && out[idx].text === null) {
+          out[idx] = { ...out[idx], id: m.id, text, noKey: false };
+          continue;
+        }
+        byBase.set(base, out.length);
+        out.push({
+          id: m.id,
+          mine: m.sender_id === myId,
+          sender_id: m.sender_id,
+          text,
+          noKey: false,
+          created_at: m.created_at,
+        });
+      } else {
+        if (byBase.has(base)) continue;
+        byBase.set(base, out.length);
+        out.push({
+          id: m.id,
+          mine: m.sender_id === myId,
+          sender_id: m.sender_id,
+          text: null,
+          noKey,
+          created_at: m.created_at,
+        });
+      }
+    }
+    return out;
+  };
+
+  // Initial load + polling. My rows only — each member reads their own copies.
   useEffect(() => {
-    if (!secrets) return;
+    if (!memberKeys) return;
     let live = true;
     let timer: ReturnType<typeof setInterval>;
     const load = async (after?: string) => {
@@ -353,10 +443,26 @@ export default function ThreadView({
         if (after) {
           if (rows.length > 0) {
             setMsgs((prev) => {
-              const ids = new Set(prev.map((m) => m.id));
-              const fresh = decryptAll(rows).filter((m) => !ids.has(m.id));
+              const fresh = decryptAll(rows);
               if (fresh.length === 0) return prev;
-              return [...prev, ...fresh];
+              // Merge by logical message (sender + timestamp), not row
+              // id: the poll may return a different copy of a message
+              // already on screen.
+              let changed = false;
+              const next = [...prev];
+              for (const f of fresh) {
+                const idx = next.findIndex(
+                  (p) => p.sender_id === f.sender_id && p.created_at === f.created_at
+                );
+                if (idx === -1) {
+                  next.push(f);
+                  changed = true;
+                } else if (next[idx].text === null && f.text !== null) {
+                  next[idx] = f;
+                  changed = true;
+                }
+              }
+              return changed ? next : prev;
             });
             lastAtRef.current = rows[rows.length - 1].created_at;
             bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -396,11 +502,11 @@ export default function ThreadView({
       clearInterval(timer);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [secrets, peer.id]);
+  }, [memberKeys, peer.id]);
 
   const sendPayload = async (payload: string, optimisticText: string | null = null) => {
-    const secs = secretsRef.current;
-    if (!payload || !secs || secs.length === 0 || sendingRef.current) return;
+    const members = memberKeysRef.current;
+    if (!payload || !members || members.length === 0 || sendingRef.current) return;
     if (payload.length > 8000) {
       setNote("That message is too long.");
       return;
@@ -409,21 +515,38 @@ export default function ThreadView({
     setSending(true);
     setNote(null);
     try {
-      const parts = secs.map(({ user_id, shared }) => {
-        const { nonce, ciphertext } = encryptText(payload, shared);
-        return { recipient_id: user_id, nonce, ciphertext };
-      });
+      // One self-contained v2 copy per (member, registered key) —
+      // including copies for each of my own keys, so every device I
+      // use can read my sent history. Members without keys are skipped.
+      const parts: {
+        recipient_id: string;
+        recipient_key: string;
+        nonce: string;
+        ciphertext: string;
+      }[] = [];
+      for (const m of members) {
+        for (const pk of m.public_keys) {
+          const { nonce, ciphertext } = encryptForPublicKey(payload, pk);
+          parts.push({ recipient_id: m.user_id, recipient_key: pk, nonce, ciphertext });
+        }
+      }
+      if (parts.length === 0) {
+        throw new Error("No one in this chat has messaging keys set up yet.");
+      }
       const d = await fishFetch(`/api/fishmb/msg/conversations/${peer.id}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ parts }),
       });
-      // The POST stores one row per recipient (all with sender_id = me) —
-      // the optimistic row must be MY copy, or the poll will re-add it as
-      // a duplicate seconds later.
+      // The POST stores one row per (recipient, key) — the optimistic
+      // row must be MY copy for THIS device's key (or any of my copies),
+      // or the poll will re-add it as a duplicate seconds later.
       const rows = d.messages as StoredMessage[];
+      const myPub = publicKeyB64(keypair);
       const mine =
-        rows.find((m) => m.recipient_id === myId) ?? rows.find((m) => m.sender_id === myId);
+        rows.find((m) => m.recipient_id === myId && m.recipient_key === myPub) ??
+        rows.find((m) => m.recipient_id === myId) ??
+        rows.find((m) => m.sender_id === myId);
       if (mine) {
         setMsgs((prev) => {
           if (prev.some((m) => m.id === mine.id)) return prev;
@@ -466,8 +589,8 @@ export default function ThreadView({
   const [uploading, setUploading] = useState(false);
 
   const sendPhoto = async (file: File) => {
-    const secs = secretsRef.current;
-    if (!secs || secs.length === 0 || sendingRef.current || uploadingRef.current) return;
+    const members = memberKeysRef.current;
+    if (!members || members.length === 0 || sendingRef.current || uploadingRef.current) return;
     uploadingRef.current = true;
     setUploading(true);
     setNote(null);
@@ -500,6 +623,8 @@ export default function ThreadView({
     setAddSearch("");
     setAddScope("friends");
     setAllUserResults([]);
+    setConfirmRemoveId(null);
+    setConfirmLeave(false);
     setEditingGroup(true);
     // Load friends for the add-member picker.
     fishFetch("/api/fish/friends")
@@ -629,6 +754,25 @@ export default function ThreadView({
       setNote(e instanceof Error ? e.message : "Could not remove member.");
     } finally {
       setSavingGroup(false);
+      setConfirmRemoveId(null);
+    }
+  };
+
+  /** Leave the chat yourself: the members DELETE with no user_id
+   *  removes the caller. Only runs after the inline confirm. */
+  const leaveChat = async () => {
+    setSavingGroup(true);
+    try {
+      await fishFetch(`/api/fishmb/msg/conversations/${peer.id}/members`, {
+        method: "DELETE",
+      });
+      setEditingGroup(false);
+      onBack();
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Could not leave the chat.");
+    } finally {
+      setSavingGroup(false);
+      setConfirmLeave(false);
     }
   };
   const title = peer.is_group
@@ -860,11 +1004,66 @@ export default function ThreadView({
                     </span>
                     <span className="flex-1 truncate">{m.name}</span>
                     {m.user_id === myId ? (
-                      <span className="text-xs text-pine/45">(you)</span>
+                      confirmLeave ? (
+                        <span className="flex items-center gap-1.5 shrink-0">
+                          <span className="text-xs font-bold text-red-500">Leave chat?</span>
+                          <button
+                            type="button"
+                            onClick={() => void leaveChat()}
+                            disabled={savingGroup}
+                            className="text-xs font-bold bg-red-500 text-white rounded-full px-2.5 py-1 disabled:opacity-50"
+                          >
+                            Leave
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setConfirmLeave(false)}
+                            className="text-xs font-bold text-pine/50 px-1.5 py-1"
+                          >
+                            Cancel
+                          </button>
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2 shrink-0">
+                          <span className="text-xs text-pine/45">(you)</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setConfirmLeave(true);
+                              setConfirmRemoveId(null);
+                            }}
+                            className="text-xs font-bold text-red-500 underline underline-offset-2"
+                          >
+                            Leave chat
+                          </button>
+                        </span>
+                      )
+                    ) : confirmRemoveId === m.user_id ? (
+                      <span className="flex items-center gap-1.5 shrink-0">
+                        <span className="text-xs font-bold text-red-500">Remove?</span>
+                        <button
+                          type="button"
+                          onClick={() => void removeMember(m.user_id)}
+                          disabled={savingGroup}
+                          className="text-xs font-bold bg-red-500 text-white rounded-full px-2.5 py-1 disabled:opacity-50"
+                        >
+                          Remove
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setConfirmRemoveId(null)}
+                          className="text-xs font-bold text-pine/50 px-1.5 py-1"
+                        >
+                          Cancel
+                        </button>
+                      </span>
                     ) : (
                       <button
                         type="button"
-                        onClick={() => removeMember(m.user_id)}
+                        onClick={() => {
+                          setConfirmRemoveId(m.user_id);
+                          setConfirmLeave(false);
+                        }}
                         aria-label={`Remove ${m.name}`}
                         className="w-7 h-7 rounded-full bg-red-50 text-red-500 hover:bg-red-100 flex items-center justify-center text-sm font-bold"
                       >
@@ -1011,7 +1210,7 @@ export default function ThreadView({
         className="flex-1 min-h-0 overflow-y-auto py-4 space-y-1 -mx-4 px-4"
         style={{ backgroundColor: theme.chatBg }}
       >
-        {msgs.length === 0 && secrets && (
+        {msgs.length === 0 && memberKeys && (
           <p className="text-center text-pine/45 text-sm mt-8">
  No messages yet — say hey. 
           </p>
@@ -1124,7 +1323,7 @@ export default function ThreadView({
         <button
           type="button"
           onClick={() => photoInputRef.current?.click()}
-          disabled={!secrets || uploading || sending}
+          disabled={!memberKeys || uploading || sending}
           aria-label="Send a photo"
           className="shrink-0 w-9 h-9 rounded-full bg-pine/10 hover:bg-pine/20 text-pine font-bold text-xl disabled:opacity-40 transition-colors"
         >
@@ -1138,14 +1337,14 @@ export default function ThreadView({
           }}
           maxLength={2000}
           placeholder="Message…"
-          disabled={!secrets}
+          disabled={!memberKeys}
           enterKeyHint="send"
           className="flex-1 min-w-0 bg-white border border-pine/15 rounded-full px-4 py-2.5 text-[17px] md:text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-pine disabled:opacity-50"
         />
         <button
           type="button"
           onClick={send}
-          disabled={!draft.trim() || sending || uploading || !secrets}
+          disabled={!draft.trim() || sending || uploading || !memberKeys}
           aria-label="Send message"
           className="shrink-0 w-9 h-9 rounded-full bg-pine text-white text-lg font-bold disabled:opacity-30 transition-colors flex items-center justify-center"
         >

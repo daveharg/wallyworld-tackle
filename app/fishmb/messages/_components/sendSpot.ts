@@ -11,8 +11,7 @@ import { fishFetch } from "../../_components/fishFetch";
 import {
   getOrCreateKeypair,
   publicKeyB64,
-  sharedSecret,
-  encryptText,
+  encryptForPublicKey,
 } from "./msgCrypto";
 
 export interface SpotShareData {
@@ -30,6 +29,13 @@ interface Member {
   user_id: string;
   name: string;
   public_key: string | null;
+  public_keys?: string[];
+}
+
+/** All registered keys for a member (falls back to the newest key). */
+function keysOf(m: Member): string[] {
+  if (m.public_keys && m.public_keys.length > 0) return m.public_keys;
+  return m.public_key ? [m.public_key] : [];
 }
 
 export async function sendSpotToFriend(
@@ -44,8 +50,10 @@ export async function sendSpotToFriend(
   try {
     const d = (await fishFetch("/api/fishmb/msg/keys")) as {
       public_key: string | null;
+      public_keys?: string[];
     };
-    if (d.public_key !== myPub) {
+    const registered = d.public_keys ?? (d.public_key ? [d.public_key] : []);
+    if (!registered.includes(myPub)) {
       await fishFetch("/api/fishmb/msg/keys", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -71,7 +79,7 @@ export async function sendSpotToFriend(
   const convo = (list.conversations ?? []).find((x) => x.id === convoId);
   const members = convo?.members ?? [];
   const friend = members.find((m) => m.user_id === friendId);
-  if (!friend?.public_key) {
+  if (!friend || keysOf(friend).length === 0) {
     throw new Error(
       "That friend hasn't opened FishMB yet, so there's no way to deliver the spot. Once they've opened the app, you can send it."
     );
@@ -96,12 +104,19 @@ export async function sendSpotToFriend(
     origin,
   });
 
-  const parts: { recipient_id: string; nonce: string; ciphertext: string }[] = [];
+  // One self-contained v2 copy per (member, registered key) — including
+  // my own keys, so the share shows in my history on every device.
+  const parts: {
+    recipient_id: string;
+    recipient_key: string;
+    nonce: string;
+    ciphertext: string;
+  }[] = [];
   for (const m of members) {
-    if (!m.public_key) continue;
-    const sec = sharedSecret(m.public_key, kp.secretKey);
-    const { nonce, ciphertext } = encryptText(payload, sec);
-    parts.push({ recipient_id: m.user_id, nonce, ciphertext });
+    for (const pk of keysOf(m)) {
+      const { nonce, ciphertext } = encryptForPublicKey(payload, pk);
+      parts.push({ recipient_id: m.user_id, recipient_key: pk, nonce, ciphertext });
+    }
   }
 
   await fishFetch(`/api/fishmb/msg/conversations/${convoId}/messages`, {

@@ -103,8 +103,13 @@ export function FishAuthProvider({ children }: { children: React.ReactNode }) {
         const pub = publicKeyB64(getOrCreateKeypair(user.id));
         const d = (await fishFetch("/api/fishmb/msg/keys")) as {
           public_key: string | null;
+          public_keys?: string[];
         };
-        if (d.public_key !== pub) {
+        // Upload only if this device's key isn't registered yet.
+        // Registration is add-only: our key joins the set, it never
+        // replaces a key another device/context is still using.
+        const registered = d.public_keys ?? (d.public_key ? [d.public_key] : []);
+        if (!registered.includes(pub)) {
           await fishFetch("/api/fishmb/msg/keys", {
             method: "POST",
             headers: { "Content-Type": "application/json" },

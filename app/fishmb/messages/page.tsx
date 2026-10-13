@@ -14,7 +14,9 @@ import {
   getOrCreateKeypair,
   publicKeyB64,
   decryptText,
+  decryptV2Copy,
   sharedSecret,
+  V2_NONCE,
   type MsgKeypair,
 } from "./_components/msgCrypto";
 
@@ -23,6 +25,7 @@ interface ConvoMember {
   name: string;
   avatar_url: string | null;
   public_key?: string | null;
+  public_keys?: string[];
 }
 
 interface Convo {
@@ -35,8 +38,16 @@ interface Convo {
   last_sender_id: string | null;
   last_nonce: string | null;
   last_ciphertext: string | null;
+  last_recipient_key?: string | null;
   unread: number;
   pinned_at: string | null;
+}
+
+/** All registered keys for a member (newest first; falls back to the
+ *  single newest key on older payloads). */
+function keysOf(m: ConvoMember): string[] {
+  if (m.public_keys && m.public_keys.length > 0) return m.public_keys;
+  return m.public_key ? [m.public_key] : [];
 }
 
 interface Friend {
@@ -96,30 +107,46 @@ function LastMessagePreview({
       setPreview("Encrypted message");
       return;
     }
-    // The message was encrypted by its sender for us — decrypt with the
-    // shared secret for THAT sender (their public key x our secret key).
+    // v2 copies open with only our secret key. Legacy copies were
+    // encrypted by their sender for us — decrypt with the shared secret
+    // for THAT sender, trying each of their registered keys (any may
+    // have been current when the message was sent), newest first.
     const sender = convo.members.find((m) => m.user_id === convo.last_sender_id);
-    const pubKey = sender?.public_key;
-    if (!pubKey) {
+    let text: string | null = null;
+    try {
+      if (convo.last_nonce === V2_NONCE) {
+        text = decryptV2Copy(convo.last_nonce, convo.last_ciphertext, keypair.secretKey);
+      } else {
+        if (!sender) {
+          setPreview("Encrypted message");
+          return;
+        }
+        for (const pk of keysOf(sender)) {
+          text = decryptText(
+            convo.last_nonce,
+            convo.last_ciphertext,
+            sharedSecret(pk, keypair.secretKey)
+          );
+          if (text) break;
+        }
+      }
+    } catch {
+      text = null;
+    }
+    if (!text) {
       setPreview("Encrypted message");
       return;
     }
     try {
-      const sec = sharedSecret(pubKey, keypair.secretKey);
-      const text = decryptText(convo.last_nonce, convo.last_ciphertext, sec);
-      if (!text) {
-        setPreview("Encrypted message");
-        return;
-      }
       // Photo messages are JSON { t: "photo", url }.
       try {
         const parsed = JSON.parse(text);
         if (parsed && parsed.t === "photo") {
-          setPreview(`${convo.last_sender_id === myId ? "You" : sender.name ?? "Someone"} sent a photo`);
+          setPreview(`${convo.last_sender_id === myId ? "You" : sender?.name ?? "Someone"} sent a photo`);
           return;
         }
         if (parsed && parsed.t === "spot") {
-          setPreview(`${convo.last_sender_id === myId ? "You" : sender.name ?? "Someone"} sent a fishing spot 📍`);
+          setPreview(`${convo.last_sender_id === myId ? "You" : sender?.name ?? "Someone"} sent a fishing spot 📍`);
           return;
         }
       } catch {
@@ -133,6 +160,172 @@ function LastMessagePreview({
     }
   }, [convo.id, convo.last_at, keypair]);
   return <>{preview}</>;
+}
+
+/** How far a conversation row slides open to reveal Delete. */
+const SWIPE_W = 76;
+
+function TrashIcon({ size = 22 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3 6h18" />
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      <line x1="10" y1="11" x2="10" y2="17" />
+      <line x1="14" y1="11" x2="14" y2="17" />
+    </svg>
+  );
+}
+
+/**
+ * Conversation row with swipe-to-delete: drag left and the row follows
+ * the finger, snapping open at SWIPE_W to reveal a red delete button
+ * underneath. Deleting hides the chat from MY list only (per-user,
+ * server-side) — the swipe + tap is the confirmation. Tapping any row
+ * while one is open just closes it. Desktop gets a hover trash button.
+ */
+function SwipeDeleteRow({
+  id,
+  open,
+  anyOpen,
+  onOpenChange,
+  onDelete,
+  children,
+}: {
+  id: string;
+  open: boolean;
+  anyOpen: boolean;
+  onOpenChange: (id: string | null) => void;
+  onDelete: () => void;
+  children: React.ReactNode;
+}) {
+  const [dragX, setDragX] = useState<number | null>(null);
+  const touchRef = useRef<{
+    x: number;
+    y: number;
+    base: number;
+    horizontal: boolean;
+  } | null>(null);
+  const offsetRef = useRef(0);
+  const swipedRef = useRef(false);
+  const shown = dragX !== null ? dragX : open ? -SWIPE_W : 0;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    touchRef.current = {
+      x: t.clientX,
+      y: t.clientY,
+      base: open ? -SWIPE_W : 0,
+      horizontal: false,
+    };
+    offsetRef.current = open ? -SWIPE_W : 0;
+  };
+  const onTouchMove = (e: React.TouchEvent) => {
+    const s = touchRef.current;
+    if (!s) return;
+    const t = e.touches[0];
+    const dx = t.clientX - s.x;
+    const dy = t.clientY - s.y;
+    if (!s.horizontal) {
+      if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
+        s.horizontal = true;
+      } else if (Math.abs(dy) > 8) {
+        // Vertical scroll — abandon the gesture.
+        touchRef.current = null;
+        setDragX(null);
+        return;
+      } else {
+        return;
+      }
+    }
+    const next = Math.max(-SWIPE_W, Math.min(0, s.base + dx));
+    offsetRef.current = next;
+    setDragX(next);
+  };
+  const onTouchEnd = () => {
+    const s = touchRef.current;
+    touchRef.current = null;
+    if (s?.horizontal) {
+      // The tap that ends a swipe must not also open the thread.
+      swipedRef.current = true;
+      window.setTimeout(() => {
+        swipedRef.current = false;
+      }, 100);
+      onOpenChange(offsetRef.current < -SWIPE_W / 2 ? id : null);
+    }
+    setDragX(null);
+  };
+  const onClickCapture = (e: React.MouseEvent) => {
+    if (swipedRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      swipedRef.current = false;
+      return;
+    }
+    if (anyOpen) {
+      // Any row open (this one or another): a tap just closes it.
+      e.preventDefault();
+      e.stopPropagation();
+      onOpenChange(null);
+    }
+  };
+
+  return (
+    <div className="relative overflow-hidden">
+      <div
+        className="absolute inset-y-0 right-0 flex"
+        style={{ width: SWIPE_W }}
+        aria-hidden={!open}
+      >
+        <button
+          type="button"
+          tabIndex={open ? 0 : -1}
+          onClick={onDelete}
+          aria-label="Delete chat"
+          className="w-full bg-red-500 text-white flex items-center justify-center"
+        >
+          <TrashIcon />
+        </button>
+      </div>
+      <div
+        className="relative bg-white group"
+        style={{
+          transform: `translateX(${shown}px)`,
+          transition: dragX !== null ? "none" : "transform 200ms ease",
+        }}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        onTouchCancel={onTouchEnd}
+        onClickCapture={onClickCapture}
+      >
+        {children}
+        {!open && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            aria-label="Delete chat"
+            className="hidden md:flex absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-red-500 text-white items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <TrashIcon size={16} />
+          </button>
+        )}
+      </div>
+    </div>
+  );
 }
 
 function MessagesPageInner() {
@@ -157,6 +350,8 @@ function MessagesPageInner() {
   const [chatTab, setChatTab] = useState<"friends" | "other">("friends");
   const [note, setNote] = useState<string | null>(null);
   const [sheetConvo, setSheetConvo] = useState<Convo | null>(null);
+  // Swipe-to-delete: which conversation row is currently swiped open.
+  const [openSwipeId, setOpenSwipeId] = useState<string | null>(null);
   const convoSheetDrag = useSheetDrag(() => setSheetConvo(null));
   const newChatSheetDrag = useSheetDrag(() => closeNewChat());
   const [pushState, setPushState] = useState<"unknown" | "enabled" | "prompt" | "denied" | "unsupported">("unknown");
@@ -208,6 +403,21 @@ function MessagesPageInner() {
     }
   };
 
+  /** "Delete chat" — hides it from MY list only. Membership and history
+   *  are untouched; the chat comes back if a new message arrives. */
+  const deleteConvo = async (c: Convo) => {
+    setOpenSwipeId(null);
+    setConvos((prev) => prev.filter((x) => x.id !== c.id));
+    try {
+      await fishFetch(`/api/fishmb/msg/conversations/${c.id}/hide`, {
+        method: "POST",
+      });
+    } catch (e) {
+      setNote(e instanceof Error ? e.message : "Could not delete the chat.");
+      loadConvos();
+    }
+  };
+
   const loadConvos = async () => {
     try {
       const d = await fishFetch("/api/fishmb/msg/conversations");
@@ -226,8 +436,9 @@ function MessagesPageInner() {
     }
   };
 
-  // Setup check: local keypair + server public key. Auto-uploads the public
-  // key if missing or mismatched — no manual setup step needed.
+  // Setup check: local keypair + server public keys. If this device's
+  // key isn't registered yet, it's ADDED (never replaces anyone's key —
+  // other devices/contexts keep working) — no manual setup step needed.
   useEffect(() => {
     if (!user) return;
     (async () => {
@@ -235,14 +446,16 @@ function MessagesPageInner() {
         const d = await fishFetch("/api/fishmb/msg/keys");
         const kp = getOrCreateKeypair(user.id);
         setKeypair(kp);
-        const serverKey = (d as { public_key: string | null }).public_key;
+        const serverKeys =
+          (d as { public_keys?: string[] }).public_keys ??
+          ((d as { public_key: string | null }).public_key
+            ? [(d as { public_key: string }).public_key]
+            : []);
         const localKey = publicKeyB64(kp);
-        if (serverKey && serverKey === localKey) {
+        if (serverKeys.includes(localKey)) {
           setSetup("ready");
           loadConvos();
         } else {
-          // No public key on server, or local keypair changed (new device,
-          // cleared data) — upload the current public key automatically.
           try {
             await fishFetch("/api/fishmb/msg/keys", {
               method: "POST",
@@ -808,6 +1021,13 @@ function MessagesPageInner() {
                         const title = convoTitle(c);
                         return (
                           <div key={c.id}>
+                            <SwipeDeleteRow
+                              id={c.id}
+                              open={openSwipeId === c.id}
+                              anyOpen={openSwipeId !== null}
+                              onOpenChange={setOpenSwipeId}
+                              onDelete={() => void deleteConvo(c)}
+                            >
                             <button
                               type="button"
                               onClick={() => openConvo(c)}
@@ -843,6 +1063,7 @@ function MessagesPageInner() {
                                 </span>
                               </span>
                             </button>
+                            </SwipeDeleteRow>
                             {i < rest.length - 1 && <div className="ml-[76px] border-b border-pine/10" />}
                           </div>
                         );

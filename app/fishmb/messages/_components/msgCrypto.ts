@@ -1,6 +1,20 @@
 // Client-side E2E crypto for FishMB messages (tweetnacl).
-// The private key NEVER leaves this device — it lives in localStorage and
-// is never sent to the server. Only the public key is uploaded.
+// Private keys NEVER leave this device — they live in localStorage and
+// are never sent to the server. Only public keys are uploaded, and the
+// server keeps several per user (add-only), so a fresh device/context
+// registering its key can never orphan older messages.
+//
+// Two copy formats:
+// - v2 (current): self-contained per-copy envelope. A random message
+//   key encrypts the plaintext (secretbox); the key is wrapped to ONE
+//   recipient public key with nacl.box under a FRESH ephemeral keypair.
+//   Decryption needs only the recipient's own secret key — the sender's
+//   key state doesn't matter. The copy's nonce field is the literal
+//   string "v2" and the ciphertext field is a JSON envelope.
+// - legacy: pairwise ECDH shared secret (sender pub x recipient secret)
+//   + secretbox, nonce/ciphertext are plain base64. Copies written
+//   before v2 still decrypt client-side by trying the sender's
+//   registered keys, newest first.
 
 import nacl from "tweetnacl";
 
@@ -88,6 +102,95 @@ export function decryptText(
       b64ToBytes(ciphertextB64),
       b64ToBytes(nonceB64),
       shared
+    );
+    return opened ? new TextDecoder().decode(opened) : null;
+  } catch {
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// v2 self-contained copies (pure functions over Uint8Array + base64 — no
+// browser globals beyond btoa/atob, so they can be exercised from node).
+// ---------------------------------------------------------------------------
+
+/** The nonce-field marker that identifies a v2 copy. */
+export const V2_NONCE = "v2";
+
+export interface V2Envelope {
+  v: 2;
+  /** Ephemeral public key (base64) the message key was wrapped under. */
+  e: string;
+  /** Wrap nonce (base64). */
+  wn: string;
+  /** Wrapped message key (base64 nacl.box output). */
+  w: string;
+  /** Message nonce (base64). */
+  mn: string;
+  /** Secretbox ciphertext of the plaintext under the message key (base64). */
+  c: string;
+}
+
+/**
+ * Encrypt `plain` for ONE recipient public key, producing a copy whose
+ * stored fields are { nonce: "v2", ciphertext: <JSON envelope> }.
+ * The sender's own keypair plays no part — only the recipient's secret
+ * key can open the copy.
+ */
+export function encryptForPublicKey(
+  plain: string,
+  recipientPublicB64: string
+): { nonce: string; ciphertext: string } {
+  const recipientPub = b64ToBytes(recipientPublicB64);
+  const msgKey = nacl.randomBytes(nacl.secretbox.keyLength);
+  const msgNonce = nacl.randomBytes(nacl.secretbox.nonceLength);
+  const c = nacl.secretbox(new TextEncoder().encode(plain), msgNonce, msgKey);
+  const ephemeral = nacl.box.keyPair();
+  const wrapNonce = nacl.randomBytes(nacl.box.nonceLength);
+  const w = nacl.box(msgKey, wrapNonce, recipientPub, ephemeral.secretKey);
+  const envelope: V2Envelope = {
+    v: 2,
+    e: bytesToB64(ephemeral.publicKey),
+    wn: bytesToB64(wrapNonce),
+    w: bytesToB64(w),
+    mn: bytesToB64(msgNonce),
+    c: bytesToB64(c),
+  };
+  return { nonce: V2_NONCE, ciphertext: JSON.stringify(envelope) };
+}
+
+/**
+ * Open a v2 copy with the recipient's own secret key. Returns null when
+ * the copy wasn't wrapped to this key or was tampered with.
+ */
+export function decryptV2Copy(
+  nonceField: string,
+  ciphertextField: string,
+  mySecret: Uint8Array
+): string | null {
+  if (nonceField !== V2_NONCE) return null;
+  try {
+    const env = JSON.parse(ciphertextField) as Partial<V2Envelope>;
+    if (
+      env.v !== 2 ||
+      typeof env.e !== "string" ||
+      typeof env.wn !== "string" ||
+      typeof env.w !== "string" ||
+      typeof env.mn !== "string" ||
+      typeof env.c !== "string"
+    )
+      return null;
+    const msgKey = nacl.box.open(
+      b64ToBytes(env.w),
+      b64ToBytes(env.wn),
+      b64ToBytes(env.e),
+      mySecret
+    );
+    if (!msgKey) return null;
+    const opened = nacl.secretbox.open(
+      b64ToBytes(env.c),
+      b64ToBytes(env.mn),
+      msgKey
     );
     return opened ? new TextDecoder().decode(opened) : null;
   } catch {

@@ -1,14 +1,19 @@
 // /api/fishmb/msg/keys — my own messaging public key.
 import { NextRequest, NextResponse } from "next/server";
 import { fishUserFromRequest, unauthorized, badRequest } from "@/lib/fish/auth";
-import { getPublicKey, setPublicKey } from "@/lib/fish/messages";
+import { getPublicKey, getPublicKeys, setPublicKey } from "@/lib/fish/messages";
 
 const B64 = /^[A-Za-z0-9+/=]+$/;
 
 export async function GET(req: NextRequest) {
   const me = await fishUserFromRequest(req);
   if (!me) return unauthorized();
-  return NextResponse.json({ public_key: await getPublicKey(me.id) });
+  // public_key stays the newest key (native app compat); public_keys is
+  // the full registered set, newest first.
+  return NextResponse.json({
+    public_key: await getPublicKey(me.id),
+    public_keys: await getPublicKeys(me.id),
+  });
 }
 
 export async function POST(req: NextRequest) {
