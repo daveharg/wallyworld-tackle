@@ -646,7 +646,22 @@ function MessagesPageInner() {
         const reg = await navigator.serviceWorker.ready;
         const sub = await reg.pushManager.getSubscription();
         if (sub) {
-          setPushState("enabled");
+          // Rebind this device's subscription to whoever is signed in NOW.
+          // The browser-level subscription survives logout and account
+          // switches, while the server keys pushes by account — without
+          // this re-POST, the phone keeps receiving the previous account's
+          // notifications (it looks "signed in as both").
+          try {
+            const json = sub.toJSON();
+            await fishFetch("/api/fishmb/push/subscribe", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ endpoint: json.endpoint, keys: json.keys }),
+            });
+          } catch {
+            // Best-effort — the enabled display state doesn't depend on it.
+          }
+          if (!cancelled) setPushState("enabled");
           return;
         }
         // No subscription — try to enable automatically. Stays on until the

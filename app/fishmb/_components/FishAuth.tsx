@@ -123,6 +123,27 @@ export function FishAuthProvider({ children }: { children: React.ReactNode }) {
   }, [user]);
 
   const logout = useCallback(() => {
+    // Stop this device receiving the outgoing account's pushes: the browser
+    // push subscription outlives the session, so unregister it server-side
+    // while the token is still valid. Fire-and-forget — logout never blocks
+    // on it, and the next sign-in rebinds the subscription anyway.
+    (async () => {
+      try {
+        if ("serviceWorker" in navigator && "PushManager" in window) {
+          const reg = await navigator.serviceWorker.ready;
+          const sub = await reg.pushManager.getSubscription();
+          if (sub) {
+            await fishFetch("/api/fishmb/push/subscribe", {
+              method: "DELETE",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ endpoint: sub.endpoint }),
+            });
+          }
+        }
+      } catch {
+        // Non-fatal.
+      }
+    })();
     localStorage.removeItem(FISHMB_TOKEN_KEY);
     setUser(null);
   }, []);

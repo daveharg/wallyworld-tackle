@@ -31,3 +31,28 @@ export async function POST(req: NextRequest) {
   );
   return NextResponse.json({ ok: true });
 }
+
+// DELETE /api/fishmb/push/subscribe — remove the current user's subscription
+// for one device endpoint (called on logout, while the token is still valid).
+export async function DELETE(req: NextRequest) {
+  const me = await fishUserFromRequest(req);
+  if (!me) {
+    return NextResponse.json({ error: "Not signed in." }, { status: 401 });
+  }
+  let body: { endpoint?: string };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid body." }, { status: 400 });
+  }
+  const endpoint = typeof body.endpoint === "string" ? body.endpoint.trim() : "";
+  if (!endpoint) {
+    return NextResponse.json({ error: "Invalid subscription." }, { status: 400 });
+  }
+  await ensurePushTable();
+  await query(
+    `DELETE FROM fm_push_subscriptions WHERE endpoint = $1 AND user_id = $2`,
+    [endpoint, me.id]
+  );
+  return NextResponse.json({ ok: true });
+}
