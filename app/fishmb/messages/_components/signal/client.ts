@@ -17,7 +17,8 @@
 // owns identity, server sync, backups and the local sent log.
 
 import { b64, str, utf8 } from "./bytes";
-import { edSign } from "./crypto";
+import { edSign, sha256Hash } from "./crypto";
+import { encodeEnvelope } from "./envelope";
 import {
   generateOneTimePreKeys,
   loadOrCreateDevice,
@@ -45,6 +46,10 @@ import type { SigTransport } from "./transport";
 const PREKEY_LOW_WATERMARK = 25;
 /** One-time prekeys generated per top-up batch. */
 const PREKEY_TOPUP_BATCH = 50;
+/** Meta key holding the decrypted-plaintext cache (JSON {order, map}). */
+const PT_CACHE_META_KEY = "ptcache:v1";
+/** Cap on cached plaintexts; the oldest are evicted first. */
+const PT_CACHE_MAX = 500;
 
 export type InitStatus =
   | "fresh"
@@ -243,11 +248,74 @@ export class SignalClient {
   }
 
   /** Decrypt one envelope copy addressed to this device. DecryptFailure
-   *  propagates to the caller (the UI renders it as a typed notice). */
+   *  propagates to the caller (the UI renders it as a typed notice).
+   *
+   *  Successful plaintexts are cached by envelope hash first: a Double
+   *  Ratchet message key exists exactly once, so the same copy can
+   *  never be ratchet-decrypted twice — yet the UI legitimately reads
+   *  copies more than once (the conversation list's preview decrypts
+   *  the last message, then the thread decrypts it again on open, and
+   *  again on every reload). Cache hits return the plaintext without
+   *  touching the ratchet, so repeat reads can never fail, burn a
+   *  message key, or inflate the session's fail counter. */
   async decryptCopy(fromUserId: string, env: SigEnvelope): Promise<string> {
+    const cacheId = b64(sha256Hash(utf8(encodeEnvelope(env))));
+    const cached = await this.readPlaintextCache(cacheId);
+    if (cached !== null) return cached;
     const addr = addressOf(fromUserId, env.fd);
     const bytes = await this.manager.decrypt(this.identity, addr, env);
-    return str(bytes);
+    const text = str(bytes);
+    await this.writePlaintextCache(cacheId, text);
+    return text;
+  }
+
+  private async readPlaintextCache(
+    cacheId: string
+  ): Promise<string | null> {
+    try {
+      const raw = await this.store.getMeta(PT_CACHE_META_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as {
+        map?: Record<string, string>;
+      };
+      const v = parsed.map?.[cacheId];
+      return typeof v === "string" ? v : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private async writePlaintextCache(
+    cacheId: string,
+    text: string
+  ): Promise<void> {
+    try {
+      let order: string[] = [];
+      let map: Record<string, string> = {};
+      const raw = await this.store.getMeta(PT_CACHE_META_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as {
+          order?: string[];
+          map?: Record<string, string>;
+        };
+        if (Array.isArray(parsed.order)) order = parsed.order;
+        if (parsed.map && typeof parsed.map === "object") {
+          map = parsed.map;
+        }
+      }
+      if (!(cacheId in map)) order.push(cacheId);
+      map[cacheId] = text;
+      while (order.length > PT_CACHE_MAX) {
+        const old = order.shift();
+        if (old) delete map[old];
+      }
+      await this.store.setMeta(
+        PT_CACHE_META_KEY,
+        JSON.stringify({ order, map })
+      );
+    } catch {
+      // The cache is an optimization — never fail a decrypt over it.
+    }
   }
 
   /** If the peer reset this session (a PreKeyMessage replaced a live
