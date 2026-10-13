@@ -13,6 +13,9 @@ import {
   V2_NONCE,
   type MsgKeypair,
 } from "./msgCrypto";
+import type { SignalClient } from "./signal/client";
+import { encodeEnvelope, decodeEnvelope } from "./signal/envelope";
+import { DecryptFailure, type DeviceInfo } from "./signal/types";
 
 interface StoredMessage {
   id: string;
@@ -22,6 +25,36 @@ interface StoredMessage {
   nonce: string;
   ciphertext: string;
   created_at: string;
+  proto?: string | null;
+}
+
+/** One message part as posted to the messages route. sig1 parts carry
+ *  proto: "sig1", nonce: "sig1" and a JSON Signal envelope ciphertext. */
+interface MessagePart {
+  recipient_id: string;
+  recipient_key: string;
+  nonce: string;
+  ciphertext: string;
+  proto?: string;
+}
+
+/** Shown when a peer re-secured the session (received reset notice,
+ *  a peer reset we detected, or a reset we triggered ourselves). */
+const RESET_LINE =
+  "Messages were re-secured on a new session — anything sent while the session was broken couldn't be recovered.";
+/** Shown when messages failed to decrypt and couldn't be recovered. */
+const UNREADABLE_LINE =
+  "Some messages in this chat couldn't be read — they were sent while the session was broken.";
+
+/** True when a decrypted payload is a session-reset system notice. */
+function isSysResetPayload(text: string): boolean {
+  if (!text.startsWith("{")) return false;
+  try {
+    const o = JSON.parse(text) as { t?: string; kind?: string };
+    return o.t === "sys" && o.kind === "session-reset";
+  } catch {
+    return false;
+  }
 }
 
 /** A conversation member plus every public key they have registered. */
@@ -67,6 +100,9 @@ interface Decrypted {
   text: string | null;
   noKey: boolean;
   created_at: string;
+  /** System line (session reset / unreadable notice) — rendered as a
+   *  centered muted line instead of a chat bubble. */
+  sys?: boolean;
 }
 
 export interface ThreadPeer {
@@ -127,6 +163,7 @@ export default function ThreadView({
   peer,
   myId,
   keypair,
+  signal,
   onBack,
   onSent,
   onRead,
@@ -134,6 +171,9 @@ export default function ThreadView({
   peer: ThreadPeer;
   myId: string;
   keypair: MsgKeypair;
+  /** Signal-protocol client for this device, or null while it loads /
+   *  when unavailable (legacy v2/legacy messaging keeps working). */
+  signal?: SignalClient | null;
   onBack: () => void;
   onSent: () => void;
   onRead: () => void;
@@ -141,6 +181,51 @@ export default function ThreadView({
   const [memberKeys, setMemberKeys] = useState<MemberKeys[] | null>(null);
   const [missingNames, setMissingNames] = useState<string[]>([]);
   const [msgs, setMsgs] = useState<Decrypted[]>([]);
+  // Locally injected system lines (peer reset detected on mount, a
+  // recovery I triggered, unrecoverable-history notice). Kept separate
+  // from msgs so a full reload can't wipe them; rendered after the
+  // loaded history.
+  const [sysLines, setSysLines] = useState<Decrypted[]>([]);
+  const sysInjectedRef = useRef<Set<string>>(new Set());
+  // Signal device lists per user, cached for this thread (refreshed
+  // when a send fails).
+  const deviceCacheRef = useRef<Map<string, DeviceInfo[]>>(new Map());
+  // Auto-recovery attempts: once per sender per thread mount.
+  const recoveryAttemptedRef = useRef<Set<string>>(new Set());
+  const peerResetCheckedRef = useRef(false);
+
+  /** Append a system line once per key for this thread mount. */
+  const injectSysLine = (key: string, text: string) => {
+    if (sysInjectedRef.current.has(key)) return;
+    sysInjectedRef.current.add(key);
+    setSysLines((prev) => [
+      ...prev,
+      {
+        id: `sys-${key}`,
+        mine: false,
+        sender_id: "",
+        text,
+        noKey: false,
+        sys: true,
+        created_at: lastAtRef.current ?? new Date().toISOString(),
+      },
+    ]);
+  };
+
+  /** A member's Signal devices, cached per thread. */
+  const getDevicesCached = async (
+    userId: string,
+    force: boolean = false
+  ): Promise<DeviceInfo[]> => {
+    if (!signal) return [];
+    if (!force) {
+      const hit = deviceCacheRef.current.get(userId);
+      if (hit) return hit;
+    }
+    const devices = await signal.devicesOf(userId);
+    deviceCacheRef.current.set(userId, devices);
+    return devices;
+  };
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const [note, setNote] = useState<string | null>(null);
@@ -356,6 +441,11 @@ export default function ThreadView({
   }, [peer.id, keypair]);
 
   // Decrypt ONE of my copies.
+  // - sig1 copies (proto === "sig1" || nonce === "sig1") go through the
+  //   Signal client: the ciphertext is a JSON envelope addressed to one
+  //   device identity key. A copy addressed to a DIFFERENT identity key
+  //   than this device's is for my other device — it is skipped (not a
+  //   failure, contributes nothing).
   // - v2 copies are self-contained: they open with only my secret key,
   //   whichever of my keys they were wrapped to (copies wrapped to a key
   //   whose secret is lost simply fail and a sibling copy is tried).
@@ -364,7 +454,35 @@ export default function ThreadView({
   //   sender's registered keys may have been current when the message
   //   was sent (e.g. before they got a new phone), so try each,
   //   newest first.
-  const decryptRow = (m: StoredMessage): { text: string | null; noKey: boolean } => {
+  type RowResult = {
+    text: string | null;
+    noKey: boolean;
+    failureKind?: string;
+    skip?: boolean;
+  };
+  const decryptRow = async (m: StoredMessage): Promise<RowResult> => {
+    if (m.proto === "sig1" || m.nonce === "sig1") {
+      if (m.recipient_key && signal && m.recipient_key !== signal.identityPubB64) {
+        return { text: null, noKey: false, skip: true };
+      }
+      if (!signal) return { text: null, noKey: false, failureKind: "no-session" };
+      let env;
+      try {
+        env = decodeEnvelope(m.ciphertext);
+      } catch {
+        return { text: null, noKey: false, failureKind: "bad-envelope" };
+      }
+      try {
+        const text = await signal.decryptCopy(m.sender_id, env);
+        return { text, noKey: false };
+      } catch (e) {
+        const kind =
+          e instanceof DecryptFailure
+            ? e.kind
+            : ((e as { kind?: string } | null)?.kind ?? "bad-mac");
+        return { text: null, noKey: false, failureKind: kind };
+      }
+    }
     if (m.nonce === V2_NONCE) {
       return {
         text: decryptV2Copy(m.nonce, m.ciphertext, keypair.secretKey),
@@ -386,32 +504,48 @@ export default function ThreadView({
   // of a send with a single timestamp), so fold them into one bubble:
   // the first copy that decrypts becomes the bubble; sibling copies are
   // dropped, and a failed placeholder upgrades if a later copy opens.
-  const decryptAll = (rows: StoredMessage[]): Decrypted[] => {
+  // sig1 decrypt failures are collected per logical message (a base
+  // that later opens drops its failure) for the auto-recovery pass.
+  // Decryption is sequential on purpose: the Double Ratchet must run
+  // in message order.
+  const decryptAll = async (
+    rows: StoredMessage[]
+  ): Promise<{ items: Decrypted[]; failures: { sender_id: string; kind: string }[] }> => {
     const out: Decrypted[] = [];
     const byBase = new Map<string, number>();
     const seenGood = new Set<string>();
+    const failureByBase = new Map<string, { sender_id: string; kind: string }>();
     for (const m of rows) {
-      const { text, noKey } = decryptRow(m);
+      const { text, noKey, failureKind, skip } = await decryptRow(m);
+      if (skip) continue;
       const base = `${m.sender_id}|${m.created_at}`;
       if (text !== null) {
+        failureByBase.delete(base);
         const goodKey = `${base}|${text}`;
         if (seenGood.has(goodKey)) continue;
         seenGood.add(goodKey);
-        const idx = byBase.get(base);
-        if (idx !== undefined && out[idx].text === null) {
-          out[idx] = { ...out[idx], id: m.id, text, noKey: false };
-          continue;
-        }
-        byBase.set(base, out.length);
-        out.push({
+        // System payloads render as a centered system line, not a bubble.
+        const sys = isSysResetPayload(text);
+        const entry: Decrypted = {
           id: m.id,
           mine: m.sender_id === myId,
           sender_id: m.sender_id,
-          text,
+          text: sys ? RESET_LINE : text,
           noKey: false,
           created_at: m.created_at,
-        });
+          ...(sys ? { sys: true } : {}),
+        };
+        const idx = byBase.get(base);
+        if (idx !== undefined && out[idx].text === null) {
+          out[idx] = entry;
+          continue;
+        }
+        byBase.set(base, out.length);
+        out.push(entry);
       } else {
+        if (failureKind && !failureByBase.has(base)) {
+          failureByBase.set(base, { sender_id: m.sender_id, kind: failureKind });
+        }
         if (byBase.has(base)) continue;
         byBase.set(base, out.length);
         out.push({
@@ -424,7 +558,154 @@ export default function ThreadView({
         });
       }
     }
-    return out;
+    return { items: out, failures: Array.from(failureByBase.values()) };
+  };
+
+  /** Merge this device's local sent-log into the bubbles: entries whose
+   *  created_at isn't already represented by one of my bubbles become
+   *  mine bubbles, sorted into place. A failed placeholder at the same
+   *  timestamp upgrades to the logged text. */
+  const mergeSentLog = async () => {
+    if (!signal) return;
+    try {
+      const entries = await signal.sentLog(peer.id);
+      if (entries.length === 0) return;
+      setMsgs((prev) => {
+        const next = [...prev];
+        let changed = false;
+        for (const e of entries) {
+          const idx = next.findIndex(
+            (p) => p.mine && p.created_at === e.created_at
+          );
+          if (idx >= 0) {
+            if (next[idx].text === null) {
+              next[idx] = { ...next[idx], text: e.text, noKey: false };
+              changed = true;
+            }
+            continue;
+          }
+          const entry: Decrypted = {
+            id: `log-${e.created_at}`,
+            mine: true,
+            sender_id: myId,
+            text: e.text,
+            noKey: false,
+            created_at: e.created_at,
+          };
+          const pos = next.findIndex((p) => p.created_at > e.created_at);
+          if (pos === -1) next.push(entry);
+          else next.splice(pos, 0, entry);
+          changed = true;
+        }
+        return changed ? next : prev;
+      });
+    } catch {
+      // Sent-log is best-effort display sugar.
+    }
+  };
+
+  /** Once per thread mount: if any peer device reports a consumed reset,
+   *  show the re-secured line once. (The received sys payload handled
+   *  in decryptAll is the primary mechanism; this is the backstop.) */
+  const checkPeerResets = async () => {
+    if (!signal || peerResetCheckedRef.current) return;
+    peerResetCheckedRef.current = true;
+    try {
+      for (const m of memberKeysRef.current ?? []) {
+        if (m.user_id === myId) continue;
+        const devices = await getDevicesCached(m.user_id);
+        for (const d of devices) {
+          if (await signal.consumePeerReset(m.user_id, d.deviceId)) {
+            injectSysLine("session-reset", RESET_LINE);
+            return;
+          }
+        }
+      }
+    } catch {
+      // Detection only — never block the thread on it.
+    }
+  };
+
+  /** Auto-recovery for broken Signal sessions, once per sender per
+   *  mount. Trigger rule (documented choice): a failure kind of
+   *  "no-session" or "desync" triggers on the first failure; "bad-mac"
+   *  triggers once a sender has >= 2 failed logical messages. When the
+   *  user has a server backup we never auto-reset (restoring beats
+   *  resetting) — we point them at Settings instead. Otherwise we reset
+   *  the sessions with that sender, start fresh ones, and the FIRST
+   *  message on each fresh session is the session-reset notice. */
+  const maybeRecover = async (failures: { sender_id: string; kind: string }[]) => {
+    if (!signal || failures.length === 0) return;
+    const bySender = new Map<string, { sender_id: string; kind: string }[]>();
+    for (const f of failures) {
+      const list = bySender.get(f.sender_id) ?? [];
+      list.push(f);
+      bySender.set(f.sender_id, list);
+    }
+    let anyUnrecovered = false;
+    for (const [senderId, senderFailures] of Array.from(bySender.entries())) {
+      // Never "recover" sessions with myself (copies from my other
+      // devices failing here are a device-key problem, not a peer one).
+      if (senderId === myId) {
+        anyUnrecovered = true;
+        continue;
+      }
+      if (recoveryAttemptedRef.current.has(senderId)) {
+        anyUnrecovered = true;
+        continue;
+      }
+      const eligible = senderFailures.some(
+        (f) =>
+          f.kind === "no-session" ||
+          f.kind === "desync" ||
+          (f.kind === "bad-mac" &&
+            senderFailures.filter((x) => x.kind === "bad-mac").length >= 2)
+      );
+      if (!eligible) {
+        anyUnrecovered = true;
+        continue;
+      }
+      recoveryAttemptedRef.current.add(senderId);
+      try {
+        if (await signal.hasServerBackup()) {
+          setNote(
+            "Some messages couldn't be read. You have an encrypted message backup — restore it from Settings to recover them, or keep chatting to start a fresh session."
+          );
+          continue;
+        }
+        await signal.resetSessionsWith(senderId);
+        const devices = await signal.startFreshSessions(senderId);
+        const notice = JSON.stringify({ t: "sys", kind: "session-reset" });
+        const parts: MessagePart[] = [];
+        for (const device of devices) {
+          const env = await signal.encryptToDevice(senderId, device.deviceId, notice);
+          parts.push({
+            recipient_id: senderId,
+            recipient_key: device.identityKey,
+            nonce: "sig1",
+            ciphertext: encodeEnvelope(env),
+            proto: "sig1",
+          });
+        }
+        if (parts.length > 0) {
+          await fishFetch(`/api/fishmb/msg/conversations/${peer.id}/messages`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ parts }),
+          });
+        }
+        injectSysLine("session-reset", RESET_LINE);
+      } catch {
+        anyUnrecovered = true;
+        setNote(
+          "Some messages couldn't be read, and the chat couldn't be re-secured automatically."
+        );
+      }
+    }
+    // Failures that remain unrecovered get the plain-language line once.
+    if (anyUnrecovered) {
+      injectSysLine("unreadable", UNREADABLE_LINE);
+    }
   };
 
   // Initial load + polling. My rows only — each member reads their own copies.
@@ -442,39 +723,50 @@ export default function ThreadView({
         if (!live) return;
         if (after) {
           if (rows.length > 0) {
-            setMsgs((prev) => {
-              const fresh = decryptAll(rows);
-              if (fresh.length === 0) return prev;
-              // Merge by logical message (sender + timestamp), not row
-              // id: the poll may return a different copy of a message
-              // already on screen.
-              let changed = false;
-              const next = [...prev];
-              for (const f of fresh) {
-                const idx = next.findIndex(
-                  (p) => p.sender_id === f.sender_id && p.created_at === f.created_at
-                );
-                if (idx === -1) {
-                  next.push(f);
-                  changed = true;
-                } else if (next[idx].text === null && f.text !== null) {
-                  next[idx] = f;
-                  changed = true;
+            const { items: fresh, failures } = await decryptAll(rows);
+            if (!live) return;
+            if (fresh.length > 0) {
+              setMsgs((prev) => {
+                // Merge by logical message (sender + timestamp), not row
+                // id: the poll may return a different copy of a message
+                // already on screen.
+                let changed = false;
+                const next = [...prev];
+                for (const f of fresh) {
+                  const idx = next.findIndex(
+                    (p) => p.sender_id === f.sender_id && p.created_at === f.created_at
+                  );
+                  if (idx === -1) {
+                    next.push(f);
+                    changed = true;
+                  } else if (next[idx].text === null && f.text !== null) {
+                    next[idx] = f;
+                    changed = true;
+                  }
                 }
-              }
-              return changed ? next : prev;
-            });
-            lastAtRef.current = rows[rows.length - 1].created_at;
-            bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+                return changed ? next : prev;
+              });
+              lastAtRef.current = rows[rows.length - 1].created_at;
+              bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+            }
+            if (failures.length > 0) void maybeRecover(failures);
+            void mergeSentLog();
           }
         } else {
-          setMsgs(decryptAll(rows));
+          const { items, failures } = await decryptAll(rows);
+          if (!live) return;
+          setMsgs(items);
           lastAtRef.current =
             rows.length > 0 ? rows[rows.length - 1].created_at : null;
           setTimeout(
             () => bottomRef.current?.scrollIntoView({ behavior: "auto" }),
             50
           );
+          // Sent-log merge, one-time peer-reset check, and Signal
+          // session auto-recovery for anything that failed to decrypt.
+          void mergeSentLog();
+          void checkPeerResets();
+          if (failures.length > 0) void maybeRecover(failures);
         }
         if (rows.length > 0) {
           fishFetch(`/api/fishmb/msg/conversations/${peer.id}/read`, {
@@ -502,7 +794,7 @@ export default function ThreadView({
       clearInterval(timer);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [memberKeys, peer.id]);
+  }, [memberKeys, peer.id, signal]);
 
   const sendPayload = async (payload: string, optimisticText: string | null = null) => {
     const members = memberKeysRef.current;
@@ -515,20 +807,58 @@ export default function ThreadView({
     setSending(true);
     setNote(null);
     try {
-      // One self-contained v2 copy per (member, registered key) —
-      // including copies for each of my own keys, so every device I
-      // use can read my sent history. Members without keys are skipped.
-      const parts: {
-        recipient_id: string;
-        recipient_key: string;
-        nonce: string;
-        ciphertext: string;
-      }[] = [];
-      for (const m of members) {
+      // Photo payloads keep the v2 path unchanged. Everything else
+      // prefers Signal when this device has a client: one sig1 copy per
+      // (member, device) for members who have Signal devices; members
+      // without devices get v2 copies for their legacy keys, exactly
+      // as before. My own OTHER devices get sig1 copies too — the
+      // sending device keeps no server copy (Signal model) and relies
+      // on its local sent-log instead.
+      let isPhoto = false;
+      try {
+        const parsed = JSON.parse(payload) as { t?: string };
+        isPhoto = parsed?.t === "photo";
+      } catch {
+        // Plain text.
+      }
+      const parts: MessagePart[] = [];
+      let usedSignal = false;
+      const addV2Copies = (m: MemberKeys) => {
         for (const pk of m.public_keys) {
           const { nonce, ciphertext } = encryptForPublicKey(payload, pk);
           parts.push({ recipient_id: m.user_id, recipient_key: pk, nonce, ciphertext });
         }
+      };
+      if (!isPhoto && signal) {
+        for (const m of members) {
+          let devices: DeviceInfo[] = [];
+          try {
+            devices = await getDevicesCached(m.user_id);
+          } catch {
+            devices = [];
+          }
+          if (devices.length > 0) {
+            usedSignal = true;
+            for (const device of devices) {
+              if (m.user_id === myId && device.deviceId === signal.deviceId) continue;
+              const env = await signal.encryptToDevice(m.user_id, device.deviceId, payload);
+              parts.push({
+                recipient_id: m.user_id,
+                recipient_key: device.identityKey,
+                nonce: "sig1",
+                ciphertext: encodeEnvelope(env),
+                proto: "sig1",
+              });
+            }
+          } else {
+            addV2Copies(m);
+          }
+        }
+      } else {
+        // One self-contained v2 copy per (member, registered key) —
+        // including copies for each of my own keys, so every device I
+        // use can read my sent history. Members without keys are skipped.
+        for (const m of members) addV2Copies(m);
       }
       if (parts.length === 0) {
         throw new Error("No one in this chat has messaging keys set up yet.");
@@ -543,10 +873,11 @@ export default function ThreadView({
       // or the poll will re-add it as a duplicate seconds later.
       const rows = d.messages as StoredMessage[];
       const myPub = publicKeyB64(keypair);
+      const addressedToMe = rows.filter((m) => m.recipient_id === myId);
       const mine =
-        rows.find((m) => m.recipient_id === myId && m.recipient_key === myPub) ??
-        rows.find((m) => m.recipient_id === myId) ??
-        rows.find((m) => m.sender_id === myId);
+        addressedToMe.find((m) => m.recipient_key === myPub) ??
+        addressedToMe[0] ??
+        (addressedToMe.length > 0 ? rows.find((m) => m.sender_id === myId) : undefined);
       if (mine) {
         setMsgs((prev) => {
           if (prev.some((m) => m.id === mine.id)) return prev;
@@ -556,6 +887,33 @@ export default function ThreadView({
           ];
         });
         lastAtRef.current = mine.created_at;
+      } else if (rows.length > 0) {
+        // Sig-only send: no copy is addressed to me (the sending device
+        // keeps none). Show a local bubble and record the send in the
+        // device sent-log so history survives a reload.
+        const created_at = rows[0].created_at;
+        const localId = `local-${created_at}`;
+        setMsgs((prev) => {
+          if (
+            prev.some(
+              (m) => m.id === localId || (m.mine && m.created_at === created_at)
+            )
+          ) {
+            return prev;
+          }
+          return [
+            ...prev,
+            { id: localId, mine: true, sender_id: myId, text: optimisticText ?? payload, noKey: false, created_at },
+          ];
+        });
+        lastAtRef.current = created_at;
+        if (signal && usedSignal) {
+          try {
+            await signal.logSent(peer.id, payload, created_at);
+          } catch {
+            // The message itself was delivered; the local log is best-effort.
+          }
+        }
       }
       setTimeout(
         () => bottomRef.current?.scrollIntoView({ behavior: "smooth" }),
@@ -567,6 +925,9 @@ export default function ThreadView({
         window.dispatchEvent(new Event("fishmb-unread-changed"));
       } catch {}
     } catch (e) {
+      // A failed send may mean a stale device list — drop the cache so
+      // the next attempt re-fetches every member's devices.
+      deviceCacheRef.current.clear();
       setNote(e instanceof Error ? e.message : "Could not send.");
     } finally {
       sendingRef.current = false;
@@ -841,6 +1202,9 @@ export default function ThreadView({
     const a = new Date(prev.created_at), b = new Date(m.created_at);
     return a.getFullYear() !== b.getFullYear() || a.getMonth() !== b.getMonth() || a.getDate() !== b.getDate();
   };
+
+  // Loaded history, then any locally injected system lines at the end.
+  const displayMsgs: Decrypted[] = [...msgs, ...sysLines];
 
   return (
     <div className="flex flex-col h-full min-h-0">
@@ -1215,9 +1579,18 @@ export default function ThreadView({
  No messages yet — say hey. 
           </p>
         )}
-        {msgs.map((m, i) => {
-          const prev = i > 0 ? msgs[i - 1] : undefined;
-          const next = i < msgs.length - 1 ? msgs[i + 1] : undefined;
+        {displayMsgs.map((m, i) => {
+          const prev = i > 0 ? displayMsgs[i - 1] : undefined;
+          const next = i < displayMsgs.length - 1 ? displayMsgs[i + 1] : undefined;
+          if (m.sys) {
+            return (
+              <div key={m.id}>
+                <p className="text-center text-[11px] text-pine/40 py-2.5 px-6 leading-relaxed">
+                  {m.text}
+                </p>
+              </div>
+            );
+          }
           const senderName = m.mine
             ? null
             : (peer.members.find((x) => x.user_id === m.sender_id)?.name ?? null);

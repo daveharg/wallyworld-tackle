@@ -13,6 +13,8 @@ import {
   publicKeyB64,
   encryptForPublicKey,
 } from "./msgCrypto";
+import { peekSignalClient } from "./signal/singleton";
+import { encodeEnvelope } from "./signal/envelope";
 
 export interface SpotShareData {
   name: string;
@@ -79,11 +81,6 @@ export async function sendSpotToFriend(
   const convo = (list.conversations ?? []).find((x) => x.id === convoId);
   const members = convo?.members ?? [];
   const friend = members.find((m) => m.user_id === friendId);
-  if (!friend || keysOf(friend).length === 0) {
-    throw new Error(
-      "That friend hasn't opened FishMB yet, so there's no way to deliver the spot. Once they've opened the app, you can send it."
-    );
-  }
 
   const origin =
     spot.origin_user_id && spot.origin_name
@@ -103,6 +100,70 @@ export async function sendSpotToFriend(
     },
     origin,
   });
+
+  // Signal path: if this device has a Signal client and the friend has
+  // Signal devices, send one sig1 copy per device (friend's devices +
+  // my other devices; the sending device keeps no server copy and logs
+  // the send locally instead).
+  const client = peekSignalClient(myId);
+  const friendDevices = client ? await client.devicesOf(friendId) : [];
+  if (client && friendDevices.length > 0) {
+    const parts: {
+      recipient_id: string;
+      recipient_key: string;
+      nonce: string;
+      ciphertext: string;
+      proto: string;
+    }[] = [];
+    for (const device of friendDevices) {
+      const env = await client.encryptToDevice(friendId, device.deviceId, payload);
+      parts.push({
+        recipient_id: friendId,
+        recipient_key: device.identityKey,
+        nonce: "sig1",
+        ciphertext: encodeEnvelope(env),
+        proto: "sig1",
+      });
+    }
+    const myDevices = await client.devicesOf(myId);
+    for (const device of myDevices) {
+      if (device.deviceId === client.deviceId) continue;
+      const env = await client.encryptToDevice(myId, device.deviceId, payload);
+      parts.push({
+        recipient_id: myId,
+        recipient_key: device.identityKey,
+        nonce: "sig1",
+        ciphertext: encodeEnvelope(env),
+        proto: "sig1",
+      });
+    }
+    const res = (await fishFetch(`/api/fishmb/msg/conversations/${convoId}/messages`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ parts }),
+    })) as { messages?: { created_at: string }[] };
+    const created_at = res.messages?.[0]?.created_at;
+    if (created_at) {
+      try {
+        await client.logSent(convoId, payload, created_at);
+      } catch {
+        // Delivered either way; the local log is best-effort.
+      }
+    }
+    try {
+      window.dispatchEvent(new Event("fishmb-unread-changed"));
+    } catch {}
+    return convoId;
+  }
+
+  // v2 path: the friend needs at least legacy keys. The "hasn't opened
+  // FishMB yet" error only applies when they have NEITHER Signal
+  // devices (checked above) NOR legacy keys.
+  if (!friend || keysOf(friend).length === 0) {
+    throw new Error(
+      "That friend hasn't opened FishMB yet, so there's no way to deliver the spot. Once they've opened the app, you can send it."
+    );
+  }
 
   // One self-contained v2 copy per (member, registered key) — including
   // my own keys, so the share shows in my history on every device.

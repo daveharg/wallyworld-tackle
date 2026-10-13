@@ -19,6 +19,9 @@ import {
   V2_NONCE,
   type MsgKeypair,
 } from "./_components/msgCrypto";
+import { useSignalClient } from "./_components/signal/singleton";
+import type { SignalClient } from "./_components/signal/client";
+import { decodeEnvelope } from "./_components/signal/envelope";
 
 interface ConvoMember {
   user_id: string;
@@ -38,6 +41,7 @@ interface Convo {
   last_sender_id: string | null;
   last_nonce: string | null;
   last_ciphertext: string | null;
+  last_proto?: string | null;
   last_recipient_key?: string | null;
   unread: number;
   pinned_at: string | null;
@@ -96,13 +100,59 @@ function LastMessagePreview({
   convo,
   keypair,
   myId,
+  signal,
 }: {
   convo: Convo;
   keypair: MsgKeypair | null;
   myId: string | undefined;
+  signal: SignalClient | null;
 }) {
   const [preview, setPreview] = useState<string>("…");
   useEffect(() => {
+    const sender = convo.members.find((m) => m.user_id === convo.last_sender_id);
+    // Shared preview formatting for a successfully decrypted text:
+    // photo/spot JSON detection, then "You: …" / plain truncation.
+    const formatText = (text: string) => {
+      try {
+        const parsed = JSON.parse(text);
+        if (parsed && parsed.t === "photo") {
+          setPreview(`${convo.last_sender_id === myId ? "You" : sender?.name ?? "Someone"} sent a photo`);
+          return;
+        }
+        if (parsed && parsed.t === "spot") {
+          setPreview(`${convo.last_sender_id === myId ? "You" : sender?.name ?? "Someone"} sent a fishing spot 📍`);
+          return;
+        }
+      } catch {
+        // Not JSON — plain text.
+      }
+      const prefix = convo.last_sender_id === myId ? "You: " : "";
+      const short = text.length > 60 ? text.slice(0, 60) + "…" : text;
+      setPreview(prefix + short);
+    };
+    // Signal-protocol copies: nonce/proto "sig1", ciphertext is a JSON
+    // envelope addressed to one specific device identity key.
+    if (convo.last_nonce === "sig1" || convo.last_proto === "sig1") {
+      if (!convo.last_ciphertext || !signal || convo.last_recipient_key !== signal.identityPubB64) {
+        // Not addressed to THIS device (a copy for my other device, or
+        // Signal isn't ready yet) — nothing to show at list level.
+        setPreview("Encrypted message");
+        return;
+      }
+      let cancelled = false;
+      (async () => {
+        try {
+          const env = decodeEnvelope(convo.last_ciphertext!);
+          const text = await signal.decryptCopy(convo.last_sender_id ?? "", env);
+          if (!cancelled) formatText(text);
+        } catch {
+          if (!cancelled) setPreview("Encrypted message");
+        }
+      })();
+      return () => {
+        cancelled = true;
+      };
+    }
     if (!convo.last_nonce || !convo.last_ciphertext || !keypair) {
       setPreview("Encrypted message");
       return;
@@ -111,7 +161,6 @@ function LastMessagePreview({
     // encrypted by their sender for us — decrypt with the shared secret
     // for THAT sender, trying each of their registered keys (any may
     // have been current when the message was sent), newest first.
-    const sender = convo.members.find((m) => m.user_id === convo.last_sender_id);
     let text: string | null = null;
     try {
       if (convo.last_nonce === V2_NONCE) {
@@ -137,28 +186,8 @@ function LastMessagePreview({
       setPreview("Encrypted message");
       return;
     }
-    try {
-      // Photo messages are JSON { t: "photo", url }.
-      try {
-        const parsed = JSON.parse(text);
-        if (parsed && parsed.t === "photo") {
-          setPreview(`${convo.last_sender_id === myId ? "You" : sender?.name ?? "Someone"} sent a photo`);
-          return;
-        }
-        if (parsed && parsed.t === "spot") {
-          setPreview(`${convo.last_sender_id === myId ? "You" : sender?.name ?? "Someone"} sent a fishing spot 📍`);
-          return;
-        }
-      } catch {
-        // Not JSON — plain text.
-      }
-      const prefix = convo.last_sender_id === myId ? "You: " : "";
-      const short = text.length > 60 ? text.slice(0, 60) + "…" : text;
-      setPreview(prefix + short);
-    } catch {
-      setPreview("Encrypted message");
-    }
-  }, [convo.id, convo.last_at, keypair]);
+    formatText(text);
+  }, [convo.id, convo.last_at, keypair, signal]);
   return <>{preview}</>;
 }
 
@@ -330,6 +359,11 @@ function SwipeDeleteRow({
 
 function MessagesPageInner() {
   const { user, openLogin } = useFishAuth();
+  // Signal-protocol client for this device (alongside the legacy keypair
+  // setup below, which stays exactly as-is). Null while it initializes.
+  const signalInit = useSignalClient(user?.id);
+  const signal: SignalClient | null = signalInit?.client ?? null;
+  const [wipedBannerDismissed, setWipedBannerDismissed] = useState(false);
   const searchParams = useSearchParams();
   const [setup, setSetup] = useState<"checking" | "needed" | "ready">("checking");
   const [enabling, setEnabling] = useState(false);
@@ -927,6 +961,28 @@ function MessagesPageInner() {
         </p>
       )}
 
+      {/* One-time-per-mount notice when this device lost its Signal keys. */}
+      {signalInit &&
+        (signalInit.status === "wiped-backup-available" ||
+          signalInit.status === "wiped-no-backup") &&
+        !wipedBannerDismissed && (
+          <div className="flex items-start gap-3 text-sm text-pine bg-pine/5 border border-pine/15 rounded-2xl px-4 py-3 mb-4">
+            <p className="flex-1">
+              {signalInit.status === "wiped-backup-available"
+                ? "This device lost its message keys. You have an encrypted backup — restore it in Settings to read older chats."
+                : "This device lost its message keys, so older chats can't be read here. New messages will work normally."}
+            </p>
+            <button
+              type="button"
+              onClick={() => setWipedBannerDismissed(true)}
+              aria-label="Dismiss"
+              className="shrink-0 text-pine/40 text-lg leading-none px-1"
+            >
+              ×
+            </button>
+          </div>
+        )}
+
       <div className="md:grid md:grid-cols-[320px_1fr] md:gap-6">
         {/* Conversation list */}
         <div className={peer ? "hidden md:block" : ""}>
@@ -1047,7 +1103,7 @@ function MessagesPageInner() {
                                 <span className="flex items-center justify-between gap-2 mt-0.5">
                                   <span className="text-[15px] text-pine/50 truncate">
                                     {c.last_at ? (
-                                      <LastMessagePreview convo={c} keypair={keypair} myId={user?.id} />
+                                      <LastMessagePreview convo={c} keypair={keypair} myId={user?.id} signal={signal} />
                                     ) : (
                                       "Say hey "
                                     )}
@@ -1084,6 +1140,7 @@ function MessagesPageInner() {
                 peer={peer}
                 myId={user.id}
                 keypair={keypair}
+                signal={signal}
                 onBack={() => setSelected(null)}
                 onSent={loadConvos}
                 onRead={loadConvos}

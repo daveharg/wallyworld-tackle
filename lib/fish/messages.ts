@@ -46,6 +46,8 @@ export interface ConversationPreview {
   last_nonce: string | null;
   last_ciphertext: string | null;
   last_recipient_key: string | null;
+  /** Protocol of the newest copy ("sig1" for Signal), null for v2/legacy. */
+  last_proto: string | null;
   unread: number;
   pinned_at: string | null;
 }
@@ -57,6 +59,9 @@ export interface StoredMessage {
   /** Which of the recipient's public keys this copy was wrapped to (v2).
    *  NULL for legacy pairwise copies. */
   recipient_key: string | null;
+  /** Wire protocol of this copy ("sig1" for Signal-protocol copies).
+   *  NULL for v2 wrapped-key and legacy pairwise copies. */
+  proto: string | null;
   nonce: string;
   ciphertext: string;
   created_at: string;
@@ -92,8 +97,11 @@ export async function getReactions(
 
 export interface MessagePart {
   recipient_id: string;
-  /** Public key (base64) this copy is wrapped to; null/absent = legacy copy. */
+  /** Public key (base64) this copy is wrapped to; null/absent = legacy copy.
+   *  For proto "sig1" copies: the recipient device's identity key. */
   recipient_key?: string | null;
+  /** Wire protocol of this copy ("sig1" for Signal); absent/null = v2/legacy. */
+  proto?: string | null;
   nonce: string;
   ciphertext: string;
 }
@@ -178,6 +186,9 @@ export async function ensureMsgTables(): Promise<void> {
   // v2 copies record which of the recipient's public keys they were
   // wrapped to, so the recipient can pick the copy their device can open.
   await query(`ALTER TABLE fm_messages ADD COLUMN IF NOT EXISTS recipient_key text`);
+  // Signal-protocol copies record their wire protocol ("sig1") so clients
+  // can route them to the Signal stack instead of the v2/legacy path.
+  await query(`ALTER TABLE fm_messages ADD COLUMN IF NOT EXISTS proto text`);
   await query(
     `CREATE INDEX IF NOT EXISTS fm_messages_conv_idx ON fm_messages (conversation_id, created_at)`
   );
@@ -301,6 +312,7 @@ export async function listConversations(userId: string): Promise<ConversationPre
     last_nonce: string | null;
     last_ciphertext: string | null;
     last_recipient_key: string | null;
+    last_proto: string | null;
     unread: number;
     pinned_at: string | null;
   }>(
@@ -313,6 +325,7 @@ export async function listConversations(userId: string): Promise<ConversationPre
             m.created_at AS last_at, m.sender_id AS last_sender_id,
             m.nonce AS last_nonce, m.ciphertext AS last_ciphertext,
             m.recipient_key AS last_recipient_key,
+            m.proto AS last_proto,
             (SELECT COUNT(*)::int FROM fm_messages mm
               WHERE mm.conversation_id = c.id
                 AND mm.recipient_id = $1
@@ -322,7 +335,7 @@ export async function listConversations(userId: string): Promise<ConversationPre
        FROM mine
        JOIN fm_conversations c ON c.id = mine.conversation_id
        LEFT JOIN LATERAL (
-         SELECT created_at, sender_id, nonce, ciphertext, recipient_key
+         SELECT created_at, sender_id, nonce, ciphertext, recipient_key, proto
            FROM fm_messages
           WHERE conversation_id = c.id AND recipient_id = $1
           ORDER BY created_at DESC LIMIT 1
@@ -356,6 +369,7 @@ export async function listConversations(userId: string): Promise<ConversationPre
       last_nonce: r.last_nonce,
       last_ciphertext: r.last_ciphertext,
       last_recipient_key: r.last_recipient_key,
+      last_proto: r.last_proto ?? null,
       unread: r.unread,
       pinned_at: r.pinned_at,
     });
@@ -549,7 +563,7 @@ export async function listMessages(
   );
   if (after) {
     return query<StoredMessage>(
-      `SELECT id, sender_id, recipient_id, recipient_key, nonce, ciphertext, created_at
+      `SELECT id, sender_id, recipient_id, recipient_key, proto, nonce, ciphertext, created_at
          FROM fm_messages
         WHERE conversation_id = $1 AND recipient_id = $2 AND created_at > $3
         ORDER BY created_at ASC`,
@@ -557,7 +571,7 @@ export async function listMessages(
     );
   }
   return query<StoredMessage>(
-    `SELECT id, sender_id, recipient_id, recipient_key, nonce, ciphertext, created_at
+    `SELECT id, sender_id, recipient_id, recipient_key, proto, nonce, ciphertext, created_at
        FROM fm_messages
       WHERE conversation_id = $1 AND recipient_id = $2
       ORDER BY created_at DESC LIMIT 100`,
@@ -585,10 +599,10 @@ export async function storeMessage(
       throw new Error("Recipient is not a member.");
     }
     const row = await queryOne<StoredMessage>(
-      `INSERT INTO fm_messages (conversation_id, sender_id, recipient_id, recipient_key, nonce, ciphertext, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
-       RETURNING id, sender_id, recipient_id, recipient_key, nonce, ciphertext, created_at`,
-      [conversationId, senderId, p.recipient_id, p.recipient_key ?? null, p.nonce, p.ciphertext, createdAt]
+      `INSERT INTO fm_messages (conversation_id, sender_id, recipient_id, recipient_key, proto, nonce, ciphertext, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING id, sender_id, recipient_id, recipient_key, proto, nonce, ciphertext, created_at`,
+      [conversationId, senderId, p.recipient_id, p.recipient_key ?? null, p.proto ?? null, p.nonce, p.ciphertext, createdAt]
     );
     if (row) stored.push(row);
   }

@@ -5,6 +5,8 @@ import { fishFetch } from "./fishFetch";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
 import { THEMES, getTheme, setTheme, type ThemeId } from "./theme";
 import { useSheetDrag, SheetGrabber } from "./sheetDrag";
+import { useFishAuth } from "./FishAuth";
+import { useSignalClient } from "../messages/_components/signal/singleton";
 
 interface Prefs {
   friend_catch: boolean;
@@ -35,6 +37,83 @@ type PushState = "checking" | "unsupported" | "denied" | "prompt" | "enabled";
 /** Settings popup: color themes + push notification alert settings. */
 export default function SettingsModal({ onClose }: { onClose: () => void }) {
   const { dragHandlers, dragStyle } = useSheetDrag(onClose);
+  const { user } = useFishAuth();
+  // Signal-protocol client for the messaging-backup section.
+  const signalInit = useSignalClient(user?.id);
+  const signalClient = signalInit?.client ?? null;
+  // Backup status for this device (or the wiped device, while a
+  // restore is pending), including the last-backup date.
+  const [backupInfo, setBackupInfo] = useState<{
+    exists: boolean;
+    updated_at: string | null;
+  } | null>(null);
+  const [backupPass, setBackupPass] = useState("");
+  const [restorePass, setRestorePass] = useState("");
+  const [backupBusy, setBackupBusy] = useState<"backup" | "restore" | null>(null);
+  const [backupMsg, setBackupMsg] = useState<string | null>(null);
+  const [backupError, setBackupError] = useState<string | null>(null);
+
+  const refreshBackupInfo = async () => {
+    if (!signalClient) return;
+    try {
+      let info = await signalClient.backupInfo();
+      if (!info.exists && signalInit?.oldDeviceId != null) {
+        info = await signalClient.backupInfo(signalInit.oldDeviceId);
+      }
+      setBackupInfo(info);
+    } catch {
+      setBackupInfo({ exists: false, updated_at: null });
+    }
+  };
+
+  useEffect(() => {
+    void refreshBackupInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signalClient]);
+
+  const doBackup = async () => {
+    if (!signalClient || backupBusy) return;
+    if (!backupPass) {
+      setBackupError("Enter a passphrase for the backup.");
+      setBackupMsg(null);
+      return;
+    }
+    setBackupBusy("backup");
+    setBackupError(null);
+    setBackupMsg(null);
+    try {
+      await signalClient.createBackup(backupPass);
+      setBackupPass("");
+      setBackupMsg("Backup saved.");
+      await refreshBackupInfo();
+    } catch {
+      setBackupError("Couldn't save the backup — try again.");
+    } finally {
+      setBackupBusy(null);
+    }
+  };
+
+  const doRestore = async () => {
+    if (!signalClient || backupBusy) return;
+    if (!restorePass) {
+      setBackupError("Enter your backup passphrase.");
+      setBackupMsg(null);
+      return;
+    }
+    setBackupBusy("restore");
+    setBackupError(null);
+    setBackupMsg(null);
+    try {
+      await signalClient.restoreFromBackup(restorePass, signalInit?.oldDeviceId);
+      setRestorePass("");
+      setBackupMsg("Backup restored — reopen Messages to see your chats.");
+      await refreshBackupInfo();
+    } catch {
+      setBackupError("Couldn't restore the backup — check the passphrase and try again.");
+    } finally {
+      setBackupBusy(null);
+    }
+  };
   const [theme, setThemeState] = useState<ThemeId>("ocean");
   const [prefs, setPrefs] = useState<Prefs | null>(null);
   const [saving, setSaving] = useState<keyof Prefs | null>(null);
@@ -335,6 +414,99 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                   </button>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Messaging backup */}
+          <h3 className="text-xs font-black uppercase tracking-[0.14em] text-pine/45 mt-7 mb-3">
+            Messaging backup
+          </h3>
+          {!signalClient ? (
+            <p className="text-xs text-pine/50 mb-2">Setting up encrypted messaging…</p>
+          ) : (
+            <div className="mb-2">
+              {signalInit?.status === "wiped-backup-available" && (
+                <div className="bg-signal/10 border border-signal/30 rounded-2xl px-4 py-4 mb-4">
+                  <p className="text-sm font-bold text-pine mb-1">
+                    This device lost its message keys.
+                  </p>
+                  <p className="text-xs text-pine/65 leading-relaxed mb-3">
+                    Restore your encrypted backup to read your older chats.
+                  </p>
+                  <input
+                    type="password"
+                    value={restorePass}
+                    onChange={(e) => setRestorePass(e.target.value)}
+                    placeholder="Backup passphrase"
+                    autoComplete="off"
+                    className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-2.5 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal mb-2"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => void doRestore()}
+                    disabled={backupBusy !== null}
+                    className="w-full bg-signal text-white font-bold text-sm uppercase tracking-wider rounded-full px-5 py-2.5 disabled:opacity-50"
+                  >
+                    {backupBusy === "restore" ? "Restoring…" : "Restore backup"}
+                  </button>
+                </div>
+              )}
+              <p className="text-xs text-pine/55 mb-3">
+                {backupInfo === null
+                  ? "Checking for a backup…"
+                  : backupInfo.exists
+                    ? backupInfo.updated_at
+                      ? `Last backup: ${new Date(backupInfo.updated_at).toLocaleString()}`
+                      : "A backup exists for this device."
+                    : "No backup yet."}
+              </p>
+              <input
+                type="password"
+                value={backupPass}
+                onChange={(e) => setBackupPass(e.target.value)}
+                placeholder="Backup passphrase"
+                autoComplete="new-password"
+                className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-2.5 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal mb-2"
+              />
+              <button
+                type="button"
+                onClick={() => void doBackup()}
+                disabled={backupBusy !== null}
+                className="w-full bg-pine text-white font-bold text-sm uppercase tracking-wider rounded-full px-5 py-2.5 disabled:opacity-50 mb-3"
+              >
+                {backupBusy === "backup" ? "Backing up…" : "Back up now"}
+              </button>
+              {backupInfo?.exists && signalInit?.status !== "wiped-backup-available" && (
+                <div className="bg-pine/5 rounded-2xl px-4 py-3 mb-3">
+                  <input
+                    type="password"
+                    value={restorePass}
+                    onChange={(e) => setRestorePass(e.target.value)}
+                    placeholder="Backup passphrase"
+                    autoComplete="off"
+                    className="w-full bg-white border border-pine/15 rounded-2xl px-4 py-2.5 text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal mb-2"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => void doRestore()}
+                    disabled={backupBusy !== null}
+                    className="w-full border border-pine/20 text-pine font-bold text-sm uppercase tracking-wider rounded-full px-5 py-2.5 disabled:opacity-50"
+                  >
+                    {backupBusy === "restore" ? "Restoring…" : "Restore from backup"}
+                  </button>
+                </div>
+              )}
+              {backupMsg && (
+                <p className="text-xs font-bold text-pine mb-2">{backupMsg}</p>
+              )}
+              {backupError && (
+                <p className="text-xs font-bold text-red-700 mb-2">{backupError}</p>
+              )}
+              <p className="text-[11px] text-pine/40 leading-relaxed">
+                Your backup is encrypted with this passphrase — FishMB can&apos;t
+                read it or reset it. If you forget it, the backup can&apos;t be
+                recovered.
+              </p>
             </div>
           )}
 
