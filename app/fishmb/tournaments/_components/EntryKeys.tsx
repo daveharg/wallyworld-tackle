@@ -45,6 +45,8 @@ export function EntryKeys({
   const [copied, setCopied] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editLabel, setEditLabel] = useState("");
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [confirmPurge, setConfirmPurge] = useState(false);
   const [revealed, setRevealed] = useState<Set<string>>(new Set());
 
   const toggleReveal = (id: string) => {
@@ -122,6 +124,42 @@ export function EntryKeys({
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not save the name.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const deleteKey = async (keyId: string) => {
+    setBusy(true);
+    setError(null);
+    try {
+      await fishFetch(`/api/fishmb/tournaments/${tournamentId}/keys`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key_id: keyId }),
+      });
+      setConfirmDeleteId(null);
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not delete the key.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const deleteUnused = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      await fishFetch(`/api/fishmb/tournaments/${tournamentId}/keys`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ unused_only: true }),
+      });
+      setConfirmPurge(false);
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not delete unused keys.");
     } finally {
       setBusy(false);
     }
@@ -271,6 +309,38 @@ export function EntryKeys({
         </div>
       )}
 
+      {keys.length > 0 && unusedIndividual > 0 && (
+        <div className="mb-3 flex flex-wrap items-center gap-3">
+          {confirmPurge ? (
+            <>
+              <span className="text-sm text-pine/70">
+                Delete all {unusedIndividual} unused keys? This can&apos;t be undone.
+              </span>
+              <button
+                onClick={deleteUnused}
+                disabled={busy}
+                className="text-xs font-bold uppercase tracking-wider bg-red-700 text-white px-4 py-2 rounded-full disabled:opacity-50"
+              >
+                Delete all
+              </button>
+              <button
+                onClick={() => setConfirmPurge(false)}
+                className="text-xs font-bold uppercase tracking-wider text-pine/50 hover:underline"
+              >
+                Keep them
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => setConfirmPurge(true)}
+              className="text-xs font-bold uppercase tracking-wider text-pine/40 hover:text-red-700"
+            >
+              Delete all unused keys ({unusedIndividual})
+            </button>
+          )}
+        </div>
+      )}
+
       {keys.length > 0 && (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
           {keys.map((k) => {
@@ -318,7 +388,35 @@ export function EntryKeys({
                       {copied === k.key_code ? "Copied!" : "Copy"}
                     </button>
                   )}
+                  {k.uses === 0 && k.status === "unused" && confirmDeleteId !== k.id && (
+                    <button
+                      onClick={() => setConfirmDeleteId(k.id)}
+                      className="text-xs font-bold uppercase tracking-wider text-pine/40 hover:text-red-700"
+                    >
+                      Delete
+                    </button>
+                  )}
                 </div>
+                {confirmDeleteId === k.id && (
+                  <div className="mt-2 flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl px-3 py-2">
+                    <span className="text-xs text-red-800 flex-1">
+                      Delete this key? It can&apos;t be undone.
+                    </span>
+                    <button
+                      onClick={() => deleteKey(k.id)}
+                      disabled={busy}
+                      className="text-xs font-bold uppercase tracking-wider bg-red-700 text-white px-3 py-1.5 rounded-full disabled:opacity-50"
+                    >
+                      Delete
+                    </button>
+                    <button
+                      onClick={() => setConfirmDeleteId(null)}
+                      className="text-xs font-bold uppercase tracking-wider text-pine/50 hover:underline"
+                    >
+                      Keep
+                    </button>
+                  </div>
+                )}
                 {(k.label || k.redeemers.length > 0 || editingId === k.id) && (
                   <div className="mt-1">
                     {editingId === k.id ? (

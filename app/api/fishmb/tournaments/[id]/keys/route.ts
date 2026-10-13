@@ -125,3 +125,51 @@ export async function PATCH(
   if (rows.length === 0) return notFound("Key not found.");
   return NextResponse.json({ ok: true });
 }
+
+/**
+ * DELETE: { key_id } → delete one never-used key;
+ *         { unused_only: true } → delete every never-used key.
+ * A key that has already joined an angler (uses > 0 or status 'used') can
+ * never be deleted — its redemption record is that angler's proof of entry.
+ * Deleting every key also frees the tournament's key mode (individual vs
+ * shared) to be chosen again.
+ */
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const res = await organizerOr(req, params.id);
+  if (res instanceof NextResponse) return res;
+
+  let body: Record<string, unknown> = {};
+  try {
+    body = await req.json();
+  } catch {
+    return badRequest("Invalid JSON body.");
+  }
+  const tid = params.id;
+  if (body.unused_only === true) {
+    const rows = await query<{ id: string }>(
+      `DELETE FROM fm_tournament_keys
+        WHERE tournament_id = $1 AND uses = 0 AND status = 'unused'
+        RETURNING id`,
+      [tid]
+    );
+    return NextResponse.json({ ok: true, deleted: rows.length });
+  }
+  const keyId = typeof body.key_id === "string" ? body.key_id : "";
+  if (!keyId) return badRequest("key_id is required.");
+  const existing = await query<{ uses: number; status: string }>(
+    `SELECT uses, status FROM fm_tournament_keys WHERE id = $1 AND tournament_id = $2`,
+    [keyId, tid]
+  );
+  if (existing.length === 0) return notFound("Key not found.");
+  if (existing[0].uses > 0 || existing[0].status === "used") {
+    return badRequest("That key has already been used — it can't be deleted.");
+  }
+  await query(
+    `DELETE FROM fm_tournament_keys WHERE id = $1 AND tournament_id = $2 AND uses = 0 AND status = 'unused'`,
+    [keyId, tid]
+  );
+  return NextResponse.json({ ok: true, deleted: 1 });
+}
