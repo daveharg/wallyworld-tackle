@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     const me = await fishUserFromRequest(req);
     if (me) {
       userId = me.id;
-      name = me.display_name;
+      name = me.name;
       email = me.email ?? email;
     }
   } catch {

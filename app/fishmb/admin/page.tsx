@@ -132,6 +132,117 @@ interface VisitStatsData {
   top_pages_7d: { path: string; views: number }[];
 }
 
+interface RecommendationItem {
+  id: string;
+  user_id: string | null;
+  user_name: string | null;
+  name: string;
+  email: string | null;
+  kind: string;
+  subject: string;
+  message: string;
+  page: string | null;
+  status: string;
+  created_at: string;
+}
+
+const RECOMMENDATION_KIND_LABELS: Record<string, string> = {
+  general: "General",
+  lake: "Lake",
+  lodge: "Lodge",
+  guide: "Guide",
+  feature: "Feature idea",
+  correction: "Correction",
+};
+
+/** Recommendations tab: everything the "give a recommendation" boxes
+ *  collect — lakes, lodges, guides, feature ideas, corrections. */
+function RecommendationsPanel({
+  items,
+  onStatus,
+}: {
+  items: RecommendationItem[];
+  onStatus: (id: string, status: string) => void;
+}) {
+  if (items.length === 0)
+    return (
+      <p className="text-pine/60 text-sm bg-white border border-pine/10 rounded-2xl px-5 py-6">
+        No recommendations yet — the boxes are on the Contact page and every lake page.
+      </p>
+    );
+  return (
+    <div className="space-y-3">
+      {items.map((r) => (
+        <div
+          key={r.id}
+          className={`bg-white border rounded-2xl px-5 py-4 ${
+            r.status === "new" ? "border-signal ring-1 ring-signal/40" : "border-pine/10"
+          }`}
+        >
+          <div className="flex items-start gap-3 flex-wrap">
+            <div className="flex-1 min-w-[220px]">
+              <p className="font-bold text-pine">
+                {r.subject || "(no title)"}
+                <span className="ml-2 align-middle text-[10px] font-black uppercase tracking-wider bg-lake-mist text-pine/70 rounded-full px-2 py-0.5">
+                  {RECOMMENDATION_KIND_LABELS[r.kind] ?? r.kind}
+                </span>
+                {r.status === "new" && (
+                  <span className="ml-1.5 align-middle text-[10px] font-black uppercase tracking-wider bg-signal text-pine-dark rounded-full px-2 py-0.5">
+                    New
+                  </span>
+                )}
+                {r.status === "done" && (
+                  <span className="ml-1.5 align-middle text-[10px] font-black uppercase tracking-wider bg-pine text-white rounded-full px-2 py-0.5">
+                    Done
+                  </span>
+                )}
+              </p>
+              <p className="text-xs text-pine/55 mt-0.5">
+                {r.user_name ?? (r.name || "Anonymous")}
+                {r.email ? ` · ${r.email}` : ""} · {timeAgo(r.created_at)}
+                {r.page ? ` · from ${r.page}` : ""}
+              </p>
+              <p className="text-sm text-pine/80 mt-2 whitespace-pre-wrap">{r.message}</p>
+            </div>
+          </div>
+          {r.status !== "done" && r.status !== "dismissed" && (
+            <div className="flex gap-2 mt-3 flex-wrap">
+              {r.status === "new" && (
+                <button
+                  onClick={() => onStatus(r.id, "read")}
+                  className="text-xs font-bold uppercase tracking-wider bg-pine/5 hover:bg-pine/10 text-pine px-3.5 py-2 rounded-full"
+                >
+                  Mark read
+                </button>
+              )}
+              <button
+                onClick={() => onStatus(r.id, "done")}
+                className="text-xs font-bold uppercase tracking-wider bg-pine text-white px-3.5 py-2 rounded-full"
+              >
+                ✓ Done
+              </button>
+              <button
+                onClick={() => onStatus(r.id, "dismissed")}
+                className="text-xs font-bold uppercase tracking-wider bg-red-50 hover:bg-red-100 text-red-700 px-3.5 py-2 rounded-full"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
+          {(r.status === "done" || r.status === "dismissed") && (
+            <button
+              onClick={() => onStatus(r.id, "read")}
+              className="mt-3 text-xs font-bold text-pine/50 underline"
+            >
+              Reopen
+            </button>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function fmtDuration(totalSeconds: number): string {
   const s = Math.max(0, Math.round(totalSeconds));
   if (s < 60) return `${s}s`;
@@ -589,10 +700,11 @@ export default function AdminPage() {
   const [allUsers, setAllUsers] = useState<ManagedUser[]>([]);
   const [reports, setReports] = useState<ModerationReport[]>([]);
   const [visitStats, setVisitStats] = useState<VisitStatsData | null>(null);
+  const [recommendations, setRecommendations] = useState<RecommendationItem[]>([]);
   const [userSearch, setUserSearch] = useState("");
   const [growth, setGrowth] = useState<GrowthData | null>(null);
   const [userMap, setUserMap] = useState<UserMapData | null>(null);
-  const [tab, setTab] = useState<"claims" | "ads" | "tournaments" | "messages" | "anglers" | "users" | "growth" | "map" | "reports" | "visits">("claims");
+  const [tab, setTab] = useState<"claims" | "ads" | "tournaments" | "messages" | "anglers" | "users" | "growth" | "map" | "reports" | "visits" | "recommendations">("claims");
   const [denied, setDenied] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [acting, setActing] = useState<string | null>(null);
@@ -631,6 +743,9 @@ export default function AdminPage() {
     fishFetch("/api/fishmb/admin/visits")
       .then((d) => setVisitStats((d.stats ?? null) as VisitStatsData | null))
       .catch(() => {});
+    fishFetch("/api/fishmb/admin/recommendations?status=all")
+      .then((d) => setRecommendations(d.recommendations ?? []))
+      .catch(() => {});
   };
 
   useEffect(() => {
@@ -653,6 +768,21 @@ export default function AdminPage() {
       setNote("Action failed.");
     } finally {
       setActing(null);
+    }
+  };
+
+  const actOnRecommendation = async (id: string, status: string) => {
+    try {
+      await fishFetch("/api/fishmb/admin/recommendations", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status }),
+      });
+      setRecommendations((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, status } : r))
+      );
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Action failed.");
     }
   };
 
@@ -783,6 +913,7 @@ export default function AdminPage() {
           [
  ["reports", `🚩 Reports (${reports.length})`],
  ["visits", `📈 Visits`],
+ ["recommendations", `💡 Recommendations (${recommendations.filter((r) => r.status === "new").length})`],
  ["claims", ` Business claims (${claims.length})`],
  ["ads", ` Ad submissions (${ads.length})`],
  ["tournaments", ` Tournament suggestions (${suggestions.length})`],
@@ -805,7 +936,9 @@ export default function AdminPage() {
         ))}
       </div>
 
-      {tab === "visits" ? (
+      {tab === "recommendations" ? (
+        <RecommendationsPanel items={recommendations} onStatus={actOnRecommendation} />
+      ) : tab === "visits" ? (
         <VisitsPanel stats={visitStats} />
       ) : tab === "reports" ? (
         <ReportsQueue reports={reports} acting={acting} onAct={actOnReport} />

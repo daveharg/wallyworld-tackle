@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useFishAuth } from "../_components/FishAuth";
 import { fishFetch } from "../_components/fishFetch";
 import BackArrow from "../_components/BackArrow";
+import RecommendBox from "../_components/RecommendBox";
 
 const inputCls =
   "w-full bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-pine placeholder:text-pine/40 focus:outline-none focus:border-signal";
@@ -143,6 +144,9 @@ export default function ContactPage() {
           </button>
         </div>
       )}
+      <div className="mt-8">
+        <RecommendBox />
+      </div>
     </div>
   );
 }

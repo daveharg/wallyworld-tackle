@@ -6,6 +6,7 @@ import { slugifySpecies, getSpeciesAdvice } from "@/lib/fishmb-species";
 import { lakePhotoUrl, hasRealLakePhoto, lakePhotoCredit } from "@/lib/fishmb-constants";
 import { LakeMap } from "../_components/LakeMap";
 import AddToMyLakesButton from "../../_components/AddToMyLakesButton";
+import RecommendBox from "../../_components/RecommendBox";
 import { LakeSpotsSection } from "../_components/LakeSpotsSection";
 import { TrophyCatchesList } from "./TrophyCatchesList";
 import { SharedCatchesList } from "./SharedCatchesList";
@@ -525,6 +526,14 @@ export default function LakeDetailPage({ params }: { params: { id: string } }) {
             </Link>
           </div>
         </aside>
+      </div>
+      <div className="mt-6">
+        <RecommendBox
+          kind="lake"
+          subject={lake.name}
+          heading={`💡 Know ${lake.name}?`}
+          blurb="A better launch, a lodge or rental we missed, a correction to these details — recommend it and it lands on the FishMB team's desk."
+        />
       </div>
     </div>
   );

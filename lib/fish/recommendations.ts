@@ -68,7 +68,7 @@ export async function createRecommendation(input: {
 export async function listRecommendations(status: string | null): Promise<Recommendation[]> {
   await ensureRecommendationsTable();
   return query<Recommendation>(
-    `SELECT r.id, r.user_id, u.display_name AS user_name, r.name, r.email,
+    `SELECT r.id, r.user_id, u.name AS user_name, r.name, r.email,
             r.kind, r.subject, r.message, r.page, r.status, r.created_at
        FROM fm_recommendations r
        LEFT JOIN fm_users u ON u.id = r.user_id

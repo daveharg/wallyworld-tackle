@@ -32,6 +32,7 @@ export default function FishFooter() {
           <ul className="space-y-2.5 text-sm">
             <li><Link href="/fishmb/feed" className="text-white/70 hover:text-white">Angler feed</Link></li>
             <li><Link href="/fishmb/dashboard?tab=tournaments" className="text-white/70 hover:text-white">Tournaments</Link></li>
+            <li><Link href="/fishmb/contact#recommend" className="text-white/70 hover:text-white">💡 Recommend something</Link></li>
           </ul>
         </div>
         <div>
