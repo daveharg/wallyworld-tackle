@@ -378,7 +378,7 @@ function Bar() {
               }}
               className="w-full bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-8 py-4 rounded-full transition-colors mb-3"
             >
-              Join free to start posting
+              Log in to start posting
             </button>
             <button
               onClick={() => setPostGateOpen(false)}

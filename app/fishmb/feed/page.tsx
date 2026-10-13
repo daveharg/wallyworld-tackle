@@ -583,14 +583,14 @@ function FeedSignupWall({ onJoin }: { onJoin: () => void }) {
         The bite is happening in here.
       </h1>
       <p className="text-pine/60 text-sm max-w-xs mx-auto mb-6">
-        Manitoba anglers are sharing catches, reports and tips right now. Join
-        free to see the community feed.
+        Manitoba anglers are sharing catches, reports and tips right now. Log
+        in to see the community feed.
       </p>
       <button
         onClick={onJoin}
         className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-10 py-4 rounded-full transition-colors mb-8"
       >
-        Join FishMB — it's free
+        Log in to FishMB
       </button>
       <div className="flex flex-col gap-3 max-w-md mx-auto text-left">
         {perks.map((p) => (
