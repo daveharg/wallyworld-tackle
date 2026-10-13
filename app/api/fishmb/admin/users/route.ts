@@ -32,16 +32,18 @@ export async function GET(req: NextRequest) {
     created_at: string;
     suspended: boolean;
     suspended_reason: string;
+    is_demo: boolean;
     post_count: string;
     catch_count: string;
   }>(
     `SELECT u.id, u.name, u.email, u.avatar_url, u.created_at,
             COALESCE(u.suspended, false) AS suspended,
             COALESCE(u.suspended_reason, '') AS suspended_reason,
+            COALESCE(u.is_demo, false) AS is_demo,
             (SELECT COUNT(*) FROM fm_discussions d WHERE d.user_id = u.id)::text AS post_count,
             (SELECT COUNT(*) FROM fm_catches c WHERE c.user_id = u.id)::text AS catch_count
        FROM fm_users u
-      ORDER BY u.created_at DESC
+      ORDER BY u.is_demo ASC, u.created_at DESC
       LIMIT 500`
   );
   return NextResponse.json({ users });
@@ -58,6 +60,14 @@ export async function PATCH(req: NextRequest) {
   }
   const userId = String(body.user_id ?? "");
   if (!userId) return badRequest("user_id required.");
+
+  // Demo flag toggle: { user_id, is_demo } — keeps demo/test accounts
+  // separate from real anglers in the list and the counts.
+  if (typeof body.is_demo === "boolean") {
+    await query(`UPDATE fm_users SET is_demo = $2 WHERE id = $1`, [userId, body.is_demo]);
+    return NextResponse.json({ ok: true });
+  }
+
   if (typeof body.suspended !== "boolean") return badRequest("suspended must be boolean.");
 
   // Never suspend yourself.

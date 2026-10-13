@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
        SELECT generate_series(CURRENT_DATE - INTERVAL '29 days', CURRENT_DATE, '1 day')::date AS day
      )
      SELECT d.day::text AS day,
-            (SELECT COUNT(*) FROM fm_users u WHERE u.created_at::date = d.day)::text AS signups,
+            (SELECT COUNT(*) FROM fm_users u WHERE u.created_at::date = d.day AND NOT u.is_demo)::text AS signups,
             (SELECT COUNT(*) FROM fm_discussions p WHERE p.created_at::date = d.day)::text AS posts,
             (SELECT COUNT(*) FROM fm_catches c WHERE c.created_at::date = d.day)::text AS catches
        FROM days d
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
   );
 
   const totals = await query<{ users: string; posts: string; catches: string; tournaments: string }>(
-    `SELECT (SELECT COUNT(*) FROM fm_users)::text AS users,
+    `SELECT (SELECT COUNT(*) FROM fm_users WHERE NOT is_demo)::text AS users,
             (SELECT COUNT(*) FROM fm_discussions)::text AS posts,
             (SELECT COUNT(*) FROM fm_catches)::text AS catches,
             (SELECT COUNT(*) FROM fm_tournaments)::text AS tournaments`

@@ -105,6 +105,7 @@ interface ManagedUser {
   created_at: string;
   suspended: boolean;
   suspended_reason: string;
+  is_demo: boolean;
   post_count: string;
   catch_count: string;
 }
@@ -528,12 +529,14 @@ function UsersTable({
   search,
   onSearch,
   onToggleSuspend,
+  onToggleDemo,
   acting,
 }: {
   users: ManagedUser[];
   search: string;
   onSearch: (v: string) => void;
   onToggleSuspend: (u: ManagedUser) => void;
+  onToggleDemo: (u: ManagedUser) => void;
   acting: string | null;
 }) {
   const q = search.trim().toLowerCase();
@@ -544,6 +547,95 @@ function UsersTable({
           (u.email ?? "").toLowerCase().includes(q)
       )
     : users;
+  const realRows = rows.filter((u) => !u.is_demo);
+  const demoRows = rows.filter((u) => u.is_demo);
+
+  const renderRow = (u: ManagedUser) => (
+    <tr key={u.id} className={`border-b border-pine/5 last:border-0 ${u.suspended ? "bg-red-50/50" : ""}`}>
+      <td className="py-3 px-4">
+        <div className="flex items-center gap-3">
+          {u.avatar_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={u.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover" />
+          ) : (
+            <span className="w-9 h-9 rounded-full bg-signal text-white flex items-center justify-center font-bold text-sm">
+              {u.name.charAt(0).toUpperCase()}
+            </span>
+          )}
+          <div className="min-w-0">
+            <p className="font-bold text-pine truncate">{u.name}</p>
+            <p className="text-xs text-pine/50 truncate">{u.email ?? "no email"}</p>
+          </div>
+        </div>
+      </td>
+      <td className="py-3 px-3 text-center text-pine/60 text-xs">
+        {new Date(u.created_at).toLocaleDateString()}
+      </td>
+      <td className="py-3 px-3 text-center font-bold text-pine">{u.post_count}</td>
+      <td className="py-3 px-3 text-center text-pine/75">{u.catch_count}</td>
+      <td className="py-3 px-3 text-center">
+        <span className="inline-flex gap-1.5 justify-center flex-wrap">
+          {u.suspended ? (
+            <span className="inline-block bg-red-100 text-red-800 text-[11px] font-bold uppercase tracking-wider rounded-full px-3 py-1" title={u.suspended_reason}>
+              Suspended
+            </span>
+          ) : (
+            <span className="inline-block bg-green-100 text-green-800 text-[11px] font-bold uppercase tracking-wider rounded-full px-3 py-1">
+              Active
+            </span>
+          )}
+          {u.is_demo && (
+            <span className="inline-block bg-amber-100 text-amber-800 text-[11px] font-bold uppercase tracking-wider rounded-full px-3 py-1">
+              Demo
+            </span>
+          )}
+        </span>
+      </td>
+      <td className="py-3 px-4 text-right">
+        <span className="inline-flex gap-2 justify-end">
+          <button
+            onClick={() => onToggleDemo(u)}
+            disabled={acting === u.id}
+            className="text-xs font-bold uppercase tracking-wider rounded-full px-4 py-2 bg-pine/5 hover:bg-pine/10 text-pine transition-colors disabled:opacity-40"
+          >
+            {u.is_demo ? "Unmark demo" : "Mark demo"}
+          </button>
+          <button
+            onClick={() => onToggleSuspend(u)}
+            disabled={acting === u.id}
+            className={`text-xs font-bold uppercase tracking-wider rounded-full px-4 py-2 transition-colors disabled:opacity-40 ${
+              u.suspended
+                ? "bg-green-700 hover:bg-green-800 text-white"
+                : "bg-red-50 hover:bg-red-100 text-red-800"
+            }`}
+          >
+            {acting === u.id ? "…" : u.suspended ? "Reinstate" : "Suspend"}
+          </button>
+        </span>
+      </td>
+    </tr>
+  );
+
+  const renderTable = (list: ManagedUser[]) => (
+    <div className="bg-white border border-pine/10 rounded-3xl overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm min-w-[720px]">
+          <thead>
+            <tr className="border-b border-pine/10 text-left">
+              <th className="py-3 px-4 text-xs font-bold uppercase tracking-wider text-pine/55">User</th>
+              <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider text-pine/55 text-center">Joined</th>
+              <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider text-pine/55 text-center">Posts</th>
+              <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider text-pine/55 text-center">Catches</th>
+              <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider text-pine/55 text-center">Status</th>
+              <th className="py-3 px-4 text-xs font-bold uppercase tracking-wider text-pine/55 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody>{list.map(renderRow)}</tbody>
+        </table>
+      </div>
+    </div>
+  );
+
   return (
     <div>
       <input
@@ -557,73 +649,20 @@ function UsersTable({
           <p className="text-pine/60">No users found.</p>
         </div>
       ) : (
-        <div className="bg-white border border-pine/10 rounded-3xl overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm min-w-[720px]">
-              <thead>
-                <tr className="border-b border-pine/10 text-left">
-                  <th className="py-3 px-4 text-xs font-bold uppercase tracking-wider text-pine/55">User</th>
-                  <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider text-pine/55 text-center">Joined</th>
-                  <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider text-pine/55 text-center">Posts</th>
-                  <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider text-pine/55 text-center">Catches</th>
-                  <th className="py-3 px-3 text-xs font-bold uppercase tracking-wider text-pine/55 text-center">Status</th>
-                  <th className="py-3 px-4 text-xs font-bold uppercase tracking-wider text-pine/55 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((u) => (
-                  <tr key={u.id} className={`border-b border-pine/5 last:border-0 ${u.suspended ? "bg-red-50/50" : ""}`}>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-3">
-                        {u.avatar_url ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img src={u.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover" />
-                        ) : (
-                          <span className="w-9 h-9 rounded-full bg-signal text-white flex items-center justify-center font-bold text-sm">
-                            {u.name.charAt(0).toUpperCase()}
-                          </span>
-                        )}
-                        <div className="min-w-0">
-                          <p className="font-bold text-pine truncate">{u.name}</p>
-                          <p className="text-xs text-pine/50 truncate">{u.email ?? "no email"}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-3 px-3 text-center text-pine/60 text-xs">
-                      {new Date(u.created_at).toLocaleDateString()}
-                    </td>
-                    <td className="py-3 px-3 text-center font-bold text-pine">{u.post_count}</td>
-                    <td className="py-3 px-3 text-center text-pine/75">{u.catch_count}</td>
-                    <td className="py-3 px-3 text-center">
-                      {u.suspended ? (
-                        <span className="inline-block bg-red-100 text-red-800 text-[11px] font-bold uppercase tracking-wider rounded-full px-3 py-1" title={u.suspended_reason}>
-                          Suspended
-                        </span>
-                      ) : (
-                        <span className="inline-block bg-green-100 text-green-800 text-[11px] font-bold uppercase tracking-wider rounded-full px-3 py-1">
-                          Active
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <button
-                        onClick={() => onToggleSuspend(u)}
-                        disabled={acting === u.id}
-                        className={`text-xs font-bold uppercase tracking-wider rounded-full px-4 py-2 transition-colors disabled:opacity-40 ${
-                          u.suspended
-                            ? "bg-green-700 hover:bg-green-800 text-white"
-                            : "bg-red-50 hover:bg-red-100 text-red-800"
-                        }`}
-                      >
-                        {acting === u.id ? "…" : u.suspended ? "Reinstate" : "Suspend"}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <>
+          {renderTable(realRows)}
+          {demoRows.length > 0 && (
+            <div className="mt-8">
+              <h3 className="font-display font-bold uppercase text-pine text-lg">
+                Demo / test accounts ({demoRows.length})
+              </h3>
+              <p className="text-sm text-pine/55 mb-3">
+                Kept separate — not counted in the angler totals.
+              </p>
+              {renderTable(demoRows)}
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -813,6 +852,25 @@ export default function AdminPage() {
     }
   };
 
+  const toggleDemo = async (u: ManagedUser) => {
+    setActing(u.id);
+    try {
+      await fishFetch("/api/fishmb/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: u.id, is_demo: !u.is_demo }),
+      });
+      setAllUsers((prev) =>
+        prev.map((x) => (x.id === u.id ? { ...x, is_demo: !u.is_demo } : x))
+      );
+      setNote(u.is_demo ? `${u.name} is a regular angler again.` : `${u.name} marked as a demo account.`);
+    } catch {
+      setNote("Action failed.");
+    } finally {
+      setActing(null);
+    }
+  };
+
   const toggleSuspend = async (u: ManagedUser) => {
     const action = u.suspended ? "reinstate" : "suspend";
     let reason = "";
@@ -919,7 +977,7 @@ export default function AdminPage() {
  ["tournaments", ` Tournament suggestions (${suggestions.length})`],
  ["messages", ` Messages (${messages.length})`],
  ["anglers", ` Angler stats (${anglerStats.length})`],
- ["users", ` Users (${allUsers.length})`],
+ ["users", ` Users (${allUsers.filter((u) => !u.is_demo).length})`],
  ["growth", ` Growth`],
  ["map", ` Angler map`],
           ] as const
@@ -1071,6 +1129,7 @@ export default function AdminPage() {
           search={userSearch}
           onSearch={setUserSearch}
           onToggleSuspend={toggleSuspend}
+          onToggleDemo={toggleDemo}
           acting={acting}
         />
       ) : tab === "growth" ? (

@@ -1,7 +1,7 @@
 // /api/fishmb/admin/stats — dashboard counts for the site owner.
 
 import { NextRequest, NextResponse } from "next/server";
-import { fishUserFromRequest, unauthorized, forbidden } from "@/lib/fish/auth";
+import { fishUserFromRequest, unauthorized, forbidden, ensureProfileColumns } from "@/lib/fish/auth";
 import { ensureBusinessTables, isAdminEmail } from "@/lib/fish/business";
 import { ensureGuideClassifiedsTable } from "@/lib/fish/guide-classifieds";
 import { ensureTournamentTables } from "@/lib/fish/tournaments";
@@ -12,10 +12,11 @@ export async function GET(req: NextRequest) {
   if (!me) return unauthorized();
   if (!isAdminEmail(me.email)) return forbidden("Admin only.");
   await ensureBusinessTables();
+  await ensureProfileColumns();
   await ensureGuideClassifiedsTable();
   await ensureTournamentTables();
 
-  const users = await queryOne<{ c: string }>(`SELECT COUNT(*)::text AS c FROM fm_users`);
+  const users = await queryOne<{ c: string }>(`SELECT COUNT(*)::text AS c FROM fm_users WHERE NOT is_demo`);
   const businesses = await queryOne<{ c: string }>(`SELECT COUNT(*)::text AS c FROM fm_businesses`);
   const pendingClaims = await queryOne<{ c: string }>(
     `SELECT COUNT(*)::text AS c FROM fm_business_claims WHERE status = 'pending'`

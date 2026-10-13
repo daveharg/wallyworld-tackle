@@ -63,6 +63,23 @@ export async function ensureProfileColumns(): Promise<void> {
   await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS suspended boolean NOT NULL DEFAULT false`);
   await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS suspended_at timestamptz`);
   await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS suspended_reason text NOT NULL DEFAULT ''`);
+  // Demo/test accounts stay separate from real anglers in admin lists and
+  // counts. The column-add moment is the one chance to seed the flag:
+  // anonymous signups (the demo path) + anything demo-named starts flagged;
+  // admins can re-mark either way from the Users tab afterwards.
+  const demoCol = await queryOne<{ exists: boolean }>(
+    `SELECT EXISTS (
+       SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'fm_users' AND column_name = 'is_demo'
+     ) AS exists`
+  );
+  await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS is_demo boolean NOT NULL DEFAULT false`);
+  if (demoCol && !demoCol.exists) {
+    await query(
+      `UPDATE fm_users SET is_demo = true
+        WHERE google_sub LIKE 'anon:%' OR name ILIKE '%demo%' OR email ILIKE '%demo%'`
+    );
+  }
   profileColsEnsured = true;
 }
 
