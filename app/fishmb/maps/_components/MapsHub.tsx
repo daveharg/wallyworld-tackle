@@ -1993,6 +1993,14 @@ export default function MapsHub() {
             </div>
             <div className="flex flex-wrap gap-2.5 mt-6">
               <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([selectedShop.name, selectedShop.address, selectedShop.town].filter(Boolean).join(" "))}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white border border-pine/15 text-pine font-bold uppercase tracking-wider text-xs px-5 py-3 rounded-full"
+              >
+                📍 Google Maps →
+              </a>
+              <a
                 href={`https://www.google.com/maps/dir/?api=1&destination=${selectedShop.lat},${selectedShop.lng}`}
                 target="_blank"
                 rel="noopener noreferrer"
