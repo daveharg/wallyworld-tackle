@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useFishAuth } from "../_components/FishAuth";
-import { fishFetch } from "../_components/fishFetch";
+import { fishFetch, formatDateTime } from "../_components/fishFetch";
 import { UserActivityMap } from "./UserActivityMap";
 
 interface MapCell {
@@ -748,26 +748,61 @@ interface AutopostRunResult {
   failed: boolean;
 }
 
+/** One entry waiting in the Facebook Page mirror queue (fm_fb_outbox). */
+interface FbMirrorEntry {
+  id: string;
+  ts: string;
+  type: string;
+  body: string;
+}
+
 /** Auto-posts tab: manual "Run now" triggers for the server-side feed
  *  auto-post jobs (Vercel Cron runs them on schedule; this fires one
  *  immediately as the signed-in admin — force=1 bypasses the time
- *  window, the jobs' already-posted dedupe still applies). Also shows
- *  how many posts are waiting in the Facebook Page mirror queue. */
+ *  window, the jobs' already-posted dedupe still applies). Also lists
+ *  every post waiting in the Facebook Page mirror queue (the exact
+ *  text the mirror copies to Facebook) and can mark them all posted
+ *  once they've been published to the Page. */
 function AutoPostsPanel() {
   const [running, setRunning] = useState<string | null>(null);
   const [results, setResults] = useState<Record<string, AutopostRunResult>>({});
-  const [fbWaiting, setFbWaiting] = useState<number | null>(null);
+  const [fbEntries, setFbEntries] = useState<FbMirrorEntry[] | null>(null);
+  const [fbMarking, setFbMarking] = useState(false);
+  const [fbMarkedNote, setFbMarkedNote] = useState<string | null>(null);
 
-  const loadFbWaiting = () => {
+  const fbWaiting = fbEntries === null ? null : fbEntries.length;
+
+  const loadFbOutbox = () => {
     fishFetch("/api/fishmb/admin/fb-outbox")
-      .then((d) => setFbWaiting(Array.isArray(d.entries) ? d.entries.length : 0))
-      .catch(() => setFbWaiting(null));
+      .then((d) => setFbEntries(Array.isArray(d.entries) ? d.entries : []))
+      .catch(() => setFbEntries(null));
   };
 
   useEffect(() => {
-    loadFbWaiting();
+    loadFbOutbox();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const markAllPosted = async () => {
+    if (!fbEntries || fbEntries.length === 0 || fbMarking) return;
+    setFbMarking(true);
+    setFbMarkedNote(null);
+    try {
+      const d = await fishFetch("/api/fishmb/admin/fb-outbox", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: fbEntries.map((e) => e.id) }),
+      });
+      const marked = typeof d.marked === "number" ? d.marked : fbEntries.length;
+      setFbMarkedNote(`Marked ${marked} as posted.`);
+    } catch {
+      setFbMarkedNote("Could not mark them as posted — try again.");
+    } finally {
+      setFbMarking(false);
+      loadFbOutbox();
+      window.setTimeout(() => setFbMarkedNote(null), 6000);
+    }
+  };
 
   const stamp = () =>
     new Date().toLocaleString("en-CA", {
@@ -797,7 +832,7 @@ function AutoPostsPanel() {
       }));
     } finally {
       setRunning(null);
-      loadFbWaiting();
+      loadFbOutbox();
     }
   };
 
@@ -810,6 +845,41 @@ function AutoPostsPanel() {
           Facebook mirror: {fbWaiting === null ? "…" : `${fbWaiting} post${fbWaiting === 1 ? "" : "s"} waiting`}
         </span>
       </p>
+      {fbMarkedNote && (
+        <p className="text-sm font-bold text-pine bg-lake-mist/60 border border-pine/10 rounded-2xl px-5 py-3">
+          {fbMarkedNote}
+        </p>
+      )}
+      {fbEntries !== null && fbEntries.length > 0 && (
+        <div className="bg-white border border-pine/10 rounded-2xl px-5 py-4 space-y-3">
+          <div className="flex items-center gap-3 flex-wrap">
+            <p className="flex-1 min-w-[220px] font-bold text-pine">📘 Facebook mirror queue</p>
+            <button
+              onClick={markAllPosted}
+              disabled={fbMarking}
+              className="bg-signal hover:bg-signal-dark text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full disabled:opacity-40 transition-colors"
+            >
+              {fbMarking ? "Marking…" : "Mark all as posted"}
+            </button>
+          </div>
+          <p className="text-xs text-pine/55">
+            This is the exact text copied to the Fishmb.ca Page. Clear the queue only
+            after every post below is live on Facebook.
+          </p>
+          {fbEntries.map((entry) => (
+            <div key={entry.id} className="border border-pine/10 rounded-xl px-4 py-3 bg-lake-mist/40">
+              <p className="text-xs text-pine/55 mb-1.5">
+                <span className="font-bold uppercase tracking-wider text-pine/70">{entry.type}</span>
+                {" · "}
+                {formatDateTime(entry.ts)}
+              </p>
+              <p className="text-sm text-pine/85 whitespace-pre-wrap max-h-56 overflow-y-auto">
+                {entry.body}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
       {AUTOPOST_JOB_ROWS.map((row) => {
         const result = results[row.job];
         return (
