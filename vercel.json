@@ -147,6 +147,14 @@
     {
       "path": "/api/cron/fishmb?job=lodge",
       "schedule": "0 15 * * 0"
+    },
+    {
+      "path": "/api/cron/fishmb?job=monitor",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/fishmb?job=monitor",
+      "schedule": "0 12 * * *"
     }
   ]
 }

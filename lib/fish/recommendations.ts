@@ -58,11 +58,26 @@ export async function createRecommendation(input: {
   page: string | null;
 }): Promise<void> {
   await ensureRecommendationsTable();
-  await query(
+  const inserted = await query<{ id: string }>(
     `INSERT INTO fm_recommendations (user_id, name, email, kind, subject, message, page)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
+     RETURNING id`,
     [input.userId, input.name, input.email, input.kind, input.subject, input.message, input.page]
   );
+  // Internal admin alert — the app tells the owner itself, instantly.
+  // Dynamic import avoids a module cycle with admin-alerts.
+  try {
+    const { alertAdminsNewItem } = await import("./admin-alerts");
+    alertAdminsNewItem("recommendation", inserted[0]?.id ?? "", {
+      title: "💡 New FishMB recommendation",
+      body:
+        (input.subject ? `${input.subject}: ` : `${input.kind}: `) +
+        input.message.slice(0, 90),
+      tag: "fm-admin-rec",
+    });
+  } catch {
+    // Alerting is best-effort; the recommendation itself is saved either way.
+  }
 }
 
 export async function listRecommendations(status: string | null): Promise<Recommendation[]> {

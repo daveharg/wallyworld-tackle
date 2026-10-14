@@ -251,10 +251,26 @@ export async function createReport(
 ): Promise<{ targetUserId: string | null }> {
   await ensureModerationTables();
   const targetUserId = await resolveTargetAuthor(type, targetId);
-  await query(
+  const inserted = await query<{ id: string }>(
     `INSERT INTO fm_reports (reporter_id, target_type, target_id, target_user_id, reason)
-     VALUES ($1, $2, $3, $4, $5)`,
+     VALUES ($1, $2, $3, $4, $5)
+     RETURNING id`,
     [reporterId, type, targetId, targetUserId, reason.slice(0, 500)]
   );
+  // Internal admin alert — the app tells the owner itself, instantly.
+  // Dynamic import avoids a module cycle with admin-alerts.
+  try {
+    const { alertAdminsNewItem } = await import("./admin-alerts");
+    alertAdminsNewItem("report", inserted[0]?.id ?? targetId, {
+      title: "🚩 New FishMB report",
+      body:
+        `A ${type} was reported` +
+        (reason ? `: ${reason.slice(0, 80)}` : "") +
+        ". Review it in Admin → Reports.",
+      tag: "fm-admin-report",
+    });
+  } catch {
+    // Alerting is best-effort; the report itself is saved either way.
+  }
   return { targetUserId };
 }

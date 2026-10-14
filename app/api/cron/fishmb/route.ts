@@ -1,4 +1,5 @@
-// GET /api/cron/fishmb?job=weather|video|tip|hotspot|lake|lodge|ice
+// GET /api/cron/fishmb?job=weather|video|tip|hotspot|lake|lodge|ice|monitor
+// (job=monitor is the admin-alerts backstop sweep — see lib/fish/admin-alerts.ts)
 //
 // Server-side FishMB auto-posts, triggered by Vercel Cron (see
 // vercel.json). Replaces the VM cron jobs that had to fetch DATABASE_URL
@@ -26,6 +27,7 @@ import {
   type AutopostJob,
 } from "@/lib/fish/autopost-server";
 import { isInJobWindow } from "@/lib/fish/winnipeg-time";
+import { sweepAdminAlerts } from "@/lib/fish/admin-alerts";
 
 export const dynamic = "force-dynamic";
 
@@ -48,6 +50,23 @@ export async function GET(req: NextRequest) {
   if (!viaCron && !viaAdmin) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  // job=monitor — the admin-alerts backstop sweep. Not an auto-post:
+  // no Winnipeg window gate (a waiting report matters at any hour),
+  // it only summary-pushes items that never got an instant alert.
+  if (jobParam === "monitor") {
+    try {
+      const result = await sweepAdminAlerts();
+      return NextResponse.json({ ok: true, job: "monitor", ...result });
+    } catch (err) {
+      console.error("[cron/fishmb] monitor sweep failed:", err);
+      return NextResponse.json(
+        { error: "Monitor sweep failed.", detail: String(err).slice(0, 300) },
+        { status: 500 }
+      );
+    }
+  }
+
   if (!isJob) {
     return NextResponse.json(
       { error: `Unknown job: ${jobParam || "(missing)"}` },
