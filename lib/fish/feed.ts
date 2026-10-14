@@ -110,17 +110,21 @@ export async function ensureFeedColumns(): Promise<void> {
   await query(
     `CREATE INDEX IF NOT EXISTS fm_comment_reactions_comment_idx ON fm_comment_reactions(comment_id)`
   );
-  // Widen the reaction value sets to the full Facebook picker codes
-  // (lib/fish/reactions.ts). The original CREATE TABLE text pinned
-  // CHECK (value IN (1, -1)); replace any existing CHECK constraints on
-  // these two tables with the full set. Idempotent per cold start.
+  // Widen the reaction value sets to the full picker codes
+  // (lib/fish/reactions.ts), including 8 = 🖕. The original CREATE TABLE
+  // text pinned CHECK (value IN (1, -1)); the first widening shipped as
+  // constraint `${t}_value_set` with (1, -1, 2, 3, 4, 5, 6, 7). Replace
+  // any existing CHECK constraints on these two tables with the current
+  // set (note the versioned name — a table already carrying the v1
+  // constraint must be re-widened, not skipped). Idempotent per cold
+  // start.
   for (const t of ["fm_post_reactions", "fm_comment_reactions"] as const) {
     const cons = await query<{ conname: string }>(
       `SELECT conname FROM pg_constraint
         WHERE conrelid = $1::regclass AND contype = 'c'`,
       [t]
     );
-    const target = `${t}_value_set`;
+    const target = `${t}_value_set_v2`;
     for (const c of cons) {
       if (c.conname === target) continue;
       await query(
@@ -129,7 +133,7 @@ export async function ensureFeedColumns(): Promise<void> {
     }
     if (!cons.some((c) => c.conname === target)) {
       await query(
-        `ALTER TABLE ${t} ADD CONSTRAINT ${target} CHECK (value IN (1, -1, 2, 3, 4, 5, 6, 7))`
+        `ALTER TABLE ${t} ADD CONSTRAINT ${target} CHECK (value IN (1, -1, 2, 3, 4, 5, 6, 7, 8))`
       ).catch(() => {
         // A concurrent cold start may have added it first.
       });

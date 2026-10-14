@@ -5,9 +5,10 @@
 // Feed posts/comments store reactions as smallint codes in
 // fm_post_reactions / fm_comment_reactions (value column). Codes 1, -1, 2
 // predate this module (👍 like, 👎 dislike, 😆 laugh) and MUST keep
-// rendering; the Facebook picker set adds 3..7. 👎 stays displayable as a
-// chip (legacy rows) but is not offered in the picker — Facebook's set has
-// no dislike.
+// rendering; the Facebook picker set adds 3..7, and code 8 is Dave's 🖕
+// (was Messenger-only; added to the feed picker too, last position).
+// 👎 stays displayable as a chip (legacy rows) but is not offered in the
+// picker — Facebook's set has no dislike.
 
 /** Code → emoji for every storable feed reaction value. */
 export const FEED_REACTION_EMOJI: Record<number, string> = {
@@ -19,13 +20,14 @@ export const FEED_REACTION_EMOJI: Record<number, string> = {
   5: "😮",
   6: "😢",
   7: "😡",
+  8: "🖕",
 };
 
-/** The Facebook seven, in Facebook's picker order, as feed codes. */
-export const FEED_REACTION_PICKER: number[] = [1, 3, 4, 2, 5, 6, 7];
+/** The Facebook seven plus 🖕, in picker order, as feed codes. */
+export const FEED_REACTION_PICKER: number[] = [1, 3, 4, 2, 5, 6, 7, 8];
 
 /** Every value the feed react endpoints accept (picker set + legacy 👎). */
-export const FEED_REACTION_VALUES: readonly number[] = [1, -1, 2, 3, 4, 5, 6, 7];
+export const FEED_REACTION_VALUES: readonly number[] = [1, -1, 2, 3, 4, 5, 6, 7, 8];
 
 export function isFeedReactionValue(v: unknown): v is number {
   return typeof v === "number" && FEED_REACTION_VALUES.includes(v);
@@ -81,7 +83,7 @@ export function totalFeedReactions(
 
 // ---- Messenger -------------------------------------------------------
 
-/** Facebook's seven plus Dave's 🖕 — Messenger only, finger goes last. */
+/** Facebook's seven plus Dave's 🖕 (finger also on the feed, as code 8). */
 export const MSG_REACTION_PICKER: string[] = [
   "👍",
   "❤️",

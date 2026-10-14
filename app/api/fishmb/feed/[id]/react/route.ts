@@ -1,6 +1,7 @@
 // /api/fishmb/feed/[id]/react — react to a feed item.
 // POST { value: number | null } — a reaction code from lib/fish/reactions.ts
-// (1 👍, -1 👎 legacy, 2 😆, 3 ❤️, 4 🥰, 5 😮, 6 😢, 7 😡), null = remove.
+// (1 👍, -1 👎 legacy, 2 😆, 3 ❤️, 4 🥰, 5 😮, 6 😢, 7 😡, 8 🖕),
+// null = remove.
 
 import { NextRequest, NextResponse } from "next/server";
 import { fishUserFromRequest, unauthorized, badRequest, notFound } from "@/lib/fish/auth";

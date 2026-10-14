@@ -1,7 +1,7 @@
 // /api/fishmb/feed/[id]/comments/[commentId]/react — react to a comment.
 // POST { value: number | null } (auth) — a reaction code from
 // lib/fish/reactions.ts (1 👍, -1 👎 legacy, 2 😆, 3 ❤️, 4 🥰, 5 😮, 6 😢,
-// 7 😡), null = remove.
+// 7 😡, 8 🖕), null = remove.
 
 import { NextRequest, NextResponse } from "next/server";
 import { fishUserFromRequest, unauthorized, badRequest, suspendedCheck } from "@/lib/fish/auth";
