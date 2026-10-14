@@ -90,5 +90,63 @@
       "destination": "/fish-manitoba-preview/index.html",
       "source": "/fish-manitoba-preview/tournaments/:id/log"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/fishmb?job=weather",
+      "schedule": "0 10 * * *"
+    },
+    {
+      "path": "/api/cron/fishmb?job=weather",
+      "schedule": "0 11 * * *"
+    },
+    {
+      "path": "/api/cron/fishmb?job=video",
+      "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/fishmb?job=video",
+      "schedule": "0 13 * * *"
+    },
+    {
+      "path": "/api/cron/fishmb?job=tip",
+      "schedule": "0 14 * * 1"
+    },
+    {
+      "path": "/api/cron/fishmb?job=tip",
+      "schedule": "0 15 * * 1"
+    },
+    {
+      "path": "/api/cron/fishmb?job=ice",
+      "schedule": "0 14 * * 2"
+    },
+    {
+      "path": "/api/cron/fishmb?job=ice",
+      "schedule": "0 15 * * 2"
+    },
+    {
+      "path": "/api/cron/fishmb?job=hotspot",
+      "schedule": "0 14 * * 3"
+    },
+    {
+      "path": "/api/cron/fishmb?job=hotspot",
+      "schedule": "0 15 * * 3"
+    },
+    {
+      "path": "/api/cron/fishmb?job=lake",
+      "schedule": "0 14 * * 5"
+    },
+    {
+      "path": "/api/cron/fishmb?job=lake",
+      "schedule": "0 15 * * 5"
+    },
+    {
+      "path": "/api/cron/fishmb?job=lodge",
+      "schedule": "0 14 * * 0"
+    },
+    {
+      "path": "/api/cron/fishmb?job=lodge",
+      "schedule": "0 15 * * 0"
+    }
   ]
 }
