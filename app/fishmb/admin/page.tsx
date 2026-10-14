@@ -726,6 +726,126 @@ function GrowthChart({ data }: { data: GrowthData | null }) {
   );
 }
 
+interface AutopostJobRow {
+  job: "weather" | "video" | "tip" | "hotspot" | "lake" | "lodge" | "ice";
+  name: string;
+  schedule: string;
+}
+
+const AUTOPOST_JOB_ROWS: AutopostJobRow[] = [
+  { job: "weather", name: "🌦️ Weather report", schedule: "Daily · 5:00 AM (Winnipeg)" },
+  { job: "video", name: "🎬 Video of the Day", schedule: "Daily · 7:00 AM (Winnipeg)" },
+  { job: "tip", name: "🎣 Tip of the Week (+ ads rotation)", schedule: "Mondays · ~9:00 AM (Winnipeg)" },
+  { job: "ice", name: "🧊 Ice report", schedule: "Tuesdays · ~9:00 AM (Winnipeg)" },
+  { job: "hotspot", name: "🔥 Hot spot of the Week", schedule: "Wednesdays · ~9:00 AM (Winnipeg)" },
+  { job: "lake", name: "🏞️ Featured lake", schedule: "Fridays · ~9:00 AM (Winnipeg)" },
+  { job: "lodge", name: "🏕️ Featured lodge", schedule: "Sundays · ~9:00 AM (Winnipeg)" },
+];
+
+interface AutopostRunResult {
+  lines: string[];
+  at: string;
+  failed: boolean;
+}
+
+/** Auto-posts tab: manual "Run now" triggers for the server-side feed
+ *  auto-post jobs (Vercel Cron runs them on schedule; this fires one
+ *  immediately as the signed-in admin — force=1 bypasses the time
+ *  window, the jobs' already-posted dedupe still applies). Also shows
+ *  how many posts are waiting in the Facebook Page mirror queue. */
+function AutoPostsPanel() {
+  const [running, setRunning] = useState<string | null>(null);
+  const [results, setResults] = useState<Record<string, AutopostRunResult>>({});
+  const [fbWaiting, setFbWaiting] = useState<number | null>(null);
+
+  const loadFbWaiting = () => {
+    fishFetch("/api/fishmb/admin/fb-outbox")
+      .then((d) => setFbWaiting(Array.isArray(d.entries) ? d.entries.length : 0))
+      .catch(() => setFbWaiting(null));
+  };
+
+  useEffect(() => {
+    loadFbWaiting();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const stamp = () =>
+    new Date().toLocaleString("en-CA", {
+      timeZone: "America/Winnipeg",
+      dateStyle: "medium",
+      timeStyle: "medium",
+    });
+
+  const run = async (job: AutopostJobRow["job"]) => {
+    setRunning(job);
+    try {
+      const d = await fishFetch(`/api/cron/fishmb?job=${job}&force=1`);
+      const lines: string[] = d.skipped
+        ? ["Skipped — outside the job's scheduled window."]
+        : Array.isArray(d.log) && d.log.length > 0
+          ? d.log
+          : ["Done — nothing new to post."];
+      setResults((prev) => ({ ...prev, [job]: { lines, at: stamp(), failed: false } }));
+    } catch (e) {
+      setResults((prev) => ({
+        ...prev,
+        [job]: {
+          lines: [e instanceof Error ? e.message : "Run failed."],
+          at: stamp(),
+          failed: true,
+        },
+      }));
+    } finally {
+      setRunning(null);
+      loadFbWaiting();
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-pine/60 bg-white border border-pine/10 rounded-2xl px-5 py-4">
+        These post to the FishMB feed automatically on schedule. “Run now” fires one
+        immediately — if it already ran today or this week, it says so instead of posting twice.
+        <span className="block mt-2 font-bold text-pine">
+          Facebook mirror: {fbWaiting === null ? "…" : `${fbWaiting} post${fbWaiting === 1 ? "" : "s"} waiting`}
+        </span>
+      </p>
+      {AUTOPOST_JOB_ROWS.map((row) => {
+        const result = results[row.job];
+        return (
+          <div key={row.job} className="bg-white border border-pine/10 rounded-2xl px-5 py-4">
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex-1 min-w-[220px]">
+                <p className="font-bold text-pine">{row.name}</p>
+                <p className="text-xs text-pine/55">{row.schedule}</p>
+              </div>
+              <button
+                onClick={() => run(row.job)}
+                disabled={running === row.job}
+                className="bg-signal hover:bg-signal-dark text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full disabled:opacity-40 transition-colors"
+              >
+                {running === row.job ? "Running…" : "Run now"}
+              </button>
+            </div>
+            {result && (
+              <div
+                className={`mt-3 text-sm rounded-xl px-4 py-3 ${
+                  result.failed ? "bg-red-50 text-red-800" : "bg-lake-mist/60 text-pine/80"
+                }`}
+              >
+                {result.lines.map((line, i) => (
+                  <p key={i}>{line}</p>
+                ))}
+                <p className="text-[11px] text-pine/45 mt-1">{result.at} (Winnipeg)</p>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const router = useRouter();
   const { user } = useFishAuth();
@@ -743,7 +863,7 @@ export default function AdminPage() {
   const [userSearch, setUserSearch] = useState("");
   const [growth, setGrowth] = useState<GrowthData | null>(null);
   const [userMap, setUserMap] = useState<UserMapData | null>(null);
-  const [tab, setTab] = useState<"claims" | "ads" | "tournaments" | "messages" | "anglers" | "users" | "growth" | "map" | "reports" | "visits" | "recommendations">("claims");
+  const [tab, setTab] = useState<"claims" | "ads" | "tournaments" | "messages" | "anglers" | "users" | "growth" | "map" | "reports" | "visits" | "recommendations" | "autoposts">("claims");
   const [denied, setDenied] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [acting, setActing] = useState<string | null>(null);
@@ -972,6 +1092,7 @@ export default function AdminPage() {
  ["reports", `🚩 Reports (${reports.length})`],
  ["visits", `📈 Visits`],
  ["recommendations", `💡 Recommendations (${recommendations.filter((r) => r.status === "new").length})`],
+ ["autoposts", `⏱️ Auto-posts`],
  ["claims", ` Business claims (${claims.length})`],
  ["ads", ` Ad submissions (${ads.length})`],
  ["tournaments", ` Tournament suggestions (${suggestions.length})`],
@@ -996,6 +1117,8 @@ export default function AdminPage() {
 
       {tab === "recommendations" ? (
         <RecommendationsPanel items={recommendations} onStatus={actOnRecommendation} />
+      ) : tab === "autoposts" ? (
+        <AutoPostsPanel />
       ) : tab === "visits" ? (
         <VisitsPanel stats={visitStats} />
       ) : tab === "reports" ? (
