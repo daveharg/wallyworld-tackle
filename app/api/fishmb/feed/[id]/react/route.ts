@@ -1,9 +1,11 @@
-// /api/fishmb/feed/[id]/react — like/dislike/laugh on a feed item.
-// POST { value: 1 | -1 | 2 | null } — 1 = like, -1 = dislike, 2 = laugh, null = remove.
+// /api/fishmb/feed/[id]/react — react to a feed item.
+// POST { value: number | null } — a reaction code from lib/fish/reactions.ts
+// (1 👍, -1 👎 legacy, 2 😆, 3 ❤️, 4 🥰, 5 😮, 6 😢, 7 😡), null = remove.
 
 import { NextRequest, NextResponse } from "next/server";
 import { fishUserFromRequest, unauthorized, badRequest, notFound } from "@/lib/fish/auth";
 import { ensureFeedColumns, toggleReaction } from "@/lib/fish/feed";
+import { isFeedReactionValue } from "@/lib/fish/reactions";
 import { queryOne } from "@/lib/fish/db";
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
@@ -16,8 +18,8 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     return badRequest("Invalid JSON body.");
   }
   const value = body.value;
-  if (value !== 1 && value !== -1 && value !== 2 && value !== null) {
-    return badRequest("value must be 1, -1, 2, or null.");
+  if (value !== null && !isFeedReactionValue(value)) {
+    return badRequest("value must be a reaction code or null.");
   }
   await ensureFeedColumns();
   // A feed item is either a discussion or a catch.

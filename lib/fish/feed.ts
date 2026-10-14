@@ -9,6 +9,7 @@ import {
   OBJECTIONABLE_ERROR,
   hiddenAuthorIds,
 } from "./moderation";
+import { isFeedReactionValue } from "./reactions";
 
 export interface FeedItem {
   id: string;
@@ -32,8 +33,10 @@ export interface FeedItem {
   like_count: number;
   dislike_count: number;
   laugh_count: number;
-  /** The viewer's own reaction, if any. */
-  viewer_reaction: 1 | -1 | 2 | null;
+  /** Per-code reaction totals, keyed by reaction value ("1", "3", …). */
+  reaction_counts: Record<string, number>;
+  /** The viewer's own reaction code (see lib/fish/reactions.ts), if any. */
+  viewer_reaction: number | null;
   created_at: string;
 }
 
@@ -47,7 +50,9 @@ export interface FeedComment {
   parent_id: string | null;
   like_count: number;
   dislike_count: number;
-  viewer_reaction: 1 | -1 | null;
+  /** Per-code reaction totals, keyed by reaction value ("1", "3", …). */
+  reaction_counts: Record<string, number>;
+  viewer_reaction: number | null;
   created_at: string;
 }
 
@@ -105,6 +110,31 @@ export async function ensureFeedColumns(): Promise<void> {
   await query(
     `CREATE INDEX IF NOT EXISTS fm_comment_reactions_comment_idx ON fm_comment_reactions(comment_id)`
   );
+  // Widen the reaction value sets to the full Facebook picker codes
+  // (lib/fish/reactions.ts). The original CREATE TABLE text pinned
+  // CHECK (value IN (1, -1)); replace any existing CHECK constraints on
+  // these two tables with the full set. Idempotent per cold start.
+  for (const t of ["fm_post_reactions", "fm_comment_reactions"] as const) {
+    const cons = await query<{ conname: string }>(
+      `SELECT conname FROM pg_constraint
+        WHERE conrelid = $1::regclass AND contype = 'c'`,
+      [t]
+    );
+    const target = `${t}_value_set`;
+    for (const c of cons) {
+      if (c.conname === target) continue;
+      await query(
+        `ALTER TABLE ${t} DROP CONSTRAINT IF EXISTS "${c.conname.replace(/"/g, '""')}"`
+      );
+    }
+    if (!cons.some((c) => c.conname === target)) {
+      await query(
+        `ALTER TABLE ${t} ADD CONSTRAINT ${target} CHECK (value IN (1, -1, 2, 3, 4, 5, 6, 7))`
+      ).catch(() => {
+        // A concurrent cold start may have added it first.
+      });
+    }
+  }
   ensured = true;
 }
 
@@ -206,6 +236,9 @@ export async function getFeed(opts: GetFeedOptions = {}): Promise<FeedPage> {
               WHERE r.post_id = feed.id AND r.value = -1)::int AS dislike_count,
             (SELECT COUNT(*) FROM fm_post_reactions r
               WHERE r.post_id = feed.id AND r.value = 2)::int AS laugh_count,
+            (SELECT COALESCE(jsonb_object_agg(t.value::text, t.n), '{}'::jsonb)
+               FROM (SELECT r.value, COUNT(*)::int AS n FROM fm_post_reactions r
+                      WHERE r.post_id = feed.id GROUP BY r.value) t) AS reaction_counts,
             (SELECT r.value FROM fm_post_reactions r
               WHERE r.post_id = feed.id AND r.user_id = $1::uuid)::smallint AS viewer_reaction
      FROM (
@@ -266,7 +299,8 @@ export async function createPost(
        body, photo_url, photos, video, NULL AS species, NULL AS length_in,
        visibility, species_tag,
        0 AS comment_count,
-       0 AS like_count, 0 AS dislike_count, NULL::smallint AS viewer_reaction,
+       0 AS like_count, 0 AS dislike_count, 0 AS laugh_count,
+       '{}'::jsonb AS reaction_counts, NULL::smallint AS viewer_reaction,
        created_at`,
     [userId, body, finalPhotoUrl, JSON.stringify(finalPhotos), video ? JSON.stringify(video) : null, visibility, speciesTag]
   );
@@ -286,12 +320,52 @@ export async function createPost(
   return post;
 }
 
-/** Toggle the viewer's reaction: 1 = like, -1 = dislike, null = remove. */
+export interface ReactionResult {
+  like_count: number;
+  dislike_count: number;
+  laugh_count: number;
+  reaction_counts: Record<string, number>;
+  viewer_reaction: number | null;
+}
+
+/** Aggregate one target's reaction rows into counts + the viewer's pick. */
+async function reactionSummary(
+  table: "fm_post_reactions" | "fm_comment_reactions",
+  idColumn: "post_id" | "comment_id",
+  targetId: string,
+  userId: string
+): Promise<ReactionResult> {
+  const rows = await query<{ value: number; n: number }>(
+    `SELECT value, COUNT(*)::int AS n FROM ${table}
+      WHERE ${idColumn} = $1 GROUP BY value`,
+    [targetId]
+  );
+  const counts: Record<string, number> = {};
+  for (const r of rows) counts[String(r.value)] = r.n;
+  const mine = await queryOne<{ value: number }>(
+    `SELECT value FROM ${table} WHERE ${idColumn} = $1 AND user_id = $2`,
+    [targetId, userId]
+  );
+  const vr = mine?.value ?? null;
+  return {
+    like_count: counts["1"] ?? 0,
+    dislike_count: counts["-1"] ?? 0,
+    laugh_count: counts["2"] ?? 0,
+    reaction_counts: counts,
+    viewer_reaction: vr !== null && isFeedReactionValue(vr) ? vr : null,
+  };
+}
+
+/**
+ * Set the viewer's post reaction: a code from lib/fish/reactions.ts
+ * (1 👍, -1 👎 legacy, 2 😆, 3 ❤️, 4 🥰, 5 😮, 6 😢, 7 😡) or null to remove.
+ * One reaction per user per post (UNIQUE(post_id, user_id)).
+ */
 export async function toggleReaction(
   postId: string,
   userId: string,
-  value: 1 | -1 | 2 | null
-): Promise<{ like_count: number; dislike_count: number; laugh_count: number; viewer_reaction: 1 | -1 | 2 | null }> {
+  value: number | null
+): Promise<ReactionResult> {
   await ensureFeedColumns();
   if (value === null) {
     await query(`DELETE FROM fm_post_reactions WHERE post_id = $1 AND user_id = $2`, [
@@ -306,22 +380,7 @@ export async function toggleReaction(
       [postId, userId, value]
     );
   }
-  const row = await queryOne<{ like_count: number; dislike_count: number; laugh_count: number; viewer_reaction: number | null }>(
-    `SELECT COUNT(*) FILTER (WHERE value = 1)::int AS like_count,
-            COUNT(*) FILTER (WHERE value = -1)::int AS dislike_count,
-            COUNT(*) FILTER (WHERE value = 2)::int AS laugh_count,
-            (SELECT value FROM fm_post_reactions WHERE post_id = $1 AND user_id = $2)::int AS viewer_reaction
-     FROM fm_post_reactions
-     WHERE post_id = $1`,
-    [postId, userId]
-  );
-  const vr = row?.viewer_reaction;
-  return {
-    like_count: row?.like_count ?? 0,
-    dislike_count: row?.dislike_count ?? 0,
-    laugh_count: row?.laugh_count ?? 0,
-    viewer_reaction: vr === 1 || vr === -1 || vr === 2 ? vr : null,
-  };
+  return reactionSummary("fm_post_reactions", "post_id", postId, userId);
 }
 
 /** Public fishing tips tagged to a species (for the how-to-fish pages). */
@@ -335,7 +394,8 @@ export async function getSpeciesTips(species: string, limit = 20): Promise<FeedI
             NULL AS species, NULL AS length_in,
             d.visibility, d.species_tag,
             (SELECT COUNT(*) FROM fm_comments cm WHERE cm.post_id = d.id)::int AS comment_count,
-            0 AS like_count, 0 AS dislike_count, NULL::smallint AS viewer_reaction,
+            0 AS like_count, 0 AS dislike_count, 0 AS laugh_count,
+            '{}'::jsonb AS reaction_counts, NULL::smallint AS viewer_reaction,
             d.created_at
      FROM fm_discussions d
      JOIN fm_users u ON u.id = d.user_id
@@ -357,6 +417,9 @@ export async function getComments(postId: string, viewerId?: string): Promise<Fe
             cm.parent_id::text AS parent_id,
             (SELECT COUNT(*) FROM fm_comment_reactions r WHERE r.comment_id = cm.id AND r.value = 1)::int AS like_count,
             (SELECT COUNT(*) FROM fm_comment_reactions r WHERE r.comment_id = cm.id AND r.value = -1)::int AS dislike_count,
+            (SELECT COALESCE(jsonb_object_agg(t.value::text, t.n), '{}'::jsonb)
+               FROM (SELECT r.value, COUNT(*)::int AS n FROM fm_comment_reactions r
+                      WHERE r.comment_id = cm.id GROUP BY r.value) t) AS reaction_counts,
             (SELECT r.value FROM fm_comment_reactions r WHERE r.comment_id = cm.id AND r.user_id = $2::uuid)::smallint AS viewer_reaction,
             cm.created_at
      FROM fm_comments cm
@@ -367,7 +430,11 @@ export async function getComments(postId: string, viewerId?: string): Promise<Fe
   );
   return rows.map((c) => ({
     ...c,
-    viewer_reaction: c.viewer_reaction === 1 || c.viewer_reaction === -1 ? c.viewer_reaction : null,
+    reaction_counts: c.reaction_counts ?? {},
+    viewer_reaction:
+      c.viewer_reaction !== null && c.viewer_reaction !== undefined && isFeedReactionValue(c.viewer_reaction)
+        ? c.viewer_reaction
+        : null,
   }));
 }
 
@@ -396,19 +463,23 @@ export async function addComment(
        (SELECT name FROM fm_users WHERE id = $2) AS user_name,
        (SELECT avatar_url FROM fm_users WHERE id = $2) AS avatar_url,
        body, photo_url, parent_id::text AS parent_id,
-       0 AS like_count, 0 AS dislike_count, NULL::smallint AS viewer_reaction,
+       0 AS like_count, 0 AS dislike_count, '{}'::jsonb AS reaction_counts,
+       NULL::smallint AS viewer_reaction,
        created_at`,
     [postId, userId, body, parent, photoUrl ?? null]
   );
   return { ...rows[0], viewer_reaction: null };
 }
 
-/** Toggle the viewer's like/dislike on a comment: 1 = like, -1 = dislike, null = remove. */
+/**
+ * Set the viewer's comment reaction: same codes as posts
+ * (lib/fish/reactions.ts) or null to remove. One per user per comment.
+ */
 export async function toggleCommentReaction(
   commentId: string,
   userId: string,
-  value: 1 | -1 | null
-): Promise<{ like_count: number; dislike_count: number; viewer_reaction: 1 | -1 | null }> {
+  value: number | null
+): Promise<ReactionResult> {
   await ensureFeedColumns();
   if (value === null) {
     await query(`DELETE FROM fm_comment_reactions WHERE comment_id = $1 AND user_id = $2`, [
@@ -423,20 +494,7 @@ export async function toggleCommentReaction(
       [commentId, userId, value]
     );
   }
-  const row = await queryOne<{ like_count: number; dislike_count: number; viewer_reaction: number | null }>(
-    `SELECT COUNT(*) FILTER (WHERE value = 1)::int AS like_count,
-            COUNT(*) FILTER (WHERE value = -1)::int AS dislike_count,
-            (SELECT value FROM fm_comment_reactions WHERE comment_id = $1 AND user_id = $2)::int AS viewer_reaction
-     FROM fm_comment_reactions
-     WHERE comment_id = $1`,
-    [commentId, userId]
-  );
-  const vr = row?.viewer_reaction;
-  return {
-    like_count: row?.like_count ?? 0,
-    dislike_count: row?.dislike_count ?? 0,
-    viewer_reaction: vr === 1 || vr === -1 ? vr : null,
-  };
+  return reactionSummary("fm_comment_reactions", "comment_id", commentId, userId);
 }
 
 /** Ensure the follow-system tables/columns exist. */

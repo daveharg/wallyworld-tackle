@@ -1,9 +1,12 @@
-// /api/fishmb/feed/[id]/comments/[commentId]/react — like/dislike a comment.
-// POST { value: 1 | -1 | null } (auth). 1 = like, -1 = dislike, null = remove.
+// /api/fishmb/feed/[id]/comments/[commentId]/react — react to a comment.
+// POST { value: number | null } (auth) — a reaction code from
+// lib/fish/reactions.ts (1 👍, -1 👎 legacy, 2 😆, 3 ❤️, 4 🥰, 5 😮, 6 😢,
+// 7 😡), null = remove.
 
 import { NextRequest, NextResponse } from "next/server";
 import { fishUserFromRequest, unauthorized, badRequest, suspendedCheck } from "@/lib/fish/auth";
 import { toggleCommentReaction } from "@/lib/fish/feed";
+import { isFeedReactionValue } from "@/lib/fish/reactions";
 
 export async function POST(
   req: NextRequest,
@@ -20,8 +23,8 @@ export async function POST(
     return badRequest("Invalid JSON body.");
   }
   const v = body.value;
-  const value = v === 1 || v === -1 ? v : v === null ? null : undefined;
-  if (value === undefined) return badRequest("value must be 1, -1, or null.");
+  const value = v === null ? null : isFeedReactionValue(v) ? v : undefined;
+  if (value === undefined) return badRequest("value must be a reaction code or null.");
   const result = await toggleCommentReaction(params.commentId, me.id, value);
   return NextResponse.json(result);
 }
