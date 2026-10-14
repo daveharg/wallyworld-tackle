@@ -40,6 +40,12 @@ interface SettingsTabProps {
   onBaitShopsChange: (v: boolean) => void;
   tackleShopsOn: boolean;
   onTackleShopsChange: (v: boolean) => void;
+  lodgesWidgetOn: boolean;
+  onLodgesWidgetChange: (v: boolean) => void;
+  lodgeLayerOn: boolean;
+  onLodgeLayerChange: (v: boolean) => void;
+  guideLayerOn: boolean;
+  onGuideLayerChange: (v: boolean) => void;
   widgetBtnOn: boolean;
   onWidgetBtnChange: (v: boolean) => void;
   followDot: string;
@@ -102,6 +108,12 @@ export default function SettingsTab({
   onBaitShopsChange,
   tackleShopsOn,
   onTackleShopsChange,
+  lodgesWidgetOn,
+  onLodgesWidgetChange,
+  lodgeLayerOn,
+  onLodgeLayerChange,
+  guideLayerOn,
+  onGuideLayerChange,
   widgetBtnOn,
   onWidgetBtnChange,
   followDot,
@@ -383,6 +395,69 @@ export default function SettingsTab({
         </button>
         <p className="text-[11px] text-pine/45 mt-2">
           Teal pins for tackle and rod retailers — a separate layer from bait shops.
+        </p>
+        <button
+          type="button"
+          onClick={() => onLodgesWidgetChange(!lodgesWidgetOn)}
+          className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3 mt-3"
+        >
+          <span className="text-sm font-bold text-pine">Lodges widget</span>
+          <span
+            className={`w-12 h-7 rounded-full p-1 transition-colors ${
+              lodgesWidgetOn ? "bg-signal" : "bg-pine/15"
+            }`}
+          >
+            <span
+              className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                lodgesWidgetOn ? "translate-x-5" : ""
+              }`}
+            />
+          </span>
+        </button>
+        <p className="text-[11px] text-pine/45 mt-2">
+          Quick switches for the lodge and guide overlays — drag it anywhere on the map.
+        </p>
+        <button
+          type="button"
+          onClick={() => onLodgeLayerChange(!lodgeLayerOn)}
+          className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3 mt-3"
+        >
+          <span className="text-sm font-bold text-pine">🏕️ Lodges overlay</span>
+          <span
+            className={`w-12 h-7 rounded-full p-1 transition-colors ${
+              lodgeLayerOn ? "bg-signal" : "bg-pine/15"
+            }`}
+          >
+            <span
+              className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                lodgeLayerOn ? "translate-x-5" : ""
+              }`}
+            />
+          </span>
+        </button>
+        <p className="text-[11px] text-pine/45 mt-2">
+          Violet pins for Manitoba lodges — tap a pin for the lodge's page.
+        </p>
+        <button
+          type="button"
+          onClick={() => onGuideLayerChange(!guideLayerOn)}
+          className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3 mt-3"
+        >
+          <span className="text-sm font-bold text-pine">🧭 Guides & services overlay</span>
+          <span
+            className={`w-12 h-7 rounded-full p-1 transition-colors ${
+              guideLayerOn ? "bg-signal" : "bg-pine/15"
+            }`}
+          >
+            <span
+              className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                guideLayerOn ? "translate-x-5" : ""
+              }`}
+            />
+          </span>
+        </button>
+        <p className="text-[11px] text-pine/45 mt-2">
+          Blue pins for guides and outfitters — tap a pin for their page.
         </p>
         <button
           type="button"

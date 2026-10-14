@@ -49,6 +49,14 @@ export interface ShopPin {
   sells_tackle: boolean;
 }
 
+export interface LodgePin {
+  id: string;
+  name: string;
+  lat: number;
+  lng: number;
+  kind: "lodge" | "guide";
+}
+
 export type BasemapId = "streets" | "satellite";
 
 interface SpotMapProps {
@@ -84,6 +92,10 @@ interface SpotMapProps {
   shopPins?: ShopPin[];
   /** Fired when a shop pin is tapped — parent shows the shop card. */
   onShopClick?: (pin: ShopPin) => void;
+  /** Lodge / guide pins for the lodges overlay. */
+  lodgePins?: LodgePin[];
+  /** Fired when a lodge pin is tapped — parent shows the lodge slide-up. */
+  onLodgeClick?: (pin: LodgePin) => void;
   /** Base map style. */
   basemap?: BasemapId;
   /** Fired (debounced by Leaflet) whenever the map stops moving. */
@@ -147,6 +159,8 @@ export default function SpotMap({
   onCatchClick,
   shopPins,
   onShopClick,
+  lodgePins,
+  onLodgeClick,
   basemap = "streets",
   onMoveEnd,
   fill = false,
@@ -158,6 +172,8 @@ export default function SpotMap({
   onCatchClickRef.current = onCatchClick;
   const onShopClickRef = useRef(onShopClick);
   onShopClickRef.current = onShopClick;
+  const onLodgeClickRef = useRef(onLodgeClick);
+  onLodgeClickRef.current = onLodgeClick;
   const [map, setMap] = useState<any>(null);
   const [expanded, setExpanded] = useState(false);
   // Circular fill indicator shown at the press point during a long-press.
@@ -527,6 +543,47 @@ export default function SpotMap({
       cancelled = true;
     };
   }, [shopPins, map]);
+
+  // Lodges overlay pins — lodges in violet (🏕️), guides & services in
+  // blue (🧭). Coordinates come from lodge-coords.json (real locations
+  // only — a lodge without verified coordinates never gets a pin).
+  const lodgeLayerRef = useRef<any>(null);
+  useEffect(() => {
+    if (!map) return;
+    let cancelled = false;
+    (async () => {
+      const L = (await import("leaflet")).default;
+      if (cancelled) return;
+      lodgeLayerRef.current?.remove();
+      lodgeLayerRef.current = null;
+      const pins = lodgePins ?? [];
+      if (pins.length === 0) return;
+      const layer = L.layerGroup();
+      for (const p of pins) {
+        const bg = p.kind === "lodge" ? "#7c3aed" : "#2563eb";
+        const glyph = p.kind === "lodge" ? "🏕️" : "🧭";
+        const icon = L.divIcon({
+          className: "",
+          html: `<div style="position:relative;width:30px;height:30px;border-radius:50%;background:${bg};border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;font-size:15px;">${glyph}</div>`,
+          iconSize: [30, 30],
+          iconAnchor: [15, 15],
+        });
+        const marker = L.marker([p.lat, p.lng], { icon, zIndexOffset: 250 });
+        if (onLodgeClickRef.current) {
+          marker.on("click", () => onLodgeClickRef.current?.(p));
+        } else {
+          marker.bindPopup(`<strong>${escapeHtml(p.name)}</strong>`);
+        }
+        marker.addTo(layer);
+      }
+      if (cancelled) return;
+      layer.addTo(map);
+      lodgeLayerRef.current = layer;
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [lodgePins, map]);
 
   // Live GPS person marker — follows you whenever we have a fix.
   // Single persistent marker (no duplicates): we reuse one Leaflet marker and

@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import type {
   BasemapId,
   CatchPin,
+  LodgePin,
   ShopPin,
   SpotPin,
   TrailPoint,
@@ -102,6 +103,8 @@ export default function MapsHub() {
     setSpotEditing(false);
   });
   const catchSheetDrag = useSheetDrag(() => setSelectedCatch(null));
+  const shopSheetDrag = useSheetDrag(() => setSelectedShop(null));
+  const lodgeSheetDrag = useSheetDrag(() => setSelectedLodge(null));
   const [myLoc, setMyLoc] = useState<{ lat: number; lng: number; speed: number | null } | null>(null);
   const [mapCenter, setMapCenter] = useState(() => {
     try {
@@ -377,6 +380,125 @@ export default function MapsHub() {
         })),
     [allShops, baitShopsOn, tackleShopsOn]
   );
+  // Lodges overlay — the Lodges widget carries two layer toggles: lodges
+  // and guides & services. Data is the directory's 175 lodge/guide pages
+  // (public/fish-manitoba/data.json) joined to their verified coordinates
+  // (public/fishmb/lodge-coords.json); entries without coordinates never
+  // get a pin. Same defaults/persistence pattern as the shop overlays.
+  const [lodgesWidgetOn, setLodgesWidgetOn] = useState(() => {
+    try {
+      return localStorage.getItem("fishmb-widget-lodges") !== "0";
+    } catch {
+      return true;
+    }
+  });
+  const changeLodgesWidget = (v: boolean) => {
+    setLodgesWidgetOn(v);
+    try {
+      localStorage.setItem("fishmb-widget-lodges", v ? "1" : "0");
+    } catch {
+      // Best effort.
+    }
+  };
+  const [lodgeLayerOn, setLodgeLayerOn] = useState(() => {
+    try {
+      return localStorage.getItem("fishmb-layer-lodges") !== "0";
+    } catch {
+      return true;
+    }
+  });
+  const changeLodgeLayer = (v: boolean) => {
+    setLodgeLayerOn(v);
+    try {
+      localStorage.setItem("fishmb-layer-lodges", v ? "1" : "0");
+    } catch {
+      // Best effort.
+    }
+  };
+  const [guideLayerOn, setGuideLayerOn] = useState(() => {
+    try {
+      return localStorage.getItem("fishmb-layer-guides") !== "0";
+    } catch {
+      return true;
+    }
+  });
+  const changeGuideLayer = (v: boolean) => {
+    setGuideLayerOn(v);
+    try {
+      localStorage.setItem("fishmb-layer-guides", v ? "1" : "0");
+    } catch {
+      // Best effort.
+    }
+  };
+  interface LodgeItem {
+    id: string;
+    name: string;
+    kind: "lodge" | "guide";
+    location: string;
+    description: string;
+    species: string[];
+    fishing_waters: string[];
+    amenities: string[];
+    packages: { name: string; description: string }[];
+    rates_note: string;
+    ice_fishing: boolean;
+    ice_fishing_details: string;
+    established: number | null;
+    access: string;
+    address: string | null;
+    website: string | null;
+    phone: string | null;
+    email: string | null;
+    lat: number;
+    lng: number;
+  }
+  const [allLodgesFull, setAllLodgesFull] = useState<LodgeItem[]>([]);
+  const [selectedLodge, setSelectedLodge] = useState<LodgeItem | null>(null);
+  useEffect(() => {
+    let live = true;
+    Promise.all([
+      fetch("/fish-manitoba/data.json").then((r) => r.json()).catch(() => null),
+      fetch("/fishmb/lodge-coords.json").then((r) => r.json()).catch(() => ({})),
+    ]).then(([d, coords]) => {
+      if (!live || !d) return;
+      const c = (coords ?? {}) as Record<string, { lat: number; lng: number }>;
+      const items: LodgeItem[] = (((d as { lodges?: unknown[] }).lodges ?? []) as Record<string, unknown>[])
+        .filter((l) => typeof l.id === "string" && c[l.id as string])
+        .map((l) => ({
+          id: l.id as string,
+          name: String(l.name ?? ""),
+          kind: l.kind === "guide" ? "guide" : "lodge",
+          location: String(l.location ?? ""),
+          description: String(l.description ?? ""),
+          species: (l.species as string[]) ?? [],
+          fishing_waters: (l.fishing_waters as string[]) ?? [],
+          amenities: (l.amenities as string[]) ?? [],
+          packages: (l.packages as { name: string; description: string }[]) ?? [],
+          rates_note: String(l.rates_note ?? ""),
+          ice_fishing: Boolean(l.ice_fishing),
+          ice_fishing_details: String(l.ice_fishing_details ?? ""),
+          established: typeof l.established === "number" ? l.established : null,
+          access: String(l.access ?? ""),
+          address: (l.address as string) || null,
+          website: (l.website as string) || null,
+          phone: (l.phone as string) || null,
+          email: (l.email as string) || null,
+          lat: c[l.id as string].lat,
+          lng: c[l.id as string].lng,
+        }));
+      setAllLodgesFull(items);
+    });
+    return () => {
+      live = false;
+    };
+  }, []);
+  const lodgePins: LodgePin[] = useMemo(
+    () =>
+      allLodgesFull
+        .filter((l) => (l.kind === "lodge" && lodgeLayerOn) || (l.kind === "guide" && guideLayerOn))
+        .map((l) => ({ id: l.id, name: l.name, lat: l.lat, lng: l.lng, kind: l.kind })),
+    [allLodgesFull, lodgeLayerOn, guideLayerOn]
+  );
   // The widget-settings shortcut button (top-left of the map) is itself a
   // widget: ON for everyone until turned off in Settings → Widgets.
   const [widgetBtnOn, setWidgetBtnOn] = useState(() => {
@@ -427,6 +549,7 @@ export default function MapsHub() {
   // doesn't also flip a switch on release.
   const catchToggleDown = useRef<{ x: number; y: number } | null>(null);
   const shopToggleDown = useRef<{ x: number; y: number } | null>(null);
+  const lodgeToggleDown = useRef<{ x: number; y: number } | null>(null);
 
   // (0,0) is "Null Island" — never a real spot or GPS fix. Treat as invalid
   // so the map can't get stuck in the ocean.
@@ -1255,6 +1378,11 @@ export default function MapsHub() {
               const full = allShops.find((s) => s.id === pin.id) ?? null;
               if (full) setSelectedShop(full);
             }}
+            lodgePins={lodgePins}
+            onLodgeClick={(pin) => {
+              const full = allLodgesFull.find((l) => l.id === pin.id) ?? null;
+              if (full) setSelectedLodge(full);
+            }}
             basemap={basemap}
             onMoveEnd={onMoveEnd}
             panTo={followPan}
@@ -1405,6 +1533,48 @@ export default function MapsHub() {
               }}
               onClick={(e) => {
                 const d = shopToggleDown.current;
+                if (d && Math.hypot(e.clientX - d.x, e.clientY - d.y) > 8) return;
+                t.set(!t.on);
+              }}
+              className="flex items-center gap-2 w-full"
+              aria-pressed={t.on}
+            >
+              <span
+                className={`w-9 h-5 rounded-full p-0.5 transition-colors shrink-0 ${
+                  t.on ? "bg-signal" : "bg-pine/15"
+                }`}
+              >
+                <span
+                  className={`block w-4 h-4 rounded-full bg-white shadow transition-transform ${
+                    t.on ? "translate-x-4" : ""
+                  }`}
+                />
+              </span>
+              <span className="text-[11px] font-bold text-pine whitespace-nowrap">{t.label}</span>
+            </button>
+          ))}
+        </div>
+      </DraggableWidget>
+      )}
+
+      {/* Lodges widget — toggles for the lodge and guide overlays */}
+      {lodgesWidgetOn && (
+      <DraggableWidget id="lodges" defaultPos={{ x: 12, y: 470 }} onClose={() => changeLodgesWidget(false)}>
+        <div className="bg-white/95 backdrop-blur border border-pine/15 rounded-2xl shadow-lg px-3 py-2 space-y-1.5">
+          {(
+            [
+              { label: "🏕️ Lodges", on: lodgeLayerOn, set: changeLodgeLayer },
+              { label: "🧭 Guides & services", on: guideLayerOn, set: changeGuideLayer },
+            ] as const
+          ).map((t) => (
+            <button
+              key={t.label}
+              type="button"
+              onPointerDown={(e) => {
+                lodgeToggleDown.current = { x: e.clientX, y: e.clientY };
+              }}
+              onClick={(e) => {
+                const d = lodgeToggleDown.current;
                 if (d && Math.hypot(e.clientX - d.x, e.clientY - d.y) > 8) return;
                 t.set(!t.on);
               }}
@@ -1663,6 +1833,12 @@ export default function MapsHub() {
             onBaitShopsChange={changeBaitShops}
             tackleShopsOn={tackleShopsOn}
             onTackleShopsChange={changeTackleShops}
+            lodgesWidgetOn={lodgesWidgetOn}
+            onLodgesWidgetChange={changeLodgesWidget}
+            lodgeLayerOn={lodgeLayerOn}
+            onLodgeLayerChange={changeLodgeLayer}
+            guideLayerOn={guideLayerOn}
+            onGuideLayerChange={changeGuideLayer}
             widgetBtnOn={widgetBtnOn}
             onWidgetBtnChange={changeWidgetBtn}
             followDot={followDot}
@@ -1971,17 +2147,21 @@ export default function MapsHub() {
         />
       )}
 
-      {/* Catch detail sheet — tap a catch pin on the map */}
+      {/* Shop card — tap a shop pin on the map. Slides up clear of the
+          bottom bar (pb-32) and closes by swiping down (shared sheet drag). */}
       {selectedShop && (
         <div
           className="fixed inset-0 z-[1200] flex items-end justify-center bg-pine-deep/50 backdrop-blur-sm"
           onClick={() => setSelectedShop(null)}
         >
           <div
-            className="bg-paper rounded-t-3xl p-6 pt-3 pb-10 w-full sm:max-w-md shadow-2xl"
+            className="bg-paper rounded-t-3xl p-6 pt-3 pb-32 w-full sm:max-w-md shadow-2xl max-h-[88vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
+            style={shopSheetDrag.dragStyle}
           >
-            <div className="w-10 h-1 rounded-full bg-pine/20 mx-auto mb-4" />
+            <div className="touch-none cursor-grab active:cursor-grabbing -mt-1 pb-2" {...shopSheetDrag.dragHandlers}>
+              <SheetGrabber onClose={() => setSelectedShop(null)} />
+            </div>
             <div className="flex items-start justify-between gap-3">
               <h3 className="font-display font-bold text-pine text-2xl leading-tight">{selectedShop.name}</h3>
               <button
@@ -2049,6 +2229,145 @@ export default function MapsHub() {
                 >
                   Business page →
                 </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Lodge slide-up — tap a lodge/guide pin. Same page info the lodge
+          directory pages carry, in a sheet that clears the bottom bar
+          and closes by swiping down. */}
+      {selectedLodge && (
+        <div
+          className="fixed inset-0 z-[1200] flex items-end justify-center bg-pine-deep/50 backdrop-blur-sm"
+          onClick={() => setSelectedLodge(null)}
+        >
+          <div
+            className="bg-paper rounded-t-3xl p-6 pt-3 pb-32 w-full sm:max-w-md shadow-2xl max-h-[88vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+            style={lodgeSheetDrag.dragStyle}
+          >
+            <div className="touch-none cursor-grab active:cursor-grabbing -mt-1 pb-2" {...lodgeSheetDrag.dragHandlers}>
+              <SheetGrabber onClose={() => setSelectedLodge(null)} />
+            </div>
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="font-display font-bold text-pine text-2xl leading-tight">{selectedLodge.name}</h3>
+              <button
+                type="button"
+                onClick={() => setSelectedLodge(null)}
+                aria-label="Close"
+                className="w-9 h-9 rounded-full bg-pine/5 text-pine font-bold shrink-0"
+              >
+                ×
+              </button>
+            </div>
+            {(selectedLodge.location || selectedLodge.address) && (
+              <p className="text-pine/60 text-sm mt-1">
+                {[selectedLodge.address, selectedLodge.location].filter(Boolean).join(" · ")}
+              </p>
+            )}
+            <div className="flex flex-wrap gap-2 mt-4">
+              <span className="bg-violet-100 border border-violet-300 text-pine text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">
+                {selectedLodge.kind === "lodge" ? "🏕️ Lodge" : "🧭 Guide & services"}
+              </span>
+              {selectedLodge.ice_fishing && (
+                <span className="bg-sky-100 border border-sky-300 text-pine text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">
+                  ❄️ Ice fishing
+                </span>
+              )}
+              {selectedLodge.established && (
+                <span className="bg-pine/10 border border-pine/20 text-pine text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">
+                  Est. {selectedLodge.established}
+                </span>
+              )}
+              {selectedLodge.access && (
+                <span className="bg-pine/10 border border-pine/20 text-pine text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">
+                  {selectedLodge.access}
+                </span>
+              )}
+            </div>
+            {selectedLodge.description && (
+              <p className="text-pine/80 text-sm leading-relaxed mt-4 whitespace-pre-line">{selectedLodge.description}</p>
+            )}
+            {selectedLodge.species.length > 0 && (
+              <div className="mt-5">
+                <p className="text-[11px] font-black uppercase tracking-widest text-pine/45">Fish species</p>
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {selectedLodge.species.map((s) => (
+                    <span key={s} className="bg-white border border-pine/15 text-pine text-xs font-semibold px-2.5 py-1 rounded-full">{s}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {selectedLodge.fishing_waters.length > 0 && (
+              <div className="mt-5">
+                <p className="text-[11px] font-black uppercase tracking-widest text-pine/45">Fishing waters</p>
+                <p className="text-sm text-pine/80 mt-1.5">{selectedLodge.fishing_waters.join(" · ")}</p>
+              </div>
+            )}
+            {selectedLodge.amenities.length > 0 && (
+              <div className="mt-5">
+                <p className="text-[11px] font-black uppercase tracking-widest text-pine/45">Amenities</p>
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {selectedLodge.amenities.map((a) => (
+                    <span key={a} className="bg-white border border-pine/15 text-pine text-xs font-semibold px-2.5 py-1 rounded-full">{a}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {selectedLodge.packages.length > 0 && (
+              <div className="mt-5">
+                <p className="text-[11px] font-black uppercase tracking-widest text-pine/45">Packages</p>
+                <div className="space-y-2.5 mt-2">
+                  {selectedLodge.packages.map((p) => (
+                    <div key={p.name} className="bg-white border border-pine/10 rounded-2xl px-3.5 py-2.5">
+                      <p className="text-sm font-bold text-pine">{p.name}</p>
+                      {p.description && <p className="text-xs text-pine/65 leading-relaxed mt-0.5">{p.description}</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {selectedLodge.rates_note && (
+              <p className="text-xs text-pine/60 leading-relaxed mt-4">{selectedLodge.rates_note}</p>
+            )}
+            {selectedLodge.ice_fishing && selectedLodge.ice_fishing_details && (
+              <div className="mt-5">
+                <p className="text-[11px] font-black uppercase tracking-widest text-pine/45">Ice fishing</p>
+                <p className="text-sm text-pine/80 leading-relaxed mt-1.5">{selectedLodge.ice_fishing_details}</p>
+              </div>
+            )}
+            <div className="flex flex-wrap gap-2.5 mt-6">
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([selectedLodge.name, selectedLodge.address, selectedLodge.location].filter(Boolean).join(" "))}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white border border-pine/15 text-pine font-bold uppercase tracking-wider text-xs px-5 py-3 rounded-full"
+              >
+                📍 Google Maps →
+              </a>
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination=${selectedLodge.lat},${selectedLodge.lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-5 py-3 rounded-full transition-colors"
+              >
+                Directions →
+              </a>
+              {(selectedLodge.phone || selectedLodge.email) && (
+                <span className="bg-white border border-pine/15 text-pine font-bold text-xs px-5 py-3 rounded-full">
+                  {selectedLodge.phone || selectedLodge.email}
+                </span>
+              )}
+              {selectedLodge.website && (
+                <a
+                  href={selectedLodge.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white border border-pine/15 text-pine font-bold uppercase tracking-wider text-xs px-5 py-3 rounded-full"
+                >
+                  Website →
+                </a>
               )}
             </div>
           </div>
