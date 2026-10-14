@@ -4,6 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { fishFetch } from "../../_components/fishFetch";
 import { useSheetDrag, SheetGrabber } from "../../_components/sheetDrag";
+import { HoldMenu, ReactionChips, useLongPress } from "../../_components/HoldMenu";
+import {
+  MSG_REACTION_PICKER,
+  aggregateEmojiReactions,
+} from "@/lib/fish/reactions";
 import {
   decryptText,
   decryptV2Copy,
@@ -26,6 +31,9 @@ interface StoredMessage {
   ciphertext: string;
   created_at: string;
   proto?: string | null;
+  /** Reaction summaries for this copy's LOGICAL message (sender +
+   *  created_at), attached by the messages route. */
+  reactions?: { emoji: string; n: number; mine: boolean }[];
 }
 
 /** One message part as posted to the messages route. sig1 parts carry
@@ -100,6 +108,9 @@ interface Decrypted {
   text: string | null;
   noKey: boolean;
   created_at: string;
+  /** Reaction summaries keyed to this logical message (sender +
+   *  created_at) — shared by every participant's copy. */
+  reactions: { emoji: string; n: number; mine: boolean }[];
   /** System line (session reset / unreadable notice) — rendered as a
    *  centered muted line instead of a chat bubble. */
   sys?: boolean;
@@ -159,6 +170,90 @@ function spotPayload(text: string | null): SpotPayload | null {
   }
 }
 
+/**
+ * Quote-reply payloads are JSON { t: "quote", q: { by, text }, body }.
+ * The quote snippet is sender-authored plaintext carried INSIDE the
+ * encrypted payload (sender includes it; receivers render it from the
+ * payload — the server never sees or stores a copy).
+ */
+export interface QuotePayload {
+  by: string;
+  text: string;
+  body: string;
+}
+
+function quotePayload(text: string | null): QuotePayload | null {
+  if (!text || !text.startsWith("{")) return null;
+  try {
+    const o = JSON.parse(text);
+    if (
+      o &&
+      o.t === "quote" &&
+      o.q &&
+      typeof o.q.by === "string" &&
+      typeof o.q.text === "string" &&
+      typeof o.body === "string"
+    ) {
+      return { by: o.q.by, text: o.q.text, body: o.body };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/** Short human snippet of a message, for the quote preview / payload.
+ *  Null when there's nothing quotable (undecryptable, system lines). */
+function snippetOf(m: Decrypted): string | null {
+  if (!m.text || m.sys) return null;
+  const q = quotePayload(m.text);
+  if (q) return q.body.slice(0, 140);
+  if (photoUrl(m.text)) return "📷 Photo";
+  const s = spotPayload(m.text);
+  if (s) return `📍 ${s.spot.name || "Fishing spot"}`;
+  if (isSysResetPayload(m.text)) return null;
+  return m.text.slice(0, 140);
+}
+
+/** The copyable plain text of a message (quote body for quote payloads),
+ *  or null when the message isn't text (photo / spot / unreadable). */
+function copyTextOf(m: Decrypted): string | null {
+  if (!m.text || m.sys) return null;
+  const q = quotePayload(m.text);
+  if (q) return q.body;
+  if (photoUrl(m.text) || spotPayload(m.text) || isSysResetPayload(m.text)) return null;
+  return m.text;
+}
+
+/** A chat bubble that opens the shared hold menu on long-press /
+ *  right-click, and "pops" while its menu is open. */
+function BubbleWrap({
+  active,
+  onHold,
+  className,
+  style,
+  children,
+}: {
+  active: boolean;
+  onHold: (rect: DOMRect) => void;
+  className?: string;
+  style?: React.CSSProperties;
+  children: React.ReactNode;
+}) {
+  const handlers = useLongPress(onHold);
+  return (
+    <div
+      {...handlers}
+      style={{ ...style, WebkitTouchCallout: "none" }}
+      className={`${className ?? ""} transition-all duration-150 ${
+        active ? "scale-[1.03] shadow-2xl ring-2 ring-pine/30 relative z-10" : ""
+      }`}
+    >
+      {children}
+    </div>
+  );
+}
+
 export default function ThreadView({
   peer,
   myId,
@@ -206,6 +301,7 @@ export default function ThreadView({
         sender_id: "",
         text,
         noKey: false,
+        reactions: [],
         sys: true,
         created_at: lastAtRef.current ?? new Date().toISOString(),
       },
@@ -229,6 +325,61 @@ export default function ThreadView({
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
   const [note, setNote] = useState<string | null>(null);
+  // Press-and-hold menu + quote-reply state.
+  const [holdMsg, setHoldMsg] = useState<{ msg: Decrypted; rect: DOMRect } | null>(null);
+  const [quote, setQuote] = useState<{ by: string; text: string } | null>(null);
+  const composerRef = useRef<HTMLInputElement>(null);
+
+  /** Toggle my reaction on a logical message (sender + created_at).
+   *  The server owns toggle semantics: send the emoji the user tapped. */
+  const reactToMessage = async (m: Decrypted, emoji: string) => {
+    try {
+      const d = await fishFetch("/api/fishmb/msg/messages/react", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversation_id: peer.id,
+          sender_id: m.sender_id,
+          msg_created_at: m.created_at,
+          emoji,
+        }),
+      });
+      const reactions = (d.reactions ?? []) as Decrypted["reactions"];
+      setMsgs((prev) =>
+        prev.map((x) =>
+          x.sender_id === m.sender_id && x.created_at === m.created_at
+            ? { ...x, reactions }
+            : x
+        )
+      );
+      setHoldMsg((h) =>
+        h && h.msg.sender_id === m.sender_id && h.msg.created_at === m.created_at
+          ? { ...h, msg: { ...h.msg, reactions } }
+          : h
+      );
+    } catch {
+      // Reactions are best-effort; the next poll resyncs.
+    }
+  };
+
+  /** Report a message's sender (messages are E2E — the existing report
+   *  flow targets the user; the server can't see message content). */
+  const reportMessage = async (m: Decrypted) => {
+    try {
+      await fishFetch("/api/fishmb/reports", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          target_type: "user",
+          target_id: m.sender_id,
+          reason: "Reported from a message in a FishMB chat.",
+        }),
+      });
+      setNote("Reported — thanks. We review every report within 24 hours.");
+    } catch {
+      setNote("Couldn't send the report — try again.");
+    }
+  };
   const [showMembers, setShowMembers] = useState(false);
   const [editingGroup, setEditingGroup] = useState(false);
   const [themeOpen, setThemeOpen] = useState(false);
@@ -533,6 +684,7 @@ export default function ThreadView({
           text: sys ? RESET_LINE : text,
           noKey: false,
           created_at: m.created_at,
+          reactions: m.reactions ?? [],
           ...(sys ? { sys: true } : {}),
         };
         const idx = byBase.get(base);
@@ -555,6 +707,7 @@ export default function ThreadView({
           text: null,
           noKey,
           created_at: m.created_at,
+          reactions: m.reactions ?? [],
         });
       }
     }
@@ -591,6 +744,7 @@ export default function ThreadView({
             text: e.text,
             noKey: false,
             created_at: e.created_at,
+            reactions: [],
           };
           const pos = next.findIndex((p) => p.created_at > e.created_at);
           if (pos === -1) next.push(entry);
@@ -742,6 +896,12 @@ export default function ThreadView({
                   } else if (next[idx].text === null && f.text !== null) {
                     next[idx] = f;
                     changed = true;
+                  } else if (
+                    JSON.stringify(next[idx].reactions) !== JSON.stringify(f.reactions)
+                  ) {
+                    // Someone reacted (or un-reacted) since the last poll.
+                    next[idx] = { ...next[idx], reactions: f.reactions };
+                    changed = true;
                   }
                 }
                 return changed ? next : prev;
@@ -883,7 +1043,7 @@ export default function ThreadView({
           if (prev.some((m) => m.id === mine.id)) return prev;
           return [
             ...prev,
-            { id: mine.id, mine: true, sender_id: myId, text: optimisticText ?? payload, noKey: false, created_at: mine.created_at },
+            { id: mine.id, mine: true, sender_id: myId, text: optimisticText ?? payload, noKey: false, created_at: mine.created_at, reactions: mine.reactions ?? [] },
           ];
         });
         lastAtRef.current = mine.created_at;
@@ -903,7 +1063,7 @@ export default function ThreadView({
           }
           return [
             ...prev,
-            { id: localId, mine: true, sender_id: myId, text: optimisticText ?? payload, noKey: false, created_at },
+            { id: localId, mine: true, sender_id: myId, text: optimisticText ?? payload, noKey: false, created_at, reactions: [] },
           ];
         });
         lastAtRef.current = created_at;
@@ -940,6 +1100,18 @@ export default function ThreadView({
     if (!text) return;
     if (text.length > 2000) {
       setNote("Messages are limited to 2000 characters.");
+      return;
+    }
+    if (quote) {
+      // The quote travels inside the encrypted payload (sender-authored
+      // snippet); receivers render it from the payload, never a server copy.
+      const payload = JSON.stringify({
+        t: "quote",
+        q: { by: quote.by, text: quote.text },
+        body: text,
+      });
+      setQuote(null);
+      await sendPayload(payload);
       return;
     }
     await sendPayload(text);
@@ -1634,6 +1806,17 @@ export default function ThreadView({
             : (peer.members.find((x) => x.user_id === m.sender_id)?.name ?? null);
           const photo = photoUrl(m.text);
           const spot = spotPayload(m.text);
+          const quoteP = quotePayload(m.text);
+          const msgChips = aggregateEmojiReactions(m.reactions ?? []).map((c) => ({
+            key: c.emoji,
+            emoji: c.emoji,
+            n: c.n,
+            mine: c.mine,
+          }));
+          const isHeld =
+            holdMsg !== null &&
+            holdMsg.msg.sender_id === m.sender_id &&
+            holdMsg.msg.created_at === m.created_at;
           // iOS touches: name above the first bubble of a sender run (groups),
           // avatar only on the last bubble of a sender run.
           const showName = !m.mine && peer.is_group && senderName && prev?.sender_id !== m.sender_id;
@@ -1649,8 +1832,11 @@ export default function ThreadView({
               {!m.mine && peer.is_group && (
                 <span className="w-7 shrink-0">{showAvatar ? senderAvatar(m, "w-7 h-7") : null}</span>
               )}
-              <div
-                className={`max-w-[75%] px-3.5 py-2 rounded-[1.25rem] ${
+              <div className={`flex flex-col max-w-[75%] ${m.mine ? "items-end" : "items-start"}`}>
+              <BubbleWrap
+                active={isHeld}
+                onHold={(rect) => setHoldMsg({ msg: m, rect })}
+                className={`px-3.5 py-2 rounded-[1.25rem] ${
                   m.mine ? "rounded-br-md" : "rounded-bl-md"
                 }`}
                 style={{
@@ -1660,7 +1846,23 @@ export default function ThreadView({
                 {showName && (
                   <p className="text-[11px] font-semibold text-pine/50 mb-0.5">{senderName}</p>
                 )}
-                {spot ? (
+                {quoteP ? (
+                  <>
+                    <div
+                      className="rounded-xl px-2.5 py-1.5 mb-1.5 bg-black/10"
+                      style={{ color: m.mine ? theme.sentText : theme.receivedText }}
+                    >
+                      <p className="text-[11px] font-bold opacity-90">{quoteP.by}</p>
+                      <p className="text-[12px] leading-snug opacity-75 line-clamp-2">{quoteP.text}</p>
+                    </div>
+                    <p
+                      className="text-[17px] leading-snug whitespace-pre-wrap break-words"
+                      style={{ color: m.mine ? theme.sentText : theme.receivedText }}
+                    >
+                      {quoteP.body}
+                    </p>
+                  </>
+                ) : spot ? (
                   <div className="bg-white rounded-2xl p-3.5 w-60 text-pine shadow-sm">
                     <p className="font-bold text-[15px] leading-snug">
                       📍 {spot.spot.name || "Fishing spot"}
@@ -1711,6 +1913,12 @@ export default function ThreadView({
                     {m.text ?? (m.noKey ? "Waiting for encryption key…" : "Couldn't decrypt this message.")}
                   </p>
                 )}
+              </BubbleWrap>
+              <ReactionChips
+                chips={msgChips}
+                onTap={(key) => reactToMessage(m, key)}
+                align={m.mine ? "right" : "left"}
+              />
               </div>
             </div>
           </div>
@@ -1718,6 +1926,23 @@ export default function ThreadView({
         })}
         <div ref={bottomRef} />
       </div>
+
+      {quote && (
+        <div className="flex items-start gap-2 mt-2 bg-pine/5 border border-pine/10 rounded-2xl px-3 py-2 shrink-0">
+          <div className="flex-1 min-w-0 border-l-4 border-signal pl-2.5">
+            <p className="text-[11px] font-bold text-pine">{quote.by}</p>
+            <p className="text-xs text-pine/60 truncate">{quote.text}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setQuote(null)}
+            aria-label="Cancel reply"
+            className="shrink-0 w-6 h-6 rounded-full bg-pine/10 text-pine/60 font-bold text-xs flex items-center justify-center"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       <div className="flex items-center gap-2 pt-2 shrink-0">
         <input
@@ -1741,13 +1966,14 @@ export default function ThreadView({
           {uploading ? "…" : "+"}
         </button>
         <input
+          ref={composerRef}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") send();
           }}
           maxLength={2000}
-          placeholder="Message…"
+          placeholder={quote ? "Reply…" : "Message…"}
           disabled={!memberKeys}
           enterKeyHint="send"
           className="flex-1 min-w-0 bg-white border border-pine/15 rounded-full px-4 py-2.5 text-[17px] md:text-sm text-pine placeholder:text-pine/40 focus:outline-none focus:border-pine disabled:opacity-50"
@@ -1762,6 +1988,75 @@ export default function ThreadView({
           {sending ? "…" : "↑"}
         </button>
       </div>
+
+      {/* Press-and-hold menu for a message bubble */}
+      {holdMsg && (() => {
+        const m = holdMsg.msg;
+        const snippet = snippetOf(m);
+        const copyText = copyTextOf(m);
+        const myEmoji = (m.reactions ?? []).find((r) => r.mine)?.emoji ?? null;
+        const senderName =
+          peer.members.find((x) => x.user_id === m.sender_id)?.name ?? "Angler";
+        // Prefer the live copy of the message (reactions may have moved).
+        const live =
+          msgs.find(
+            (x) => x.sender_id === m.sender_id && x.created_at === m.created_at
+          ) ?? m;
+        const liveEmoji = (live.reactions ?? []).find((r) => r.mine)?.emoji ?? myEmoji;
+        return (
+          <HoldMenu
+            anchor={holdMsg.rect}
+            reactions={MSG_REACTION_PICKER.map((e) => ({
+              key: e,
+              emoji: e,
+              active: liveEmoji === e,
+            }))}
+            onPickReaction={(key) => reactToMessage(live, key)}
+            actions={[
+              ...(snippet !== null
+                ? [
+                    {
+                      icon: "↩️",
+                      label: "Reply",
+                      onSelect: () => {
+                        setQuote({
+                          by: live.mine ? "You" : senderName,
+                          text: snippet,
+                        });
+                        composerRef.current?.focus();
+                      },
+                    },
+                  ]
+                : []),
+              ...(copyText !== null
+                ? [
+                    {
+                      icon: "📋",
+                      label: "Copy text",
+                      onSelect: () => {
+                        try {
+                          void navigator.clipboard.writeText(copyText);
+                        } catch {
+                          // Clipboard unavailable.
+                        }
+                      },
+                    },
+                  ]
+                : []),
+              ...(!live.mine
+                ? [
+                    {
+                      icon: "🚩",
+                      label: `Report ${senderName}`,
+                      onSelect: () => reportMessage(live),
+                    },
+                  ]
+                : []),
+            ]}
+            onClose={() => setHoldMsg(null)}
+          />
+        );
+      })()}
 
       {/* Chat appearance settings — curated themes */}
       {themeOpen && (
