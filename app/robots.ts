@@ -5,7 +5,19 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
   const host = (await headers()).get("host") ?? "";
   if (host.includes("fishmb.ca")) {
     return {
-      rules: [{ userAgent: "*", allow: "/", disallow: ["/api/", "/fishmb/admin/"] }],
+      rules: [
+        {
+          userAgent: "*",
+          allow: "/",
+          disallow: [
+            "/api/",
+            "/fishmb/admin/",
+            "/fishmb/auth/",
+            "/fishmb/dashboard/",
+            "/fishmb/messages/",
+          ],
+        },
+      ],
       sitemap: "https://www.fishmb.ca/sitemap.xml",
     };
   }

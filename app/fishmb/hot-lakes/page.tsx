@@ -8,6 +8,13 @@ export const metadata: Metadata = {
   title: "Hot lakes — what's biting now in Manitoba",
   description:
     "Where Manitoba anglers are catching fish right now — recent bite reports from around the province.",
+  alternates: { canonical: "https://www.fishmb.ca/fishmb/hot-lakes" },
+  openGraph: {
+    title: "Hot lakes — what's biting now in Manitoba | FishMB",
+    description:
+      "Where Manitoba anglers are catching fish right now — recent bite reports from around the province.",
+    url: "https://www.fishmb.ca/fishmb/hot-lakes",
+  },
 };
 
 export const revalidate = 3600;

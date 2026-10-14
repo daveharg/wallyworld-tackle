@@ -17,9 +17,38 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const lodge = getLodge(params.id);
   if (!lodge) return { title: "Lodge not found" };
+  const description = `${lodge.name} (${lodge.location}): species, waters, packages and contact info.`;
   return {
     title: `${lodge.name} — Manitoba fishing lodge`,
-    description: `${lodge.name} (${lodge.location}): species, waters, packages and contact info.`,
+    description,
+    alternates: { canonical: `https://www.fishmb.ca/fishmb/lodges/${lodge.id}` },
+    openGraph: {
+      title: `${lodge.name} — Manitoba fishing lodge | FishMB`,
+      description,
+      url: `https://www.fishmb.ca/fishmb/lodges/${lodge.id}`,
+    },
+  };
+}
+
+function lodgeBreadcrumbJsonLd(lodge: { id: string; name: string }) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "FishMB", item: "https://www.fishmb.ca/" },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Manitoba lodges & guides",
+        item: "https://www.fishmb.ca/fishmb/lodges",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: lodge.name,
+        item: `https://www.fishmb.ca/fishmb/lodges/${lodge.id}`,
+      },
+    ],
   };
 }
 
@@ -41,6 +70,10 @@ export default function LodgeDetailPage({ params }: { params: { id: string } }) 
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 md:py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(lodgeBreadcrumbJsonLd(lodge)) }}
+      />
       <Link
         href="/fishmb/lodges"
         className="text-sm font-bold text-signal uppercase tracking-wider"

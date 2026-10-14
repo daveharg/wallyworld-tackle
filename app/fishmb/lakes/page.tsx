@@ -6,6 +6,13 @@ export const metadata: Metadata = {
   title: "Manitoba lake directory",
   description:
     "Search 271 Manitoba lakes — species, 2026 fishing regulations, stocking history, nearby towns and lodges.",
+  alternates: { canonical: "https://www.fishmb.ca/fishmb/lakes" },
+  openGraph: {
+    title: "Manitoba lake directory | FishMB",
+    description:
+      "Search 271 Manitoba lakes — species, 2026 fishing regulations, stocking history, nearby towns and lodges.",
+    url: "https://www.fishmb.ca/fishmb/lakes",
+  },
 };
 
 export const revalidate = 3600;
@@ -24,8 +31,24 @@ export default function LakesPage({
     photo: l.photo,
     regulations: { division: l.regulations?.division ?? "" },
   }));
+  const itemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Manitoba lakes",
+    numberOfItems: lakes.length,
+    itemListElement: lakes.map((l, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: l.name,
+      url: `https://www.fishmb.ca/fishmb/lakes/${l.id}`,
+    })),
+  };
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 md:py-14">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+      />
       <p className="text-signal text-xs font-bold uppercase tracking-[0.24em] mb-2">
         Lake directory
       </p>

@@ -9,11 +9,21 @@ const FISHMB_BASE = "https://www.fishmb.ca";
 async function fishmbSitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     { url: FISHMB_BASE, changeFrequency: "daily", priority: 1 },
+    { url: `${FISHMB_BASE}/fishmb/app`, changeFrequency: "weekly", priority: 0.9 },
     { url: `${FISHMB_BASE}/fishmb/tips`, changeFrequency: "weekly", priority: 0.9 },
     { url: `${FISHMB_BASE}/fishmb/weather`, changeFrequency: "daily", priority: 0.9 },
+    { url: `${FISHMB_BASE}/fishmb/regulations`, changeFrequency: "monthly", priority: 0.9 },
     { url: `${FISHMB_BASE}/fishmb/tournaments`, changeFrequency: "weekly", priority: 0.8 },
+    {
+      url: `${FISHMB_BASE}/fishmb/tournaments/how-it-works`,
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     { url: `${FISHMB_BASE}/fishmb/lakes`, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${FISHMB_BASE}/fishmb/hot-lakes`, changeFrequency: "daily", priority: 0.7 },
     { url: `${FISHMB_BASE}/fishmb/lodges`, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${FISHMB_BASE}/fishmb/leaderboards`, changeFrequency: "daily", priority: 0.7 },
+    { url: `${FISHMB_BASE}/fishmb/contact`, changeFrequency: "monthly", priority: 0.4 },
   ];
   try {
     const { readFileSync } = await import("fs");
@@ -35,7 +45,18 @@ async function fishmbSitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.5,
       })
     );
-    return [...staticPages, ...lakes, ...lodges];
+    let species: MetadataRoute.Sitemap = [];
+    try {
+      const { getSpeciesAdvice, slugifySpecies } = await import("../lib/fishmb-species");
+      species = getSpeciesAdvice().map((s) => ({
+        url: `${FISHMB_BASE}/fishmb/species/${slugifySpecies(s.species)}`,
+        changeFrequency: "monthly" as const,
+        priority: 0.6,
+      }));
+    } catch {
+      species = [];
+    }
+    return [...staticPages, ...lakes, ...lodges, ...species];
   } catch {
     return staticPages;
   }

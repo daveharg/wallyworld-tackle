@@ -27,9 +27,38 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const lake = getLake(params.id);
   if (!lake) return { title: "Lake not found" };
+  const description = `${lake.name}, ${lake.region} Manitoba: 2026 fishing regulations, species, stocking history and nearby lodges.`;
   return {
     title: `${lake.name} — fishing regulations & lake info`,
-    description: `${lake.name}, ${lake.region} Manitoba: 2026 fishing regulations, species, stocking history and nearby lodges.`,
+    description,
+    alternates: { canonical: `https://www.fishmb.ca/fishmb/lakes/${lake.id}` },
+    openGraph: {
+      title: `${lake.name} — fishing regulations & lake info | FishMB`,
+      description,
+      url: `https://www.fishmb.ca/fishmb/lakes/${lake.id}`,
+    },
+  };
+}
+
+function lakeBreadcrumbJsonLd(lake: { id: string; name: string }) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "FishMB", item: "https://www.fishmb.ca/" },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Manitoba lakes",
+        item: "https://www.fishmb.ca/fishmb/lakes",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: lake.name,
+        item: `https://www.fishmb.ca/fishmb/lakes/${lake.id}`,
+      },
+    ],
   };
 }
 
@@ -205,6 +234,10 @@ export default function LakeDetailPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(lakeBreadcrumbJsonLd(lake)) }}
+      />
       <div className="mb-6 max-w-sm">
         <AddToMyLakesButton lakeId={lake.id} className="w-full" />
       </div>

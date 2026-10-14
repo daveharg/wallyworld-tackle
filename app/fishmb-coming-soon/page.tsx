@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: { absolute: "FishMB — Manitoba's fishing app: maps, catches, tournaments & community" },
   description:
     "Manitoba's fishing companion — fishing maps, a social feed for anglers, encrypted messaging, AI fish-activity weather, catch logging, tournaments and provincial leaderboards. All free.",
+  alternates: { canonical: "https://www.fishmb.ca/" },
   openGraph: {
     title: "FishMB — Manitoba's fishing app: maps, catches, tournaments & community",
     description:
@@ -17,20 +18,45 @@ export const metadata: Metadata = {
     siteName: "FishMB",
     images: [
       {
-        url: "https://www.fishmb.ca/fishmb/icon-512.png",
-        width: 512,
-        height: 512,
+        url: "https://www.fishmb.ca/fishmb/og-share.png",
+        width: 1200,
+        height: 630,
         alt: "FishMB — Manitoba's fishing app",
       },
     ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "FishMB — Manitoba's fishing app: maps, catches, tournaments & community",
     description:
       "Manitoba's fishing companion — fishing maps, a social feed for anglers, encrypted messaging, AI fish-activity weather, catch logging, tournaments and provincial leaderboards. All free.",
-    images: ["https://www.fishmb.ca/fishmb/icon-512.png"],
+    images: ["https://www.fishmb.ca/fishmb/og-share.png"],
   },
+};
+
+const JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.fishmb.ca/#organization",
+      name: "FishMB",
+      url: "https://www.fishmb.ca/",
+      logo: "https://www.fishmb.ca/fishmb/icon-512.png",
+      description:
+        "FishMB is Manitoba's fishing app: lake maps, 2026 fishing regulations for 271 lakes, catch logging, tournaments, leaderboards and a fish-activity forecast. Free for Manitoba anglers.",
+      email: "hello@fishmb.ca",
+      sameAs: ["https://www.facebook.com/profile.php?id=61594977917533"],
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.fishmb.ca/#website",
+      name: "FishMB",
+      url: "https://www.fishmb.ca/",
+      publisher: { "@id": "https://www.fishmb.ca/#organization" },
+      inLanguage: "en-CA",
+    },
+  ],
 };
 
 const SECTIONS = [
@@ -123,6 +149,10 @@ const SECTIONS = [
 export default function FishMBComingSoon() {
   return (
     <div className="min-h-screen bg-pine-deep text-white font-body">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
+      />
       <div className="max-w-3xl mx-auto px-6 py-16 md:py-24 text-center">
         <p className="font-display font-bold uppercase tracking-[0.3em] text-gold text-sm mb-4">
           Coming soon

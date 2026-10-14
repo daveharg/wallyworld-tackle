@@ -13,6 +13,10 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  // All FishMB URLs canonicalize to fishmb.ca, even when the same pages are
+  // served from wallyworldtackle.ca — keeps the two domains from splitting
+  // search ranking. Relative canonicals/OG URLs in child pages resolve here.
+  metadataBase: new URL("https://www.fishmb.ca"),
   title: {
     // absolute: the root layout's "%s | Wallyworld Tackle" template would
     // otherwise wrap this default (templates apply to child-segment titles).
@@ -36,7 +40,6 @@ export const metadata: Metadata = {
     title: "FishMB — Manitoba's fishing app: maps, catches, tournaments & community",
     description:
       "Your Manitoba fishing companion — predicting fish activity, interactive lake maps, log your catches, join tournaments, and connect with local anglers.",
-    url: "https://www.fishmb.ca/fishmb/feed",
     images: [
       {
         url: "https://www.fishmb.ca/fishmb/og-share.png",
@@ -47,11 +50,11 @@ export const metadata: Metadata = {
     ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "FishMB — Manitoba's fishing app: maps, catches, tournaments & community",
     description:
       "Your Manitoba fishing companion — predicting fish activity, interactive lake maps, log your catches, join tournaments, and connect with local anglers.",
-    images: ["https://www.fishmb.ca/fishmb/icon-512.png"],
+    images: ["https://www.fishmb.ca/fishmb/og-share.png"],
   },
   manifest: "/fishmb/manifest.json",
   themeColor: "#1a2e1f",

@@ -2,8 +2,16 @@ import Link from "next/link";
 import { getSpeciesAdvice, slugifySpecies } from "@/lib/fishmb-species";
 
 export const metadata = {
-  title: "Fishing Tips | FishMB",
-  description: "Pick a fish and learn how to catch it — plus tips from Manitoba anglers.",
+  title: "Manitoba fishing tips — how to catch every species",
+  description:
+    "Pick a fish and learn how to catch it in Manitoba — species guides plus tips from Manitoba anglers.",
+  alternates: { canonical: "https://www.fishmb.ca/fishmb/tips" },
+  openGraph: {
+    title: "Manitoba fishing tips — how to catch every species | FishMB",
+    description:
+      "Pick a fish and learn how to catch it in Manitoba — species guides plus tips from Manitoba anglers.",
+    url: "https://www.fishmb.ca/fishmb/tips",
+  },
 };
 
 export default function TipsPage() {

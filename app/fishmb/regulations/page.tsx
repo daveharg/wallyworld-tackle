@@ -8,6 +8,13 @@ export const metadata: Metadata = {
   title: "Manitoba fishing regulations 2026",
   description:
     "2026 Manitoba Anglers' Guide regulations by division — possession limits, size restrictions, seasons — plus waterbody-specific rules for 271 lakes.",
+  alternates: { canonical: "https://www.fishmb.ca/fishmb/regulations" },
+  openGraph: {
+    title: "Manitoba fishing regulations 2026 | FishMB",
+    description:
+      "2026 Manitoba Anglers' Guide regulations by division — possession limits, size restrictions, seasons — plus waterbody-specific rules for 271 lakes.",
+    url: "https://www.fishmb.ca/fishmb/regulations",
+  },
 };
 
 export const revalidate = 3600;

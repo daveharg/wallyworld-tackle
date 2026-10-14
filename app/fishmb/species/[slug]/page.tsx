@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSpeciesAdvice, getSpeciesBySlug, slugifySpecies } from "@/lib/fishmb-species";
@@ -10,6 +11,27 @@ const COORDS = coordsJson as Record<string, { lat: number; lng: number }>;
 
 export async function generateStaticParams() {
   return getSpeciesAdvice().map((s) => ({ slug: slugifySpecies(s.species) }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const advice = getSpeciesBySlug(params.slug);
+  if (!advice) return { title: "Species not found" };
+  const slug = slugifySpecies(advice.species);
+  const description = `How to catch ${advice.species} in Manitoba — best lakes, baits, seasons and techniques from Manitoba anglers.`;
+  return {
+    title: `How to catch ${advice.species} in Manitoba`,
+    description,
+    alternates: { canonical: `https://www.fishmb.ca/fishmb/species/${slug}` },
+    openGraph: {
+      title: `How to catch ${advice.species} in Manitoba | FishMB`,
+      description,
+      url: `https://www.fishmb.ca/fishmb/species/${slug}`,
+    },
+  };
 }
 
 function lakesForSpecies(species: string, limit = 12) {

@@ -3,9 +3,16 @@ import type { Metadata } from "next";
 import BackButton from "../_components/BackButton";
 
 export const metadata: Metadata = {
-  title: "How tournaments work | FishMB",
+  title: "Manitoba fishing tournaments — how FishMB tournaments work",
   description:
     "Learn how FishMB fishing tournaments work — creating, joining, logging catches, anti-cheat, organizer review, and the manage dashboard.",
+  alternates: { canonical: "https://www.fishmb.ca/fishmb/tournaments/how-it-works" },
+  openGraph: {
+    title: "Manitoba fishing tournaments — how FishMB tournaments work | FishMB",
+    description:
+      "Learn how FishMB fishing tournaments work — creating, joining, logging catches, anti-cheat, organizer review, and the manage dashboard.",
+    url: "https://www.fishmb.ca/fishmb/tournaments/how-it-works",
+  },
 };
 
 const steps = [
