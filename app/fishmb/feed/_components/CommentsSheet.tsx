@@ -1,12 +1,22 @@
 // Full-screen Facebook-style comments view.
 // Opens with the post image large at top; after 500ms it auto-collapses
 // to bring the comments into focus.
+//
+// Comments support the shared press-and-hold menu (HoldMenu): Facebook's
+// seven reactions, Reply, Copy, and Report. Reactions go through the
+// real endpoint POST /api/fishmb/feed/<postId>/comments/<id>/react with
+// the codes from lib/fish/reactions.ts.
 
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import { fishFetch } from "../../_components/fishFetch";
 import { useFishAuth } from "../../_components/FishAuth";
+import { HoldMenu, ReactionChips, useLongPress } from "../../_components/HoldMenu";
+import {
+  FEED_REACTION_PICKER,
+  FEED_REACTION_EMOJI,
+} from "@/lib/fish/reactions";
 
 interface Comment {
   id: string;
@@ -14,9 +24,13 @@ interface Comment {
   user_name: string;
   avatar_url?: string | null;
   body: string;
+  photo_url?: string | null;
+  parent_id?: string | null;
   created_at: string;
   like_count?: number;
-  liked?: boolean;
+  dislike_count?: number;
+  reaction_counts?: Record<string, number>;
+  viewer_reaction?: number | null;
   replies?: Comment[];
   is_author?: boolean;
   is_admin?: boolean;
@@ -43,37 +57,46 @@ function timeAgo(iso: string): string {
   return `${Math.floor(s / 86400)}d`;
 }
 
+function chipsOf(c: Comment) {
+  return [...FEED_REACTION_PICKER, -1]
+    .filter((code) => (c.reaction_counts?.[String(code)] ?? 0) > 0)
+    .map((code) => ({
+      key: String(code),
+      emoji: FEED_REACTION_EMOJI[code],
+      n: c.reaction_counts![String(code)],
+      mine: c.viewer_reaction === code,
+    }));
+}
+
 function CommentRow({
   comment,
   postUserId,
   depth = 0,
+  activeId,
   onReply,
+  onReact,
+  onHold,
 }: {
   comment: Comment;
   postUserId: string;
   depth?: number;
+  activeId: string | null;
   onReply: (c: Comment) => void;
+  onReact: (c: Comment, code: number) => void;
+  onHold: (c: Comment, rect: DOMRect) => void;
 }) {
-  const [liked, setLiked] = useState(!!comment.liked);
-  const [likeCount, setLikeCount] = useState(comment.like_count ?? 0);
-
-  const toggleLike = async () => {
-    const next = !liked;
-    setLiked(next);
-    setLikeCount((c) => c + (next ? 1 : -1));
-    try {
-      await fishFetch(`/api/fishmb/feed/comments/${comment.id}/like`, {
-        method: next ? "POST" : "DELETE",
-      });
-    } catch {
-      setLiked(!next);
-      setLikeCount((c) => c + (next ? -1 : 1));
-    }
-  };
-
+  const handlers = useLongPress((rect) => onHold(comment, rect));
+  const chips = chipsOf(comment);
+  const active = activeId === comment.id;
   return (
     <div className={depth > 0 ? "ml-12" : ""}>
-      <div className="flex gap-3 px-4 py-3">
+      <div
+        {...handlers}
+        style={{ WebkitTouchCallout: "none" }}
+        className={`flex gap-3 px-4 py-3 transition-all duration-150 ${
+          active ? "scale-[1.02] bg-signal/5 rounded-2xl shadow-lg ring-1 ring-signal/40 relative z-10" : ""
+        }`}
+      >
         {comment.avatar_url ? (
           <img
             src={comment.avatar_url}
@@ -96,6 +119,11 @@ function CommentRow({
           <p className="text-[15px] text-pine leading-snug mt-0.5 whitespace-pre-wrap break-words">
             {comment.body}
           </p>
+          {comment.photo_url && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={comment.photo_url} alt="" className="mt-2 rounded-xl max-h-48 w-auto object-cover" />
+          )}
+          <ReactionChips chips={chips} onTap={(key) => onReact(comment, Number(key))} />
           <div className="flex items-center gap-4 mt-1.5">
             <button
               type="button"
@@ -104,29 +132,22 @@ function CommentRow({
             >
               Reply
             </button>
-            {likeCount > 0 && (
-              <span className="flex items-center gap-1 text-pine/50 text-[13px] font-bold">
-                <span className="w-5 h-5 rounded-full bg-signal text-white flex items-center justify-center text-[11px]">
-                  👍
-                </span>
-                {likeCount}
-              </span>
-            )}
           </div>
         </div>
         <div className="flex items-start gap-3 shrink-0 pt-1">
           <button
             type="button"
-            onClick={toggleLike}
+            onClick={() => onReact(comment, 1)}
             aria-label="Like comment"
-            className={`text-xl ${liked ? "opacity-100" : "opacity-40 grayscale"}`}
+            className={`text-xl ${comment.viewer_reaction === 1 ? "opacity-100" : "opacity-40 grayscale"}`}
           >
             👍
           </button>
           <button
             type="button"
+            onClick={() => onReact(comment, -1)}
             aria-label="Dislike comment"
-            className="text-xl opacity-40 grayscale"
+            className={`text-xl ${comment.viewer_reaction === -1 ? "opacity-100" : "opacity-40 grayscale"}`}
           >
             👎
           </button>
@@ -138,7 +159,10 @@ function CommentRow({
           comment={r}
           postUserId={postUserId}
           depth={depth + 1}
+          activeId={activeId}
           onReply={onReply}
+          onReact={onReact}
+          onHold={onHold}
         />
       ))}
     </div>
@@ -158,6 +182,8 @@ export default function CommentsSheet({
   const [busy, setBusy] = useState(false);
   const [replyTo, setReplyTo] = useState<Comment | null>(null);
   const [collapsed, setCollapsed] = useState(false);
+  const [hold, setHold] = useState<{ comment: Comment; rect: DOMRect } | null>(null);
+  const [note, setNote] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const photos = post.photos?.length ? post.photos : post.photo_url ? [post.photo_url] : [];
@@ -170,6 +196,75 @@ export default function CommentsSheet({
     const t = setTimeout(() => setCollapsed(true), 500);
     return () => clearTimeout(t);
   }, [post.id]);
+
+  /** Update one comment wherever it sits (top level or nested reply). */
+  const patchComment = (id: string, patch: Partial<Comment>) => {
+    const walk = (list: Comment[]): Comment[] =>
+      list.map((c) =>
+        c.id === id
+          ? { ...c, ...patch }
+          : c.replies
+            ? { ...c, replies: walk(c.replies) }
+            : c
+      );
+    setComments((prev) => walk(prev));
+  };
+
+  const reactToComment = async (comment: Comment, code: number) => {
+    if (!user) {
+      openLogin();
+      return;
+    }
+    const next = comment.viewer_reaction === code ? null : code;
+    try {
+      const d = await fishFetch(
+        `/api/fishmb/feed/${post.id}/comments/${comment.id}/react`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ value: next }),
+        }
+      );
+      patchComment(comment.id, {
+        like_count: d.like_count,
+        dislike_count: d.dislike_count,
+        reaction_counts: d.reaction_counts,
+        viewer_reaction: d.viewer_reaction,
+      });
+      // Keep the open menu's snapshot in sync so its active state is right.
+      setHold((h) =>
+        h && h.comment.id === comment.id
+          ? { ...h, comment: { ...h.comment, reaction_counts: d.reaction_counts, viewer_reaction: d.viewer_reaction } }
+          : h
+      );
+    } catch {
+      // non-fatal
+    }
+  };
+
+  const reportComment = async (comment: Comment) => {
+    try {
+      await fishFetch("/api/fishmb/reports", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ target_type: "comment", target_id: comment.id, reason: "" }),
+      });
+      setNote("Reported — thanks. We review every report within 24 hours.");
+    } catch {
+      setNote("Couldn't send the report — try again.");
+    }
+    setTimeout(() => setNote(null), 3000);
+  };
+
+  const copyComment = async (comment: Comment) => {
+    try {
+      await navigator.clipboard.writeText(comment.body);
+      setNote("Copied.");
+      setTimeout(() => setNote(null), 2000);
+    } catch {
+      // Clipboard unavailable — nothing sensible to fall back to here.
+    }
+  };
 
   const send = async () => {
     if (!user) {
@@ -207,6 +302,8 @@ export default function CommentsSheet({
     }
   };
 
+  const holdComment = hold ? comments.find((c) => c.id === hold.comment.id) ?? hold.comment : null;
+
   return (
     <div className="fixed inset-0 z-[1200] bg-white flex flex-col">
       {/* Header */}
@@ -227,6 +324,12 @@ export default function CommentsSheet({
           •••
         </button>
       </div>
+
+      {note && (
+        <p className="px-4 py-2 text-sm font-bold text-signal-dark bg-signal/10 border-b border-signal/20">
+          {note}
+        </p>
+      )}
 
       {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto">
@@ -267,10 +370,13 @@ export default function CommentsSheet({
               key={c.id}
               comment={c}
               postUserId={post.user_id}
+              activeId={hold?.comment.id ?? null}
               onReply={(comment) => {
                 setReplyTo(comment);
                 inputRef.current?.focus();
               }}
+              onReact={reactToComment}
+              onHold={(comment, rect) => setHold({ comment, rect })}
             />
           ))}
           {comments.length === 0 && (
@@ -280,6 +386,44 @@ export default function CommentsSheet({
           )}
         </div>
       </div>
+
+      {/* Press-and-hold menu for a comment */}
+      {hold && holdComment && (
+        <HoldMenu
+          anchor={hold.rect}
+          reactions={FEED_REACTION_PICKER.map((code) => ({
+            key: String(code),
+            emoji: FEED_REACTION_EMOJI[code],
+            active: holdComment.viewer_reaction === code,
+          }))}
+          onPickReaction={(key) => reactToComment(holdComment, Number(key))}
+          actions={[
+            {
+              icon: "↩️",
+              label: "Reply",
+              onSelect: () => {
+                setReplyTo(holdComment);
+                inputRef.current?.focus();
+              },
+            },
+            {
+              icon: "📋",
+              label: "Copy text",
+              onSelect: () => copyComment(holdComment),
+            },
+            ...(user && holdComment.user_id !== user.id
+              ? [
+                  {
+                    icon: "🚩",
+                    label: "Report comment",
+                    onSelect: () => reportComment(holdComment),
+                  },
+                ]
+              : []),
+          ]}
+          onClose={() => setHold(null)}
+        />
+      )}
 
       {/* Comment input */}
       <div className="border-t border-pine/10 bg-white px-3 py-2.5 shrink-0">

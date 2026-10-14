@@ -14,6 +14,11 @@ import YouTubeEmbed, { extractYouTubeId } from "../_components/YouTubeEmbed";
 import { TournamentBuilder } from "../tournaments/_components/TournamentBuilder";
 import { JoinByCode } from "../tournaments/_components/JoinByCode";
 import CommentsSheet from "./_components/CommentsSheet";
+import { HoldMenu, ReactionChips, useLongPress } from "../_components/HoldMenu";
+import {
+  FEED_REACTION_PICKER,
+  FEED_REACTION_EMOJI,
+} from "@/lib/fish/reactions";
 import StoriesRow from "./_components/StoriesRow";
 import SettingsModal from "../_components/SettingsModal";
 import dynamic from "next/dynamic";
@@ -281,8 +286,10 @@ interface FeedItem {
   comment_count: number;
   like_count: number;
   dislike_count: number;
+  laugh_count?: number;
+  reaction_counts?: Record<string, number>;
   share_count?: number;
-  viewer_reaction: 1 | -1 | null;
+  viewer_reaction: number | null;
   created_at: string;
 }
 
@@ -296,8 +303,34 @@ interface FeedComment {
   parent_id: string | null;
   like_count: number;
   dislike_count: number;
-  viewer_reaction: 1 | -1 | null;
+  reaction_counts?: Record<string, number>;
+  viewer_reaction: number | null;
   created_at: string;
+}
+
+/** Wrapper that makes a feed card holdable: long-press / right-click
+ *  opens the shared hold menu; while open the card "pops". */
+function Holdable({
+  onHold,
+  active,
+  children,
+}: {
+  onHold: (rect: DOMRect) => void;
+  active: boolean;
+  children: React.ReactNode;
+}) {
+  const handlers = useLongPress(onHold);
+  return (
+    <div
+      {...handlers}
+      style={{ WebkitTouchCallout: "none" }}
+      className={`rounded-3xl transition-all duration-150 ${
+        active ? "scale-[1.015] shadow-2xl ring-2 ring-signal/50 relative z-20" : ""
+      }`}
+    >
+      {children}
+    </div>
+  );
 }
 
 function timeAgo(iso: string): string {
@@ -712,13 +745,13 @@ function Reactions({
   onShare,
 }: {
   item: FeedItem;
-  onReacted: (id: string, r: { like_count: number; dislike_count: number; viewer_reaction: 1 | -1 | null }) => void;
+  onReacted: (id: string, r: { like_count: number; dislike_count: number; laugh_count?: number; reaction_counts?: Record<string, number>; viewer_reaction: number | null }) => void;
   onShare: (id: string) => void;
 }) {
   const { user, openLogin } = useFishAuth();
   const [busy, setBusy] = useState(false);
 
-  const react = async (value: 1 | -1) => {
+  const react = async (value: number) => {
     if (!user) {
       openLogin();
       return;
@@ -741,7 +774,18 @@ function Reactions({
     }
   };
 
-  const btn = (value: 1 | -1, icon: React.ReactNode, count: number, label: string) => {
+  // Every reaction type with a positive count, picker order (legacy 👎
+  // last) — tapping a chip toggles that reaction.
+  const chips = [...FEED_REACTION_PICKER, -1]
+    .filter((code) => (item.reaction_counts?.[String(code)] ?? 0) > 0)
+    .map((code) => ({
+      key: String(code),
+      emoji: FEED_REACTION_EMOJI[code],
+      n: item.reaction_counts![String(code)],
+      mine: item.viewer_reaction === code,
+    }));
+
+  const btn = (value: number, icon: React.ReactNode, count: number, label: string) => {
     const active = item.viewer_reaction === value;
     return (
       <button
@@ -777,7 +821,9 @@ function Reactions({
   };
 
   return (
-    <div className="flex items-center gap-4">
+    <div>
+      <ReactionChips chips={chips} onTap={(key) => react(Number(key))} />
+      <div className="flex items-center gap-4">
       {btn(1, thumbsUp, item.like_count, "Like")}
       {btn(-1, thumbsDown, item.dislike_count, "Dislike")}
       <button
@@ -793,6 +839,7 @@ function Reactions({
         </span>
         <span className="tabular-nums">{item.share_count ?? 0}</span>
       </button>
+      </div>
     </div>
   );
 }
@@ -1683,9 +1730,70 @@ function FeedPageInner() {
 
   const handleReacted = (
     id: string,
-    r: { like_count: number; dislike_count: number; viewer_reaction: 1 | -1 | null }
+    r: { like_count: number; dislike_count: number; laugh_count?: number; reaction_counts?: Record<string, number>; viewer_reaction: number | null }
   ) => {
     setItems((prev) => prev.map((it) => (it.id === id ? { ...it, ...r } : it)));
+  };
+
+  // Press-and-hold menu on a post card (Facebook-style react + actions).
+  const [holdPost, setHoldPost] = useState<{ item: FeedItem; rect: DOMRect } | null>(null);
+
+  const reactWithCode = async (item: FeedItem, code: number) => {
+    if (!user) {
+      openLogin();
+      return;
+    }
+    const next = item.viewer_reaction === code ? null : code;
+    try {
+      const d = await fishFetch(`/api/fishmb/feed/${item.id}/react`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ value: next }),
+      });
+      handleReacted(item.id, d);
+    } catch {
+      // non-fatal
+    }
+  };
+
+  const reportPost = async (item: FeedItem) => {
+    try {
+      await fishFetch("/api/fishmb/reports", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          target_type: item.kind === "catch" ? "catch" : "post",
+          target_id: item.id,
+          reason: "",
+        }),
+      });
+      setShareNote("Reported — thanks. We review every report within 24 hours.");
+    } catch {
+      setShareNote("Couldn't send the report — try again.");
+    }
+    setTimeout(() => setShareNote(null), 3000);
+  };
+
+  const blockAuthor = async (item: FeedItem) => {
+    try {
+      await fishFetch("/api/fishmb/blocks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: item.user_id }),
+      });
+      handleAuthorBlocked(item.user_id);
+    } catch {
+      // non-fatal
+    }
+  };
+
+  const deletePost = async (item: FeedItem) => {
+    try {
+      await fishFetch(`/api/fishmb/feed/${item.id}`, { method: "DELETE" });
+      handlePostDeleted(item.id);
+    } catch {
+      // non-fatal
+    }
   };
 
   const handleShare = async (id: string) => {
@@ -2495,6 +2603,10 @@ function FeedPageInner() {
             );
             return (
             <Fragment key={item.id}>
+            <Holdable
+              onHold={(rect) => setHoldPost({ item, rect })}
+              active={holdPost?.item.id === item.id}
+            >
             <article className="bg-white border border-pine/10 rounded-3xl overflow-hidden max-sm:-mx-4 max-sm:rounded-none max-sm:border-x-0">
               {hasVideo ? (
                 <div className="relative">
@@ -2614,6 +2726,7 @@ function FeedPageInner() {
                 </div>
               </div>
             </article>
+            </Holdable>
             {/* Interleave a sponsored ad after every 8th post */}
             {feedAds.length > 0 && (idx + 1) % 8 === 0 && (
               <FeedAdCard ad={feedAds[Math.floor((idx + 1) / 8 - 1) % feedAds.length]} />
@@ -3187,6 +3300,59 @@ function FeedPageInner() {
         </div>
       )}
 
+
+      {/* Press-and-hold menu for a post card */}
+      {holdPost && (
+        <HoldMenu
+          anchor={holdPost.rect}
+          reactions={FEED_REACTION_PICKER.map((code) => ({
+            key: String(code),
+            emoji: FEED_REACTION_EMOJI[code],
+            active: holdPost.item.viewer_reaction === code,
+          }))}
+          onPickReaction={(key) => reactWithCode(holdPost.item, Number(key))}
+          actions={[
+            {
+              icon: "💬",
+              label: "Comment",
+              onSelect: () => setCommentsPost(holdPost.item),
+            },
+            {
+              icon: "🔗",
+              label: "Share",
+              onSelect: () => handleShare(holdPost.item.id),
+            },
+            ...(user && user.id === holdPost.item.user_id
+              ? [
+                  {
+                    icon: "🗑️",
+                    label: holdPost.item.kind === "catch" ? "Remove from feed" : "Delete post",
+                    danger: true,
+                    confirmLabel: "Tap again to delete",
+                    onSelect: () => deletePost(holdPost.item),
+                  },
+                ]
+              : []),
+            ...(user && user.id !== holdPost.item.user_id
+              ? [
+                  {
+                    icon: "🚩",
+                    label: `Report ${holdPost.item.kind === "catch" ? "catch" : "post"}`,
+                    onSelect: () => reportPost(holdPost.item),
+                  },
+                  {
+                    icon: "🚫",
+                    label: `Block ${holdPost.item.user_name}`,
+                    danger: true,
+                    confirmLabel: `Tap again to block ${holdPost.item.user_name}`,
+                    onSelect: () => blockAuthor(holdPost.item),
+                  },
+                ]
+              : []),
+          ]}
+          onClose={() => setHoldPost(null)}
+        />
+      )}
 
       {/* Full-screen Facebook-style comments */}
       {commentsPost && (
