@@ -31,16 +31,19 @@ interface LakeEntry {
 /**
  * Top-left map search — finds Manitoba lakes (local database), bait & tackle
  * shops (the shop directory), plus towns/cities (OpenStreetMap Nominatim).
- * Tapping a result flies the map there; a shop result also opens its card.
+ * Tapping a result flies the map there; a shop result also opens its card,
+ * and a lake result opens the lake's slide-up page when onSelectLake is given.
  */
 export default function MapSearch({
   onSelect,
   shops,
   onSelectShop,
+  onSelectLake,
 }: {
   onSelect: (lat: number, lng: number, label: string) => void;
   shops?: ShopSearchItem[];
   onSelectShop?: (id: string) => void;
+  onSelectLake?: (id: string) => void;
 }) {
   const shopsRef = useRef<ShopSearchItem[]>([]);
   shopsRef.current = shops ?? [];
@@ -185,6 +188,10 @@ export default function MapSearch({
     setQ(r.name);
     if (r.kind === "shop" && onSelectShop) {
       onSelectShop(r.id.slice("shop:".length));
+      return;
+    }
+    if (r.kind === "lake" && onSelectLake) {
+      onSelectLake(r.id.slice("lake:".length));
       return;
     }
     onSelect(r.lat, r.lng, r.name);

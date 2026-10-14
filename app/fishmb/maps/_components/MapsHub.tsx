@@ -490,7 +490,9 @@ export default function MapsHub() {
     }
   };
 
-  // Load the full lake list once for the spot-edit lake search.
+  // Load the full lake list once for the spot-edit lake search, plus the
+  // lake coordinates so a top-bar search pick can open the lake's sheet.
+  const lakeCoords = useRef<Record<string, { lat: number; lng: number }>>({});
   useEffect(() => {
     fetch("/fish-manitoba/data.json")
       .then((r) => r.json())
@@ -501,6 +503,12 @@ export default function MapsHub() {
           region: l.region,
         }));
         setAllLakes(lakes);
+      })
+      .catch(() => {});
+    fetch("/fishmb/lake-coords.json")
+      .then((r) => r.json())
+      .then((c) => {
+        lakeCoords.current = c as Record<string, { lat: number; lng: number }>;
       })
       .catch(() => {});
   }, []);
@@ -1309,6 +1317,17 @@ export default function MapsHub() {
           setTimeout(() => setNote(null), 2500);
         }}
         shops={allShops}
+        onSelectLake={(id) => {
+          const base = allLakes.find((l) => l.id === id);
+          const c = lakeCoords.current[id];
+          openLake({
+            id,
+            name: base?.name ?? id,
+            region: base?.region,
+            lat: c?.lat ?? null,
+            lng: c?.lng ?? null,
+          });
+        }}
         onSelectShop={(id) => {
           const s = allShops.find((x) => x.id === id);
           if (!s) return;
