@@ -16,7 +16,7 @@ import {
   badRequest,
   forbidden,
 } from "@/lib/fish/auth";
-import { isMember, listMessages, storeMessage, getReactions, getPublicKeys } from "@/lib/fish/messages";
+import { isMember, listMessages, storeMessage, getLogicalReactions, getPublicKeys } from "@/lib/fish/messages";
 import { isDeviceIdentity } from "@/lib/fish/signal";
 import { blockedEitherWay } from "@/lib/fish/moderation";
 
@@ -40,13 +40,23 @@ export async function GET(
   if (g.err) return g.err;
   const after = new URL(req.url).searchParams.get("after") ?? undefined;
   const messages = await listMessages(id, g.me!.id, after);
-  const reactionMap = await getReactions(
-    messages.map((m) => m.id),
-    g.me!.id
-  );
+  // Reactions key off the LOGICAL message (sender + server-stamped
+  // created_at, shared by every copy of a send), never the row id.
+  const seen = new Set<string>();
+  const keys: { sender_id: string; created_at: string }[] = [];
+  for (const m of messages) {
+    const iso = new Date(m.created_at).toISOString();
+    const k = `${m.sender_id}|${iso}`;
+    if (!seen.has(k)) {
+      seen.add(k);
+      keys.push({ sender_id: m.sender_id, created_at: iso });
+    }
+  }
+  const reactionMap = await getLogicalReactions(id, keys, g.me!.id);
   const withReactions = messages.map((m) => ({
     ...m,
-    reactions: reactionMap.get(m.id) ?? [],
+    reactions:
+      reactionMap.get(`${m.sender_id}|${new Date(m.created_at).toISOString()}`) ?? [],
   }));
   return NextResponse.json({ messages: withReactions });
 }

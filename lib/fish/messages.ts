@@ -68,7 +68,90 @@ export interface StoredMessage {
   reactions?: { emoji: string; n: number; mine: boolean }[];
 }
 
-/** Fetch reaction summaries for a batch of message IDs. Never throws. */
+export interface LogicalMessageKey {
+  sender_id: string;
+  /** ISO timestamp of the send (client-visible, millisecond precision). */
+  created_at: string;
+}
+
+/**
+ * Reaction summaries for a batch of LOGICAL messages in one conversation,
+ * keyed by `${sender_id}|${created_at}` (see lib/fish/reactions.ts).
+ * `mine` marks summaries the viewer contributed to. Never throws.
+ */
+export async function getLogicalReactions(
+  conversationId: string,
+  keys: LogicalMessageKey[],
+  viewerId: string
+): Promise<Map<string, { emoji: string; n: number; mine: boolean }[]>> {
+  const map = new Map<string, { emoji: string; n: number; mine: boolean }[]>();
+  if (keys.length === 0) return map;
+  try {
+    await ensureMsgTables();
+    const senders = keys.map((k) => k.sender_id);
+    const stamps = keys.map((k) => k.created_at);
+    const rows = (await query(
+      `SELECT sender_id,
+              to_char(msg_created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS msg_iso,
+              emoji, COUNT(*)::int AS n, BOOL_OR(user_id = $4) AS mine
+         FROM fm_msg_reactions
+        WHERE conversation_id = $1
+          AND (sender_id, msg_created_at) IN (
+            SELECT UNNEST($2::uuid[]), UNNEST($3::timestamptz[])
+          )
+        GROUP BY sender_id, msg_created_at, emoji`,
+      [conversationId, senders, stamps, viewerId]
+    )) as { sender_id: string; msg_iso: string; emoji: string; n: number; mine: boolean }[];
+    for (const r of rows) {
+      const key = `${r.sender_id}|${r.msg_iso}`;
+      const arr = map.get(key) ?? [];
+      arr.push({ emoji: r.emoji, n: r.n, mine: r.mine });
+      map.set(key, arr);
+    }
+  } catch {
+    // Reactions are optional — never break message loading.
+  }
+  return map;
+}
+
+/**
+ * Set (or clear, with emoji = null) the viewer's reaction on one logical
+ * message. Returns the message's updated summaries for the viewer.
+ */
+export async function toggleLogicalReaction(
+  conversationId: string,
+  key: LogicalMessageKey,
+  userId: string,
+  emoji: string | null
+): Promise<{ emoji: string; n: number; mine: boolean }[]> {
+  await ensureMsgTables();
+  if (emoji === null) {
+    await query(
+      `DELETE FROM fm_msg_reactions
+        WHERE conversation_id = $1 AND sender_id = $2
+          AND msg_created_at = date_trunc('milliseconds', $3::timestamptz)
+          AND user_id = $4`,
+      [conversationId, key.sender_id, key.created_at, userId]
+    );
+  } else {
+    await query(
+      `INSERT INTO fm_msg_reactions (conversation_id, sender_id, msg_created_at, user_id, emoji)
+       VALUES ($1, $2, date_trunc('milliseconds', $3::timestamptz), $4, $5)
+       ON CONFLICT (conversation_id, sender_id, msg_created_at, user_id)
+       DO UPDATE SET emoji = EXCLUDED.emoji, created_at = now()`,
+      [conversationId, key.sender_id, key.created_at, userId, emoji]
+    );
+  }
+  const map = await getLogicalReactions(conversationId, [key], userId);
+  const canon = new Date(key.created_at).toISOString();
+  return map.get(`${key.sender_id}|${canon}`) ?? [];
+}
+
+/**
+ * Fetch reaction summaries for a batch of message IDs. Never throws.
+ * @deprecated Per-copy row-id keying — superseded by getLogicalReactions;
+ * kept only because StoredMessage.reactions was typed around it.
+ */
 export async function getReactions(
   messageIds: string[],
   viewerId: string
@@ -206,6 +289,41 @@ export async function ensureMsgTables(): Promise<void> {
   await query(
     `CREATE INDEX IF NOT EXISTS fm_reactions_msg_idx ON fm_message_reactions (message_id)`
   );
+  // Logical-message reactions: the table above keys off the per-copy ROW
+  // id, but a send fans out to one row per (recipient, key/device), so a
+  // reaction stored there never shows on anyone else's copy. This table
+  // keys off the shared logical identity of a send — (conversation_id,
+  // sender_id, msg_created_at) — with the timestamp truncated to
+  // milliseconds, which is the precision clients ever see. One reaction
+  // per user per logical message (Facebook semantics: picking another
+  // emoji switches, picking the same one removes it).
+  await query(`CREATE TABLE IF NOT EXISTS fm_msg_reactions (
+    conversation_id uuid NOT NULL REFERENCES fm_conversations(id) ON DELETE CASCADE,
+    sender_id uuid NOT NULL,
+    msg_created_at timestamptz NOT NULL,
+    user_id uuid NOT NULL REFERENCES fm_users(id) ON DELETE CASCADE,
+    emoji text NOT NULL,
+    created_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (conversation_id, sender_id, msg_created_at, user_id)
+  )`);
+  await query(
+    `CREATE INDEX IF NOT EXISTS fm_msg_reactions_key_idx
+       ON fm_msg_reactions (conversation_id, sender_id, msg_created_at)`
+  );
+  // Lazy one-way copy of the old per-row reactions into the logical
+  // table (joined through fm_messages for the key). Idempotent: runs on
+  // every cold start, ON CONFLICT DO NOTHING keeps it a no-op once done.
+  await query(
+    `INSERT INTO fm_msg_reactions (conversation_id, sender_id, msg_created_at, user_id, emoji, created_at)
+     SELECT m.conversation_id, m.sender_id,
+            date_trunc('milliseconds', m.created_at),
+            r.user_id, r.emoji, r.created_at
+       FROM fm_message_reactions r
+       JOIN fm_messages m ON m.id = r.message_id
+     ON CONFLICT DO NOTHING`
+  ).catch(() => {
+    // Reactions are optional — a copy hiccup must never break messaging.
+  });
   ensured = true;
 }
 
