@@ -50,6 +50,18 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       .slice(0, 8);
     set("photos", JSON.stringify(photos));
   }
+  if (typeof body.sells_live_bait === "boolean") set("sells_live_bait", body.sells_live_bait);
+  if (typeof body.sells_tackle === "boolean") set("sells_tackle", body.sells_tackle);
+  if (body.lat === null && body.lng === null) {
+    set("lat", null);
+    set("lng", null);
+  } else if (
+    typeof body.lat === "number" && typeof body.lng === "number" &&
+    body.lat >= -90 && body.lat <= 90 && body.lng >= -180 && body.lng <= 180
+  ) {
+    set("lat", body.lat);
+    set("lng", body.lng);
+  }
   if (updates.length === 0) return badRequest("Nothing to update.");
   vals.push(params.id);
   const rows = await query(

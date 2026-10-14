@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import type {
   BasemapId,
   CatchPin,
+  ShopPin,
   SpotPin,
   TrailPoint,
 } from "../../profile/_components/SpotMap";
@@ -282,6 +283,100 @@ export default function MapsHub() {
       // Best effort.
     }
   };
+  // Shop overlays — the Shops widget carries two layer toggles: bait shops
+  // and tackle & rods. Both default ON; the widget itself defaults ON and
+  // can be hidden here or from Settings → Widgets.
+  const [shopsWidgetOn, setShopsWidgetOn] = useState(() => {
+    try {
+      return localStorage.getItem("fishmb-widget-shops") !== "0";
+    } catch {
+      return true;
+    }
+  });
+  const changeShopsWidget = (v: boolean) => {
+    setShopsWidgetOn(v);
+    try {
+      localStorage.setItem("fishmb-widget-shops", v ? "1" : "0");
+    } catch {
+      // Best effort.
+    }
+  };
+  const [baitShopsOn, setBaitShopsOn] = useState(() => {
+    try {
+      return localStorage.getItem("fishmb-layer-bait-shops") !== "0";
+    } catch {
+      return true;
+    }
+  });
+  const changeBaitShops = (v: boolean) => {
+    setBaitShopsOn(v);
+    try {
+      localStorage.setItem("fishmb-layer-bait-shops", v ? "1" : "0");
+    } catch {
+      // Best effort.
+    }
+  };
+  const [tackleShopsOn, setTackleShopsOn] = useState(() => {
+    try {
+      return localStorage.getItem("fishmb-layer-tackle-shops") !== "0";
+    } catch {
+      return true;
+    }
+  });
+  const changeTackleShops = (v: boolean) => {
+    setTackleShopsOn(v);
+    try {
+      localStorage.setItem("fishmb-layer-tackle-shops", v ? "1" : "0");
+    } catch {
+      // Best effort.
+    }
+  };
+  interface ShopItem {
+    id: string;
+    name: string;
+    town: string;
+    address: string | null;
+    lat: number;
+    lng: number;
+    phone: string | null;
+    website: string | null;
+    contact: string | null;
+    sells_bait: boolean;
+    sells_tackle: boolean;
+    bait_types: string | null;
+    business_id: string | null;
+  }
+  const [allShops, setAllShops] = useState<ShopItem[]>([]);
+  const [selectedShop, setSelectedShop] = useState<ShopItem | null>(null);
+  useEffect(() => {
+    // Fetched once on mount regardless of the layer toggles — the top
+    // search bar finds shops even when both overlays are off.
+    let live = true;
+    fishFetch("/api/fishmb/shops")
+      .then((d) => {
+        if (live) setAllShops(((d as { items?: ShopItem[] }).items ?? []));
+      })
+      .catch(() => {
+        // Shops are an extra layer — failing silently is fine.
+      });
+    return () => {
+      live = false;
+    };
+  }, []);
+  const shopPins: ShopPin[] = useMemo(
+    () =>
+      allShops
+        .filter((s) => (s.sells_bait && baitShopsOn) || (s.sells_tackle && tackleShopsOn))
+        .map((s) => ({
+          id: s.id,
+          name: s.name,
+          lat: s.lat,
+          lng: s.lng,
+          sells_bait: s.sells_bait && baitShopsOn,
+          sells_tackle: s.sells_tackle && tackleShopsOn,
+        })),
+    [allShops, baitShopsOn, tackleShopsOn]
+  );
   // The widget-settings shortcut button (top-left of the map) is itself a
   // widget: ON for everyone until turned off in Settings → Widgets.
   const [widgetBtnOn, setWidgetBtnOn] = useState(() => {
@@ -331,6 +426,7 @@ export default function MapsHub() {
   // Pointer-down spot for the catch-toggle widget buttons, so a widget drag
   // doesn't also flip a switch on release.
   const catchToggleDown = useRef<{ x: number; y: number } | null>(null);
+  const shopToggleDown = useRef<{ x: number; y: number } | null>(null);
 
   // (0,0) is "Null Island" — never a real spot or GPS fix. Treat as invalid
   // so the map can't get stuck in the ocean.
@@ -1146,6 +1242,11 @@ export default function MapsHub() {
                 null;
               if (full) { setCatchEditing(false); setSelectedCatch(full); }
             }}
+            shopPins={shopPins}
+            onShopClick={(pin) => {
+              const full = allShops.find((s) => s.id === pin.id) ?? null;
+              if (full) setSelectedShop(full);
+            }}
             basemap={basemap}
             onMoveEnd={onMoveEnd}
             panTo={followPan}
@@ -1207,6 +1308,18 @@ export default function MapsHub() {
           setNote(`Showing ${label}`);
           setTimeout(() => setNote(null), 2500);
         }}
+        shops={allShops}
+        onSelectShop={(id) => {
+          const s = allShops.find((x) => x.id === id);
+          if (!s) return;
+          // Make sure the shop's pin layer is visible, then fly to the
+          // marker and open its card.
+          if (s.sells_bait && !baitShopsOn) changeBaitShops(true);
+          if (s.sells_tackle && !tackleShopsOn) changeTackleShops(true);
+          setMapCenter({ lat: s.lat, lng: s.lng });
+          setFocus({ lat: s.lat, lng: s.lng, key: `shop:${s.id}:${Date.now()}`, zoom: 14 });
+          setSelectedShop(s);
+        }}
       />
 
       {/* Catch pin toggles — draggable widget, auto-starts below the search
@@ -1230,6 +1343,49 @@ export default function MapsHub() {
               onClick={(e) => {
                 // Ignore the click if this was a widget drag, not a tap.
                 const d = catchToggleDown.current;
+                if (d && Math.hypot(e.clientX - d.x, e.clientY - d.y) > 8) return;
+                t.set(!t.on);
+              }}
+              className="flex items-center gap-2 w-full"
+              aria-pressed={t.on}
+            >
+              <span
+                className={`w-9 h-5 rounded-full p-0.5 transition-colors shrink-0 ${
+                  t.on ? "bg-signal" : "bg-pine/15"
+                }`}
+              >
+                <span
+                  className={`block w-4 h-4 rounded-full bg-white shadow transition-transform ${
+                    t.on ? "translate-x-4" : ""
+                  }`}
+                />
+              </span>
+              <span className="text-[11px] font-bold text-pine whitespace-nowrap">{t.label}</span>
+            </button>
+          ))}
+        </div>
+      </DraggableWidget>
+      )}
+
+      {/* Shop overlay toggles — bait shops and tackle & rods are SEPARATE
+          layers, flipped from this one Shops widget (or Settings). */}
+      {shopsWidgetOn && (
+      <DraggableWidget id="shops" defaultPos={{ x: 12, y: 398 }} onClose={() => changeShopsWidget(false)}>
+        <div className="bg-white/95 backdrop-blur border border-pine/15 rounded-2xl shadow-lg px-3 py-2 space-y-1.5">
+          {(
+            [
+              { label: "🪱 Bait shops", on: baitShopsOn, set: changeBaitShops },
+              { label: "🎣 Tackle & rods", on: tackleShopsOn, set: changeTackleShops },
+            ] as const
+          ).map((t) => (
+            <button
+              key={t.label}
+              type="button"
+              onPointerDown={(e) => {
+                shopToggleDown.current = { x: e.clientX, y: e.clientY };
+              }}
+              onClick={(e) => {
+                const d = shopToggleDown.current;
                 if (d && Math.hypot(e.clientX - d.x, e.clientY - d.y) > 8) return;
                 t.set(!t.on);
               }}
@@ -1482,6 +1638,12 @@ export default function MapsHub() {
             onShowFriendCatchesChange={changeShowFriendCatches}
             catchesWidgetOn={catchesWidgetOn}
             onCatchesWidgetChange={changeCatchesWidget}
+            shopsWidgetOn={shopsWidgetOn}
+            onShopsWidgetChange={changeShopsWidget}
+            baitShopsOn={baitShopsOn}
+            onBaitShopsChange={changeBaitShops}
+            tackleShopsOn={tackleShopsOn}
+            onTackleShopsChange={changeTackleShops}
             widgetBtnOn={widgetBtnOn}
             onWidgetBtnChange={changeWidgetBtn}
             followDot={followDot}
@@ -1791,6 +1953,80 @@ export default function MapsHub() {
       )}
 
       {/* Catch detail sheet — tap a catch pin on the map */}
+      {selectedShop && (
+        <div
+          className="fixed inset-0 z-[1200] flex items-end justify-center bg-pine-deep/50 backdrop-blur-sm"
+          onClick={() => setSelectedShop(null)}
+        >
+          <div
+            className="bg-paper rounded-t-3xl p-6 pt-3 pb-10 w-full sm:max-w-md shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-10 h-1 rounded-full bg-pine/20 mx-auto mb-4" />
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="font-display font-bold text-pine text-2xl leading-tight">{selectedShop.name}</h3>
+              <button
+                type="button"
+                onClick={() => setSelectedShop(null)}
+                aria-label="Close"
+                className="w-9 h-9 rounded-full bg-pine/5 text-pine font-bold shrink-0"
+              >
+                ×
+              </button>
+            </div>
+            {(selectedShop.town || selectedShop.address) && (
+              <p className="text-pine/60 text-sm mt-1">
+                {[selectedShop.address, selectedShop.town].filter(Boolean).join(" · ")}
+              </p>
+            )}
+            <div className="flex flex-wrap gap-2 mt-4">
+              {selectedShop.sells_bait && (
+                <span className="bg-gold/20 border border-gold/50 text-pine text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">
+                  🪱 Live bait{selectedShop.bait_types ? ` — ${selectedShop.bait_types}` : ""}
+                </span>
+              )}
+              {selectedShop.sells_tackle && (
+                <span className="bg-pine/10 border border-pine/20 text-pine text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">
+                  🎣 Tackle & rods
+                </span>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2.5 mt-6">
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination=${selectedShop.lat},${selectedShop.lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs px-5 py-3 rounded-full transition-colors"
+              >
+                Directions →
+              </a>
+              {(selectedShop.phone || selectedShop.contact) && (
+                <span className="bg-white border border-pine/15 text-pine font-bold text-xs px-5 py-3 rounded-full">
+                  {selectedShop.phone || selectedShop.contact}
+                </span>
+              )}
+              {selectedShop.website && (
+                <a
+                  href={selectedShop.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white border border-pine/15 text-pine font-bold uppercase tracking-wider text-xs px-5 py-3 rounded-full"
+                >
+                  Website →
+                </a>
+              )}
+              {selectedShop.business_id && (
+                <Link
+                  href={`/fishmb/business/${selectedShop.business_id}`}
+                  className="bg-white border border-pine/15 text-pine font-bold uppercase tracking-wider text-xs px-5 py-3 rounded-full"
+                >
+                  Business page →
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
       {selectedCatch && (
         <div
           className="fixed inset-0 z-[1200] flex items-end justify-center bg-pine-deep/50 backdrop-blur-sm"

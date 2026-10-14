@@ -8,7 +8,18 @@ interface SearchResult {
   detail: string;
   lat: number;
   lng: number;
-  kind: "lake" | "place";
+  kind: "lake" | "place" | "shop";
+}
+
+export interface ShopSearchItem {
+  id: string;
+  name: string;
+  town: string;
+  address: string | null;
+  lat: number;
+  lng: number;
+  sells_bait: boolean;
+  sells_tackle: boolean;
 }
 
 interface LakeEntry {
@@ -18,14 +29,21 @@ interface LakeEntry {
 }
 
 /**
- * Top-left map search — finds Manitoba lakes (local database) plus
- * towns/cities (OpenStreetMap Nominatim). Tapping a result flies the map there.
+ * Top-left map search — finds Manitoba lakes (local database), bait & tackle
+ * shops (the shop directory), plus towns/cities (OpenStreetMap Nominatim).
+ * Tapping a result flies the map there; a shop result also opens its card.
  */
 export default function MapSearch({
   onSelect,
+  shops,
+  onSelectShop,
 }: {
   onSelect: (lat: number, lng: number, label: string) => void;
+  shops?: ShopSearchItem[];
+  onSelectShop?: (id: string) => void;
 }) {
+  const shopsRef = useRef<ShopSearchItem[]>([]);
+  shopsRef.current = shops ?? [];
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -99,7 +117,29 @@ export default function MapSearch({
         lng: l.lng as number,
         kind: "lake" as const,
       }));
-    setResults(lakeHits);
+    // Shop matches — by business name or town, shown first.
+    const shopHits: SearchResult[] = shopsRef.current
+      .filter(
+        (s) =>
+          s.name.toLowerCase().includes(lower) ||
+          (s.town && s.town.toLowerCase().includes(lower))
+      )
+      .slice(0, 4)
+      .map((s) => ({
+        id: `shop:${s.id}`,
+        name: s.name,
+        detail: [
+          s.sells_bait ? "🪱 Bait" : null,
+          s.sells_tackle ? "🎣 Tackle & rods" : null,
+          s.town || null,
+        ]
+          .filter(Boolean)
+          .join(" · "),
+        lat: s.lat,
+        lng: s.lng,
+        kind: "shop" as const,
+      }));
+    setResults([...shopHits, ...lakeHits]);
     setOpen(true);
 
     // Remote town/city search (debounced).
@@ -143,6 +183,10 @@ export default function MapSearch({
   const pick = (r: SearchResult) => {
     setOpen(false);
     setQ(r.name);
+    if (r.kind === "shop" && onSelectShop) {
+      onSelectShop(r.id.slice("shop:".length));
+      return;
+    }
     onSelect(r.lat, r.lng, r.name);
   };
 
@@ -157,7 +201,7 @@ export default function MapSearch({
         onFocus={() => {
           if (results.length > 0) setOpen(true);
         }}
-        placeholder="Search lake, town, city…"
+        placeholder="Search lake, town, shop…"
         className="w-full bg-white/95 backdrop-blur border border-pine/15 rounded-full pl-4 pr-4 py-2.5 text-sm font-semibold text-pine placeholder:text-pine/40 shadow-lg focus:outline-none focus:border-pine/40"
       />
       {open && (results.length > 0 || searching) && (

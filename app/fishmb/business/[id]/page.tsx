@@ -2,12 +2,15 @@
 
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useFishAuth } from "../../_components/FishAuth";
 import { fishFetch } from "../../_components/fishFetch";
 import { compressImage } from "../../_components/compressImage";
 import { FISHMB_TOKEN_KEY } from "@/lib/fishmb-constants";
+
+const SpotMap = dynamic(() => import("../../profile/_components/SpotMap"), { ssr: false });
 
 interface Biz {
   id: string;
@@ -18,6 +21,10 @@ interface Biz {
   contact: string;
   website: string | null;
   location: string | null;
+  lat: number | null;
+  lng: number | null;
+  sells_live_bait: boolean;
+  sells_tackle: boolean;
   owner_name?: string;
 }
 
@@ -26,7 +33,8 @@ export default function BusinessPage({ params }: { params: { id: string } }) {
   const [biz, setBiz] = useState<Biz | null>(null);
   const [missing, setMissing] = useState(false);
   const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState({ name: "", description: "", contact: "", website: "", location: "" });
+  const [form, setForm] = useState({ name: "", description: "", contact: "", website: "", location: "", sells_live_bait: false, sells_tackle: false });
+  const [pin, setPin] = useState<{ lat: number; lng: number } | null>(null);
   const [newFiles, setNewFiles] = useState<File[]>([]);
   const [saving, setSaving] = useState(false);
   const [note, setNote] = useState<string | null>(null);
@@ -41,7 +49,12 @@ export default function BusinessPage({ params }: { params: { id: string } }) {
           contact: d.business.contact ?? "",
           website: d.business.website ?? "",
           location: d.business.location ?? "",
+          sells_live_bait: d.business.sells_live_bait === true,
+          sells_tackle: d.business.sells_tackle === true,
         });
+        if (typeof d.business.lat === "number" && typeof d.business.lng === "number") {
+          setPin({ lat: d.business.lat, lng: d.business.lng });
+        }
       })
       .catch(() => setMissing(true));
   }, [params.id]);
@@ -81,7 +94,7 @@ export default function BusinessPage({ params }: { params: { id: string } }) {
       const d = await fishFetch(`/api/fishmb/business/${biz.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, photos }),
+        body: JSON.stringify({ ...form, photos, lat: pin?.lat ?? null, lng: pin?.lng ?? null }),
       });
       if ((d as { error?: string }).error) throw new Error((d as { error: string }).error);
       setBiz((d as { business: Biz }).business);
@@ -120,6 +133,16 @@ export default function BusinessPage({ params }: { params: { id: string } }) {
             {biz.name}
           </h1>
           {biz.location && <p className="text-pine/60 mt-2">{biz.location}</p>}
+          {(biz.sells_live_bait || biz.sells_tackle) && (
+            <div className="flex flex-wrap gap-2 mt-3">
+              {biz.sells_live_bait && (
+                <span className="bg-gold/20 border border-gold/50 text-pine text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">🪱 Sells live bait</span>
+              )}
+              {biz.sells_tackle && (
+                <span className="bg-pine/10 border border-pine/20 text-pine text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">🎣 Tackle & rods</span>
+              )}
+            </div>
+          )}
         </div>
         {isOwner && (
           <button
@@ -140,6 +163,65 @@ export default function BusinessPage({ params }: { params: { id: string } }) {
             <input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} maxLength={120} placeholder="Location" className={inputCls} />
           </div>
           <input value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} maxLength={300} placeholder="Website" className={inputCls} />
+          <div className="bg-paper-deep border border-pine/15 rounded-2xl px-4 py-4 space-y-3">
+            <p className="text-sm font-bold text-pine">Show up on the fishing map</p>
+            <p className="text-xs text-pine/55 -mt-2">Flip on what you sell and drop a pin — anglers will find you on the Maps bait &amp; tackle overlays.</p>
+            {(
+              [
+                { key: "sells_live_bait", label: "🪱 We sell live bait" },
+                { key: "sells_tackle", label: "🎣 We sell tackle & rods" },
+              ] as const
+            ).map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => setForm({ ...form, [t.key]: !form[t.key] })}
+                className="w-full flex items-center justify-between"
+                aria-pressed={form[t.key]}
+              >
+                <span className="text-sm font-bold text-pine">{t.label}</span>
+                <span className={`w-12 h-7 rounded-full p-1 transition-colors ${form[t.key] ? "bg-signal" : "bg-pine/15"}`}>
+                  <span className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${form[t.key] ? "translate-x-5" : ""}`} />
+                </span>
+              </button>
+            ))}
+            <div className="h-64 rounded-2xl overflow-hidden border border-pine/15 relative">
+              <SpotMap
+                fill
+                spots={[]}
+                picking
+                onPick={(lat, lng) => setPin({ lat, lng })}
+                pendingPin={pin}
+                focus={pin ? { lat: pin.lat, lng: pin.lng, key: "biz-pin", zoom: 13 } : null}
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.geolocation?.getCurrentPosition(
+                    (pos) => setPin({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                    () => setNote("Couldn't get your location — tap the map instead.")
+                  );
+                }}
+                className="bg-pine hover:bg-pine-deep text-white font-bold uppercase tracking-wider text-[11px] px-4 py-2 rounded-full transition-colors"
+              >
+                Use my location
+              </button>
+              {pin && (
+                <button
+                  type="button"
+                  onClick={() => setPin(null)}
+                  className="bg-white border border-pine/20 text-pine font-bold uppercase tracking-wider text-[11px] px-4 py-2 rounded-full"
+                >
+                  Remove pin
+                </button>
+              )}
+              <span className="text-[11px] text-pine/50">
+                {pin ? "Pin set — tap the map to move it." : "Tap the map where your shop is."}
+              </span>
+            </div>
+          </div>
           <label className="block bg-paper-deep border border-pine/15 rounded-2xl px-4 py-3 text-sm text-pine/70 cursor-pointer">
  {newFiles.length > 0 ? ` ${newFiles.length} new photo(s)` : " Add more photos"}
             <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => setNewFiles(Array.from(e.target.files ?? []))} />

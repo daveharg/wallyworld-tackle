@@ -40,6 +40,15 @@ export interface CatchPin {
   user_name: string;
 }
 
+export interface ShopPin {
+  id: string;
+  name: string;
+  lat: number;
+  lng: number;
+  sells_bait: boolean;
+  sells_tackle: boolean;
+}
+
 export type BasemapId = "streets" | "satellite";
 
 interface SpotMapProps {
@@ -71,6 +80,10 @@ interface SpotMapProps {
   catchPins?: CatchPin[];
   /** Fired when a catch pin is tapped — parent shows a detail sheet. */
   onCatchClick?: (pin: CatchPin) => void;
+  /** Bait / tackle shop pins for the shop overlays. */
+  shopPins?: ShopPin[];
+  /** Fired when a shop pin is tapped — parent shows the shop card. */
+  onShopClick?: (pin: ShopPin) => void;
   /** Base map style. */
   basemap?: BasemapId;
   /** Fired (debounced by Leaflet) whenever the map stops moving. */
@@ -132,6 +145,8 @@ export default function SpotMap({
   followDot = "dot-blue",
   catchPins,
   onCatchClick,
+  shopPins,
+  onShopClick,
   basemap = "streets",
   onMoveEnd,
   fill = false,
@@ -141,6 +156,8 @@ export default function SpotMap({
   onSpotClickRef.current = onSpotClick;
   const onCatchClickRef = useRef(onCatchClick);
   onCatchClickRef.current = onCatchClick;
+  const onShopClickRef = useRef(onShopClick);
+  onShopClickRef.current = onShopClick;
   const [map, setMap] = useState<any>(null);
   const [expanded, setExpanded] = useState(false);
   // Circular fill indicator shown at the press point during a long-press.
@@ -467,6 +484,49 @@ export default function SpotMap({
       cancelled = true;
     };
   }, [catchPins, map]);
+
+  // Shop overlay pins — bait shops in gold (🪱), tackle & rods in teal (🎣).
+  // A shop selling both wears the gold bait pin with a small 🎣 badge.
+  const shopLayerRef = useRef<any>(null);
+  useEffect(() => {
+    if (!map) return;
+    let cancelled = false;
+    (async () => {
+      const L = (await import("leaflet")).default;
+      if (cancelled) return;
+      shopLayerRef.current?.remove();
+      shopLayerRef.current = null;
+      const pins = shopPins ?? [];
+      if (pins.length === 0) return;
+      const layer = L.layerGroup();
+      for (const s of pins) {
+        const bg = s.sells_bait ? "#d97706" : "#0f766e";
+        const glyph = s.sells_bait ? "🪱" : "🎣";
+        const badge = s.sells_bait && s.sells_tackle
+          ? `<span style="position:absolute;right:-5px;bottom:-5px;width:16px;height:16px;border-radius:50%;background:#0f766e;border:2px solid white;display:flex;align-items:center;justify-content:center;font-size:9px;">🎣</span>`
+          : "";
+        const icon = L.divIcon({
+          className: "",
+          html: `<div style="position:relative;width:30px;height:30px;border-radius:50%;background:${bg};border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;font-size:15px;">${glyph}${badge}</div>`,
+          iconSize: [30, 30],
+          iconAnchor: [15, 15],
+        });
+        const marker = L.marker([s.lat, s.lng], { icon, zIndexOffset: 300 });
+        if (onShopClickRef.current) {
+          marker.on("click", () => onShopClickRef.current?.(s));
+        } else {
+          marker.bindPopup(`<strong>${escapeHtml(s.name)}</strong>`);
+        }
+        marker.addTo(layer);
+      }
+      if (cancelled) return;
+      layer.addTo(map);
+      shopLayerRef.current = layer;
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [shopPins, map]);
 
   // Live GPS person marker — follows you whenever we have a fix.
   // Single persistent marker (no duplicates): we reuse one Leaflet marker and

@@ -34,6 +34,12 @@ interface SettingsTabProps {
   onShowFriendCatchesChange: (v: boolean) => void;
   catchesWidgetOn: boolean;
   onCatchesWidgetChange: (v: boolean) => void;
+  shopsWidgetOn: boolean;
+  onShopsWidgetChange: (v: boolean) => void;
+  baitShopsOn: boolean;
+  onBaitShopsChange: (v: boolean) => void;
+  tackleShopsOn: boolean;
+  onTackleShopsChange: (v: boolean) => void;
   widgetBtnOn: boolean;
   onWidgetBtnChange: (v: boolean) => void;
   followDot: string;
@@ -90,6 +96,12 @@ export default function SettingsTab({
   onShowFriendCatchesChange,
   catchesWidgetOn,
   onCatchesWidgetChange,
+  shopsWidgetOn,
+  onShopsWidgetChange,
+  baitShopsOn,
+  onBaitShopsChange,
+  tackleShopsOn,
+  onTackleShopsChange,
   widgetBtnOn,
   onWidgetBtnChange,
   followDot,
@@ -308,6 +320,69 @@ export default function SettingsTab({
         </button>
         <p className="text-[11px] text-pine/45 mt-2">
           Quick switches for my / friends' / others' catches — drag it anywhere on the map.
+        </p>
+        <button
+          type="button"
+          onClick={() => onShopsWidgetChange(!shopsWidgetOn)}
+          className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3 mt-3"
+        >
+          <span className="text-sm font-bold text-pine">Shops widget</span>
+          <span
+            className={`w-12 h-7 rounded-full p-1 transition-colors ${
+              shopsWidgetOn ? "bg-signal" : "bg-pine/15"
+            }`}
+          >
+            <span
+              className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                shopsWidgetOn ? "translate-x-5" : ""
+              }`}
+            />
+          </span>
+        </button>
+        <p className="text-[11px] text-pine/45 mt-2">
+          Quick switches for the bait and tackle shop overlays — drag it anywhere on the map.
+        </p>
+        <button
+          type="button"
+          onClick={() => onBaitShopsChange(!baitShopsOn)}
+          className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3 mt-3"
+        >
+          <span className="text-sm font-bold text-pine">🪱 Bait shops overlay</span>
+          <span
+            className={`w-12 h-7 rounded-full p-1 transition-colors ${
+              baitShopsOn ? "bg-signal" : "bg-pine/15"
+            }`}
+          >
+            <span
+              className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                baitShopsOn ? "translate-x-5" : ""
+              }`}
+            />
+          </span>
+        </button>
+        <p className="text-[11px] text-pine/45 mt-2">
+          Gold pins for every shop that sells live bait — tap a pin for the shop's details.
+        </p>
+        <button
+          type="button"
+          onClick={() => onTackleShopsChange(!tackleShopsOn)}
+          className="w-full flex items-center justify-between bg-pine/5 rounded-2xl px-4 py-3 mt-3"
+        >
+          <span className="text-sm font-bold text-pine">🎣 Tackle & rods overlay</span>
+          <span
+            className={`w-12 h-7 rounded-full p-1 transition-colors ${
+              tackleShopsOn ? "bg-signal" : "bg-pine/15"
+            }`}
+          >
+            <span
+              className={`block w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                tackleShopsOn ? "translate-x-5" : ""
+              }`}
+            />
+          </span>
+        </button>
+        <p className="text-[11px] text-pine/45 mt-2">
+          Teal pins for tackle and rod retailers — a separate layer from bait shops.
         </p>
         <button
           type="button"

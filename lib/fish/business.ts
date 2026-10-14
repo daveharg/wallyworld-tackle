@@ -53,6 +53,12 @@ export async function ensureBusinessTables(): Promise<void> {
   await query(
     `CREATE INDEX IF NOT EXISTS fm_ads_slot_status_idx ON fm_ads(slot, status)`
   );
+  // Shop overlay fields: a business can pin itself on the map and flag what
+  // it sells (live bait / tackle & rods) for the Maps shop overlays.
+  await query(`ALTER TABLE fm_businesses ADD COLUMN IF NOT EXISTS lat double precision`);
+  await query(`ALTER TABLE fm_businesses ADD COLUMN IF NOT EXISTS lng double precision`);
+  await query(`ALTER TABLE fm_businesses ADD COLUMN IF NOT EXISTS sells_live_bait boolean NOT NULL DEFAULT false`);
+  await query(`ALTER TABLE fm_businesses ADD COLUMN IF NOT EXISTS sells_tackle boolean NOT NULL DEFAULT false`);
   ensured = true;
 }
 
@@ -75,6 +81,10 @@ export interface Business {
   contact: string;
   website: string | null;
   location: string | null;
+  lat: number | null;
+  lng: number | null;
+  sells_live_bait: boolean;
+  sells_tackle: boolean;
   created_at: string;
   owner_name?: string;
 }

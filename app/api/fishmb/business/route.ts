@@ -51,11 +51,15 @@ export async function POST(req: NextRequest) {
   const photos = Array.isArray(body.photos)
     ? body.photos.filter((p): p is string => typeof p === "string" && /^https?:\/\//.test(p)).slice(0, 8)
     : [];
+  const lat = typeof body.lat === "number" && body.lat >= -90 && body.lat <= 90 ? body.lat : null;
+  const lng = typeof body.lng === "number" && body.lng >= -180 && body.lng <= 180 ? body.lng : null;
+  const sellsLiveBait = body.sells_live_bait === true;
+  const sellsTackle = body.sells_tackle === true;
 
   const rows = await query(
-    `INSERT INTO fm_businesses (owner_user_id, name, description, photos, contact, website, location)
-     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-    [me.id, name, description, JSON.stringify(photos), contact, website, location]
+    `INSERT INTO fm_businesses (owner_user_id, name, description, photos, contact, website, location, lat, lng, sells_live_bait, sells_tackle)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *`,
+    [me.id, name, description, JSON.stringify(photos), contact, website, location, lat, lng, sellsLiveBait, sellsTackle]
   );
   return NextResponse.json({ business: rows[0] }, { status: 201 });
 }
