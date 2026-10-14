@@ -126,6 +126,17 @@ body:has(.fishmb-shell) {
   overscroll-behavior: none;
 }
 
+/* FishMB holdable surfaces (feed posts/comments, message bubbles) and the
+   hold menu itself: a long-press must open OUR menu only — kill iOS's
+   native text selection (handles) and the Copy / Look Up / Translate
+   callout. Descendants need it too or selection can start on child text. */
+.fm-noselect,
+.fm-noselect * {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+
 .font-display {
   font-family: var(--font-display), "Arial Narrow", sans-serif;
   letter-spacing: 0.02em;

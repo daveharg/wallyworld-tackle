@@ -244,8 +244,8 @@ function BubbleWrap({
   return (
     <div
       {...handlers}
-      style={{ ...style, WebkitTouchCallout: "none" }}
-      className={`${className ?? ""} transition-all duration-150 ${
+      style={style}
+      className={`fm-noselect ${className ?? ""} transition-all duration-150 ${
         active ? "scale-[1.03] shadow-2xl ring-2 ring-pine/30 relative z-10" : ""
       }`}
     >
@@ -1904,7 +1904,7 @@ export default function ThreadView({
                   </div>
                 ) : photo ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={photo} alt="Shared photo" className="rounded-2xl max-h-64 object-cover" loading="lazy" />
+                  <img src={photo} alt="Shared photo" draggable={false} className="rounded-2xl max-h-64 object-cover" loading="lazy" />
                 ) : (
                   <p
                     className="text-[17px] leading-snug whitespace-pre-wrap break-words"

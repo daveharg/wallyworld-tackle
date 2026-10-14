@@ -323,8 +323,7 @@ function Holdable({
   return (
     <div
       {...handlers}
-      style={{ WebkitTouchCallout: "none" }}
-      className={`rounded-3xl transition-all duration-150 ${
+      className={`fm-noselect rounded-3xl transition-all duration-150 ${
         active ? "scale-[1.015] shadow-2xl ring-2 ring-signal/50 relative z-20" : ""
       }`}
     >

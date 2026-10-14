@@ -102,6 +102,18 @@ export function useLongPress(
 
 const MENU_Z = 3200;
 
+/** iMessage-style frosted glass, shared by the reaction capsule and the
+ *  action card so the two read as one unit. The app is light-only
+ *  (globals.css: "Always light theme"), so one light variant serves
+ *  every surface the menu appears on. */
+const FROSTED: React.CSSProperties = {
+  background: "rgba(255,255,255,0.85)",
+  backdropFilter: "blur(20px) saturate(1.6)",
+  WebkitBackdropFilter: "blur(20px) saturate(1.6)",
+  border: "1px solid rgba(0,0,0,0.06)",
+  boxShadow: "0 12px 40px rgba(0,0,0,0.18)",
+};
+
 export function HoldMenu({
   anchor,
   reactions,
@@ -135,6 +147,8 @@ export function HoldMenu({
     const above = anchor.top - h - 10;
     const top =
       above >= 8 ? above : Math.min(anchor.bottom + 10, Math.max(8, vh - h - 8));
+    // Bloom open from the edge nearest the held item (iMessage-style).
+    card.style.transformOrigin = above >= 8 ? "50% 100%" : "50% 0%";
     setPos({ left, top });
   }, [anchor]);
 
@@ -156,15 +170,15 @@ export function HoldMenu({
 
   return (
     <div
-      className="fixed inset-0"
-      style={{ zIndex: MENU_Z }}
+      className="fixed inset-0 fm-noselect"
+      style={{ zIndex: MENU_Z, background: "rgba(0,0,0,0.10)" }}
       onClick={onClose}
       onContextMenu={(e) => e.preventDefault()}
     >
       <style>{`
         @keyframes fishmb-hold-in {
-          from { opacity: 0; transform: scale(.82) translateY(5px); }
-          to { opacity: 1; transform: scale(1) translateY(0); }
+          from { opacity: 0; transform: scale(.9); }
+          to { opacity: 1; transform: scale(1); }
         }
         @keyframes fishmb-emoji-in {
           from { opacity: 0; transform: translateY(10px) scale(.5); }
@@ -173,7 +187,7 @@ export function HoldMenu({
       `}</style>
       <div
         ref={cardRef}
-        className="fixed w-[320px] max-w-[calc(100vw-24px)]"
+        className="fixed w-[320px] max-w-[calc(100vw-24px)] fm-noselect"
         style={{
           left: pos?.left ?? -9999,
           top: pos?.top ?? -9999,
@@ -184,7 +198,10 @@ export function HoldMenu({
         onPointerDown={(e) => e.stopPropagation()}
       >
         {reactions.length > 0 && (
-          <div className="flex items-center justify-between bg-white rounded-full shadow-2xl border border-pine/10 px-2 py-1.5 mb-2">
+          <div
+            className="flex items-center justify-between rounded-full px-3 py-2 mb-2"
+            style={FROSTED}
+          >
             {reactions.map((r, i) => (
               <button
                 key={r.key}
@@ -207,7 +224,7 @@ export function HoldMenu({
           </div>
         )}
         {actions.length > 0 && (
-          <div className="bg-white rounded-3xl shadow-2xl border border-pine/10 overflow-hidden py-1.5">
+          <div className="rounded-[20px] overflow-hidden" style={FROSTED}>
             {actions.map((a, i) => (
               <button
                 key={`${a.label}-${i}`}
@@ -220,7 +237,10 @@ export function HoldMenu({
                   a.onSelect();
                   onClose();
                 }}
-                className={`w-full flex items-center gap-3 px-4 py-2.5 text-left text-[15px] font-semibold transition-colors hover:bg-pine/5 ${
+                style={{
+                  borderTop: i > 0 ? "1px solid rgba(0,0,0,0.06)" : undefined,
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-3 text-left text-[15px] font-semibold transition-colors hover:bg-pine/5 ${
                   a.danger || (a.confirmLabel && confirmIdx === i)
                     ? "text-red-600"
                     : "text-pine"

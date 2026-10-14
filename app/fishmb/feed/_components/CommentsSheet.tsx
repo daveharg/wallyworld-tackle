@@ -92,8 +92,7 @@ function CommentRow({
     <div className={depth > 0 ? "ml-12" : ""}>
       <div
         {...handlers}
-        style={{ WebkitTouchCallout: "none" }}
-        className={`flex gap-3 px-4 py-3 transition-all duration-150 ${
+        className={`fm-noselect flex gap-3 px-4 py-3 transition-all duration-150 ${
           active ? "scale-[1.02] bg-signal/5 rounded-2xl shadow-lg ring-1 ring-signal/40 relative z-10" : ""
         }`}
       >
@@ -101,6 +100,7 @@ function CommentRow({
           <img
             src={comment.avatar_url}
             alt=""
+            draggable={false}
             className="w-10 h-10 rounded-full object-cover shrink-0"
           />
         ) : (
@@ -121,7 +121,7 @@ function CommentRow({
           </p>
           {comment.photo_url && (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={comment.photo_url} alt="" className="mt-2 rounded-xl max-h-48 w-auto object-cover" />
+            <img src={comment.photo_url} alt="" draggable={false} className="mt-2 rounded-xl max-h-48 w-auto object-cover" />
           )}
           <ReactionChips chips={chips} onTap={(key) => onReact(comment, Number(key))} />
           <div className="flex items-center gap-4 mt-1.5">
