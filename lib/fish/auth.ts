@@ -12,6 +12,10 @@ import type { PoolClient } from "pg";
 export interface FishUser {
   id: string;
   google_sub: string;
+  /** Apple subject id once the user has signed in/linked with Apple, else null.
+   *  Apple-created accounts also carry google_sub = 'apple:' + sub as a
+   *  placeholder (google_sub stays the NOT NULL identity column). */
+  apple_sub: string | null;
   name: string;
   email: string | null;
   avatar_url: string | null;
@@ -59,6 +63,9 @@ export async function ensureProfileColumns(): Promise<void> {
   await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS age_confirmed boolean NOT NULL DEFAULT false`);
   // Terms acceptance recorded at signup.
   await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS terms_accepted boolean NOT NULL DEFAULT false`);
+  // Sign in with Apple: the stable Apple subject id, set when an account is
+  // created via Apple or a guest links Apple (POST /api/fish/auth/apple).
+  await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS apple_sub text`);
   // Admin moderation: suspended users can't post, comment, or message.
   await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS suspended boolean NOT NULL DEFAULT false`);
   await query(`ALTER TABLE fm_users ADD COLUMN IF NOT EXISTS suspended_at timestamptz`);
