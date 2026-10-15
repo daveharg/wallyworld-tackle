@@ -16,18 +16,8 @@ import {
   getSlots,
   setSlots,
   todayPlus,
+  validDate,
 } from "@/lib/fish/rentals";
-
-/** Strict YYYY-MM-DD real-calendar-date check. */
-export function validDate(s: unknown): s is string {
-  if (typeof s !== "string") return false;
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
-  if (!m) return false;
-  const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
-  if (mo < 1 || mo > 12 || d < 1 || d > 31) return false;
-  const dt = new Date(Date.UTC(y, mo - 1, d));
-  return dt.getUTCFullYear() === y && dt.getUTCMonth() === mo - 1 && dt.getUTCDate() === d;
-}
 
 export async function GET(
   req: NextRequest,

@@ -16,8 +16,8 @@ import {
   createBooking,
   datesInRange,
   getRentalBookingsForOwner,
+  validDate,
 } from "@/lib/fish/rentals";
-import { validDate } from "../slots/route";
 
 export async function GET(
   req: NextRequest,
