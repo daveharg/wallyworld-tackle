@@ -55,7 +55,9 @@ export interface JobWindow {
 export const JOB_WINDOWS: Record<string, JobWindow> = {
   // Dave's schedule (America/Winnipeg): weather 05:00 daily, video 07:00
   // daily, weekly content at 09:xx — tip Mon, ice Tue, hotspot Wed,
-  // lake Fri, lodge Sun (the tip job also runs the ads pass).
+  // lake Fri, lodge Sun (the tip job also runs the ads pass). Tech
+  // spotlight Thu: a weekly slot, but the job itself enforces biweekly
+  // spacing (13 days) in lib/fish/autopost-server.ts.
   weather: { hour: 5, weekdays: null },
   video: { hour: 7, weekdays: null },
   tip: { hour: 9, weekdays: [1] },
@@ -63,6 +65,7 @@ export const JOB_WINDOWS: Record<string, JobWindow> = {
   hotspot: { hour: 9, weekdays: [3] },
   lake: { hour: 9, weekdays: [5] },
   lodge: { hour: 9, weekdays: [0] },
+  tech: { hour: 9, weekdays: [4] },
 };
 
 /** True when `d` falls inside job's Winnipeg target window. */

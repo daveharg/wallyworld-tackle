@@ -727,7 +727,7 @@ function GrowthChart({ data }: { data: GrowthData | null }) {
 }
 
 interface AutopostJobRow {
-  job: "weather" | "video" | "tip" | "hotspot" | "lake" | "lodge" | "ice";
+  job: "weather" | "video" | "tip" | "hotspot" | "lake" | "lodge" | "ice" | "tech";
   name: string;
   schedule: string;
 }
@@ -740,6 +740,7 @@ const AUTOPOST_JOB_ROWS: AutopostJobRow[] = [
   { job: "hotspot", name: "🔥 Hot spot of the Week", schedule: "Wednesdays · ~9:00 AM (Winnipeg)" },
   { job: "lake", name: "🏞️ Featured lake", schedule: "Fridays · ~9:00 AM (Winnipeg)" },
   { job: "lodge", name: "🏕️ Featured lodge", schedule: "Sundays · ~9:00 AM (Winnipeg)" },
+  { job: "tech", name: "🔦 Fishing Tech Spotlight", schedule: "Thursdays · ~9:00 AM (Winnipeg) · every 2 weeks" },
 ];
 
 interface AutopostRunResult {

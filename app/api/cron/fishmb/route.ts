@@ -1,4 +1,4 @@
-// GET /api/cron/fishmb?job=weather|video|tip|hotspot|lake|lodge|ice|monitor
+// GET /api/cron/fishmb?job=weather|video|tip|hotspot|lake|lodge|ice|tech|monitor
 // (job=monitor is the admin-alerts backstop sweep — see lib/fish/admin-alerts.ts)
 //
 // Server-side FishMB auto-posts, triggered by Vercel Cron (see
@@ -82,7 +82,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const result = await runAutopostJob(job);
+    const result = await runAutopostJob(job, { force });
     return NextResponse.json({ ok: true, forced: force, ...result });
   } catch (err) {
     console.error(`[cron/fishmb] job ${job} failed:`, err);

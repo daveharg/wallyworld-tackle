@@ -26,6 +26,7 @@ import {
   snippetOf,
   type WeatherPayload,
 } from "./autopost-format";
+import { TECH_SPOTLIGHTS } from "./tech-spotlights";
 
 export type AutopostJob =
   | "weather"
@@ -34,7 +35,8 @@ export type AutopostJob =
   | "hotspot"
   | "lake"
   | "lodge"
-  | "ice";
+  | "ice"
+  | "tech";
 
 export const AUTOPOST_JOBS: AutopostJob[] = [
   "weather",
@@ -44,6 +46,7 @@ export const AUTOPOST_JOBS: AutopostJob[] = [
   "lake",
   "lodge",
   "ice",
+  "tech",
 ];
 
 // ---------------------------------------------------------------------------
@@ -677,7 +680,52 @@ export interface AutopostResult {
   log: string[];
 }
 
-export async function runAutopostJob(job: AutopostJob): Promise<AutopostResult> {
+// ---------------------------------------------------------------------------
+// Fishing Tech Spotlight (biweekly, curated — lib/fish/tech-spotlights.ts).
+// Server port of the retired VM script job (which had to fetch DATABASE_URL
+// out of the Vercel dashboard on every run). Editorial content is curated
+// and approved with Dave in advance; this job only decides WHEN the next
+// unpublished spotlight goes out.
+// ---------------------------------------------------------------------------
+
+/** True when a post whose body contains `marker` exists at any time. */
+async function everPosted(userId: string, marker: string): Promise<boolean> {
+  const rows = await query<{ id: string }>(
+    `SELECT id FROM fm_discussions
+      WHERE user_id = $1 AND body LIKE $2
+      LIMIT 1`,
+    [userId, `%${marker}%`]
+  );
+  return rows.length > 0;
+}
+
+async function techPost(
+  userId: string,
+  log: string[],
+  force: boolean
+): Promise<void> {
+  // Biweekly spacing on scheduled runs: nothing if a spotlight went out in
+  // the last 13 days. An admin Run now (force) may post early by Dave's
+  // call; the per-spotlight never-posted check below still applies, so the
+  // same spotlight can never be posted twice.
+  if (!force && (await alreadyPosted(userId, "%FISHING TECH SPOTLIGHT%", 13))) {
+    log.push("Tech spotlight: last one is less than 13 days old, skipping.");
+    return;
+  }
+  for (const entry of TECH_SPOTLIGHTS) {
+    if (entry.body == null) continue; // pre-server coverage anchor
+    const marker = `FISHING TECH SPOTLIGHT #${entry.n}:`;
+    if (await everPosted(userId, marker)) continue;
+    await postToFeed(userId, "TECH", entry.body, null, log);
+    return;
+  }
+  log.push("Tech spotlight: no unpublished spotlights in the rotation.");
+}
+
+export async function runAutopostJob(
+  job: AutopostJob,
+  opts?: { force?: boolean }
+): Promise<AutopostResult> {
   const userId = await ensureFishMBUser();
   const log: string[] = [];
   switch (job) {
@@ -702,6 +750,9 @@ export async function runAutopostJob(job: AutopostJob): Promise<AutopostResult> 
       break;
     case "ice":
       await icePost(userId, log);
+      break;
+    case "tech":
+      await techPost(userId, log, opts?.force === true);
       break;
   }
   for (const line of log) console.log(`[autopost:${job}] ${line}`);

@@ -155,6 +155,14 @@
     {
       "path": "/api/cron/fishmb?job=monitor",
       "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/fishmb?job=tech",
+      "schedule": "0 14 * * 4"
+    },
+    {
+      "path": "/api/cron/fishmb?job=tech",
+      "schedule": "0 15 * * 4"
     }
   ]
 }
