@@ -36,9 +36,12 @@ export function middleware(req: NextRequest) {
     return withFlag(NextResponse.next());
   }
   // Allow the internal app routes the demo needs (API, assets, auth callbacks).
+  // /.well-known/ carries the app-link files (apple-app-site-association) —
+  // Apple fetches them from fishmb.ca and will not follow the site redirect.
   if (
     pathname.startsWith("/api/") ||
     pathname.startsWith("/_next/") ||
+    pathname.startsWith("/.well-known/") ||
     pathname.startsWith("/fish-manitoba/") ||
     pathname === "/favicon.ico" ||
     pathname === "/robots.txt" ||

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTournament, getLeaderboard } from "@/lib/fish/tournaments";
@@ -10,6 +11,50 @@ import { formatDateTime } from "../../_components/formatDate";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 30;
+
+/**
+ * Share card for challenge links: when an angler shares a tournament,
+ * chat apps unfurl THIS page — the card carries the tournament's name,
+ * dates, species, entry fee and its cover photo (or the generated
+ * brand card from opengraph-image.tsx when it has no photo).
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  const t = await getTournament(params.id);
+  if (!t) return { title: "Tournament not found" };
+  const url = `https://www.fishmb.ca/fishmb/tournaments/${t.id}`;
+  const fee = t.entry_fee_cents ?? 0;
+  const description =
+    `${t.name} — a FishMB fishing tournament. ` +
+    `${formatDateTime(t.starts_at)} → ${formatDateTime(t.ends_at)} · ` +
+    `${t.species.join(", ") || "All species"}` +
+    (fee > 0
+      ? ` · Entry $${(fee / 100).toFixed(fee % 100 === 0 ? 0 : 2)}`
+      : " · Free entry") +
+    `. Tap to accept the challenge and join.`;
+  const image = t.cover_photo_url ?? `${url}/opengraph-image`;
+  return {
+    title: `${t.name} — FishMB tournament`,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title: `${t.name} | FishMB`,
+      description,
+      url,
+      type: "website",
+      images: [{ url: image, width: 1200, height: 630, alt: t.name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${t.name} | FishMB`,
+      description,
+      images: [image],
+    },
+  };
+}
 
 function scoringLabel(scoring: string, scoringCount: number | null): string {
   if (scoring === "heaviest") return "Biggest fish (heaviest)";
@@ -72,6 +117,30 @@ export default async function TournamentDetailPage({ params }: { params: { id: s
         {t.participant_count === 1 ? "angler" : "anglers"} · {formatDateTime(t.starts_at)} →{" "}
         {formatDateTime(t.ends_at)}
       </p>
+
+      {/* App landing — shared challenge links land on this page when
+          the app doesn't claim them (no app, older build, desktop).
+          With the app installed, the fishmb:// link jumps straight
+          to the tournament's Accept challenge screen. */}
+      <div className="bg-pine-deep rounded-3xl px-5 py-4 mt-4 flex flex-col sm:flex-row sm:items-center gap-3">
+        <p className="text-white font-bold text-sm flex-1">
+          🎣 Challenged? Fish this tournament in the FishMB app.
+        </p>
+        <div className="flex gap-2">
+          <a
+            href={`fishmb://tournaments/${t.id}?challenge=1`}
+            className="bg-gold text-pine-deep text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full text-center"
+          >
+            Open in the app
+          </a>
+          <Link
+            href="/fishmb/app"
+            className="border border-white/40 text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-full text-center"
+          >
+            Get the app
+          </Link>
+        </div>
+      </div>
       <div className="flex flex-wrap gap-2 mt-2">
         {t.photo_mode === "measure_only" && (
           <span className="text-xs font-bold uppercase tracking-wider text-pine bg-pine/10 rounded-full px-4 py-2">

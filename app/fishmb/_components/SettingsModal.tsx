@@ -421,6 +421,19 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
           <h3 className="text-xs font-black uppercase tracking-[0.14em] text-pine/45 mt-7 mb-3">
             Messaging backup
           </h3>
+          <p className="text-xs text-pine/65 leading-relaxed mb-2">
+            Your messages are locked so only you and the person you&apos;re
+            talking to can read them. This backup saves the keys your phone
+            uses for that, locked with a passphrase only you know. If you get a
+            new phone or reinstall the app, enter the passphrase and your
+            messaging picks up right where you left off.
+          </p>
+          <p className="text-xs text-pine/65 leading-relaxed mb-3">
+            Keep the passphrase somewhere safe. We can&apos;t recover it for
+            you — without it, the backup can&apos;t be opened by anyone,
+            including us. The copy stored on our server stays locked the whole
+            time.
+          </p>
           {!signalClient ? (
             <p className="text-xs text-pine/50 mb-2">Setting up encrypted messaging…</p>
           ) : (
@@ -502,11 +515,6 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
               {backupError && (
                 <p className="text-xs font-bold text-red-700 mb-2">{backupError}</p>
               )}
-              <p className="text-[11px] text-pine/40 leading-relaxed">
-                Your backup is encrypted with this passphrase — FishMB can&apos;t
-                read it or reset it. If you forget it, the backup can&apos;t be
-                recovered.
-              </p>
             </div>
           )}
 
