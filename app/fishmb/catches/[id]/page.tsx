@@ -73,6 +73,26 @@ export default function CatchDetailPage({ params }: { params: { id: string } }) 
       .catch(() => setMissing(true));
   }, [params.id]);
 
+  // Owner-only size editing (Dave: a catch's size must be changeable
+  // after logging, on web too). The PATCH route has always accepted
+  // length_in / weight_lb with the same validation as logging — this
+  // page simply never offered the fields. Ownership is ALSO enforced
+  // server-side (the UPDATE is scoped to the caller's rows), so this
+  // check only decides whether the editor renders.
+  const [meId, setMeId] = useState<string | null>(null);
+  const [editingSize, setEditingSize] = useState(false);
+  const [lenInput, setLenInput] = useState("");
+  const [wtInput, setWtInput] = useState("");
+  const [sizeSaving, setSizeSaving] = useState(false);
+  const [sizeError, setSizeError] = useState<string | null>(null);
+  const [sizeSaved, setSizeSaved] = useState(false);
+
+  useEffect(() => {
+    fishFetch("/api/fish/auth/me")
+      .then((d) => setMeId((d.user as { id?: string } | undefined)?.id ?? null))
+      .catch(() => setMeId(null));
+  }, []);
+
   if (missing) notFound();
   if (!c) {
     return (
@@ -100,6 +120,55 @@ export default function CatchDetailPage({ params }: { params: { id: string } }) 
   const windDirDeg = num("wind_dir_deg");
   const gustKph = num("wind_gust_kph");
   const code = num("code");
+
+  const isOwner = !!meId && meId === c.user_id;
+
+  const startEditSize = () => {
+    setLenInput(c.length_in ?? "");
+    setWtInput(c.weight_lb ?? "");
+    setSizeError(null);
+    setSizeSaved(false);
+    setEditingSize(true);
+  };
+
+  const saveSize = async () => {
+    // Same validation (and wording) as the PATCH route / logging:
+    // length is a positive number of inches up to 999; weight is
+    // optional — blank clears it — otherwise positive pounds to 999.
+    const l = Number(lenInput);
+    if (!Number.isFinite(l) || l <= 0 || l > 999) {
+      setSizeError("length_in must be a positive number of inches.");
+      return;
+    }
+    let wgt: number | null = null;
+    if (wtInput.trim() !== "") {
+      wgt = Number(wtInput);
+      if (!Number.isFinite(wgt) || wgt <= 0 || wgt > 999) {
+        setSizeError("weight_lb must be a positive number of pounds, or null.");
+        return;
+      }
+    }
+    setSizeSaving(true);
+    setSizeError(null);
+    try {
+      await fishFetch(`/api/fish/catches/${c.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ length_in: l, weight_lb: wgt }),
+      });
+      setC({
+        ...c,
+        length_in: String(Math.round(l * 100) / 100),
+        weight_lb: wgt == null ? null : String(Math.round(wgt * 100) / 100),
+      });
+      setEditingSize(false);
+      setSizeSaved(true);
+    } catch (e) {
+      setSizeError(e instanceof Error ? e.message : "Something went wrong.");
+    } finally {
+      setSizeSaving(false);
+    }
+  };
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 md:py-10">
@@ -141,6 +210,73 @@ export default function CatchDetailPage({ params }: { params: { id: string } }) 
         <Stat label="Visibility" value={c.visibility === "public" ? "Shared" : c.visibility === "friends" ? "Friends" : "Private"} />
         {c.personal_record && <Stat label="Personal best" value="Yes" />}
       </div>
+
+      {isOwner && !editingSize && (
+        <div className="mb-6 -mt-2 flex items-center gap-3">
+          <button
+            type="button"
+            onClick={startEditSize}
+            className="rounded-full border border-pine/20 bg-white px-4 py-2 text-xs font-bold uppercase tracking-wider text-pine hover:bg-paper-deep"
+          >
+            ✎ Edit size
+          </button>
+          {sizeSaved && <span className="text-sm font-semibold text-pine">Size saved ✓</span>}
+        </div>
+      )}
+
+      {isOwner && editingSize && (
+        <div className="bg-white border border-pine/10 rounded-3xl p-5 mb-6">
+          <h2 className="text-xs font-bold uppercase tracking-[0.18em] text-pine/55 mb-3">
+            Edit size
+          </h2>
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            <label className="block">
+              <span className="block text-xs font-bold text-pine/60 mb-1">Length (inches)</span>
+              <input
+                type="number"
+                inputMode="decimal"
+                min="0"
+                step="0.01"
+                value={lenInput}
+                onChange={(e) => setLenInput(e.target.value)}
+                className="w-full rounded-xl border border-pine/20 px-3 py-2 text-pine font-semibold"
+              />
+            </label>
+            <label className="block">
+              <span className="block text-xs font-bold text-pine/60 mb-1">Weight (lb, optional)</span>
+              <input
+                type="number"
+                inputMode="decimal"
+                min="0"
+                step="0.01"
+                value={wtInput}
+                onChange={(e) => setWtInput(e.target.value)}
+                placeholder="No weight"
+                className="w-full rounded-xl border border-pine/20 px-3 py-2 text-pine font-semibold"
+              />
+            </label>
+          </div>
+          {sizeError && <p className="text-sm font-semibold text-red-700 mb-3">{sizeError}</p>}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => void saveSize()}
+              disabled={sizeSaving}
+              className="rounded-full bg-signal hover:bg-signal-dark px-5 py-2 text-xs font-bold uppercase tracking-wider text-white disabled:opacity-50"
+            >
+              {sizeSaving ? "Saving…" : "Save size"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditingSize(false)}
+              disabled={sizeSaving}
+              className="rounded-full border border-pine/20 bg-white px-5 py-2 text-xs font-bold uppercase tracking-wider text-pine disabled:opacity-50"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {(c.note || c.feed_caption) && (
         <div className="bg-white border border-pine/10 rounded-3xl p-5 mb-6">
