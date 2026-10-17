@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>FishMB video player</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #000; height: 100%; overflow: hidden; }
+  #player { position: absolute; inset: 0; width: 100%; height: 100%; }
+  #msg {
+    position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+    color: #fff; font-family: -apple-system, system-ui, sans-serif; font-size: 15px;
+    text-align: center; padding: 24px;
+  }
+</style>
+</head>
+<body>
+<div id="player"></div>
+<div id="msg">This video can't be played here.</div>
+<script>
+  // FishMB in-app YouTube player page.
+  //
+  // Why this page exists (2026-10-16): YouTube rejects players that an
+  // app WebView injects as an HTML string (the feed showed "This video
+  // is unavailable — Error code: 152-4" on videos that embed fine
+  // everywhere else). Loading the player as a real page on fishmb.ca,
+  // exactly like the website's own embeds, gives the player the real
+  // origin + referrer YouTube requires. The app WebView loads this
+  // page by URL: /embed-yt.html?v=<videoId>&autoplay=1
+  //
+  // Player events are posted to the app (window.ReactNativeWebView)
+  // as JSON: { type: "yt-embed", state: "ready" | "playing" |
+  // "paused" | "ended" | "error", code?: number } so the app can
+  // swap in its "Watch on YouTube" fallback when YouTube refuses.
+  (function () {
+    var params = new URLSearchParams(location.search);
+    var id = params.get("v") || "";
+    var autoplay = params.get("autoplay") === "1";
+    var msg = document.getElementById("msg");
+
+    function post(state, code) {
+      try {
+        if (window.ReactNativeWebView) {
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({ type: "yt-embed", state: state, code: code || 0 })
+          );
+        }
+      } catch (e) { /* the page still plays standalone in a browser */ }
+    }
+
+    if (!/^[A-Za-z0-9_-]{11}$/.test(id)) {
+      msg.style.display = "flex";
+      post("error", -1);
+      return;
+    }
+
+    var tag = document.createElement("script");
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
+
+    window.onYouTubeIframeAPIReady = function () {
+      new YT.Player("player", {
+        width: "100%",
+        height: "100%",
+        videoId: id,
+        playerVars: {
+          autoplay: autoplay ? 1 : 0,
+          playsinline: 1,
+          rel: 0,
+          modestbranding: 1,
+          origin: "https://www.fishmb.ca"
+        },
+        events: {
+          onReady: function (e) {
+            post("ready");
+            if (autoplay) {
+              try { e.target.playVideo(); } catch (err) { /* user can tap YouTube's own play button */ }
+            }
+          },
+          onStateChange: function (e) {
+            if (e.data === YT.PlayerState.PLAYING) post("playing");
+            else if (e.data === YT.PlayerState.PAUSED) post("paused");
+            else if (e.data === YT.PlayerState.ENDED) post("ended");
+          },
+          onError: function (e) {
+            msg.style.display = "flex";
+            post("error", e.data || 0);
+          }
+        }
+      });
+    };
+  })();
+</script>
+</body>
+</html>
