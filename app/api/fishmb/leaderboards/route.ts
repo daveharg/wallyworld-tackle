@@ -10,7 +10,7 @@ import {
   getLeaderboard,
   getLeaderboardSpecies,
   LEADERBOARD_CATEGORIES,
-  type LeaderboardCategory,
+  type LegacyLeaderboardCategory,
 } from "@/lib/fish/leaderboards";
 
 export const dynamic = "force-dynamic";
@@ -19,10 +19,13 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const species = (searchParams.get("species") ?? "all").trim() || "all";
   const rawCat = (searchParams.get("category") ?? "biggest").trim();
-  const category: LeaderboardCategory = (
-    LEADERBOARD_CATEGORIES as string[]
+  // "best" stays answerable as a legacy shim for pre-2026-10-16 app
+  // builds (see lib/fish/leaderboards.ts) — it is not an offered
+  // category anywhere anymore.
+  const category: LegacyLeaderboardCategory = (
+    [...LEADERBOARD_CATEGORIES, "best"] as string[]
   ).includes(rawCat)
-    ? (rawCat as LeaderboardCategory)
+    ? (rawCat as LegacyLeaderboardCategory)
     : "biggest";
   const minLength = Math.min(
     Math.max(Number(searchParams.get("min_length")) || 20, 0),

@@ -59,7 +59,19 @@
     tag.src = "https://www.youtube.com/iframe_api";
     document.head.appendChild(tag);
 
+    // If the IFrame API itself never loads (dead network, blocked
+    // domain), say so — a silent black page would strand the app
+    // without its Watch on YouTube fallback.
+    var apiReady = false;
+    setTimeout(function () {
+      if (!apiReady) {
+        msg.style.display = "flex";
+        post("error", -2);
+      }
+    }, 9000);
+
     window.onYouTubeIframeAPIReady = function () {
+      apiReady = true;
       new YT.Player("player", {
         width: "100%",
         height: "100%",

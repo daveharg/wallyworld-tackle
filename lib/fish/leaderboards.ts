@@ -59,6 +59,16 @@ export function masterMinimum(species: string): number | null {
 
 export type LeaderboardCategory = "biggest" | "most" | "masters" | "above";
 
+/**
+ * Legacy shim: app builds shipped before 2026-10-16 still request the
+ * retired "best" (total inches) category. The option is eliminated
+ * from every UI and from LEADERBOARD_CATEGORIES, but the server keeps
+ * answering it correctly so those installs never show biggest-fish
+ * numbers under a "total inches" label. Remove once old builds are
+ * out of circulation.
+ */
+export type LegacyLeaderboardCategory = LeaderboardCategory | "best";
+
 export const LEADERBOARD_CATEGORIES: LeaderboardCategory[] = [
   "biggest",
   "most",
@@ -130,7 +140,7 @@ async function ensureAll() {
 
 export interface LeaderboardOptions {
   species?: string | null; // lowercase key, or null/"all"
-  category: LeaderboardCategory;
+  category: LegacyLeaderboardCategory;
   minLength?: number; // for "above"
 }
 
@@ -143,7 +153,16 @@ export async function getLeaderboard(opts: LeaderboardOptions): Promise<Leaderbo
   const joinUsers = `JOIN fm_users u ON u.id = ranked.user_id`;
 
   let body: string;
-  if (opts.category === "biggest") {
+  if (opts.category === "best") {
+    // Legacy shim branch (see LegacyLeaderboardCategory) — total
+    // qualifying inches, the retired category's original semantics.
+    body = `SELECT ranked.user_id, u.name AS user_name, u.avatar_url,
+                   SUM(ranked.len)::float AS value
+              FROM (SELECT user_id, len FROM capped) ranked
+              ${joinUsers}
+             GROUP BY ranked.user_id, u.name, u.avatar_url
+             ORDER BY value DESC LIMIT ${LIMIT}`;
+  } else if (opts.category === "biggest") {
     body = `SELECT ranked.user_id, u.name AS user_name, u.avatar_url,
                    ranked.len AS value, ranked.species, ranked.ts
               FROM (SELECT DISTINCT ON (user_id) user_id, len, species, ts
