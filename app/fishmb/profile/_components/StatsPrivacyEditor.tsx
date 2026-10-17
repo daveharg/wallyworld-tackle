@@ -12,7 +12,6 @@ const OPTIONS: [string, string][] = [
   ["species", "Species"],
   ["tournaments", "Tournaments"],
   ["wins", "Wins"],
-  ["posts", "Posts"],
   ["biggest", "Biggest fish"],
 ];
 

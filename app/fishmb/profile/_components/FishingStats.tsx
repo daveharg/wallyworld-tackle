@@ -82,7 +82,7 @@ export default function FishingStats({
     ["Species", stats.species_count, "species"],
     ["Tournaments", stats.tournaments_joined, "tournaments"],
     ["Wins", stats.tournament_wins, "wins"],
-    ["Posts", stats.posts_count, "posts"],
+    // Dave, 2026-10-16 late: no Posts number on the stats page.
   ];
   // Stats the angler hides from other people don't render as tiles for them.
   const visibleTiles = tiles.filter(
@@ -108,8 +108,6 @@ export default function FishingStats({
       case "tournaments":
       case "wins":
         return "/fishmb/dashboard?tab=tournaments";
-      case "posts":
-        return "/fishmb/dashboard?tab=profile";
       default:
         return null;
     }
@@ -128,8 +126,6 @@ export default function FishingStats({
         return "🏆";
       case "wins":
         return "🥇";
-      case "posts":
-        return "💬";
       default:
         return "•";
     }

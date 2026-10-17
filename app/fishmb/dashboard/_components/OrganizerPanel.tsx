@@ -880,7 +880,10 @@ export default function OrganizerPanel({ tournamentId, onBack }: { tournamentId:
                 try {
                   await navigator.share({
                     title: `Join ${t.name} on FishMB`,
-                    text: `You're invited to ${t.name} on FishMB!`,
+                    // Dave, 2026-10-16 late: lead with the creator's
+                    // name — in the organizer panel that's the
+                    // signed-in organizer viewing their tournament.
+                    text: `${user?.name ?? "A FishMB angler"} wants to challenge you to a fish off! Join ${t.name} on FishMB:`,
                     url,
                   });
                 } catch {

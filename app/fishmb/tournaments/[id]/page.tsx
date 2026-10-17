@@ -14,9 +14,10 @@ export const revalidate = 30;
 
 /**
  * Share card for challenge links: when an angler shares a tournament,
- * chat apps unfurl THIS page — the card carries the tournament's name,
- * dates, species, entry fee and its cover photo (or the generated
- * brand card from opengraph-image.tsx when it has no photo).
+ * chat apps unfurl THIS page — the card carries the creator's
+ * challenge line, the tournament's name, dates, species, entry fee
+ * and its cover photo (or the static Lake Winnipeg brand card,
+ * public/fishmb/og-challenge.jpg, when it has no photo).
  */
 export async function generateMetadata({
   params,
@@ -27,15 +28,24 @@ export async function generateMetadata({
   if (!t) return { title: "Tournament not found" };
   const url = `https://www.fishmb.ca/fishmb/tournaments/${t.id}`;
   const fee = t.entry_fee_cents ?? 0;
+  // Dave, 2026-10-16 late: the share card leads with the creator's
+  // name — "{name} wants to challenge you to a fish off".
   const description =
-    `${t.name} — a FishMB fishing tournament. ` +
+    `${t.organizer_name} wants to challenge you to a fish off! ` +
+    `${t.name} · ` +
     `${formatDateTime(t.starts_at)} → ${formatDateTime(t.ends_at)} · ` +
     `${t.species.join(", ") || "All species"}` +
     (fee > 0
       ? ` · Entry $${(fee / 100).toFixed(fee % 100 === 0 ? 0 : 2)}`
       : " · Free entry") +
     `. Tap to accept the challenge and join.`;
-  const image = t.cover_photo_url ?? `${url}/opengraph-image`;
+  // Fallback card: a real Lake Winnipeg sunset with the FishMB band
+  // (public/fishmb/og-challenge.jpg). The old generated card
+  // (opengraph-image.tsx) 500'd in production — its image route
+  // crashed on a font fetch — leaving shares with NO photo at all
+  // (Dave flagged it 2026-10-16); the route is removed and this
+  // static card replaces it.
+  const image = t.cover_photo_url ?? "https://www.fishmb.ca/fishmb/og-challenge.jpg";
   return {
     title: `${t.name} — FishMB tournament`,
     description,
