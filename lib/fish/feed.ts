@@ -5,6 +5,7 @@
 
 import { query, queryOne } from "./db";
 import {
+  ensureModerationTables,
   findObjectionable,
   OBJECTIONABLE_ERROR,
   hiddenAuthorIds,
@@ -542,6 +543,15 @@ export async function ensureStoryTables(): Promise<void> {
   )`);
   await query(`CREATE INDEX IF NOT EXISTS fm_stories_user_idx ON fm_stories(user_id)`);
   await query(`CREATE INDEX IF NOT EXISTS fm_stories_expires_idx ON fm_stories(expires_at)`);
+  // Per-user story hides: these hide only stories, unlike fm_blocks,
+  // which blocks the angler everywhere.
+  await query(`CREATE TABLE IF NOT EXISTS fm_story_blocks (
+    blocker_id uuid NOT NULL REFERENCES fm_users(id) ON DELETE CASCADE,
+    blocked_id uuid NOT NULL REFERENCES fm_users(id) ON DELETE CASCADE,
+    created_at timestamptz NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (blocker_id, blocked_id)
+  )`);
+  await query(`CREATE INDEX IF NOT EXISTS fm_story_blocks_blocker_idx ON fm_story_blocks(blocker_id)`);
   await query(`CREATE TABLE IF NOT EXISTS fm_story_views (
     story_id uuid NOT NULL REFERENCES fm_stories(id) ON DELETE CASCADE,
     viewer_id uuid NOT NULL REFERENCES fm_users(id) ON DELETE CASCADE,
@@ -587,19 +597,71 @@ export interface StoryItem {
   media_url: string;
   media_type: string;
   caption: string | null;
+  is_public: boolean;
   created_at: string;
   viewed: boolean;
   overlays: StoryOverlay[];
   zoom: number;
 }
 
-/** Stories from friends + followed users (+ own), newest first, unexpired. Reels excluded. */
+export interface StoryBlockedUser {
+  id: string;
+  name: string;
+  avatar_url: string | null;
+  blocked_at: string;
+}
+
+/** Hide one angler's stories from the blocker (stories only — this is
+ *  not a full fm_blocks block). */
+export async function blockStories(blockerId: string, blockedId: string): Promise<void> {
+  await ensureStoryTables();
+  await query(
+    `INSERT INTO fm_story_blocks (blocker_id, blocked_id) VALUES ($1, $2)
+     ON CONFLICT DO NOTHING`,
+    [blockerId, blockedId]
+  );
+}
+
+export async function unblockStories(blockerId: string, blockedId: string): Promise<void> {
+  await ensureStoryTables();
+  await query(`DELETE FROM fm_story_blocks WHERE blocker_id = $1 AND blocked_id = $2`, [
+    blockerId,
+    blockedId,
+  ]);
+}
+
+export async function listStoryBlocks(blockerId: string): Promise<StoryBlockedUser[]> {
+  await ensureStoryTables();
+  return query<StoryBlockedUser>(
+    `SELECT u.id, u.name, u.avatar_url, sb.created_at AS blocked_at
+       FROM fm_story_blocks sb
+       JOIN fm_users u ON u.id = sb.blocked_id
+      WHERE sb.blocker_id = $1
+      ORDER BY sb.created_at DESC`,
+    [blockerId]
+  );
+}
+
+/** Stories for a viewer: own + friends + followed, plus stories the
+ *  author marked public for any signed-in viewer. Story-hidden authors
+ *  and full blocks in either direction are excluded. Signed-out viewers
+ *  keep the previous behaviour. Reels excluded. */
 export async function getStories(viewerId: string | null): Promise<StoryItem[]> {
   await ensureStoryTables();
   await ensureFollowTables();
+  if (viewerId) await ensureModerationTables();
+  const signedInAudience = viewerId ? "OR s.is_public" : "";
+  const signedInExclusions = viewerId
+    ? `AND NOT EXISTS (SELECT 1 FROM fm_story_blocks sb
+                        WHERE sb.blocker_id = $1::uuid
+                          AND sb.blocked_id = s.user_id)
+       AND NOT EXISTS (SELECT 1 FROM fm_blocks b
+                        WHERE (b.blocker_id = $1::uuid AND b.blocked_id = s.user_id)
+                           OR (b.blocker_id = s.user_id AND b.blocked_id = $1::uuid))`
+    : "";
   const rows = await query<StoryItem & { created_at: string }>(
     `SELECT s.id, s.user_id, u.name AS user_name, u.avatar_url,
-            s.media_url, s.media_type, s.caption, s.created_at, s.overlays, s.zoom, s.volume,
+            s.media_url, s.media_type, s.caption, s.is_public, s.created_at, s.overlays, s.zoom, s.volume,
             EXISTS(SELECT 1 FROM fm_story_views v
                     WHERE v.story_id = s.id AND v.viewer_id = $1::uuid) AS viewed
        FROM fm_stories s
@@ -608,12 +670,14 @@ export async function getStories(viewerId: string | null): Promise<StoryItem[]> 
         AND (s.expires_at IS NULL OR s.expires_at > NOW())
         AND ($1::uuid IS NULL
              OR s.user_id = $1::uuid
+             ${signedInAudience}
              OR EXISTS (SELECT 1 FROM fm_friendships f
                         WHERE f.status = 'accepted'
                           AND ((f.requester_id = $1::uuid AND f.addressee_id = s.user_id)
                             OR (f.requester_id = s.user_id AND f.addressee_id = $1::uuid)))
              OR EXISTS (SELECT 1 FROM fm_follows fo
                         WHERE fo.follower_id = $1::uuid AND fo.followee_id = s.user_id))
+        ${signedInExclusions}
       ORDER BY s.created_at DESC
       LIMIT 100`,
     [viewerId]
@@ -626,7 +690,7 @@ export async function getReels(userId: string): Promise<StoryItem[]> {
   await ensureStoryTables();
   const rows = await query<StoryItem & { created_at: string }>(
     `SELECT s.id, s.user_id, u.name AS user_name, u.avatar_url,
-            s.media_url, s.media_type, s.caption, s.created_at, s.overlays, s.zoom, s.volume,
+            s.media_url, s.media_type, s.caption, s.is_public, s.created_at, s.overlays, s.zoom, s.volume,
             false AS viewed
        FROM fm_stories s
        JOIN fm_users u ON u.id = s.user_id
