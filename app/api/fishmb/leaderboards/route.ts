@@ -2,7 +2,7 @@
 //
 // Query params:
 //   species: lowercase species key, or "all" (default)
-//   category: best | biggest | most | masters | above (default best)
+//   category: biggest | most | masters | above (default biggest)
 //   min_length: inches threshold for the "above" category (default 20)
 
 import { NextResponse } from "next/server";
@@ -18,12 +18,12 @@ export const dynamic = "force-dynamic";
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const species = (searchParams.get("species") ?? "all").trim() || "all";
-  const rawCat = (searchParams.get("category") ?? "best").trim();
+  const rawCat = (searchParams.get("category") ?? "biggest").trim();
   const category: LeaderboardCategory = (
     LEADERBOARD_CATEGORIES as string[]
   ).includes(rawCat)
     ? (rawCat as LeaderboardCategory)
-    : "best";
+    : "biggest";
   const minLength = Math.min(
     Math.max(Number(searchParams.get("min_length")) || 20, 0),
     120

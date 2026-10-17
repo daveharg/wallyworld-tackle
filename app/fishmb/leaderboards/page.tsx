@@ -1,4 +1,4 @@
-// FishMB species leaderboards — best fishers, biggest fish, most fish,
+// FishMB species leaderboards — biggest fish, most fish,
 // most Master Anglers, and above-average fish, all with the 4-biggest-per-day
 // anti-farming rule.
 
@@ -9,10 +9,9 @@ import Link from "next/link";
 import { fishFetch } from "../_components/fishFetch";
 import BackButton from "../_components/BackButton";
 
-type Category = "best" | "biggest" | "most" | "masters" | "above";
+type Category = "biggest" | "most" | "masters" | "above";
 
 const CATEGORIES: { key: Category; icon: string; label: string; unit: string }[] = [
- { key: "best", icon: "", label: "Best fishers", unit: "total inches" },
  { key: "biggest", icon: "", label: "Biggest fish", unit: "inches" },
  { key: "most", icon: "", label: "Most fish", unit: "fish" },
  { key: "masters", icon: "", label: "Most Masters", unit: "masters" },
@@ -54,7 +53,7 @@ function Avatar({ name, url }: { name: string; url: string | null }) {
 
 export default function LeaderboardsPage() {
   const [species, setSpecies] = useState("all");
-  const [category, setCategory] = useState<Category>("best");
+  const [category, setCategory] = useState<Category>("biggest");
   const [minLength, setMinLength] = useState(20);
   const [rows, setRows] = useState<Row[]>([]);
   const [tabs, setTabs] = useState<SpeciesTab[]>([]);
@@ -253,7 +252,7 @@ export default function LeaderboardsPage() {
               </div>
               <span className="text-right shrink-0">
                 <span className="font-display font-bold text-pine text-xl">
-                  {category === "best" || category === "biggest"
+                  {category === "biggest"
                     ? `${Number(r.value).toFixed(1)}″`
                     : Math.round(r.value)}
                 </span>

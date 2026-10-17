@@ -57,10 +57,9 @@ export function masterMinimum(species: string): number | null {
   return MINIMUM_LOOKUP.get(species.trim().toLowerCase()) ?? null;
 }
 
-export type LeaderboardCategory = "best" | "biggest" | "most" | "masters" | "above";
+export type LeaderboardCategory = "biggest" | "most" | "masters" | "above";
 
 export const LEADERBOARD_CATEGORIES: LeaderboardCategory[] = [
-  "best",
   "biggest",
   "most",
   "masters",
@@ -71,7 +70,7 @@ export interface LeaderboardRow {
   user_id: string;
   user_name: string;
   avatar_url: string | null;
-  /** inches for best/biggest, fish count for most/masters/above */
+  /** inches for biggest, fish count for most/masters/above */
   value: number;
   /** biggest: the species + ISO date of the personal-best fish */
   extra?: { species: string; date: string | null };
@@ -144,14 +143,7 @@ export async function getLeaderboard(opts: LeaderboardOptions): Promise<Leaderbo
   const joinUsers = `JOIN fm_users u ON u.id = ranked.user_id`;
 
   let body: string;
-  if (opts.category === "best") {
-    body = `SELECT ranked.user_id, u.name AS user_name, u.avatar_url,
-                   SUM(ranked.len)::float AS value
-              FROM (SELECT user_id, len FROM capped) ranked
-              ${joinUsers}
-             GROUP BY ranked.user_id, u.name, u.avatar_url
-             ORDER BY value DESC LIMIT ${LIMIT}`;
-  } else if (opts.category === "biggest") {
+  if (opts.category === "biggest") {
     body = `SELECT ranked.user_id, u.name AS user_name, u.avatar_url,
                    ranked.len AS value, ranked.species, ranked.ts
               FROM (SELECT DISTINCT ON (user_id) user_id, len, species, ts
