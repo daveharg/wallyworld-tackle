@@ -420,7 +420,7 @@ const FEATURE_PROMOS = [
     img: "/fishmb/promos/maps.jpg",
  badge: " My Maps",
     title: "Your secret spots, on your private map",
-    body: "Mark honey holes with a long-press, keep lake notes on depths and patterns, and flip to depth contours when they land. Only you can see them.",
+    body: "Mark honey holes with a long-press, keep lake notes on depths and patterns. Only you can see them.",
     cta: "Explore my maps",
     href: "/fishmb/maps",
   },
@@ -596,7 +596,7 @@ function FeedSignupWall({ onJoin }: { onJoin: () => void }) {
     {
  icon: "",
       title: "Private maps & spots",
-      text: "Save your secret spots on the map with lake contours. They stay private unless you share them with friends.",
+      text: "Save your secret spots on the map. They stay private unless you share them with friends.",
     },
     {
  icon: "",

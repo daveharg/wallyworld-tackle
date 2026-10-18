@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import Link from "next/link";
-import ContoursToggle from "../../_components/ContoursToggle";
 
 export interface MapLake {
   id: string;
@@ -81,7 +80,6 @@ export function LakeMap({ lakes }: { lakes: MapLake[] }) {
 
   return (
     <div className="rounded-3xl overflow-hidden border border-pine/10 shadow-sm relative">
-      <ContoursToggle />
       <div ref={containerRef} className="h-[320px] md:h-[420px] w-full z-0" />
       <p className="text-xs text-pine/50 px-4 py-2.5 bg-white">
         {lakes.length === 1 ? (

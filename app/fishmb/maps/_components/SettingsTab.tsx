@@ -131,7 +131,6 @@ export default function SettingsTab({
   const [addLakeId, setAddLakeId] = useState("");
   const [addingLake, setAddingLake] = useState(false);
   const [selectedFav, setSelectedFav] = useState("");
-  const [showContoursSoon, setShowContoursSoon] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -203,18 +202,13 @@ export default function SettingsTab({
             [
               { id: "satellite", label: "Satellite" },
               { id: "streets", label: "Streets" },
-              { id: "contours", label: "Contours" },
             ] as const
           ).map((b) => (
             <button
               key={b.id}
               type="button"
               onClick={() => {
-                if (b.id === "contours") {
-                  setShowContoursSoon(true);
-                } else {
-                  onBasemapChange(b.id);
-                }
+                onBasemapChange(b.id);
               }}
               className={`flex-1 py-2 rounded-full text-[13px] font-bold transition-colors ${
                 basemap === b.id ? "bg-white text-pine shadow" : "text-pine/50"
@@ -224,12 +218,6 @@ export default function SettingsTab({
             </button>
           ))}
         </div>
-        {showContoursSoon && (
-          <p className="text-[11px] text-pine/55 mt-2 bg-pine/5 rounded-2xl px-4 py-3">
-            Depth contours are coming with the FishMB mobile app (Garmin
-            Navionics). Your spots will work on both views.
-          </p>
-        )}
       </div>
       <Section icon="" title="Catches on map" sub="Show your catches and public catches from other anglers as pins on the map.">
         <button

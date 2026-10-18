@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import "leaflet/dist/leaflet.css";
-import ContoursToggle from "../../_components/ContoursToggle";
 import { fishFetch } from "../../_components/fishFetch";
 import { SPOT_ICON_CHOICES, spotIconHtml, spotIconSize } from "./spotIcons";
 import { haversineM, formatDist } from "./geo";
@@ -990,7 +989,6 @@ export default function SpotMap({
           ← Back
         </button>
       )}
-      {!fill && <ContoursToggle />}
       {/* Long-press circular fill indicator */}
       {pressRing && (
         <div

@@ -77,7 +77,7 @@ const SECTIONS = [
   {
     icon: "🗺️",
     title: "Fishing Maps & Your Spots",
-    text: "An interactive map of Manitoba's lakes. Press and hold to drop a spot, save spots from right where you're standing, keep private notes on any lake, and toggle the contours layer where chart data exists. Your spots are private by default — or send one to a friend in a message and they can save it as their own. When the FishMB app lands, Garmin Navionics depth contours join the map: bring your own Navionics account and pay Garmin directly — FishMB never touches chart money.",
+    text: "An interactive map of Manitoba's lakes. Press and hold to drop a spot, save spots from right where you're standing, keep private notes on any lake. Your spots are private by default — or send one to a friend in a message and they can save it as their own.",
     href: "/fishmb/maps",
     cta: "Open maps",
   },
