@@ -107,7 +107,7 @@ export default async function SharePage({ params }: { params: { id: string } }) 
             href="/fishmb/app"
             className="block text-center text-pine/60 font-bold text-sm mt-3"
           >
-            Get the app
+            App coming soon
           </Link>
         </div>
       </div>

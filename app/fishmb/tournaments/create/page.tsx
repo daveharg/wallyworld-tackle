@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-/** Legacy tournament create page — now built into the HQ tournaments tab. */
-export default function CreateTournamentPage() {
-  redirect("/fishmb/dashboard?tab=tournaments");
+/** Tournaments are off the web app (Dave, 2026-11-15) — see ../page.tsx. */
+export default function TournamentCreatePage() {
+  redirect("/fishmb/home");
 }

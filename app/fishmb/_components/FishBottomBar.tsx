@@ -25,12 +25,6 @@ const iconProps = {
 };
 
 const ICONS = {
-  feed: (
-    <svg {...iconProps}>
-      <path d="M4 5.5h16v13H4z" />
-      <path d="M4 10h16M9 10v8.5" />
-    </svg>
-  ),
   inbox: (
     <svg {...iconProps}>
       <path d="M4 6.5h16v10H9l-5 4v-4H4v-10Z" />
@@ -65,49 +59,21 @@ const ACTION_ICON_PROPS = {
 };
 
 const ACTION_ICONS = {
-  catch: (
-    <svg {...ACTION_ICON_PROPS}>
-      <path d="M5.5 12c2.6-3.8 6.2-5.7 10.3-5.7 3 0 5.4 2.4 6 5.7-.6 3.3-3 5.7-6 5.7-4.1 0-7.7-1.9-10.3-5.7Z" />
-      <path d="M5.5 12 2.5 9.2v5.6L5.5 12Z" />
-      <circle cx="16.8" cy="11" r="0.9" fill="#12322b" stroke="none" />
-    </svg>
-  ),
-  post: (
-    <svg {...ACTION_ICON_PROPS}>
-      <rect x="3" y="7.5" width="18" height="12.5" rx="2.5" />
-      <path d="M8.5 7.5 10 5h4l1.5 2.5" />
-      <circle cx="12" cy="13.5" r="3.5" />
-    </svg>
-  ),
   dashboard: (
     <svg {...ACTION_ICON_PROPS}>
       <path d="M4 4v16h16" />
       <path d="M8.5 16v-4.5M13 16V8M17.5 16v-2.5" />
     </svg>
   ),
-  trophy: (
-    <svg {...ACTION_ICON_PROPS}>
-      <path d="M8 4h8v4.5a4 4 0 0 1-8 0V4Z" />
-      <path d="M8 5.5H5a3.5 3.5 0 0 0 3.7 3.5M16 5.5h3a3.5 3.5 0 0 1-3.7 3.5" />
-      <path d="M12 12.5v3M8.8 20h6.4M10 15.5h4" />
-    </svg>
-  ),
 };
 
+// Feed and Tournaments came off the web app (Dave, 2026-11-15) — the +
+// menu now leads with Angler HQ only.
 const PLUS_ACTIONS = [
-  { href: "/fishmb/feed?log=catch", icon: ACTION_ICONS.catch, label: "Log a catch" },
-  { href: "/fishmb/feed?compose=1", icon: ACTION_ICONS.post, label: "Share a post" },
   { href: "/fishmb/dashboard", icon: ACTION_ICONS.dashboard, label: "Angler HQ" },
-  { href: "/fishmb/dashboard?tab=tournaments", icon: ACTION_ICONS.trophy, label: "Tournaments" },
 ];
 
 const LEFT: Item[] = [
-  {
-    href: "/fishmb/feed",
-    label: "Feed",
-    icon: ICONS.feed,
-    match: (p) => p === "/fishmb/feed" || p === "/fishmb",
-  },
   {
     href: "/fishmb/messages",
     label: "Inbox",
