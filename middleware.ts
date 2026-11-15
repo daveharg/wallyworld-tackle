@@ -1,20 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * fishmb.ca routing (Dave, 2026-11-15) — fishmb.ca's home is the MAIN
- * WEBSITE's home screen, not the FishMB app page:
- * - fishmb.ca/ → the Wallyworld Tackle storefront home page (exactly what
- *   wallyworldtackle.ca/ serves, full store chrome — no x-fishmb-site flag)
- * - fishmb.ca/app → the FishMB app landing page (fishmb-coming-soon),
- *   reachable by link only (the storefront home links here: "Get the app")
+ * fishmb.ca routing (Dave, corrected 2026-11-15) — fishmb.ca is the FishMB
+ * site, completely separate from the Wallyworld store:
+ * - fishmb.ca/ → the FishMB webapp's home screen (/fishmb/home — the same
+ *   page wallyworldtackle.ca/fishmb/home serves, FishMB chrome)
+ * - fishmb.ca/app, fishmb.ca/fishmb/app → the FishMB app features landing
+ *   page (fishmb-coming-soon), reachable by link only — never the home
  * - fishmb.ca/demo, fishmb.ca/demo/* → the full FishMB app (/fishmb, /fishmb/*)
  * - everything else on fishmb.ca → redirect to /
- * - all other hosts → unchanged (wallyworldtackle.ca serves store + /fishmb)
+ * - all other hosts → unchanged (wallyworldtackle.ca serves store + /fishmb;
+ *   its /fishmb/app stays the plain coming-soon note page)
  *
- * FishMB app responses carry x-fishmb-site: 1 so the root layout can
+ * Every fishmb.ca response carries x-fishmb-site: 1 so the root layout can
  * skip the Wallyworld store chrome (usePathname sees the pre-rewrite URL,
- * so the layout can't rely on the path alone). The storefront home at /
- * deliberately does NOT carry the flag — it renders with the store chrome.
+ * so the layout can't rely on the path alone).
  */
 export function middleware(req: NextRequest) {
   const host = req.headers.get("host") ?? "";
@@ -28,13 +28,21 @@ export function middleware(req: NextRequest) {
 
   const { pathname } = req.nextUrl;
   if (pathname === "/") {
-    // The main website's home screen: the storefront home page (app/page.tsx),
-    // same as wallyworldtackle.ca/. No rewrite, no x-fishmb-site flag — the
-    // root layout wraps it in the full Wallyworld store chrome.
-    return NextResponse.next();
+    // fishmb.ca's home screen is the FishMB webapp's home (/fishmb/home) —
+    // the exact same page wallyworldtackle.ca/fishmb/home serves, rendered
+    // with FishMB chrome (flagged rewrite, same pattern as the old
+    // coming-soon rewrite).
+    return withFlag(NextResponse.rewrite(new URL("/fishmb/home", req.url)));
   }
   if (pathname === "/app") {
-    // The FishMB app landing page — link-only, never the fishmb.ca home.
+    // The FishMB app features landing page — link-only, never the home.
+    return withFlag(NextResponse.rewrite(new URL("/fishmb-coming-soon", req.url)));
+  }
+  if (pathname === "/fishmb/app") {
+    // fishmb.ca ONLY: the webapp header's "App coming soon" button points at
+    // /fishmb/app — open the app features landing page (the "click a link
+    // to look at the app" path). On wallyworldtackle.ca this middleware
+    // returns early above, so /fishmb/app stays the plain note page there.
     return withFlag(NextResponse.rewrite(new URL("/fishmb-coming-soon", req.url)));
   }
   if (pathname === "/demo" || pathname.startsWith("/demo/")) {

@@ -105,30 +105,6 @@ export default async function HomePage() {
 
       <PromoBand />
 
-      {/* FishMB app — the store home's one link to look at the app (Dave, 2026-11-15) */}
-      <section className="max-w-7xl mx-auto px-4 mt-12 md:mt-16">
-        <div className="rounded-2xl bg-pine-deep text-white p-8 md:p-10 flex flex-col md:flex-row md:items-center gap-6">
-          <div className="flex-1">
-            <p className="text-gold text-xs font-bold uppercase tracking-[0.24em] mb-1.5">
-              The FishMB App
-            </p>
-            <h2 className="font-display font-bold uppercase text-3xl md:text-4xl tracking-wide mb-2">
-              Manitoba&apos;s fishing app
-            </h2>
-            <p className="text-white/70 max-w-2xl">
-              Bite scores, lake maps, fish measuring, tournaments and your whole
-              fishing circle — one app for Manitoba anglers.
-            </p>
-          </div>
-          <a
-            href="https://fishmb.ca/app"
-            className="inline-block shrink-0 bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-sm px-8 py-3.5 rounded-full transition-colors text-center"
-          >
-            Get the app
-          </a>
-        </div>
-      </section>
-
       <WalleyeCombos />
 
       <CategoryTiles />
