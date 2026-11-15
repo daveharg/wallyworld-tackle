@@ -8,6 +8,7 @@ import { FishLoginButton, useFishAuth } from "./FishAuth";
 const NAV = [
   { href: "/fishmb/home", label: "Home" },
   { href: "/fishmb/lakes", label: "Lakes" },
+  { href: "/fishmb/fish", label: "Fish" },
   { href: "/fishmb/lodges", label: "Lodges & Guides" },
   { href: "/fishmb/regulations", label: "Regulations" },
   { href: "/fishmb/hot-lakes", label: "Hot Lakes" },

@@ -20,6 +20,7 @@ async function fishmbSitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     },
     { url: `${FISHMB_BASE}/fishmb/lakes`, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${FISHMB_BASE}/fishmb/fish`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${FISHMB_BASE}/fishmb/hot-lakes`, changeFrequency: "daily", priority: 0.7 },
     { url: `${FISHMB_BASE}/fishmb/lodges`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${FISHMB_BASE}/fishmb/leaderboards`, changeFrequency: "daily", priority: 0.7 },
@@ -47,9 +48,15 @@ async function fishmbSitemap(): Promise<MetadataRoute.Sitemap> {
     );
     let species: MetadataRoute.Sitemap = [];
     try {
-      const { getSpeciesAdvice, slugifySpecies } = await import("../lib/fishmb-species");
-      species = getSpeciesAdvice().map((s) => ({
-        url: `${FISHMB_BASE}/fishmb/species/${slugifySpecies(s.species)}`,
+      const { slugifySpecies } = await import("../lib/fishmb-species");
+      // Every species recorded in the lake catalogue has a page under
+      // /fishmb/species/<slug> (the Fish tab) — not just the advice species.
+      const names = new Set<string>();
+      for (const l of (data.lakes ?? []) as { species: string[] }[]) {
+        for (const s of l.species) names.add(s);
+      }
+      species = Array.from(names).map((name) => ({
+        url: `${FISHMB_BASE}/fishmb/species/${slugifySpecies(name)}`,
         changeFrequency: "monthly" as const,
         priority: 0.6,
       }));
