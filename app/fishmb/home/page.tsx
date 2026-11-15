@@ -5,7 +5,6 @@ import HSlider, { SectionHeading } from "../_components/HSlider";
 import { LakeCard, LodgeCard, HotLakeCard } from "../_components/Cards";
 import { LoginCtaSection } from "../_components/LoginCta";
 import { SpeciesLakes, type SpeciesTab } from "../_components/SpeciesLakes";
-import { CommunityBox } from "../_components/CommunityBox";
 import { RegsSearch } from "../_components/RegsSearch";
 import {
   getHotLakes,
@@ -66,108 +65,6 @@ export default async function FishMBHome() {
         </p>
       </div>
       <HomepageBannerAd />
-
-      {/* Run your own tournament — first section */}
-      <section className="bg-paper-deep border-b border-pine/10">
-        <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
-          <p className="text-signal font-bold uppercase tracking-[0.28em] text-sm mb-3">
-            Organizers
-          </p>
-          <h2 className="font-display font-bold uppercase text-pine text-3xl md:text-4xl tracking-wide mb-4">
-            Run your own fishing tournament
-          </h2>
-          <p className="text-pine/65 max-w-3xl mb-8">
-            Set up a catch-photo tournament in minutes — for your club, your
-            lake, or a full licensed event with hundreds of anglers. No entry
-            caps, no platform cut. Fish any lake in Manitoba, or lock your
-            event to specific waters. And every catch is verified before it
-            touches the leaderboard:
-          </p>
-          <div className="flex gap-3 mb-8">
-            <Link
-              href="/fishmb/dashboard?tab=tournaments"
-              className="flex-1 sm:flex-none text-center bg-signal hover:bg-signal-dark text-white font-bold uppercase tracking-wider text-xs sm:text-sm px-5 py-2.5 sm:px-7 sm:py-3.5 rounded-full transition-colors"
-            >
-              Create a tournament
-            </Link>
-            <Link
-              href="/fishmb/tournaments"
-              className="flex-1 sm:flex-none text-center border border-pine/25 text-pine hover:bg-pine/5 font-bold uppercase tracking-wider text-xs sm:text-sm px-5 py-2.5 sm:px-7 sm:py-3.5 rounded-full transition-colors"
-            >
-              Browse tournaments
-            </Link>
-            <Link
-              href="/fishmb/tournaments/how-it-works"
-              className="flex-1 sm:flex-none text-center border border-pine/25 text-pine hover:bg-pine/5 font-bold uppercase tracking-wider text-xs sm:text-sm px-5 py-2.5 sm:px-7 sm:py-3.5 rounded-full transition-colors"
-            >
-              Learn more
-            </Link>
-          </div>
-
-          {/* Feature boxes — one scrollable row */}
-          <HSlider>
-            {[
-              [
- "",
-                "Phone timestamp is official",
-                "The catch is stamped with the phone's clock the moment the picture is taken — on the website or in the app, even with no service. A catch made inside your tournament window counts even if it uploads hours later. The app snaps photos in-app only; every website entry passes organizer review.",
-              ],
-              [
- "",
-                "GPS on every catch",
-                "Coordinates are stamped with each photo and shown to you on a map. Catches outside Manitoba are rejected automatically.",
-              ],
-              [
- "",
-                "Your waters, your boundaries",
-                "Set the tournament for any lake — or a list of lakes. Want a specific bay or stretch? Pull the full list of catches with their GPS pins and enforce your own boundaries.",
-              ],
-              [
- "",
-                "Duplicate detection",
-                "The same photo submitted twice — by anyone — gets flagged for your review.",
-              ],
-              [
- "",
-                "Organizer review",
-                "You approve every catch before it hits the leaderboard, and can disqualify with one tap.",
-              ],
-              [
- "",
-                "Log it at the boat",
-                "Photo, GPS and timestamp are captured offline — the camera roll can't be used, so every entry is the real moment.",
-              ],
-              [
- "⏱",
-                "Stamped when taken",
-                "The official catch time is the phone's timestamp at the shutter, not when it uploads.",
-              ],
-              [
- "",
-                "Syncs itself",
-                "Entries upload on their own when service returns. The leaderboard fills in as anglers come back online.",
-              ],
-              [
- "",
-                "Full-screen leaderboard",
-                "Put the live board on a TV or projector at weigh-in — it refreshes itself, and anyone can open it on their phone.",
-              ],
-            ].map(([icon, title, body]) => (
-              <div
-                key={title}
-                className="snap-start shrink-0 w-[260px] md:w-[300px] bg-white rounded-2xl border border-pine/10 p-5 flex flex-col"
-              >
-                <p className="text-2xl mb-2">{icon}</p>
-                <h3 className="font-bold text-pine text-sm uppercase tracking-wide mb-1.5">{title}</h3>
-                <p className="text-pine/60 text-sm">{body}</p>
-              </div>
-            ))}
-          </HSlider>
-        </div>
-      </section>
-
-      {/* Community — right below the tournament section */}
-      <CommunityBox />
 
       {/* Upcoming tournaments */}
       {tournaments.length > 0 && (
