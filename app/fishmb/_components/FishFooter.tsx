@@ -23,6 +23,7 @@ export default function FishFooter() {
             <li><Link href="/fishmb/lodges" className="text-white/70 hover:text-white">Lodges &amp; guides</Link></li>
             <li><Link href="/fishmb/regulations" className="text-white/70 hover:text-white">Fishing regulations</Link></li>
             <li><Link href="/fishmb/hot-lakes" className="text-white/70 hover:text-white">Hot lakes</Link></li>
+            <li><a href="https://bumpboard.ca" className="text-white/70 hover:text-white">Bump Board</a></li>
           </ul>
         </div>
         <div>

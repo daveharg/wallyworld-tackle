@@ -229,6 +229,19 @@ export default function FishMBHome() {
           </a>
         </div>
 
+        <div className="mt-12 text-left">
+          <h3 className="font-display font-bold uppercase tracking-[0.2em] text-gold text-sm mb-4">
+            Also try
+          </h3>
+          <p className="text-white/60 text-sm leading-relaxed">
+            Our Canada-wide fishing log app: full species guides, lake maps,
+            bite times.{" "}
+            <a href="https://bumpboard.ca" className="text-signal font-bold underline">
+              Bump Board — A Full Canadian Fishing App
+            </a>
+          </p>
+        </div>
+
         <div className="mt-16 pt-8 border-t border-white/10">
           <p className="text-white/40 text-sm">
             FishMB — Manitoba fishing, together.

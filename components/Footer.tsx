@@ -26,6 +26,7 @@ const ABOUT_LINKS = [
   { label: "Our Story", href: "/our-story" },
   { label: "Dave's Picks", href: "/#walleye-combos" },
   { label: "Wallyworld Rewards", href: "/#newsletter" },
+  { label: "Bump Board — A Full Canadian Fishing App", href: "https://bumpboard.ca" },
 ];
 
 const UTILITY = [
